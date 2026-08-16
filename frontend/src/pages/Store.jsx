@@ -52,6 +52,11 @@ export default function Store({ onNavigate }) {
   const [purchaseOrders, setPurchaseOrders] = useState([])
   const [activePoDetails, setActivePoDetails] = useState(null)
   const [selectedPoLineId, setSelectedPoLineId] = useState('')
+  const [inwardBatchMode, setInwardBatchMode] = useState(false)
+  const [batchInwardQtys, setBatchInwardQtys] = useState({})
+  const [batchSaving, setBatchSaving] = useState(false)
+  const [inwardMatSearch, setInwardMatSearch] = useState('')
+  const [inwardMatDropOpen, setInwardMatDropOpen] = useState(false)
   const [searchLot, setSearchLot] = useState('')
   const [lotTraceData, setLotTraceData] = useState([])
   const [lotSearched, setLotSearched] = useState(false)
@@ -368,6 +373,7 @@ export default function Store({ onNavigate }) {
     if (!poIdentifier) {
       setActivePoDetails(null)
       setSelectedPoLineId('')
+      setBatchInwardQtys({})
       return
     }
     try {
@@ -388,17 +394,28 @@ export default function Store({ onNavigate }) {
           remarks: `Auto-populated from PO ${poNum}`
         }
 
-        if (po.items && po.items.length === 1) {
-          const item = po.items[0]
-          const remainingQty = Math.max(0, parseFloat(item.qty || 0) - parseFloat(item.received_qty || 0)) || parseFloat(item.qty || 0)
-          updated.material_id = String(item.material_id)
-          updated.in_qty = remainingQty ? remainingQty.toString() : ''
-          updated.unit_price = item.unit_price ? item.unit_price.toString() : ''
-          updated.gst_pct = Number(item.gst_pct ?? 18)
-          updated.bin_location = item.binLocation || ''
-          setSelectedPoLineId(String(item.id))
-        } else if (po.items && po.items.length > 1) {
-          setSelectedPoLineId('')
+        // Initialize batch quantities with pending balances
+        const batchInit = {}
+        if (po.items && po.items.length) {
+          po.items.forEach(it => {
+            const rem = Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0))
+            batchInit[it.id] = {
+              in_qty: rem > 0 ? String(rem) : '',
+              batch_number: '',
+              bin_location: it.binLocation || ''
+            }
+          })
+          setBatchInwardQtys(batchInit)
+
+          // Pick the first item with pending balance (or item 0)
+          const firstPending = po.items.find(it => Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0)) > 0) || po.items[0]
+          const remainingQty = Math.max(0, parseFloat(firstPending.qty || 0) - parseFloat(firstPending.received_qty || 0))
+          updated.material_id = String(firstPending.material_id)
+          updated.in_qty = remainingQty > 0 ? remainingQty.toString() : (firstPending.qty ? String(firstPending.qty) : '')
+          updated.unit_price = firstPending.unit_price ? firstPending.unit_price.toString() : ''
+          updated.gst_pct = Number(firstPending.gst_pct ?? 18)
+          updated.bin_location = firstPending.binLocation || ''
+          setSelectedPoLineId(String(firstPending.id))
         }
 
         setInwardForm(updated)
@@ -411,19 +428,83 @@ export default function Store({ onNavigate }) {
 
   // Handle line item pick for multi-item PO
   const handleSelectPoLineItem = (lineItemId) => {
-    setSelectedPoLineId(lineItemId)
+    setSelectedPoLineId(String(lineItemId))
     if (!activePoDetails || !lineItemId) return
     const item = activePoDetails.items?.find(it => String(it.id) === String(lineItemId))
     if (item) {
-      const remainingQty = Math.max(0, parseFloat(item.qty || 0) - parseFloat(item.received_qty || 0)) || parseFloat(item.qty || 0)
+      const remainingQty = Math.max(0, parseFloat(item.qty || 0) - parseFloat(item.received_qty || 0))
       setInwardForm(prev => ({
         ...prev,
         material_id: String(item.material_id),
-        in_qty: remainingQty ? remainingQty.toString() : '',
+        in_qty: remainingQty > 0 ? remainingQty.toString() : (item.qty ? String(item.qty) : ''),
         unit_price: item.unit_price ? item.unit_price.toString() : '',
         gst_pct: Number(item.gst_pct ?? 18),
-        bin_location: item.binLocation || prev.bin_location
+        bin_location: item.binLocation || prev.bin_location,
+        remarks: `Auto-populated from PO ${activePoDetails.po_number || activePoDetails.poNumber} — ${item.materialName || item.description || ''}`
       }))
+    }
+  }
+
+  // Batch Inward submit for multi-item PO
+  const handleCreateBatchInward = async (e) => {
+    if (e) e.preventDefault()
+    if (!activePoDetails || !activePoDetails.items?.length) return
+    const validLines = []
+    for (const it of activePoDetails.items) {
+      const q = parseFloat(batchInwardQtys[it.id]?.in_qty || 0)
+      if (q > 0) {
+        validLines.push({
+          material_id: it.material_id,
+          in_qty: q,
+          unit_price: parseFloat(it.unit_price) || 0,
+          bin_location: batchInwardQtys[it.id]?.bin_location || it.binLocation || '',
+          batch_number: batchInwardQtys[it.id]?.batch_number || '',
+          quality_status: inwardForm.quality_status || 'Accepted',
+          remarks: inwardForm.remarks || `Batch PO inward ${activePoDetails.po_number || activePoDetails.poNumber}`
+        })
+      }
+    }
+    if (!validLines.length) {
+      addToast('Please enter at least one line quantity greater than 0', 'warning')
+      return
+    }
+    setBatchSaving(true)
+    try {
+      const payload = {
+        inward_type: 'grn',
+        reference_type: 'PO',
+        reference_id: activePoDetails.po_number || activePoDetails.poNumber,
+        vendor_id: activePoDetails.vendor_id,
+        vendor_name: activePoDetails.vendorName,
+        quality_status: inwardForm.quality_status || 'Accepted',
+        remarks: inwardForm.remarks || `Batch PO Inward`,
+        items: validLines
+      }
+      const r = await fetch(`${API}/store/inward`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(payload)
+      }).then(res => res.json())
+      setBatchSaving(false)
+      if (r.success) {
+        addToast(r.message || 'Batch inward recorded successfully', 'success')
+        setInwardModal(false)
+        setInwardForm({
+          material_id: '', in_qty: '', unit_price: '', gst_pct: 18, inward_type: 'grn',
+          reference_type: 'PO', reference_id: '', vendor_id: '', vendor_name: '', bin_location: '',
+          batch_number: '', quality_status: 'Accepted', remarks: ''
+        })
+        setActivePoDetails(null)
+        setSelectedPoLineId('')
+        setBatchInwardQtys({})
+        loadInward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to record batch inward', 'error')
+      }
+    } catch (err) {
+      setBatchSaving(false)
+      addToast('Error saving batch inward: ' + err.message, 'error')
     }
   }
 
@@ -1229,18 +1310,37 @@ export default function Store({ onNavigate }) {
         </div>
       )}
 
-      {/* ── MODAL: FAST INWARD (GRN) ── */}
+      {/* ── MODAL: FAST INWARD (GRN / RETURN) ── */}
       {inwardModal && (
         <div style={S.overlay}>
-          <div style={{ ...S.modal, maxWidth: 680 }}>
-            <div style={S.modalHdr}>
+          <div style={{ ...S.modal, maxWidth: activePoDetails ? 1020 : 720, maxHeight: '92vh', overflowY: 'auto', padding: 24 }}>
+            
+            {/* Modal Header & Multi-Agent Status */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, borderBottom: '1px solid #e7e6df', paddingBottom: 12 }}>
               <div>
-                <b>📥 Fast Inward Entry (GRN / Return)</b>
-                <div style={S.muted}>Direct stock addition with live ledger recording</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <b style={{ fontSize: 18, color: '#1b1b1d' }}>📥 Fast Inward Entry (GRN / Return)</b>
+                  <span style={{ ...S.badge, background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}>
+                    Live Stock Addition
+                  </span>
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                  Direct stock addition with atomic ledger recording & PO synchronization
+                </div>
               </div>
-              <button style={S.x} onClick={() => setInwardModal(false)}>✕</button>
+
+              {/* Multi-Agent Status Pill */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600, color: '#166534', display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+                  ⚡ Ledger & PO Agent: Active
+                </div>
+                <button style={S.x} onClick={() => setInwardModal(false)}>✕</button>
+              </div>
             </div>
-            <form onSubmit={handleCreateInward} style={S.form}>
+
+            {/* Inward Type & Document Reference */}
+            <div style={{ background: '#f8fafc', padding: 14, borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 16 }}>
               <div style={S.grid2}>
                 <div>
                   <label style={S.label}>Inward Type *</label>
@@ -1282,165 +1382,342 @@ export default function Store({ onNavigate }) {
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Multi-Item PO Enclosed Line Items Picker */}
-              {activePoDetails && activePoDetails.items && activePoDetails.items.length > 1 && (
-                <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', padding: '10px 14px', borderRadius: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0f766e', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
-                    <span>📦 Enclosed PO Line Items ({activePoDetails.items.length} items)</span>
-                    <span style={{ fontWeight: 500, color: '#0d9488' }}>Select item to auto-populate:</span>
-                  </div>
-                  <select
-                    style={{ ...S.select, background: '#fff', fontWeight: 600, borderColor: '#0d9488' }}
-                    value={selectedPoLineId}
-                    onChange={e => handleSelectPoLineItem(e.target.value)}
-                  >
-                    <option value="">-- Choose item line from this PO --</option>
-                    {activePoDetails.items.map(it => {
-                      const rem = Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0))
-                      return (
-                        <option key={it.id} value={it.id}>
-                          {it.materialName || it.description} [{it.materialCode || it.material_id}] — Ordered: {it.qty} {it.uom} | Recv: {it.received_qty || 0} | Bal: {rem} {it.uom} @ ₹{it.unit_price} (GST: {it.gst_pct}%)
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
-              )}
-
-              <div>
-                <label style={S.label}>Select Material *</label>
-                <select style={S.select} value={inwardForm.material_id} onChange={e => {
-                  const m = mats.find(x => String(x.id) === String(e.target.value))
-                  setInwardForm({
-                    ...inwardForm,
-                    material_id: e.target.value,
-                    unit_price: m?.unit_price || '',
-                    bin_location: m?.binLocation || m?.bin_location || ''
-                  })
-                }} required>
-                  <option value="">-- Choose Material (1,075 catalog items) --</option>
-                  {mats.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.name} [{m.code}] { (m.poCount || m.po_count) ? `[${m.poCount || m.po_count} POs]` : '' } (Stock: {m.current_stock || m.currentStock || 0} {m.uom})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.4fr', gap: 12 }}>
-                <div>
-                  <label style={S.label}>Inward Quantity *</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <input type="number" step="0.001" style={S.input} placeholder="0.000" value={inwardForm.in_qty} onChange={e => setInwardForm({ ...inwardForm, in_qty: e.target.value })} required />
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#8a8a90' }}>{selectedInwardMat?.uom || 'NOS'}</span>
-                  </div>
-                </div>
-                <div>
-                  <label style={S.label}>Unit Price (₹)</label>
-                  <input type="number" step="0.01" style={S.input} placeholder="₹ 0.00" value={inwardForm.unit_price} onChange={e => setInwardForm({ ...inwardForm, unit_price: e.target.value })} />
-                </div>
-                <div>
-                  <label style={S.label}>GST Slab %</label>
-                  <select style={S.select} value={Number(inwardForm.gst_pct ?? 18)} onChange={e => setInwardForm({ ...inwardForm, gst_pct: Number(e.target.value) })}>
-                    {GST_SLABS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {inwardForm.in_qty && inwardForm.unit_price && (() => {
-                const taxable = Number(inwardForm.in_qty) * Number(inwardForm.unit_price)
-                const gstPct = Number(inwardForm.gst_pct ?? 18)
-                const tax = (taxable * gstPct) / 100
-                const total = taxable + tax
-                return (
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 14px', borderRadius: 8, fontSize: 12 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                      <div><span style={{ color: '#64748b' }}>Taxable Base:</span> <b style={{ display: 'block', marginTop: 2 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                      <div><span style={{ color: '#64748b' }}>CGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                      <div><span style={{ color: '#64748b' }}>SGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                      <div><span style={{ color: '#166534', fontWeight: 700 }}>Grand Total:</span> <b style={{ color: '#0f766e', fontSize: 13, display: 'block', marginTop: 2 }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+            {/* ═══════ TOTAL PO CONTENT BREAKDOWN & LINE ITEM PICKER ═══════ */}
+            {activePoDetails && activePoDetails.items && activePoDetails.items.length > 0 && (
+              <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', padding: 16, borderRadius: 10, marginBottom: 16 }}>
+                
+                {/* PO Header Summary Card */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, borderBottom: '1px solid #ccfbf1', paddingBottom: 12, marginBottom: 12 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: '#0f766e' }}>
+                        📦 PO Contents: {activePoDetails.po_number || activePoDetails.poNumber}
+                      </span>
+                      <span style={{ background: '#ccfbf1', color: '#0f766e', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>
+                        {activePoDetails.status}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#134e4a', marginTop: 3 }}>
+                      Vendor: <strong>{activePoDetails.vendorName}</strong> {activePoDetails.vendorCode ? `(${activePoDetails.vendorCode})` : ''} · Total Value: <strong>₹{Number(activePoDetails.grand_total || activePoDetails.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
                     </div>
                   </div>
-                )
-              })()}
 
-              <div style={S.grid2}>
-                <div>
-                  {inwardForm.inward_type === 'return' ? (
-                    <>
-                      <label style={S.label}>Returning Department *</label>
-                      <select
-                        style={S.select}
-                        value={inwardForm.department_id || ''}
-                        onChange={e => setInwardForm({ ...inwardForm, department_id: e.target.value })}
-                        required
-                      >
-                        <option value="">-- Select Returning Department --</option>
-                        {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                      </select>
-                    </>
-                  ) : (
-                    <>
-                      <label style={S.label}>Vendor / Supplier Name</label>
-                      <select style={S.input}
-                        value={vendorPickMode === 'other' ? '__other__' : inwardForm.vendor_id}
-                        onChange={e => {
-                          if (e.target.value === '__other__') {
-                            setVendorPickMode('other')
-                            setInwardForm({ ...inwardForm, vendor_id: '', vendor_name: '' })
-                          } else {
-                            const v = vendors.find(vv => String(vv.id) === e.target.value)
-                            setVendorPickMode('list')
-                            setInwardForm({ ...inwardForm, vendor_id: e.target.value, vendor_name: v ? v.name : '' })
-                          }
-                        }}>
-                        <option value="">-- Select registered vendor --</option>
-                        {vendors.map(v => (
-                          <option key={v.id} value={v.id}>
-                            {v.name} ({v.poCount || v.po_count || 0} POs)
-                          </option>
-                        ))}
-                        <option value="__other__">Other / Direct-OEM (type name below)</option>
-                      </select>
-                      {vendorPickMode === 'other' && (
-                        <input style={{ ...S.input, marginTop: 6 }} placeholder="e.g. SKF India / Voith / Shell (not in master vendor list)"
-                          value={inwardForm.vendor_name} onChange={e => setInwardForm({ ...inwardForm, vendor_name: e.target.value })} />
-                      )}
-                    </>
-                  )}
+                  {/* Mode Toggle: Single Item vs Batch Multi-Item */}
+                  <div style={{ display: 'flex', gap: 6, background: '#e6fffa', padding: 3, borderRadius: 8, border: '1px solid #99f6e4' }}>
+                    <button
+                      type="button"
+                      onClick={() => setInwardBatchMode(false)}
+                      style={{
+                        padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                        background: !inwardBatchMode ? '#0f766e' : 'transparent',
+                        color: !inwardBatchMode ? '#ffffff' : '#0f766e'
+                      }}
+                    >
+                      ⚡ Single Item Inward
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInwardBatchMode(true)}
+                      style={{
+                        padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                        background: inwardBatchMode ? '#0f766e' : 'transparent',
+                        color: inwardBatchMode ? '#ffffff' : '#0f766e'
+                      }}
+                    >
+                      📦 Batch Multi-Item Inward
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <label style={S.label}>Target Rack / Bin Location</label>
-                  <input style={S.input} placeholder="e.g. Rack 2, Box 4" value={inwardForm.bin_location} onChange={e => setInwardForm({ ...inwardForm, bin_location: e.target.value })} />
+
+                {/* Line Items Table */}
+                <div style={{ overflowX: 'auto', background: '#ffffff', borderRadius: 8, border: '1px solid #ccfbf1' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: '#f0fdfa', borderBottom: '1px solid #ccfbf1', textAlign: 'left', color: '#0f766e', fontWeight: 700 }}>
+                        <th style={{ padding: '8px 10px', width: 30 }}>#</th>
+                        <th style={{ padding: '8px 10px' }}>Material & Specification</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Ordered</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Received</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Balance</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Unit Rate</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'center' }}>GST%</th>
+                        {inwardBatchMode ? (
+                          <th style={{ padding: '8px 10px', width: 140 }}>Inward Qty</th>
+                        ) : (
+                          <th style={{ padding: '8px 10px', textAlign: 'center', width: 130 }}>Action</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activePoDetails.items.map((it, idx) => {
+                        const ord = parseFloat(it.qty || 0)
+                        const rec = parseFloat(it.received_qty || 0)
+                        const rem = Math.max(0, ord - rec)
+                        const isSelected = String(selectedPoLineId) === String(it.id)
+                        const isFulfilled = rem === 0
+
+                        return (
+                          <tr
+                            key={it.id || idx}
+                            onClick={() => {
+                              if (!inwardBatchMode) handleSelectPoLineItem(it.id)
+                            }}
+                            style={{
+                              borderBottom: '1px solid #f0fdf4',
+                              cursor: !inwardBatchMode ? 'pointer' : 'default',
+                              background: isSelected && !inwardBatchMode ? '#ccfbf1' : (isFulfilled ? '#f8fafc' : '#ffffff'),
+                              transition: 'background 0.15s ease'
+                            }}
+                          >
+                            <td style={{ padding: '8px 10px', fontWeight: 700, color: '#64748b' }}>{idx + 1}</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <div style={{ fontWeight: 600, color: '#1b1b1d' }}>{it.materialName || it.description}</div>
+                              <div style={{ fontSize: 11, color: '#64748b', display: 'flex', gap: 6, marginTop: 2 }}>
+                                <span>Code: <code>{it.materialCode || it.material_id}</code></span>
+                                <span>· UOM: <strong>{it.uom}</strong></span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 600 }}>{ord.toFixed(3)} {it.uom}</td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', color: '#16a34a', fontWeight: 600 }}>{rec.toFixed(3)} {it.uom}</td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                              <span style={{
+                                padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 700,
+                                background: rem > 0 ? '#dcfce7' : '#e2e8f0',
+                                color: rem > 0 ? '#15803d' : '#64748b'
+                              }}>
+                                {rem.toFixed(3)} {it.uom}
+                              </span>
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f766e', fontWeight: 600 }}>
+                              ₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+
+                            {/* Column action or batch quantity */}
+                            <td style={{ padding: '8px 10px' }}>
+                              {inwardBatchMode ? (
+                                <input
+                                  type="number"
+                                  step="0.001"
+                                  min="0"
+                                  max={rem > 0 ? rem : undefined}
+                                  style={{ ...S.input, width: '100%', padding: '4px 6px', fontSize: 11, textAlign: 'right', borderColor: '#0f766e' }}
+                                  placeholder="0.000"
+                                  value={batchInwardQtys[it.id]?.in_qty || ''}
+                                  onChange={e => {
+                                    const val = e.target.value
+                                    setBatchInwardQtys(b => ({ ...b, [it.id]: { ...(b[it.id] || {}), in_qty: val } }))
+                                  }}
+                                />
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    handleSelectPoLineItem(it.id)
+                                  }}
+                                  style={{
+                                    width: '100%',
+                                    padding: '4px 8px',
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    border: isSelected ? '2px solid #0f766e' : '1px solid #99f6e4',
+                                    background: isSelected ? '#0f766e' : '#f0fdfa',
+                                    color: isSelected ? '#ffffff' : '#0f766e',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {isSelected ? '✓ Selected' : '👉 Receive Line'}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
                 </div>
+
+                {/* Batch Action Footer if in Batch Mode */}
+                {inwardBatchMode && (
+                  <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e6fffa', padding: '10px 14px', borderRadius: 8, border: '1px solid #99f6e4' }}>
+                    <div style={{ fontSize: 12, color: '#134e4a' }}>
+                      💡 Enter received quantities in the table above and record inward for all lines simultaneously.
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCreateBatchInward}
+                      disabled={batchSaving}
+                      style={{ ...S.btn, background: '#0f766e', padding: '8px 18px', fontWeight: 700 }}
+                    >
+                      {batchSaving ? 'Recording Batch…' : '📦 Record Batch Inward'}
+                    </button>
+                  </div>
+                )}
               </div>
+            )}
 
-              <div style={S.grid2}>
+            {/* ═══════ SINGLE ITEM FORM (FOR SINGLE PO LINE OR DIRECT/RETURN) ═══════ */}
+            {!inwardBatchMode && (
+              <form onSubmit={handleCreateInward} style={S.form}>
+                
+                {/* Active Selected PO Item Alert Pill */}
+                {activePoDetails && selectedPoLineId && (() => {
+                  const selItem = activePoDetails.items?.find(it => String(it.id) === String(selectedPoLineId))
+                  if (!selItem) return null
+                  const rem = Math.max(0, parseFloat(selItem.qty || 0) - parseFloat(selItem.received_qty || 0))
+                  return (
+                    <div style={{ background: '#f0fdf4', border: '1px solid #86efac', padding: '8px 14px', borderRadius: 8, fontSize: 12, color: '#166534', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>📌 <strong>Currently Receiving:</strong> {selItem.materialName || selItem.description} [{selItem.materialCode || selItem.material_id}]</span>
+                      <span>Pending Balance: <strong>{rem.toFixed(3)} {selItem.uom}</strong> @ ₹{selItem.unit_price}</span>
+                    </div>
+                  )
+                })()}
+
+                {/* Material Catalog Selector */}
                 <div>
-                  <label style={S.label}>Batch / Heat / Serial #</label>
-                  <input style={S.input} placeholder="Barcode / Batch # for tracing" value={inwardForm.batch_number} onChange={e => setInwardForm({ ...inwardForm, batch_number: e.target.value })} />
-                </div>
-                <div>
-                  <label style={S.label}>QC Inspection Status</label>
-                  <select style={S.select} value={inwardForm.quality_status} onChange={e => setInwardForm({ ...inwardForm, quality_status: e.target.value })}>
-                    <option value="Accepted">Accepted (Passed Inspection)</option>
-                    <option value="Conditionally Accepted">Conditionally Accepted</option>
-                    <option value="Under QC Inspection">Under QC Inspection</option>
+                  <label style={S.label}>Select Material *</label>
+                  <select style={S.select} value={inwardForm.material_id} onChange={e => {
+                    const m = mats.find(x => String(x.id) === String(e.target.value))
+                    setInwardForm({
+                      ...inwardForm,
+                      material_id: e.target.value,
+                      unit_price: m?.unit_price || '',
+                      bin_location: m?.binLocation || m?.bin_location || ''
+                    })
+                  }} required>
+                    <option value="">-- Choose Material (1,075 catalog items) --</option>
+                    {mats.map(m => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} [{m.code}] { (m.poCount || m.po_count) ? `[${m.poCount || m.po_count} POs]` : '' } (Stock: {m.current_stock || m.currentStock || 0} {m.uom})
+                      </option>
+                    ))}
                   </select>
                 </div>
-              </div>
 
-              <div>
-                <label style={S.label}>Remarks / Inspection Note</label>
-                <textarea style={S.input} rows={2} placeholder="Any delivery notes or inspection details..." value={inwardForm.remarks} onChange={e => setInwardForm({ ...inwardForm, remarks: e.target.value })} />
-              </div>
+                {/* Inward Quantity, Unit Price, GST Slab */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.4fr', gap: 12 }}>
+                  <div>
+                    <label style={S.label}>Inward Quantity *</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input type="number" step="0.001" style={S.input} placeholder="0.000" value={inwardForm.in_qty} onChange={e => setInwardForm({ ...inwardForm, in_qty: e.target.value })} required />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#8a8a90' }}>{selectedInwardMat?.uom || 'NOS'}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={S.label}>Unit Price (₹)</label>
+                    <input type="number" step="0.01" style={S.input} placeholder="₹ 0.00" value={inwardForm.unit_price} onChange={e => setInwardForm({ ...inwardForm, unit_price: e.target.value })} />
+                  </div>
+                  <div>
+                    <label style={S.label}>GST Slab %</label>
+                    <select style={S.select} value={Number(inwardForm.gst_pct ?? 18)} onChange={e => setInwardForm({ ...inwardForm, gst_pct: Number(e.target.value) })}>
+                      {GST_SLABS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    </select>
+                  </div>
+                </div>
 
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
-                <button type="button" style={S.btnGhost} onClick={() => setInwardModal(false)}>Cancel</button>
-                <button type="submit" style={{ ...S.btn, background: '#0f766e' }}>Record Inward GRN</button>
-              </div>
-            </form>
+                {/* Live Tax & Grand Total Computation */}
+                {inwardForm.in_qty && inwardForm.unit_price && (() => {
+                  const taxable = Number(inwardForm.in_qty) * Number(inwardForm.unit_price)
+                  const gstPct = Number(inwardForm.gst_pct ?? 18)
+                  const tax = (taxable * gstPct) / 100
+                  const total = taxable + tax
+                  return (
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 14px', borderRadius: 8, fontSize: 12 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                        <div><span style={{ color: '#64748b' }}>Taxable Base:</span> <b style={{ display: 'block', marginTop: 2 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        <div><span style={{ color: '#64748b' }}>CGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        <div><span style={{ color: '#64748b' }}>SGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        <div><span style={{ color: '#166534', fontWeight: 700 }}>Grand Total:</span> <b style={{ color: '#0f766e', fontSize: 13, display: 'block', marginTop: 2 }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Department or Vendor Selector */}
+                <div style={S.grid2}>
+                  <div>
+                    {inwardForm.inward_type === 'return' ? (
+                      <>
+                        <label style={S.label}>Returning Department *</label>
+                        <select
+                          style={S.select}
+                          value={inwardForm.department_id || ''}
+                          onChange={e => setInwardForm({ ...inwardForm, department_id: e.target.value })}
+                          required
+                        >
+                          <option value="">-- Select Returning Department --</option>
+                          {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                        </select>
+                      </>
+                    ) : (
+                      <>
+                        <label style={S.label}>Vendor / Supplier Name</label>
+                        <select style={S.input}
+                          value={vendorPickMode === 'other' ? '__other__' : inwardForm.vendor_id}
+                          onChange={e => {
+                            if (e.target.value === '__other__') {
+                              setVendorPickMode('other')
+                              setInwardForm({ ...inwardForm, vendor_id: '', vendor_name: '' })
+                            } else {
+                              const v = vendors.find(vv => String(vv.id) === e.target.value)
+                              setVendorPickMode('list')
+                              setInwardForm({ ...inwardForm, vendor_id: e.target.value, vendor_name: v ? v.name : '' })
+                            }
+                          }}>
+                          <option value="">-- Select registered vendor --</option>
+                          {vendors.map(v => (
+                            <option key={v.id} value={v.id}>
+                              {v.name} ({v.poCount || v.po_count || 0} POs)
+                            </option>
+                          ))}
+                          <option value="__other__">Other / Direct-OEM (type name below)</option>
+                        </select>
+                        {vendorPickMode === 'other' && (
+                          <input style={{ ...S.input, marginTop: 6 }} placeholder="e.g. SKF India / Voith / Shell (not in master vendor list)"
+                            value={inwardForm.vendor_name} onChange={e => setInwardForm({ ...inwardForm, vendor_name: e.target.value })} />
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <label style={S.label}>Target Rack / Bin Location</label>
+                    <input style={S.input} placeholder="e.g. Rack 2, Box 4" value={inwardForm.bin_location} onChange={e => setInwardForm({ ...inwardForm, bin_location: e.target.value })} />
+                  </div>
+                </div>
+
+                {/* Batch & QC Status */}
+                <div style={S.grid2}>
+                  <div>
+                    <label style={S.label}>Batch / Heat / Serial #</label>
+                    <input style={S.input} placeholder="Barcode / Batch # for tracing" value={inwardForm.batch_number} onChange={e => setInwardForm({ ...inwardForm, batch_number: e.target.value })} />
+                  </div>
+                  <div>
+                    <label style={S.label}>QC Inspection Status</label>
+                    <select style={S.select} value={inwardForm.quality_status} onChange={e => setInwardForm({ ...inwardForm, quality_status: e.target.value })}>
+                      <option value="Accepted">Accepted (Passed Inspection)</option>
+                      <option value="Conditionally Accepted">Conditionally Accepted</option>
+                      <option value="Under QC Inspection">Under QC Inspection</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={S.label}>Remarks / Inspection Note</label>
+                  <textarea style={S.input} rows={2} placeholder="Any delivery notes or inspection details..." value={inwardForm.remarks} onChange={e => setInwardForm({ ...inwardForm, remarks: e.target.value })} />
+                </div>
+
+                {/* Footer Buttons */}
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
+                  <button type="button" style={S.btnGhost} onClick={() => setInwardModal(false)}>Cancel</button>
+                  <button type="submit" style={{ ...S.btn, background: '#0f766e', fontWeight: 700 }}>Record Inward GRN</button>
+                </div>
+              </form>
+            )}
+
           </div>
         </div>
       )}

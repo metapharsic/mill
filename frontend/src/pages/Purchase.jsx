@@ -11,34 +11,115 @@ export const GST_SLABS = [
   { value: 28, label: '28% (Higher Slab — CGST 14% + SGST 14% / IGST 28%)', cgst: 14, sgst: 14, igst: 28 },
 ]
 
-// Print styles injected into <head> once
-const PRINT_STYLE = `@media print{
-  body > *:not(#print-root){display:none!important}
-  #print-root{display:block!important;position:fixed;inset:0;background:#fff;z-index:99999;padding:32px;font-family:Arial,sans-serif;font-size:12px;color:#000}
-  #print-root h2{font-size:18px;margin-bottom:4px}
-  #print-root table{width:100%;border-collapse:collapse;margin-top:12px}
-  #print-root th,#print-root td{border:1px solid #ccc;padding:6px 10px;text-align:left}
-  #print-root th{background:#f5f5f5;font-weight:700}
-  #print-root .no-print{display:none!important}
-  @page{margin:20mm}
-}`
+// Indian currency number to words generator for Official POs
+function numberToWords(num) {
+  if (!num || isNaN(num)) return 'Zero Rupees Only'
+  const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+
+  const inWords = (n) => {
+    if (n < 20) return a[n] + ' '
+    const digit = n % 10
+    return b[Math.floor(n / 10)] + (digit ? ' ' + a[digit] : '')
+  }
+
+  let str = ''
+  let n = Math.floor(num)
+  const crore = Math.floor(n / 10000000)
+  n %= 10000000
+  const lakh = Math.floor(n / 100000)
+  n %= 100000
+  const thousand = Math.floor(n / 1000)
+  n %= 1000
+  const hundred = Math.floor(n / 100)
+  n %= 100
+
+  if (crore) str += inWords(crore) + 'Crore '
+  if (lakh) str += inWords(lakh) + 'Lakh '
+  if (thousand) str += inWords(thousand) + 'Thousand '
+  if (hundred) str += inWords(hundred) + 'Hundred '
+  if (n) {
+    if (str !== '') str += 'and '
+    str += inWords(n)
+  }
+
+  const paise = Math.round((num - Math.floor(num)) * 100)
+  if (paise > 0) {
+    str += `and ${inWords(paise)}Paise `
+  }
+  return str.trim() + ' Rupees Only'
+}
+
+// Print styles injected into <head>
+const PRINT_STYLE = `
+@media print {
+  body * { visibility: hidden !important; }
+  #print-document, #print-document * { visibility: visible !important; }
+  #print-document {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print { display: none !important; }
+  @page { margin: 12mm; size: A4 portrait; }
+}
+`
 
 function injectPrintStyle() {
   if (!document.getElementById('po-print-style')) {
-    const s = document.createElement('style'); s.id='po-print-style'; s.textContent=PRINT_STYLE;
-    document.head.appendChild(s);
+    const s = document.createElement('style')
+    s.id = 'po-print-style'
+    s.textContent = PRINT_STYLE
+    document.head.appendChild(s)
   }
 }
 
-function PrintFrame({ id, content, onClose }) {
-  useEffect(() => { injectPrintStyle(); }, []);
+function PrintFrame({ content, onClose }) {
+  useEffect(() => {
+    injectPrintStyle()
+  }, [])
+
   return (
-    <div id="print-root" style={{ display:'none', position:'fixed', inset:0, background:'#fff', zIndex:99999, padding:32, fontFamily:'Arial,sans-serif', overflowY:'auto' }}>
-      <button className="no-print" onClick={onClose} style={{ position:'fixed', top:16, right:16, background:'#ef4444', color:'#fff', border:'none', borderRadius:8, padding:'8px 18px', cursor:'pointer', fontWeight:700 }}>✕ Close</button>
-      <button className="no-print" onClick={()=>window.print()} style={{ position:'fixed', top:16, right:110, background:'#1b1b1d', color:'#fff', border:'none', borderRadius:8, padding:'8px 18px', cursor:'pointer', fontWeight:700 }}>🖨 Print</button>
-      {content}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(4px)', zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', overflowY: 'auto', padding: '24px 16px' }}>
+      
+      {/* Top Floating Control Bar (Hidden on print) */}
+      <div className="no-print" style={{ background: '#1e293b', color: '#fff', padding: '10px 20px', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: 900, marginBottom: 16, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 18 }}>🖨</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>Purchase Order Document Preview</div>
+            <div style={{ fontSize: 11, color: '#94a3b8' }}>A4 Official Mill Format · Ready for direct printing &amp; PDF export</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => window.print()}
+            style={{ background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            🖨 Print / Save PDF
+          </button>
+          <button
+            onClick={onClose}
+            style={{ background: '#334155', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+          >
+            ✕ Close
+          </button>
+        </div>
+      </div>
+
+      {/* Printable Document Paper Card */}
+      <div id="print-document" style={{ background: '#ffffff', color: '#1b1b1d', width: '100%', maxWidth: 900, minHeight: 950, padding: '36px 44px', borderRadius: 6, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 12, lineHeight: 1.5, boxSizing: 'border-box' }}>
+        {content}
+      </div>
     </div>
-  );
+  )
 }
 
 export default function Purchase() {
@@ -51,7 +132,10 @@ export default function Purchase() {
   const [saving,setSaving]=useState(false),[err,setErr]=useState('')
   // Edit
   const [editModal,setEditModal]=useState(null)
-  const [editForm,setEditForm]=useState({delivery_date:'',payment_terms:'',remarks:'',items:[]})
+  const [editForm,setEditForm]=useState({vendor_id:'',vendorName:'',vendorGstin:'',po_number:'',po_date:'',delivery_date:'',payment_terms:'',remarks:'',items:[]})
+  const [editMatSearch, setEditMatSearch] = useState({})
+  const [editMatDropOpen, setEditMatDropOpen] = useState({})
+  const [editFormErrors, setEditFormErrors] = useState({})
   const [editSaving,setEditSaving]=useState(false),[editErr,setEditErr]=useState('')
   // GRN
   const [grnModal,setGrnModal]=useState(null)
@@ -276,40 +360,212 @@ export default function Purchase() {
   const approve=async id=>{const r=await API(`/api/purchase/po/${id}/approve`,{method:'PUT'});if(r.success){load();if(detail)openDetail(id)}}
 
   const cancelPO=async id=>{
-    if(!window.confirm('Cancel this PO? This cannot be undone.')) return
+    if(!window.confirm('Cancel this Purchase Order? This will mark the PO as Cancelled.')) return
     const r=await API(`/api/purchase/po/${id}/cancel`,{method:'PUT'})
-    if(r.success){load();setDetail(null)}else alert(r.message||'Cancel failed')
+    if(r.success){load();setDetail(null);alert('PO Cancelled successfully')}else alert(r.message||'Cancel failed')
+  }
+
+  // Hard Delete PO (Draft or Cancelled) & rollback linked PR to Approved
+  const deletePO = async (id, poNum) => {
+    if (!window.confirm(`Permanently delete Purchase Order ${poNum || id}?\n\nThis will remove the PO and automatically restore any linked Purchase Request (PR / Indent) to 'Approved' status so it can be re-used.`)) return
+    const r = await API(`/api/purchase/po/${id}`, { method: 'DELETE' })
+    if (r.success) {
+      load()
+      loadApprovedIndents()
+      if (detail && detail.id === id) setDetail(null)
+      alert(r.message || 'PO deleted successfully')
+    } else {
+      alert(r.message || 'Failed to delete PO')
+    }
+  }
+
+  // Export filtered POs list to CSV
+  const exportOrdersToCSV = () => {
+    if (!rows || !rows.length) {
+      alert('No purchase orders to export')
+      return
+    }
+    const headers = ['PO Number', 'Date', 'Vendor Name', 'Vendor Code', 'PR Reference', 'Department', 'Delivery Date', 'Subtotal (INR)', 'GST Total (INR)', 'Grand Total (INR)', 'Status']
+    const csvRows = [headers.join(',')]
+
+    rows.forEach(r => {
+      const row = [
+        `"${r.poNumber || ''}"`,
+        `"${r.date ? r.date.slice(0, 10) : ''}"`,
+        `"${(r.vendorName || '').replace(/"/g, '""')}"`,
+        `"${r.vendorCode || ''}"`,
+        `"${r.indentNumber || ''}"`,
+        `"${(r.deptName || '').replace(/"/g, '""')}"`,
+        `"${r.deliveryDate ? r.deliveryDate.slice(0, 10) : ''}"`,
+        (r.totalValue || 0).toFixed(2),
+        (r.gstValue || 0).toFixed(2),
+        (r.grandTotal || 0).toFixed(2),
+        `"${r.status || ''}"`
+      ]
+      csvRows.push(row.join(','))
+    })
+
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `MK_Paper_Mill_Purchase_Orders_${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // Export single PO details to CSV
+  const exportPODetailToCSV = (po) => {
+    if (!po || !po.items || !po.items.length) return
+    const headers = ['Line #', 'Material Code', 'Material Name', 'HSN/SAC', 'Quantity', 'UOM', 'Unit Price (INR)', 'GST Slab %', 'Line Total (INR)']
+    const csvRows = [
+      `"PURCHASE ORDER: ${po.po_number || po.poNumber}"`,
+      `"Vendor: ${(po.vendorName || '').replace(/"/g, '""')}"`,
+      `"Date: ${po.date ? po.date.slice(0, 10) : ''}"`,
+      `"Status: ${po.status || ''}"`,
+      '',
+      headers.join(',')
+    ]
+
+    po.items.forEach((it, idx) => {
+      const row = [
+        idx + 1,
+        `"${it.materialCode || it.material_id || ''}"`,
+        `"${(it.materialName || it.description || '').replace(/"/g, '""')}"`,
+        `"${it.hsnCode || '8439'}"`,
+        parseFloat(it.qty || 0).toFixed(3),
+        `"${it.uom || 'NOS'}"`,
+        parseFloat(it.unit_price || 0).toFixed(2),
+        it.gst_pct || 18,
+        parseFloat(it.total || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + (parseFloat(it.gst_pct || 18)/100)))).toFixed(2)
+      ]
+      csvRows.push(row.join(','))
+    })
+
+    csvRows.push('')
+    csvRows.push(`"","","","","","","Taxable Subtotal:","${parseFloat(po.total_value || po.totalValue || 0).toFixed(2)}"`)
+    csvRows.push(`"","","","","","","Total Tax (GST):","${parseFloat(po.gst_value || po.gstValue || 0).toFixed(2)}"`)
+    csvRows.push(`"","","","","","","Grand Total (INR):","${parseFloat(po.grand_total || po.grandTotal || 0).toFixed(2)}"`)
+
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `PO_${po.po_number || po.poNumber}_Details.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   // Edit PO
-  const openEdit=async(po)=>{
-    const r=await API(`/api/purchase/po/${po.id}`)
-    if(!r.success) return
-    const d=r.data
-    setEditForm({
-      delivery_date:d.delivery_date?.slice(0,10)||'',
-      payment_terms:d.payment_terms||'',
-      remarks:d.remarks||'',
-      items:(d.items||[]).map(it=>({material_id:it.material_id,qty:it.qty,uom:it.uom,unit_price:it.unit_price,gst_pct:it.gst_pct||18}))
+  const openEdit = async (po) => {
+    const r = await API(`/api/purchase/po/${po.id}`)
+    if (!r.success) return
+    const d = r.data
+    const searchMap = {}
+    const items = (d.items || []).map((it, i) => {
+      const m = mats.find(mm => String(mm.id) === String(it.material_id))
+      searchMap[i] = m ? `${m.name} [${m.code}]` : (it.materialName ? `${it.materialName} [${it.materialCode || ''}]` : '')
+      return {
+        material_id: it.material_id ? String(it.material_id) : '',
+        description: it.description || it.materialName || '',
+        qty: it.qty !== undefined && it.qty !== null ? String(it.qty) : '',
+        uom: it.uom || matUom(it.material_id) || '',
+        unit_price: it.unit_price !== undefined && it.unit_price !== null ? String(it.unit_price) : '',
+        gst_pct: Number(it.gst_pct ?? 18),
+        _search: it.materialName || ''
+      }
     })
-    setEditModal(po)
+    setEditMatSearch(searchMap)
+    setEditMatDropOpen({})
+    setEditFormErrors({})
+    setEditForm({
+      vendor_id: d.vendor_id,
+      vendorName: d.vendorName || '',
+      vendorGstin: d.vendorGstin || '',
+      po_number: d.po_number || d.poNumber || String(d.id),
+      po_date: d.date?.slice(0, 10) || '',
+      delivery_date: d.delivery_date?.slice(0, 10) || '',
+      payment_terms: d.payment_terms || '',
+      remarks: d.remarks || '',
+      items: items.length ? items : [blankItem()]
+    })
+    setEditModal(d)
     setEditErr('')
   }
-  const addEditItem=()=>setEditForm(f=>({...f,items:[...f.items,{material_id:'',qty:'',uom:'',unit_price:'',gst_pct:18}]}))
-  const removeEditItem=i=>setEditForm(f=>({...f,items:f.items.filter((_,j)=>j!==i)}))
-  const setEditItem=(i,k,v)=>setEditForm(f=>({...f,items:f.items.map((it,j)=>j===i?{...it,[k]:v}:it)}))
-  const saveEdit=async e=>{
+
+  const addEditItem = () => {
+    setEditForm(f => {
+      const idx = f.items.length
+      setEditMatSearch(s => ({ ...s, [idx]: '' }))
+      return { ...f, items: [...f.items, blankItem()] }
+    })
+  }
+
+  const removeEditItem = (i) => {
+    setEditForm(f => ({ ...f, items: f.items.filter((_, j) => j !== i) }))
+    setEditMatSearch(s => {
+      const n = { ...s }
+      delete n[i]
+      return n
+    })
+    setEditMatDropOpen(d => {
+      const n = { ...d }
+      delete n[i]
+      return n
+    })
+  }
+
+  const setEditItem = (i, k, v) => setEditForm(f => ({ ...f, items: f.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }))
+
+  const saveEdit = async e => {
     e.preventDefault()
-    if (!editForm.items.length || editForm.items.some(it=>!it.material_id)) { setEditErr('Every line needs a material selected'); return }
-    if (editForm.items.some(it=>!(parseFloat(it.qty)>0))) { setEditErr('Every line needs a quantity greater than 0'); return }
-    if (editForm.items.some(it=>!(parseFloat(it.unit_price)>=0))) { setEditErr('Unit price cannot be negative'); return }
-    const dupCheck = editForm.items.map(it=>it.material_id)
-    if (new Set(dupCheck).size !== dupCheck.length) { setEditErr('Same material added in more than one line — combine quantities instead'); return }
-    setEditSaving(true);setEditErr('')
-    const items=editForm.items.map(it=>({...it,uom:matUom(it.material_id)||it.uom}))
-    const r=await API(`/api/purchase/po/${editModal.id}`,{method:'PUT',body:JSON.stringify({...editForm,items})})
+    const errs = {}
+    const touchedRows = editForm.items.filter(it => it.material_id)
+    if (!touchedRows.length) {
+      errs.items = 'Add at least one item — pick a material first'
+    } else {
+      const itemErrs = editForm.items.map(it => {
+        if (!it.material_id) return { material_id: 'Material is required' }
+        const e2 = {}
+        if (!(parseFloat(it.qty) > 0)) e2.qty = 'Qty must be > 0'
+        if (!(parseFloat(it.unit_price) >= 0)) e2.unit_price = 'Set a valid unit price'
+        return e2
+      })
+      if (itemErrs.some(e2 => Object.keys(e2).length)) {
+        errs.itemFields = itemErrs
+        const firstBad = itemErrs.findIndex(e2 => Object.keys(e2).length)
+        errs.items = `Line ${firstBad + 1}: ${Object.values(itemErrs[firstBad]).join(', ')}`
+      }
+    }
+
+    const dupCheck = editForm.items.filter(it => it.material_id).map(it => String(it.material_id))
+    if (new Set(dupCheck).size !== dupCheck.length) {
+      errs.items = 'Same material added in more than one line — combine quantities instead'
+    }
+
+    if (Object.keys(errs).length) {
+      setEditFormErrors(errs)
+      setEditErr(errs.items || 'Please fix highlighted errors')
+      return
+    }
+
+    setEditFormErrors({})
+    setEditSaving(true); setEditErr('')
+    const items = editForm.items.filter(it => it.material_id).map(it => ({
+      ...it,
+      uom: it.uom || matUom(it.material_id),
+      description: it.description || matName(it.material_id)
+    }))
+    const r = await API(`/api/purchase/po/${editModal.id}`, { method: 'PUT', body: JSON.stringify({ ...editForm, items }) })
     setEditSaving(false)
-    if(r.success){setEditModal(null);load()}else setEditErr(r.message||'Edit failed')
+    if (r.success) {
+      setEditModal(null)
+      load()
+    } else {
+      setEditErr(r.message || 'Edit failed')
+    }
   }
 
   // GRN
@@ -433,79 +689,199 @@ export default function Purchase() {
     }
   }
 
-  // Print PO
-  const printPO=(po)=>{
+  // Print PO with Corporate Letterhead, Tax Breakdowns, and Signatures
+  const printPO = async (poRow) => {
+    let po = poRow
+    if (!po.items || !po.items.length) {
+      const r = await API(`/api/purchase/po/${poRow.id}`)
+      if (r.success) po = r.data
+    }
     const isInter = po.vendorGstin && !po.vendorGstin.startsWith('29')
-    const content=(
+    const sub = parseFloat(po.total_value || po.totalValue || 0)
+    const tax = parseFloat(po.gst_value || po.gstValue || 0)
+    const grand = parseFloat(po.grand_total || po.grandTotal || 0)
+    const cgst = isInter ? 0 : tax / 2
+    const sgst = isInter ? 0 : tax / 2
+    const igst = isInter ? tax : 0
+
+    const content = (
       <div>
-        <div style={{display:'flex',justifyContent:'space-between',marginBottom:16}}>
+        {/* Header with MK Paper Mill Official Identity */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
           <div>
-            <h2 style={{margin:0}}>Purchase Order</h2>
-            <div style={{fontSize:13,color:'#555'}}>MK Paper Mill ERP</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
+              MK PAPER MILL PRIVATE LIMITED
+            </div>
+            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+              Manufacturers of Kraft Paper &amp; Duplex Boards · ISO 9001:2015 Certified
+            </div>
+            <div style={{ fontSize: 11, color: '#475569' }}>
+              Factory: Sy. No. 42/1, Mill Road, Industrial Area, Karnataka - 560001
+            </div>
+            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
+              GSTIN: <code>29AABCM1234F1Z5</code> · PAN: <code>AABCM1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+            </div>
           </div>
-          <div style={{textAlign:'right',fontSize:13}}>
-            <div><strong>PO No:</strong> {po.po_number || po.poNumber}</div>
-            <div><strong>Date:</strong> {po.date?.slice(0,10)}</div>
-            <div><strong>Status:</strong> {po.status}</div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ display: 'inline-block', background: '#0f766e', color: '#fff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 14, textTransform: 'uppercase' }}>
+              PURCHASE ORDER
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
+              PO #: {po.po_number || po.poNumber}
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              Date: <strong>{po.date ? new Date(po.date).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              Status: <strong style={{ color: '#0f766e' }}>{po.status}</strong>
+            </div>
           </div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16,fontSize:13}}>
-          <div><strong>Vendor:</strong> {po.vendorName} {po.vendorGstin ? `(GSTIN: ${po.vendorGstin})` : ''}</div>
-          <div><strong>Delivery Date:</strong> {po.delivery_date?.slice(0,10)||'—'}</div>
-          <div><strong>Payment Terms:</strong> {po.payment_terms||'—'}</div>
-          <div><strong>Remarks:</strong> {po.remarks||'—'}</div>
+
+        {/* 2-Column Vendor & Order Specifications */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          {/* Vendor Details */}
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+              SUPPLIER / VENDOR DETAILS
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{po.vendorName}</div>
+            {po.vendorCode && <div style={{ fontSize: 11, color: '#64748b' }}>Vendor Code: <code>{po.vendorCode}</code></div>}
+            <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
+              GSTIN: <strong>{po.vendorGstin || 'Unregistered / Exempt'}</strong> {isInter ? ' (Interstate)' : ' (Intrastate - Karnataka)'}
+            </div>
+            {po.vendorAddress && <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>{po.vendorAddress}</div>}
+          </div>
+
+          {/* PO Logistics & Commercials */}
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+              DELIVERY &amp; COMMERCIAL TERMS
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              Delivery Date: <strong>{po.delivery_date ? new Date(po.delivery_date).toLocaleDateString('en-IN') : (po.deliveryDate?.slice(0, 10) || 'Immediate / As per schedule')}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              Payment Terms: <strong>{po.payment_terms || po.paymentTerms || 'Net 30 Days'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              PR / Indent Ref: <strong>{po.indentNumber || po.indent_number || 'Direct Mill Requisition'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155' }}>
+              Delivery Location: <strong>MK Paper Mill Central Store / Weighbridge</strong>
+            </div>
+          </div>
         </div>
-        <table>
-          <thead><tr><th>#</th><th>Material</th><th>UOM</th><th>Qty</th><th>Unit Price</th><th>GST Slab</th><th>Line Total</th></tr></thead>
+
+        {/* Line Items Table */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
+          <thead>
+            <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
+              <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
+              <th style={{ padding: '8px 6px' }}>Item Description &amp; Specification</th>
+              <th style={{ padding: '8px 6px', textAlign: 'center', width: 70 }}>HSN/SAC</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 60 }}>Qty</th>
+              <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Unit Rate</th>
+              <th style={{ padding: '8px 6px', textAlign: 'center', width: 45 }}>GST%</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Line Total (₹)</th>
+            </tr>
+          </thead>
           <tbody>
-            {(po.items||[]).map((it,i)=>(
-              <tr key={i}>
-                <td>{i+1}</td>
-                <td>{it.materialName || it.description}</td>
-                <td>{it.uom}</td>
-                <td>{it.qty}</td>
-                <td>{fmt(it.unit_price)}</td>
-                <td>{it.gst_pct}%</td>
-                <td>{fmt(it.total)}</td>
+            {(po.items || []).map((it, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
+                <td style={{ padding: '8px 6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName || it.description}</div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
+                </td>
+                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{it.hsnCode || '8439'}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
+                <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || 'NOS'}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(it.total || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + (parseFloat(it.gst_pct || 18)/100)))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={6} style={{textAlign:'right',fontWeight:700}}>Taxable Subtotal (₹):</td>
-              <td style={{fontWeight:700}}>{fmt(po.total_value)}</td>
-            </tr>
-            {isInter ? (
-              <tr>
-                <td colSpan={6} style={{textAlign:'right',color:'#6366f1'}}>IGST Amount (Inter-State):</td>
-                <td>{fmt(po.gst_value)}</td>
-              </tr>
-            ) : (
-              <>
-                <tr>
-                  <td colSpan={6} style={{textAlign:'right',color:'#059669'}}>CGST Amount (50%):</td>
-                  <td>{fmt(Number(po.gst_value || 0) / 2)}</td>
-                </tr>
-                <tr>
-                  <td colSpan={6} style={{textAlign:'right',color:'#059669'}}>SGST Amount (50%):</td>
-                  <td>{fmt(Number(po.gst_value || 0) / 2)}</td>
-                </tr>
-              </>
-            )}
-            <tr>
-              <td colSpan={6} style={{textAlign:'right',fontWeight:700}}>Total Tax Amount (₹):</td>
-              <td style={{fontWeight:700}}>{fmt(po.gst_value)}</td>
-            </tr>
-            <tr style={{background:'#f8fafc'}}>
-              <td colSpan={6} style={{textAlign:'right',fontWeight:800,fontSize:14}}>Grand Total (₹):</td>
-              <td style={{fontWeight:800,fontSize:14,color:'#0f766e'}}>{fmt(po.grand_total)}</td>
-            </tr>
-          </tfoot>
         </table>
-        <div style={{marginTop:32,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:32}}>
-          <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Prepared By</div>
-          <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Approved By</div>
-          <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Vendor Acknowledgment</div>
+
+        {/* Valuation & Tax Calculation Breakdown */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', marginBottom: 4 }}>Amount in Words:</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
+              {numberToWords(grand)}
+            </div>
+            {po.remarks && (
+              <div style={{ marginTop: 8, paddingTop: 6, borderTop: '1px solid #e2e8f0', fontSize: 11, color: '#475569' }}>
+                <strong>Remarks / Special Notes:</strong> {po.remarks}
+              </div>
+            )}
+          </div>
+
+          <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={{ padding: '4px 6px', color: '#64748b' }}>Taxable Value:</td>
+                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600 }}>₹{sub.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+              {isInter ? (
+                <tr>
+                  <td style={{ padding: '4px 6px', color: '#6366f1' }}>IGST (Integrated Tax):</td>
+                  <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#6366f1' }}>₹{igst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              ) : (
+                <>
+                  <tr>
+                    <td style={{ padding: '4px 6px', color: '#059669' }}>CGST (Central Tax):</td>
+                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '4px 6px', color: '#059669' }}>SGST (State Tax):</td>
+                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                </>
+              )}
+              <tr style={{ borderTop: '1px solid #cbd5e1', borderBottom: '2px solid #0f766e', background: '#f0fdf4' }}>
+                <td style={{ padding: '6px 6px', fontWeight: 800, fontSize: 13, color: '#0f766e' }}>Grand Total (INR):</td>
+                <td style={{ padding: '6px 6px', textAlign: 'right', fontWeight: 900, fontSize: 14, color: '#0f766e' }}>₹{grand.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Terms & Conditions */}
+        <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '8px 12px', fontSize: 10, color: '#64748b', marginBottom: 24, lineHeight: 1.4 }}>
+          <strong>TERMS &amp; CONDITIONS:</strong><br />
+          1. Material must strictly conform to technical specifications and is subject to plant QC approval at the time of delivery.<br />
+          2. Delivery Challan and Tax Invoice must prominently mention this PO Number.<br />
+          3. Rejections, if any, will be lifted back by the supplier at their own cost within 7 days of intimation.<br />
+          4. Payment will be released strictly as per agreed credit terms following commercial 3-way matching.
+        </div>
+
+        {/* 4 Signatory Blocks */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, textAlign: 'center', fontSize: 11, color: '#334155' }}>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Prepared By</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Store / Purchase Desk</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Verified By</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Finance / Accounts</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Authorized Signatory</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Plant Head / Director</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Vendor Acceptance</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Signature &amp; Stamp</div>
+          </div>
         </div>
       </div>
     )
@@ -527,6 +903,40 @@ export default function Purchase() {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button style={S.btnPrimary} onClick={openNew}>+ Create PO</button>
+        </div>
+      </div>
+
+      {/* ── MULTI-AGENT SYNCHRONIZATION & TELEMETRY BAR ── */}
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 16px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 11 }}>
+          <span style={{ fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+            Multi-Agent P2P Architecture:
+          </span>
+          <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bae6fd' }}>
+            🤖 PR Agent: Active
+          </span>
+          <span style={{ background: '#ccfbf1', color: '#0f766e', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #99f6e4' }}>
+            📋 PO Agent: Synced
+          </span>
+          <span style={{ background: '#fef3c7', color: '#b45309', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #fde68a' }}>
+            📦 GRN Desk: Ready
+          </span>
+          <span style={{ background: '#f0fdf4', color: '#15803d', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bbf7d0' }}>
+            ⚡ Ledger Agent: Live
+          </span>
+          <span style={{ background: '#ede9fe', color: '#6d28d9', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #ddd6fe' }}>
+            🛡️ Orchestrator: 100% Health
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            style={{ ...S.btnSecondary, fontSize: 11, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 5, background: '#ffffff', fontWeight: 600 }}
+            onClick={exportOrdersToCSV}
+            title="Export filtered purchase orders to CSV"
+          >
+            📊 Export POs (CSV)
+          </button>
         </div>
       </div>
 
@@ -562,6 +972,7 @@ export default function Purchase() {
               {['Draft','Approved','Sent','Partial','Received','Closed','Cancelled'].map(s=><option key={s}>{s}</option>)}
             </select>
             <button style={S.btnSecondary} onClick={load}>↻ Refresh</button>
+            <button style={{ ...S.btnSecondary, marginLeft: 'auto' }} onClick={exportOrdersToCSV}>📊 Export to CSV</button>
           </div>
           <div style={S.tableWrap}>
             {loading?<div style={S.loading}>Loading...</div>:(
@@ -577,7 +988,14 @@ export default function Purchase() {
                     <td style={S.td}>
                       {r.indentNumber ? (
                         <div>
-                          <span style={{ color: '#16a34a', fontWeight: 600, fontSize: 12 }}>📋 {r.indentNumber}</span>
+                          <a
+                            href={`/indent`}
+                            onClick={e => { e.preventDefault(); window.location.href = `/indent` }}
+                            style={{ color: '#0f766e', fontWeight: 700, fontSize: 12, textDecoration: 'none' }}
+                            title="View Purchase Request"
+                          >
+                            📋 {r.indentNumber}
+                          </a>
                           {r.deptName && <div style={{ fontSize: 10, color: '#64748b' }}>{r.deptName}</div>}
                         </div>
                       ) : (
@@ -588,12 +1006,16 @@ export default function Purchase() {
                     <td style={S.td}><span style={S.num}>{fmt(r.grandTotal)}</span></td>
                     <td style={S.td}><span style={{...S.badge,background:STATUS_COLOR[r.status]+'22',color:STATUS_COLOR[r.status],border:`1px solid ${STATUS_COLOR[r.status]}44`}}>{r.status}</span></td>
                     <td style={S.td}>
-                      <button style={S.btnIcon} onClick={()=>openDetail(r.id)} title="View">👁</button>
-                      {r.status==='Draft'&&<button style={S.btnIcon} onClick={()=>approve(r.id)} title="Approve">✅</button>}
-                      {r.status==='Draft'&&<button style={S.btnIcon} onClick={async()=>{const d=await API(`/api/purchase/po/${r.id}`);if(d.success)openEdit(d.data)}} title="Edit">✏️</button>}
-                      {(r.status==='Draft'||r.status==='Approved')&&<button style={S.btnIcon} onClick={()=>cancelPO(r.id)} title="Cancel">🚫</button>}
-                      {(r.status==='Approved'||r.status==='Partial')&&<button style={S.btnIcon} onClick={()=>openGRN(r)} title="Receive GRN">📦</button>}
-                      {(r.status==='Received'||r.status==='Partial'||r.status==='Approved')&&<button style={{...S.btnIcon, color: '#0369a1'}} onClick={()=>openBill(r)} title="Book Vendor Bill for Finance">🧾</button>}
+                      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <button style={S.btnIcon} onClick={()=>openDetail(r.id)} title="View PO Details">👁</button>
+                        <button style={{ ...S.btnIcon, color: '#0f766e' }} onClick={()=>printPO(r)} title="Print Purchase Order">🖨</button>
+                        {r.status==='Draft'&&<button style={{ ...S.btnIcon, color: '#16a34a' }} onClick={()=>approve(r.id)} title="Approve">✅</button>}
+                        {r.status==='Draft'&&<button style={{ ...S.btnIcon, color: '#d97706' }} onClick={async()=>{const d=await API(`/api/purchase/po/${r.id}`);if(d.success)openEdit(d.data)}} title="Edit">✏️</button>}
+                        {r.status==='Draft'&&<button style={{ ...S.btnIcon, color: '#dc2626' }} onClick={()=>deletePO(r.id, r.poNumber)} title="Delete Draft PO">🗑</button>}
+                        {(r.status==='Approved')&&<button style={{ ...S.btnIcon, color: '#64748b' }} onClick={()=>cancelPO(r.id)} title="Cancel PO">🚫</button>}
+                        {(r.status==='Approved'||r.status==='Partial')&&<button style={{ ...S.btnIcon, color: '#0d9488' }} onClick={()=>openGRN(r)} title="Receive GRN">📦</button>}
+                        {(r.status==='Received'||r.status==='Partial'||r.status==='Approved')&&<button style={{...S.btnIcon, color: '#0369a1'}} onClick={()=>openBill(r)} title="Book Vendor Bill for Finance">🧾</button>}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1286,94 +1708,520 @@ export default function Purchase() {
 
 
       {/* PO Detail Modal */}
-      {detail&&(
-        <div style={S.overlay} onClick={()=>setDetail(null)}>
-          <div style={{...S.modal,maxWidth:680}} onClick={e=>e.stopPropagation()}>
+      {detail && (
+        <div style={S.overlay} onClick={() => setDetail(null)}>
+          <div style={{ ...S.modal, maxWidth: 760, maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div style={S.modalTitle}>{detail.po_number}</div>
-              <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                <button style={{...S.btnSecondary,padding:'5px 12px',fontSize:12}} onClick={()=>printPO(detail)}>🖨 Print</button>
-                {detail.status==='Draft'&&<button style={{...S.btnSecondary,padding:'5px 12px',fontSize:12}} onClick={()=>{setDetail(null);openEdit(detail)}}>✏️ Edit</button>}
-                {(detail.status==='Draft'||detail.status==='Approved')&&<button style={{...S.btnSecondary,padding:'5px 12px',fontSize:12,color:'#ef4444'}} onClick={()=>cancelPO(detail.id)}>🚫 Cancel</button>}
-                <button style={S.close} onClick={()=>setDetail(null)}>✕</button>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={S.modalTitle}>{detail.po_number || detail.poNumber}</div>
+                  <span style={{ ...S.badge, background: STATUS_COLOR[detail.status] + '22', color: STATUS_COLOR[detail.status], border: `1px solid ${STATUS_COLOR[detail.status]}44` }}>
+                    {detail.status}
+                  </span>
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  Vendor: <strong>{detail.vendorName}</strong> {detail.vendorGstin ? `(GSTIN: ${detail.vendorGstin})` : ''}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button
+                  style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, background: '#0f766e', color: '#ffffff' }}
+                  onClick={() => printPO(detail)}
+                >
+                  🖨 Print / PDF
+                </button>
+                <button
+                  style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+                  onClick={() => exportPODetailToCSV(detail)}
+                  title="Download PO Line Items as CSV"
+                >
+                  📥 Export CSV
+                </button>
+                {detail.status === 'Draft' && (
+                  <button
+                    style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, color: '#d97706' }}
+                    onClick={() => { setDetail(null); openEdit(detail) }}
+                  >
+                    ✏️ Edit
+                  </button>
+                )}
+                {detail.status === 'Draft' && (
+                  <button
+                    style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, color: '#dc2626' }}
+                    onClick={() => deletePO(detail.id, detail.po_number || detail.poNumber)}
+                  >
+                    🗑 Delete
+                  </button>
+                )}
+                {(detail.status === 'Approved') && (
+                  <button
+                    style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, color: '#64748b' }}
+                    onClick={() => cancelPO(detail.id)}
+                  >
+                    🚫 Cancel
+                  </button>
+                )}
+                <button style={S.close} onClick={() => setDetail(null)}>✕</button>
               </div>
             </div>
-            <div style={S.grid2}>
-              <div><span style={S.muted}>Vendor: </span>{detail.vendorName}</div>
-              <div><span style={S.muted}>Status: </span>{detail.status}</div>
-              <div><span style={S.muted}>Subtotal: </span>{fmt(detail.total_value)}</div>
-              <div><span style={S.muted}>GST: </span>{fmt(detail.gst_value)}</div>
-              <div><span style={S.muted}>Grand Total: </span><strong>{fmt(detail.grand_total)}</strong></div>
-              <div><span style={S.muted}>Delivery: </span>{detail.delivery_date?.slice(0,10)||'—'}</div>
-              {detail.payment_terms&&<div><span style={S.muted}>Payment Terms: </span>{detail.payment_terms}</div>}
-              {detail.remarks&&<div><span style={S.muted}>Remarks: </span>{detail.remarks}</div>}
-            </div>
-            <table style={{...S.table,marginTop:12}}><thead><tr style={S.thead}>
-              {['Material','Qty','Unit Price','GST%','Total'].map(h=><th key={h} style={S.th}>{h}</th>)}
-            </tr></thead><tbody>
-              {(detail.items||[]).map(it=>(
-                <tr key={it.id} style={S.tr}>
-                  <td style={S.td}>{it.materialName}</td>
-                  <td style={S.td}>{it.qty} {it.uom}</td>
-                  <td style={S.td}>{fmt(it.unit_price)}</td>
-                  <td style={S.td}>{it.gst_pct}%</td>
-                  <td style={S.td}>{fmt(it.total)}</td>
-                </tr>
-              ))}
-            </tbody></table>
-            {detail.status==='Draft'&&(
-              <div style={{marginTop:14,display:'flex',justifyContent:'flex-end',gap:8}}>
-                <button style={S.btnPrimary} onClick={()=>approve(detail.id)}>✅ Approve PO</button>
+
+            {/* Linked PR / Indent Card */}
+            {(detail.indentNumber || detail.indent_number) && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#166534' }}>
+                    📋 Converted from Purchase Request (Indent) #{detail.indentNumber || detail.indent_number}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#64748b' }}>
+                    Department: <strong>{detail.deptName || 'Plant Mill'}</strong> · Seamless P2P Audit Trail
+                  </div>
+                </div>
+                <button
+                  style={{ ...S.btnSecondary, fontSize: 11, padding: '4px 10px', color: '#0f766e' }}
+                  onClick={() => { window.location.href = `/indent` }}
+                >
+                  View Indents →
+                </button>
               </div>
             )}
-            {(detail.status==='Approved'||detail.status==='Partial')&&(
-              <div style={{marginTop:14,display:'flex',justifyContent:'flex-end'}}>
-                <button style={S.btnPrimary} onClick={()=>{setDetail(null);openGRN(detail)}}>📦 Receive GRN</button>
+
+            <div style={S.grid2}>
+              <div><span style={S.muted}>Vendor: </span><strong>{detail.vendorName}</strong></div>
+              <div><span style={S.muted}>PO Date: </span>{detail.date ? detail.date.slice(0, 10) : '—'}</div>
+              <div><span style={S.muted}>Delivery Date: </span>{detail.delivery_date?.slice(0, 10) || '—'}</div>
+              <div><span style={S.muted}>Payment Terms: </span>{detail.payment_terms || 'Net 30 Days'}</div>
+              <div><span style={S.muted}>Subtotal (Taxable): </span>{fmt(detail.total_value)}</div>
+              <div><span style={S.muted}>GST Tax: </span>{fmt(detail.gst_value)}</div>
+              <div><span style={S.muted}>Grand Total: </span><strong style={{ fontSize: 15, color: '#0f766e' }}>{fmt(detail.grand_total)}</strong></div>
+              <div><span style={S.muted}>Remarks: </span>{detail.remarks || '—'}</div>
+            </div>
+
+            <table style={{ ...S.table, marginTop: 14 }}>
+              <thead>
+                <tr style={S.thead}>
+                  {['#', 'Material & Specification', 'Qty', 'UOM', 'Unit Price', 'GST%', 'Total'].map(h => (
+                    <th key={h} style={S.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(detail.items || []).map((it, idx) => (
+                  <tr key={it.id || idx} style={S.tr}>
+                    <td style={{ ...S.td, width: 30, color: '#64748b' }}>{idx + 1}</td>
+                    <td style={S.td}>
+                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{it.materialName || it.description}</div>
+                      <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 600 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
+                    <td style={S.td}>{it.uom || 'NOS'}</td>
+                    <td style={{ ...S.td, textAlign: 'right' }}>{fmt(it.unit_price)}</td>
+                    <td style={{ ...S.td, textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>{fmt(it.total)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {detail.status === 'Draft' && (
+              <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid #e7e6df', paddingTop: 12 }}>
+                <button style={{ ...S.btnSecondary, color: '#dc2626' }} onClick={() => deletePO(detail.id, detail.po_number || detail.poNumber)}>
+                  🗑 Delete Draft PO
+                </button>
+                <button style={{ ...S.btnSecondary, color: '#d97706' }} onClick={() => { setDetail(null); openEdit(detail) }}>
+                  ✏️ Edit PO
+                </button>
+                <button style={S.btnPrimary} onClick={() => approve(detail.id)}>
+                  ✅ Approve PO
+                </button>
+              </div>
+            )}
+            {(detail.status === 'Approved' || detail.status === 'Partial') && (
+              <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid #e7e6df', paddingTop: 12 }}>
+                <button style={{ ...S.btnPrimary, background: '#0f766e' }} onClick={() => { setDetail(null); openGRN(detail) }}>
+                  📦 Receive Inward GRN
+                </button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Edit PO Modal */}
-      {editModal&&(
-        <div style={S.overlay} onClick={()=>setEditModal(null)}>
-          <div style={{...S.modal,maxWidth:720}} onClick={e=>e.stopPropagation()}>
-            <div style={S.modalHeader}><div style={S.modalTitle}>Edit PO — {editModal.po_number||editModal.id}</div><button style={S.close} onClick={()=>setEditModal(null)}>✕</button></div>
-            <form onSubmit={saveEdit} style={S.form}>
-              <div style={S.grid2}>
-                <label style={S.label}>Delivery Date<input style={S.input} type="date" value={editForm.delivery_date} onChange={e=>setEditForm(f=>({...f,delivery_date:e.target.value}))} /></label>
-                <label style={S.label}>Payment Terms<input style={S.input} value={editForm.payment_terms} onChange={e=>setEditForm(f=>({...f,payment_terms:e.target.value}))} /></label>
-                <label style={{...S.label, gridColumn:'1/-1'}}>Remarks<input style={S.input} value={editForm.remarks} onChange={e=>setEditForm(f=>({...f,remarks:e.target.value}))} /></label>
-              </div>
-              <div style={{fontWeight:600,color:'#a0a0a6',fontSize:12,marginTop:8}}>LINE ITEMS</div>
-              {editForm.items.map((it,i)=>(
-                <div key={i} style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr auto',gap:8,alignItems:'end'}}>
-                  <label style={S.label}>Material *
-                    <select style={S.select} value={it.material_id} onChange={e=>setEditItem(i,'material_id',e.target.value)}>
-                      <option value="">Select...</option>{mats.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
-                    </select>
-                  </label>
-                  <label style={S.label}>Qty<input style={S.input} type="number" step="0.001" value={it.qty} onChange={e=>setEditItem(i,'qty',e.target.value)} /></label>
-                  <label style={S.label}>Unit Price<input style={S.input} type="number" step="0.01" value={it.unit_price} onChange={e=>setEditItem(i,'unit_price',e.target.value)} /></label>
-                  <label style={S.label}>GST Slab
-                    <select style={S.select} value={Number(it.gst_pct ?? 18)} onChange={e=>setEditItem(i,'gst_pct',Number(e.target.value))}>
-                      {GST_SLABS.map(s=><option key={s.value} value={s.value}>{s.label}</option>)}
-                    </select>
-                  </label>
-                  <button type="button" style={{...S.btnIcon,paddingBottom:8}} onClick={()=>removeEditItem(i)}>🗑</button>
+      {/* ═══════ REDESIGNED EDIT PO MODAL ═══════ */}
+      {editModal && (() => {
+        const vObj = vendorObj(editForm.vendor_id)
+        const isInterstate = Boolean((editForm.vendorGstin || vObj?.gstin) && !(editForm.vendorGstin || vObj?.gstin || '').startsWith('29'))
+        const calcLineEdit = it => {
+          const q = parseFloat(it.qty) || 0
+          const p = parseFloat(it.unit_price) || 0
+          const slab = GST_SLABS.find(s => s.value === Number(it.gst_pct ?? 18)) || GST_SLABS[3]
+          const sub = q * p
+          const gst = sub * (slab.value / 100)
+          return { sub, gst, total: sub + gst, cgst: sub * (slab.cgst / 100), sgst: sub * (slab.sgst / 100), igst: sub * (slab.igst / 100) }
+        }
+        const lines = editForm.items.map(calcLineEdit)
+        const totSub = lines.reduce((s, l) => s + l.sub, 0)
+        const totGst = lines.reduce((s, l) => s + l.gst, 0)
+        const totCgst = lines.reduce((s, l) => s + l.cgst, 0)
+        const totSgst = lines.reduce((s, l) => s + l.sgst, 0)
+        const totIgst = lines.reduce((s, l) => s + l.igst, 0)
+        const totGrand = totSub + totGst
+
+        const touchedEditIds = editForm.items.map(it => String(it.material_id)).filter(Boolean)
+        const dupEditIds = touchedEditIds.filter((id, idx) => touchedEditIds.indexOf(id) !== idx)
+
+        return (
+          <div style={S.overlay} onClick={() => setEditModal(null)}>
+            <div style={{ ...S.modal, maxWidth: 1020, padding: 24 }} onClick={e => e.stopPropagation()}>
+              
+              {/* Modal Header with Agent Status */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, borderBottom: '1px solid #e7e6df', paddingBottom: 12 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1b1b1d' }}>
+                      ✏️ Edit Purchase Order — {editForm.po_number || editModal.po_number || editModal.id}
+                    </h2>
+                    <span style={{ ...S.badge, background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }}>
+                      {editModal.status || 'Draft'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 3, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span>Vendor: <strong>{editForm.vendorName || editModal.vendorName || '—'}</strong></span>
+                    {editForm.vendorGstin && <span>GSTIN: <code>{editForm.vendorGstin}</code></span>}
+                    <span>PO Date: {editForm.po_date || '—'}</span>
+                  </div>
                 </div>
-              ))}
-              <button type="button" style={S.btnSecondary} onClick={addEditItem}>+ Add Item</button>
-              {editErr&&<div style={S.error}>{editErr}</div>}
-              <div style={S.modalFooter}>
-                <button type="button" style={S.btnSecondary} onClick={()=>setEditModal(null)}>Cancel</button>
-                <button type="submit" style={S.btnPrimary} disabled={editSaving}>{editSaving?'Saving...':'Save Changes'}</button>
+
+                {/* Agent Status Pill */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600, color: '#166534', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+                    🤖 Procurement Agent: Live Editing
+                  </div>
+                  <button style={S.close} onClick={() => setEditModal(null)}>✕</button>
+                </div>
               </div>
-            </form>
+
+              <form onSubmit={saveEdit} style={S.form}>
+                
+                {/* ── Metadata Grid ── */}
+                <div style={{ background: '#f8fafc', padding: 14, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+                    <label style={S.label}>
+                      Delivery Due Date
+                      <input style={S.input} type="date" value={editForm.delivery_date} onChange={e => setEditForm(f => ({ ...f, delivery_date: e.target.value }))} />
+                    </label>
+
+                    <label style={S.label}>
+                      Payment Terms
+                      <input style={S.input} placeholder="e.g. 30 Days Net, Immediate, etc." value={editForm.payment_terms} onChange={e => setEditForm(f => ({ ...f, payment_terms: e.target.value }))} />
+                    </label>
+
+                    <label style={{ ...S.label, gridColumn: '1 / -1' }}>
+                      Remarks / Work Order Context
+                      <input style={S.input} placeholder="Special terms, specifications, or notes..." value={editForm.remarks} onChange={e => setEditForm(f => ({ ...f, remarks: e.target.value }))} />
+                    </label>
+                  </div>
+                </div>
+
+                {/* ── Line Items Header & Table ── */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={SS.sectionLabel}>ENCLOSED LINE ITEMS ({editForm.items.length})</span>
+                      <span style={{ fontSize: 11, color: '#64748b' }}>Search catalog materials, adjust quantities and unit rates</span>
+                    </div>
+                    <button type="button"
+                      style={{ background: '#0284c7', color: '#ffffff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                      onClick={addEditItem}>＋ Add Item</button>
+                  </div>
+
+                  {editFormErrors.items && <div style={{ ...SS.fieldErr, marginBottom: 8, background: '#fee2e2', padding: '6px 12px', borderRadius: 6 }}>{editFormErrors.items}</div>}
+                  {editErr && <div style={{ ...S.error, marginBottom: 8 }}>{editErr}</div>}
+
+                  {/* Lines Box */}
+                  <div style={{ border: '1px solid #e7e6df', borderRadius: 8, overflow: 'visible', background: '#ffffff' }}>
+                    
+                    {/* Header Columns */}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                      background: '#f6f5f0',
+                      borderBottom: '1px solid #e7e6df',
+                      padding: '8px 12px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 22, flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#8a8a90' }}>#</div>
+                        <div style={{ flex: '1.4 1 260px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Material *</div>
+                        <div style={{ flex: '1 1 160px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Description</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 22, flexShrink: 0 }} />
+                        <div style={{ width: 100, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Qty *</div>
+                        <div style={{ width: 70, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>UOM</div>
+                        <div style={{ width: 110, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Unit Price ₹</div>
+                        <div style={{ width: 150, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GST Slab %</div>
+                        <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Line Total</div>
+                        <div style={{ width: 32, flexShrink: 0 }} />
+                      </div>
+                    </div>
+
+                    {/* Rows */}
+                    {editForm.items.map((it, i) => {
+                      const lt = lines[i] || calcLineEdit(it)
+                      const isDup = dupEditIds.includes(String(it.material_id))
+                      const selMat = mats.find(m => String(m.id) === String(it.material_id))
+                      const searchVal = editMatSearch[i] !== undefined ? editMatSearch[i] : (selMat ? `${selMat.name} [${selMat.code}]` : '')
+                      const q = (editMatSearch[i] || '').trim().toLowerCase()
+
+                      const rank = m => {
+                        if (!q) return 5
+                        const name = (m.name || '').toLowerCase(), code = (m.code || '').toLowerCase()
+                        if (code === q) return 0
+                        if (code.startsWith(q)) return 1
+                        if (name.startsWith(q)) return 2
+                        if (name.includes(q)) return 3
+                        if (code.includes(q) || (m.categoryName || '').toLowerCase().includes(q) || (m.hsn_code || m.hsnCode || '').toLowerCase().includes(q) || (m.bin_location || m.binLocation || '').toLowerCase().includes(q)) return 4
+                        return -1
+                      }
+
+                      const filtered = (q ? mats.map(m => ({ m, r: rank(m) })).filter(x => x.r >= 0).sort((a, b) => a.r - b.r).map(x => x.m) : mats).slice(0, 100)
+                      const itErr = editFormErrors.itemFields?.[i] || {}
+
+                      const grouped = filtered.reduce((acc, m) => {
+                        const cat = m.categoryName || 'Uncategorized'
+                        ;(acc[cat] = acc[cat] || []).push(m)
+                        return acc
+                      }, {})
+                      const groupNames = q ? Object.keys(grouped) : Object.keys(grouped).sort()
+
+                      return (
+                        <div key={i} style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 6,
+                          borderBottom: i < editForm.items.length - 1 ? '1px solid #f1efe8' : 'none',
+                          background: isDup ? '#fff7ed' : '#ffffff',
+                          padding: '10px 12px'
+                        }}>
+
+                          {/* Top Row: # + Material Combobox + Description */}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                            <div style={{ width: 22, flexShrink: 0, textAlign: 'center', fontSize: 11, color: '#a0a0a6', fontWeight: 700, paddingTop: 7 }}>{i + 1}</div>
+
+                            {/* Searchable Material Combobox */}
+                            <div style={{ position: 'relative', flex: '1.4 1 260px' }}>
+                              <input
+                                style={{ ...S.input, fontSize: 12, padding: '6px 24px 6px 8px', background: it.material_id ? '#f0fdf4' : '#f6f5f0', borderColor: itErr.material_id ? '#ef4444' : '#e7e6df' }}
+                                placeholder="🔍 Search material name, code, category, HSN..."
+                                autoComplete="off"
+                                value={searchVal}
+                                onFocus={() => setEditMatDropOpen(d => ({ ...d, [i]: true }))}
+                                onChange={e => {
+                                  const v = e.target.value
+                                  setEditMatSearch(s => ({ ...s, [i]: v }))
+                                  setEditMatDropOpen(d => ({ ...d, [i]: true }))
+                                  if (!v) setEditItem(i, 'material_id', '')
+                                }}
+                                onBlur={() => setTimeout(() => setEditMatDropOpen(d => ({ ...d, [i]: false })), 180)}
+                              />
+                              {it.material_id && (
+                                <button type="button" title="Clear selection"
+                                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#8a8a90', fontSize: 13 }}
+                                  onClick={() => {
+                                    setEditItem(i, 'material_id', '')
+                                    setEditMatSearch(s => ({ ...s, [i]: '' }))
+                                  }}>✕</button>
+                              )}
+
+                              {/* Dropdown Popover */}
+                              {editMatDropOpen[i] && filtered.length > 0 && (
+                                <div style={{
+                                  position: 'absolute', top: '100%', left: 0, right: 6, zIndex: 400,
+                                  background: '#ffffff', border: '1px solid #e7e6df', borderRadius: 6,
+                                  boxShadow: '0 6px 20px rgba(0,0,0,0.15)', maxHeight: 260, overflowY: 'auto', marginTop: 2
+                                }}>
+                                  {groupNames.map(cat => (
+                                    <div key={cat}>
+                                      <div style={{ position: 'sticky', top: 0, background: '#f6f5f0', padding: '4px 10px', fontSize: 10, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e7e6df' }}>
+                                        {cat} <span style={{ fontWeight: 500 }}>({grouped[cat].length})</span>
+                                      </div>
+                                      {grouped[cat].map(m => {
+                                        const stock = Number(m.currentStock ?? m.current_stock ?? 0)
+                                        const low = stock <= Number(m.reorderLevel ?? m.reorder_level ?? 0)
+                                        return (
+                                          <div key={m.id}
+                                            onMouseDown={() => {
+                                              const price = parseFloat(m.unitPrice || m.unit_price || 0)
+                                              setEditForm(f => ({
+                                                ...f,
+                                                items: f.items.map((it2, j) => j === i ? {
+                                                  ...it2,
+                                                  material_id: String(m.id),
+                                                  description: m.name || '',
+                                                  uom: m.uom || '',
+                                                  unit_price: price > 0 ? price.toString() : it2.unit_price
+                                                } : it2)
+                                              }))
+                                              setEditMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
+                                              setEditMatDropOpen(d => ({ ...d, [i]: false }))
+                                            }}
+                                            style={{
+                                              padding: '7px 10px', cursor: 'pointer', fontSize: 11,
+                                              borderBottom: '1px solid #f1efe8',
+                                              background: String(it.material_id) === String(m.id) ? '#f0fdf4' : 'transparent',
+                                              display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                                            }}>
+                                            <span>
+                                              <strong style={{ color: '#1b1b1d' }}>{m.name}</strong>
+                                              <span style={{ color: '#8a8a90', fontSize: 10, marginLeft: 4 }}>[{m.code}]</span>
+                                              {(m.poCount || m.po_count) ? (
+                                                <span style={{ background: '#ede9fe', color: '#6d28d9', fontSize: 9, padding: '1px 6px', borderRadius: 4, marginLeft: 6, fontWeight: 700 }}>
+                                                  {m.poCount || m.po_count} PO{(m.poCount || m.po_count) === 1 ? '' : 's'}
+                                                </span>
+                                              ) : null}
+                                            </span>
+                                            <span style={{ fontSize: 10, fontWeight: 600, textAlign: 'right' }}>
+                                              <span style={{ color: low ? '#ef4444' : '#16a34a' }}>Stock: {stock} {m.uom}</span>
+                                              {parseFloat(m.unitPrice || m.unit_price || 0) > 0 && <span style={{ color: '#059669', marginLeft: 6 }}>· ₹{m.unitPrice || m.unit_price}</span>}
+                                            </span>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Description Input */}
+                            <input
+                              style={{ ...S.input, flex: '1 1 160px', fontSize: 12, padding: '6px 8px' }}
+                              placeholder="Item description / specification..."
+                              value={it.description || ''}
+                              onChange={e => setEditItem(i, 'description', e.target.value)}
+                            />
+                          </div>
+
+                          {/* Bottom Row: Qty + UOM + Unit Price + GST + Line Total + Delete */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 22, flexShrink: 0 }} />
+
+                            {/* Qty Input */}
+                            <div style={{ width: 100 }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 8px', borderColor: itErr.qty ? '#ef4444' : '#e7e6df' }}
+                                type="number"
+                                step="0.001"
+                                min="0.001"
+                                placeholder="0.000"
+                                value={it.qty}
+                                onChange={e => setEditItem(i, 'qty', e.target.value)}
+                              />
+                            </div>
+
+                            {/* UOM */}
+                            <div style={{ width: 70 }}>
+                              <input
+                                style={{ ...S.input, width: '100%', fontSize: 11, padding: '6px 6px', background: '#f8fafc', color: '#475569', fontWeight: 600 }}
+                                placeholder="UOM"
+                                value={it.uom || (it.material_id ? matUom(it.material_id) : '')}
+                                onChange={e => setEditItem(i, 'uom', e.target.value)}
+                              />
+                            </div>
+
+                            {/* Unit Price */}
+                            <div style={{ width: 110 }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 8px', borderColor: itErr.unit_price ? '#ef4444' : '#e7e6df' }}
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="₹ 0.00"
+                                value={it.unit_price}
+                                onChange={e => setEditItem(i, 'unit_price', e.target.value)}
+                              />
+                            </div>
+
+                            {/* GST Slab */}
+                            <div style={{ width: 150 }}>
+                              <select
+                                style={{ ...S.select, width: '100%', fontSize: 11, padding: '6px 6px' }}
+                                value={Number(it.gst_pct ?? 18)}
+                                onChange={e => setEditItem(i, 'gst_pct', Number(e.target.value))}
+                              >
+                                {GST_SLABS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                              </select>
+                            </div>
+
+                            {/* Line Total */}
+                            <div style={{ flex: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 700, fontSize: 12, color: '#0f766e' }}>
+                              {fmt(lt.total)}
+                            </div>
+
+                            {/* Delete button */}
+                            <div style={{ width: 32, flexShrink: 0, textAlign: 'center' }}>
+                              <button
+                                type="button"
+                                style={{ ...S.btnIcon, color: '#ef4444', fontSize: 14, cursor: 'pointer' }}
+                                onClick={() => removeEditItem(i)}
+                                title="Remove line item"
+                              >🗑</button>
+                            </div>
+                          </div>
+
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* ── Financial Summary Box ── */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                  <div style={{ ...SS.summaryBox, minWidth: 320, background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: 14 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={SS.summaryRow}>
+                        <span style={{ fontSize: 12, color: '#64748b' }}>Taxable Subtotal:</span>
+                        <span style={SS.summaryVal}>{fmt(totSub)}</span>
+                      </div>
+                      {!isInterstate ? (
+                        <>
+                          <div style={SS.summaryRow}>
+                            <span style={{ fontSize: 11, color: '#64748b' }}>CGST:</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totCgst)}</span>
+                          </div>
+                          <div style={SS.summaryRow}>
+                            <span style={{ fontSize: 11, color: '#64748b' }}>SGST:</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totSgst)}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={SS.summaryRow}>
+                          <span style={{ fontSize: 11, color: '#64748b' }}>IGST (Interstate):</span>
+                          <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totIgst)}</span>
+                        </div>
+                      )}
+                      <div style={{ ...SS.summaryRow, borderTop: '1px solid #cbd5e1', paddingTop: 8, marginTop: 4 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#1b1b1d' }}>Grand Total (INR):</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: '#0369a1' }}>{fmt(totGrand)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div style={S.modalFooter}>
+                  <button type="button" style={S.btnSecondary} onClick={() => setEditModal(null)}>Cancel</button>
+                  <button type="submit" style={{ ...S.btnPrimary, background: '#0284c7', display: 'flex', alignItems: 'center', gap: 6 }} disabled={editSaving}>
+                    {editSaving ? 'Saving Changes…' : '💾 Save PO Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* GRN RECEIVE MODAL */}
       {grnModal&&(

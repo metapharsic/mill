@@ -268,6 +268,66 @@ router.put('/po/:id/cancel', auth, requireLevel(3), ar(async (req, res) => {
   res.json({ success:!!rows.length, data:rows[0] });
 }));
 
+// DELETE PO — Hard delete for Draft or Cancelled POs (and roll back linked PR to Approved)
+router.delete('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [po] } = await client.query('SELECT * FROM purchase_orders WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (!po) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Purchase Order not found' });
+    }
+
+    if (!['Draft', 'Cancelled'].includes(po.status) && req.user.role_level < 4) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: `Cannot delete PO in status '${po.status}'. Only Draft or Cancelled POs can be deleted.` });
+    }
+
+    // Check if GRN or stock receipts exist for this PO
+    const { rows: grns } = await client.query('SELECT id FROM grn WHERE po_id = $1 LIMIT 1', [po.id]);
+    if (grns.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Cannot delete PO with recorded Goods Receipt Notes (GRN)' });
+    }
+
+    const { rows: ledgers } = await client.query("SELECT id FROM stock_ledger WHERE reference_type = 'PO' AND reference_id = $1 LIMIT 1", [po.id]);
+    if (ledgers.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Cannot delete PO with recorded stock ledger entries' });
+    }
+
+    // If linked to an indent, roll back indent status to Approved so it can be re-used!
+    if (po.indent_id) {
+      await client.query("UPDATE indents SET status = 'Approved' WHERE id = $1", [po.indent_id]);
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'PO Deleted', 'PO Created', 'Approved', $2, $3)`,
+        [po.indent_id, req.user.id, `PO ${po.po_number} Deleted — Reverted to Approved`]
+      );
+      const { rows: storeInd } = await client.query('SELECT 1 FROM store_indents WHERE id = $1', [po.indent_id]);
+      if (storeInd.length) {
+        await client.query(
+          `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+           VALUES ($1,'PO Deleted','PO Created','Approved',$2,$3,$4,$5)`,
+          [po.indent_id, req.user.id, req.user.name, req.user.role, `PO ${po.po_number} Deleted — Reverted to Approved`]
+        );
+      }
+    }
+
+    await client.query('DELETE FROM po_items WHERE po_id = $1', [po.id]);
+    await client.query('DELETE FROM purchase_orders WHERE id = $1', [po.id]);
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `PO ${po.po_number} deleted successfully. Linked indent reverted to Approved.` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
 // LIST GRNs
 router.get('/grn', auth, ar(async (req, res) => {
   const { vendor_id, po_id, search, page=1, limit=50 } = req.query;

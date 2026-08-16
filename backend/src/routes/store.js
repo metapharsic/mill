@@ -1233,12 +1233,60 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
   });
 }));
 
-// POST /api/store/inward — Fast Inward (GRN / Vendor / Return)
+// Helper to sync PO received quantities and status atomically
+async function syncPoReceived(client, poRef, materialId, qtyDelta) {
+  if (!poRef || !materialId || !qtyDelta) return null;
+  const isNum = /^\d+$/.test(String(poRef));
+  const { rows: [po] } = await client.query(
+    isNum ? `SELECT id, po_number, status FROM purchase_orders WHERE id = $1` : `SELECT id, po_number, status FROM purchase_orders WHERE po_number = $1`,
+    [isNum ? parseInt(poRef) : String(poRef)]
+  );
+  if (!po) return null;
+
+  // Update po_items received_qty
+  await client.query(
+    `UPDATE po_items SET received_qty = GREATEST(0, COALESCE(received_qty, 0) + $1)
+     WHERE po_id = $2 AND material_id = $3`,
+    [qtyDelta, po.id, materialId]
+  );
+
+  // Recalculate PO overall status
+  const { rows: itemRows } = await client.query(
+    `SELECT qty, received_qty FROM po_items WHERE po_id = $1`, [po.id]
+  );
+  if (itemRows.length > 0) {
+    const fullyReceived = itemRows.every(r => Number(r.received_qty || 0) >= Number(r.qty));
+    const partiallyReceived = itemRows.some(r => Number(r.received_qty || 0) > 0);
+    const newStatus = fullyReceived ? 'Received' : (partiallyReceived ? 'Partial' : 'Approved');
+    if (po.status !== 'Draft' && po.status !== 'Cancelled') {
+      await client.query(`UPDATE purchase_orders SET status = $1 WHERE id = $2`, [newStatus, po.id]);
+    }
+  }
+  return po.id;
+}
+
+// POST /api/store/inward — Fast Inward (GRN / Vendor / Return) with Single & Batch Support + PO Sync
 router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
   const { material_id, in_qty, unit_price, inward_type = 'grn', reference_type, reference_id,
-          department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks } = req.body;
+          department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks, items } = req.body;
 
-  if (!material_id || !in_qty || Number(in_qty) <= 0) {
+  // Prepare normalized item list (support both single-item and multi-item batch payloads)
+  let itemList = [];
+  if (Array.isArray(items) && items.length > 0) {
+    itemList = items.filter(it => it.material_id && Number(it.in_qty) > 0);
+  } else if (material_id && Number(in_qty) > 0) {
+    itemList = [{
+      material_id,
+      in_qty: parseFloat(in_qty),
+      unit_price: unit_price !== undefined && unit_price !== '' ? parseFloat(unit_price) : undefined,
+      bin_location,
+      batch_number,
+      quality_status: quality_status || 'Accepted',
+      remarks
+    }];
+  }
+
+  if (!itemList.length) {
     return res.status(400).json({ success: false, message: 'Valid material and quantity (> 0) required' });
   }
 
@@ -1246,69 +1294,99 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [material_id]);
-    if (!mat) throw new Error('Material not found');
-
-    const qty = parseFloat(in_qty);
-    const price = unit_price !== undefined && unit_price !== '' ? parseFloat(unit_price) : parseFloat(mat.unit_price || 0);
-    const newStock = parseFloat(mat.current_stock || 0) + qty;
-    const totalVal = qty * price;
-    const finalBin = bin_location || mat.bin_location;
-
-    await client.query(`
-      UPDATE materials
-      SET current_stock = $1,
-          bin_location = COALESCE($2, bin_location),
-          unit_price = CASE WHEN $3 > 0 THEN $3 ELSE unit_price END
-      WHERE id = $4
-    `, [newStock, finalBin, price, material_id]);
-
     let deptName = '';
     if (department_id) {
       const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
       if (dept) deptName = dept.name;
     }
 
-    const refIdNum = /^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null;
-    const remarkFull = [
-      inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : '[Vendor GRN]',
-      reference_id && !refIdNum ? `Ref: ${reference_id}` : null,
-      vendor_name ? `Party: ${vendor_name}` : null,
-      quality_status ? `QC: ${quality_status}` : null,
-      remarks
-    ].filter(Boolean).join(' | ');
+    // Resolve PO ID if reference is a PO
+    let resolvedPoId = null;
+    if (reference_type === 'PO' && reference_id) {
+      const isNum = /^\d+$/.test(String(reference_id));
+      const { rows: [po] } = await client.query(
+        isNum ? `SELECT id FROM purchase_orders WHERE id = $1` : `SELECT id FROM purchase_orders WHERE po_number = $1`,
+        [isNum ? parseInt(reference_id) : String(reference_id)]
+      );
+      if (po) resolvedPoId = po.id;
+    }
 
+    const refIdNum = resolvedPoId || (/^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null);
     const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : null;
+    const results = [];
 
-    const { rows: [ledger] } = await client.query(`
-      INSERT INTO stock_ledger (
-        material_id, date, transaction_type, reference_type, reference_id,
-        in_qty, out_qty, balance, unit_price, value,
-        batch_number, bin_location, remarks, created_by
-      ) VALUES (
-        $1, CURRENT_DATE, $2, $3, $4,
-        $5, 0, $6, $7, $8,
-        $9, $10, $11, $12
-      ) RETURNING *
-    `, [
-      material_id, inward_type === 'return' ? 'return' : 'grn', reference_type || 'GRN', refIdNum,
-      qty, newStock, price, totalVal,
-      batch_number || null, finalBin || null, remarkFull, req.user.id
-    ]);
+    for (const it of itemList) {
+      const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [it.material_id]);
+      if (!mat) throw new Error(`Material ID ${it.material_id} not found`);
 
-    await auditLog(client, {
-      userId: req.user.id,
-      action: 'store.inward',
-      module: 'store',
-      recordId: ledger.id,
-      newData: { material_id, qty, price, newStock, inward_type, reference_id },
-      ip: req.ip
-    });
+      const qty = parseFloat(it.in_qty);
+      const price = it.unit_price !== undefined && it.unit_price !== '' && !isNaN(it.unit_price)
+        ? parseFloat(it.unit_price)
+        : parseFloat(mat.unit_price || 0);
+      const newStock = parseFloat(mat.current_stock || 0) + qty;
+      const totalVal = qty * price;
+      const finalBin = it.bin_location || bin_location || mat.bin_location;
+      const itemBatch = it.batch_number || batch_number || null;
+      const itemQC = it.quality_status || quality_status || 'Accepted';
+      const itemRemarks = it.remarks || remarks || '';
+
+      await client.query(`
+        UPDATE materials
+        SET current_stock = $1,
+            bin_location = COALESCE($2, bin_location),
+            unit_price = CASE WHEN $3 > 0 THEN $3 ELSE unit_price END
+        WHERE id = $4
+      `, [newStock, finalBin, price, mat.id]);
+
+      const remarkFull = [
+        inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : '[Vendor GRN]',
+        reference_id ? `Ref: ${reference_id}` : null,
+        vendor_name ? `Party: ${vendor_name}` : null,
+        itemQC ? `QC: ${itemQC}` : null,
+        itemRemarks
+      ].filter(Boolean).join(' | ');
+
+      const { rows: [ledger] } = await client.query(`
+        INSERT INTO stock_ledger (
+          material_id, date, transaction_type, reference_type, reference_id,
+          in_qty, out_qty, balance, unit_price, value,
+          batch_number, bin_location, remarks, created_by, vendor_id
+        ) VALUES (
+          $1, CURRENT_DATE, $2, $3, $4,
+          $5, 0, $6, $7, $8,
+          $9, $10, $11, $12, $13
+        ) RETURNING *
+      `, [
+        mat.id, inward_type === 'return' ? 'return' : 'grn', reference_type || 'GRN', refIdNum,
+        qty, newStock, price, totalVal,
+        itemBatch, finalBin || null, remarkFull, req.user.id, vendorIdNum
+      ]);
+
+      // Sync PO received quantity if applicable
+      if (reference_type === 'PO' && reference_id) {
+        await syncPoReceived(client, reference_id, mat.id, qty);
+      }
+
+      await auditLog(client, {
+        userId: req.user.id,
+        action: 'store.inward',
+        module: 'store',
+        recordId: ledger.id,
+        newData: { material_id: mat.id, qty, price, newStock, inward_type, reference_id },
+        ip: req.ip
+      });
+
+      publish(TOPICS.EVENTS_ALL, `inward-${ledger.id}`, { event: 'store.inward.created', id: ledger.id, materialId: mat.id, qty, newStock, userId: req.user.id });
+      results.push(ledger);
+    }
 
     await client.query('COMMIT');
-    publish(TOPICS.EVENTS_ALL, `inward-${ledger.id}`, { event: 'store.inward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
 
-    res.json({ success: true, message: `Inward recorded successfully. New balance: ${newStock} ${mat.uom}`, data: ledger });
+    const msg = itemList.length === 1
+      ? `Inward recorded successfully for ${itemList[0].material_id}. Stock updated.`
+      : `Batch inward successfully recorded (${itemList.length} items received).`;
+
+    res.json({ success: true, message: msg, data: results.length === 1 ? results[0] : results });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });
@@ -1555,6 +1633,12 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
       batch_number || null, bin_location || null, remarkFull, date || null, id
     ]);
 
+    // Sync PO received quantity if applicable
+    const poRef = reference_id || ledger.reference_id;
+    if ((reference_type === 'PO' || ledger.reference_type === 'PO') && poRef && delta !== 0) {
+      await syncPoReceived(client, poRef, mat.id, delta);
+    }
+
     await auditLog(client, {
       userId: req.user.id,
       action: 'store.inward.update',
@@ -1604,6 +1688,11 @@ router.delete('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
 
     await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, mat.id]);
     await client.query('DELETE FROM stock_ledger WHERE id = $1', [id]);
+
+    // Reverse PO received quantity if applicable
+    if (ledger.reference_type === 'PO' && ledger.reference_id && inQty > 0) {
+      await syncPoReceived(client, ledger.reference_id, mat.id, -inQty);
+    }
 
     await auditLog(client, {
       userId: req.user.id,

@@ -31,6 +31,7 @@ const SC = {
   'L1 Approved':    '#0891b2',
   'L2 Approved':    '#7c3aed',
   Approved:         '#0f766e',
+  'PO Created':     '#6366f1',
   'Partially Issued':'#f97316',
   Issued:           '#16a34a',
   Closed:           '#22c55e',
@@ -756,6 +757,28 @@ export default function Indent() {
         ))}
       </div>
 
+      {/* ── MULTI-AGENT SYNCHRONIZATION & TELEMETRY BAR ── */}
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 16px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 11 }}>
+          <span style={{ fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+            Multi-Agent PR &amp; PO Engine:
+          </span>
+          <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bae6fd' }}>
+            🤖 PR Agent: Requisition Active
+          </span>
+          <span style={{ background: '#ccfbf1', color: '#0f766e', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #99f6e4' }}>
+            📋 PO Agent: 1-Click Conversion Ready
+          </span>
+          <span style={{ background: '#f0fdf4', color: '#15803d', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bbf7d0' }}>
+            ⚡ Store Ledger: Auto-Linked
+          </span>
+        </div>
+        <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>
+          🔄 Real-time P2P Synchronization Active
+        </div>
+      </div>
+
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* ── TAB 1: ALL INDENTS LIST (With Detailed Indentor & Equipment Views) ── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
@@ -963,13 +986,26 @@ export default function Indent() {
                               {/* Create PO from Approved Indent */}
                               {['Approved', 'L2 Approved'].includes(r.status) && (
                                 <button
-                                  style={{ ...S.btnSm('#0284c7'), padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 3 }}
+                                  style={{ ...S.btnSm('#0284c7'), padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
                                   onClick={() => {
                                     window.location.href = `/purchase?indent_id=${r.id}`
                                   }}
-                                  title="Create Purchase Order against this approved indent"
+                                  title="Convert this approved Purchase Request to a Purchase Order"
                                 >
-                                  🛒 + PO
+                                  🛒 + Convert to PO
+                                </button>
+                              )}
+
+                              {/* View PO Link when status is PO Created */}
+                              {r.status === 'PO Created' && (
+                                <button
+                                  style={{ ...S.btnSm('#6366f1'), padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
+                                  onClick={() => {
+                                    window.location.href = `/purchase`
+                                  }}
+                                  title="View created Purchase Order in Procurement Desk"
+                                >
+                                  📋 View PO →
                                 </button>
                               )}
 
