@@ -1,0 +1,52 @@
+# ─── Node.js ───────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Build Outputs ─────────────────────────────────────────────
+frontend/dist/
+
+# ─── Environment & Secrets ─────────────────────────────────────
+backend/.env
+*.env.local
+*.env.*.local
+
+# ─── Logs & Runtime ────────────────────────────────────────────
+logs/
+*.log
+
+# ─── OS Files ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE / Editor ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.cursorrules
+.mcp.json
+
+# ─── AI Agent Tooling (local only, not project code) ───────────
+.claude/
+.claude-flow/
+.swarm/
+.codegraph/
+graphify-out/
+
+# ─── Database Dumps & Backups ─────────────────────────────────
+# db/backups/ (tracked for repository backup)
+db/backup_*.sql
+
+# ─── Auto-Generated Status Files ───────────────────────────────
+CHECKPOINT.md
+SYNC_STATUS.md
+checkpoint.json
+
+# ─── Large Reference Files ─────────────────────────────────────
+Documentation/Paper Mill.pdf
+Documentation/Scanned*.pdf

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcd34d" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f766e" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="64" height="64" rx="14" fill="url(#bgGrad)" />
+  <rect x="1" y="1" width="62" height="62" rx="13" stroke="#334155" stroke-width="1.5" fill="none" />
+
+  <!-- Stylized Paper Roll / Mill Cylinders -->
+  <g filter="url(#glow)" transform="translate(4, 4)">
+    <!-- Outer Roll Layer -->
+    <ellipse cx="28" cy="20" rx="20" ry="10" fill="url(#tealGrad)" opacity="0.9" />
+    <path d="M8 20v16c0 5.5 9 10 20 10s20-4.5 20-10V20" fill="url(#tealGrad)" />
+    
+    <!-- Paper Core Coil -->
+    <ellipse cx="28" cy="20" rx="14" ry="7" fill="#0f172a" />
+    <ellipse cx="28" cy="20" rx="12" ry="6" fill="url(#goldGrad)" />
+    <ellipse cx="28" cy="20" rx="6" ry="3" fill="#020617" />
+
+    <!-- "MK" Monogram overlay -->
+    <text x="28" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">MK</text>
+    <circle cx="43" cy="14" r="3.5" fill="#f59e0b" />
+  </g>
+</svg>

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 6,
+    "report_id": 1,
+    "shift": "Day+Night",
+    "minutes": 60,
+    "reason": "1st press vacuum box bolt broken",
+    "sort_order": 0,
+    "reason_code": null
+  },
+  {
+    "id": 7,
+    "report_id": 1,
+    "shift": "Day+Night",
+    "minutes": 65,
+    "reason": "power cut",
+    "sort_order": 1,
+    "reason_code": null
+  },
+  {
+    "id": 8,
+    "report_id": 1,
+    "shift": "Day+Night",
+    "minutes": 25,
+    "reason": "paper break",
+    "sort_order": 2,
+    "reason_code": null
+  }
+]

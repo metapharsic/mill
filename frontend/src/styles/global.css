@@ -1,0 +1,354 @@
+/* MK Paper Mill — "Forge" Design System v2
+   Premium dark sidebar · warm cream canvas · golden accents · glass · depth */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* ── Canvas / backgrounds ────────────────────────── */
+  --bg:        #f0ece3;
+  --bg-1:      #eae6dc;
+  --bg-2:      #f0ece3;
+  --bg-3:      #f5f0e6;
+
+  /* ── Sidebar (deep charcoal) ─────────────────────── */
+  --sb-bg:       #111113;
+  --sb-bg-2:     #18181b;
+  --sb-border:   rgba(255,255,255,.07);
+  --sb-item:     rgba(255,255,255,.055);
+  --sb-item-h:   rgba(255,255,255,.09);
+  --sb-active:   #f4c84b;
+  --sb-text:     rgba(255,255,255,.55);
+  --sb-text-h:   rgba(255,255,255,.88);
+  --sb-group:    rgba(255,255,255,.25);
+
+  /* ── Ink / neutrals ──────────────────────────────── */
+  --ink:       #18181b;
+  --ink-2:     #3f3f46;
+  --muted:     #71717a;
+  --faint:     #a1a1aa;
+  --line:      rgba(0,0,0,.08);
+  --line-dark: rgba(255,255,255,.07);
+
+  /* ── Surfaces ────────────────────────────────────── */
+  --surface:    #ffffff;
+  --surface-2:  #faf9f5;
+  --surface-3:  #f4f2ec;
+
+  /* ── Accents ─────────────────────────────────────── */
+  --gold:       #f4c84b;
+  --gold-h:     #f0bb2a;
+  --gold-soft:  rgba(244,200,75,.14);
+  --gold-glow:  rgba(244,200,75,.35);
+
+  --dark:       #18181b;
+  --dark-card:  #1c1c1f;
+
+  /* ── Status ──────────────────────────────────────── */
+  --ok:        #16a34a;
+  --ok-soft:   rgba(22,163,74,.12);
+  --warn:      #d97706;
+  --warn-soft: rgba(217,119,6,.12);
+  --bad:       #dc2626;
+  --bad-soft:  rgba(220,38,38,.12);
+  --info:      #2563eb;
+  --info-soft: rgba(37,99,235,.12);
+
+  /* ── Radii ───────────────────────────────────────── */
+  --r-xs:   8px;
+  --r-sm:   12px;
+  --r:      16px;
+  --r-lg:   20px;
+  --r-xl:   28px;
+  --r-pill: 999px;
+
+  /* ── Shadows ─────────────────────────────────────── */
+  --sh-xs:  0 1px 2px rgba(0,0,0,.04);
+  --sh-sm:  0 2px 8px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --sh-md:  0 8px 24px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+  --sh-lg:  0 20px 48px rgba(0,0,0,.12), 0 6px 14px rgba(0,0,0,.07);
+  --sh-xl:  0 32px 64px rgba(0,0,0,.18), 0 8px 20px rgba(0,0,0,.10);
+  --sh-gold: 0 8px 28px rgba(244,200,75,.28);
+
+  /* ── Transitions ─────────────────────────────────── */
+  --ease:   cubic-bezier(.22,.61,.36,1);
+  --ease-in: cubic-bezier(.4,0,1,1);
+  --ease-out: cubic-bezier(0,0,.2,1);
+  --dur-fast: .15s;
+  --dur:      .22s;
+  --dur-slow: .38s;
+}
+
+/* ── Reset & base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ink);
+  background: var(--bg-2);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px) scale(.994); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--gold-glow); }
+  50%       { box-shadow: 0 0 0 6px transparent; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes dot-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .6; transform: scale(.85); }
+}
+
+/* ── Page transitions ──────────────────────────────────────── */
+.page-enter {
+  animation: pageIn var(--dur-slow) var(--ease) both;
+}
+
+/* ── Stagger entrance ──────────────────────────────────────── */
+.stagger > * {
+  animation: riseIn .44s var(--ease) both;
+}
+.stagger > *:nth-child(1)  { animation-delay: .02s; }
+.stagger > *:nth-child(2)  { animation-delay: .07s; }
+.stagger > *:nth-child(3)  { animation-delay: .12s; }
+.stagger > *:nth-child(4)  { animation-delay: .17s; }
+.stagger > *:nth-child(5)  { animation-delay: .22s; }
+.stagger > *:nth-child(6)  { animation-delay: .27s; }
+.stagger > *:nth-child(7)  { animation-delay: .32s; }
+.stagger > *:nth-child(8)  { animation-delay: .37s; }
+.stagger > *:nth-child(9)  { animation-delay: .42s; }
+.stagger > *:nth-child(10) { animation-delay: .47s; }
+.stagger > *:nth-child(11) { animation-delay: .52s; }
+.stagger > *:nth-child(12) { animation-delay: .57s; }
+
+/* ── Hover lift card ───────────────────────────────────────── */
+.lift {
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-lg);
+}
+.lift:active {
+  transform: translateY(-2px) scale(.992);
+}
+
+/* ── Sidebar nav items ─────────────────────────────────────── */
+.nav-item {
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease);
+}
+.nav-item:hover  { transform: translateX(2px); }
+.nav-item:active { transform: translateX(1px) scale(.98); }
+
+/* ── Icon chip animation ───────────────────────────────────── */
+.icon-chip {
+  transition:
+    transform var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+.lift:hover .icon-chip {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+button {
+  transition:
+    filter var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+button:active { transform: scale(.97); }
+
+/* ── Input focus rings ─────────────────────────────────────── */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px var(--gold-soft) !important;
+}
+
+/* ── Live dot pulse ────────────────────────────────────────── */
+.live-dot {
+  animation: dot-breathe 2.2s var(--ease) infinite;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────── */
+*::-webkit-scrollbar       { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.14);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.22); }
+
+/* Sidebar scrollbar (on dark bg) */
+.sb-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.12);
+}
+.sb-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.2);
+}
+
+/* ── Tooltip ───────────────────────────────────────────────── */
+[title] { cursor: pointer; }
+
+/* ── Skeleton shimmer ──────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #e5e3db 25%, #f0ede5 50%, #e5e3db 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: var(--r-sm);
+}
+
+/* ── Glass surface ─────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,.72);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+}
+
+/* ── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, .page-enter, .stagger > * { animation: none !important; transition: none !important; }
+}
+
+/* ── Toast animations ──────────────────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(28px) scale(.97); }
+  to   { opacity: 1; transform: translateX(0)     scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0)     scale(1); }
+  to   { opacity: 0; transform: translateX(28px) scale(.95); }
+}
+
+/* ── Modal animations ──────────────────────────────────────── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Accessible focus rings ────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── Responsive table cards ────────────────────────────────── */
+/* Usage: add class="responsive-table" to <table>, add data-label="Col Name" to each <td> */
+@media (max-width: 639px) {
+  .responsive-table thead { display: none; }
+  .responsive-table tr {
+    display: block;
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    border: 1px solid rgba(0,0,0,.07);
+  }
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border: none;
+    font-size: 13px;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #71717a;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+}
+
+/* ── Mobile sidebar overlay backdrop & drawer ──────────────────────── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 199;
+  animation: fadeIn .2s ease both;
+}
+
+@media (max-width: 767px) {
+  .sidebar-drawer {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.22,.61,.36,1);
+    box-shadow: 0 0 40px rgba(0,0,0,.5);
+  }
+  .sidebar-drawer.mobile-drawer-open {
+    transform: translateX(0) !important;
+  }
+}
+
+/* ── Mobile navigation helpers ─────────────────────────────── */
+@media (max-width: 767px) {
+  .mobile-hidden { display: none !important; }
+  .mobile-only   { display: flex !important; }
+}
+@media (min-width: 768px) {
+  .mobile-only   { display: none !important; }
+}
+
+
+/* ── Print styles ──────────────────────────────────────────── */
+@media print {
+  body { background: white !important; color: black !important; }
+  .sidebar, nav, header, button, .btn, .filterBar, .actions, .modal { display: none !important; }
+  .mainContent, .page, #root { width: 100% !important; margin: 0 !important; padding: 0 !important; max-width: none !important; box-shadow: none !important; }
+  * { box-shadow: none !important; }
+  table { border-collapse: collapse !important; width: 100% !important; }
+  th, td { border: 1px solid #ccc !important; }
+}

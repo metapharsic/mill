@@ -1,0 +1,162 @@
+[
+  {
+    "filename": "phase3_migration.sql",
+    "applied_at": "2026-06-28T18:44:06.232Z"
+  },
+  {
+    "filename": "migration_phase14.sql",
+    "applied_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "filename": "migration_store_indents.sql",
+    "applied_at": "2026-06-29T03:40:11.559Z"
+  },
+  {
+    "filename": "migration_dept_categories.sql",
+    "applied_at": "2026-06-29T04:18:42.907Z"
+  },
+  {
+    "filename": "seed_logins.sql",
+    "applied_at": "2026-06-29T04:18:42.952Z"
+  },
+  {
+    "filename": "migration_approval_matrix.sql",
+    "applied_at": "2026-06-29T04:58:42.199Z"
+  },
+  {
+    "filename": "migration_paper_forms.sql",
+    "applied_at": "2026-06-29T05:11:46.294Z"
+  },
+  {
+    "filename": "migration_critical_fixes.sql",
+    "applied_at": "2026-06-29T05:22:19.791Z"
+  },
+  {
+    "filename": "migration_traceability.sql",
+    "applied_at": "2026-06-29T05:31:06.709Z"
+  },
+  {
+    "filename": "migration_seed_sections.sql",
+    "applied_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "filename": "migrate_holidays_loans.sql",
+    "applied_at": "2026-06-30T18:22:52.947Z"
+  },
+  {
+    "filename": "migration_hrms_ph16.sql",
+    "applied_at": "2026-06-30T18:22:53.116Z"
+  },
+  {
+    "filename": "seed_leave_balances.sql",
+    "applied_at": "2026-06-30T18:22:53.133Z"
+  },
+  {
+    "filename": "migration_hrms_employee_cols.sql",
+    "applied_at": "2026-06-30T18:30:45.062Z"
+  },
+  {
+    "filename": "migration_daily_production_report.sql",
+    "applied_at": "2026-06-30T18:47:38.476Z"
+  },
+  {
+    "filename": "migration_dpr_engine.sql",
+    "applied_at": "2026-06-30T18:54:19.233Z"
+  },
+  {
+    "filename": "migration_cmms_spares.sql",
+    "applied_at": "2026-07-05T11:50:38.194Z"
+  },
+  {
+    "filename": "migration_piimas.sql",
+    "applied_at": "2026-07-05T11:50:38.202Z"
+  },
+  {
+    "filename": "migration_plant_sections.sql",
+    "applied_at": "2026-07-05T11:50:38.205Z"
+  },
+  {
+    "filename": "migration_reels_ph17d.sql",
+    "applied_at": "2026-07-05T11:57:10.132Z"
+  },
+  {
+    "filename": "migration_downtime_reason_code_id.sql",
+    "applied_at": "2026-07-05T12:09:00.448Z"
+  },
+  {
+    "filename": "migration_grade_fidelity_ph17e.sql",
+    "applied_at": "2026-07-05T12:23:23.917Z"
+  },
+  {
+    "filename": "migration_equipment_seed_ph17f.sql",
+    "applied_at": "2026-07-05T13:03:01.928Z"
+  },
+  {
+    "filename": "migration_deep_analysis_ph19_22.sql",
+    "applied_at": "2026-07-05T19:08:32.509Z"
+  },
+  {
+    "filename": "migration_dps_excel_fields.sql",
+    "applied_at": "2026-07-05T19:08:32.515Z"
+  },
+  {
+    "filename": "migration_production_enhancements.sql",
+    "applied_at": "2026-07-05T19:22:52.459Z"
+  },
+  {
+    "filename": "migration_scada_boiler_energy.sql",
+    "applied_at": "2026-07-05T19:50:38.355Z"
+  },
+  {
+    "filename": "migration_bearing_check_columns.sql",
+    "applied_at": "2026-07-10T13:27:26.017Z"
+  },
+  {
+    "filename": "migration_bearing_equipment_seed.sql",
+    "applied_at": "2026-07-10T13:29:30.224Z"
+  },
+  {
+    "filename": "migration_payment_confirm.sql",
+    "applied_at": "2026-07-10T14:03:00.400Z"
+  },
+  {
+    "filename": "migration_scrap_remarks_column.sql",
+    "applied_at": "2026-07-10T14:21:00.432Z"
+  },
+  {
+    "filename": "migration_adjustment_approval.sql",
+    "applied_at": "2026-07-10T14:43:55.306Z"
+  },
+  {
+    "filename": "migration_bearing_scan_photo.sql",
+    "applied_at": "2026-07-10T15:31:22.791Z"
+  },
+  {
+    "filename": "migration_motor_electrical_specs.sql",
+    "applied_at": "2026-07-10T15:43:07.374Z"
+  },
+  {
+    "filename": "migration_bearing_readings_expand.sql",
+    "applied_at": "2026-07-10T16:04:57.181Z"
+  },
+  {
+    "filename": "migration_store_shift_tracking.sql",
+    "applied_at": "2026-07-12T02:49:32.952Z"
+  },
+  {
+    "filename": "migration_inventory_category_reset.sql",
+    "applied_at": "2026-07-14T11:04:03.570Z"
+  },
+  {
+    "filename": "migration_materials_bin_location.sql",
+    "applied_at": "2026-07-15T13:07:48.072Z"
+  },
+  {
+    "filename": "seed_motor_electrical_specs.sql",
+    "applied_at": "2026-08-06T13:16:18.144Z"
+  },
+  {
+    "filename": "seed_store_inventory_import.sql",
+    "applied_at": "2026-08-06T13:16:18.178Z"
+  }
+]

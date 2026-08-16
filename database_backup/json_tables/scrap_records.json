@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "scrap_number": "SCR-20260710-0001",
+    "date": "2026-07-09T18:30:00.000Z",
+    "scrap_type": "Paper Waste",
+    "source_department_id": 1,
+    "quantity_kg": "10.000",
+    "description": "test",
+    "disposal_method": null,
+    "buyer_name": null,
+    "sale_amount": "0.00",
+    "recorded_by": 1,
+    "status": "Pending",
+    "created_at": "2026-07-10T14:21:11.438Z",
+    "remarks": "test remark"
+  }
+]

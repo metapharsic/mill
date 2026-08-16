@@ -1,0 +1,170 @@
+[
+  {
+    "id": 9,
+    "name": "Pulp mill Section",
+    "code": "PULPMILL",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 10,
+    "name": "Centricleaner Section",
+    "code": "CENTRICLEANER",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 11,
+    "name": "Wire Section",
+    "code": "WIRE",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 12,
+    "name": "Vacuum Section",
+    "code": "VACUUM",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 13,
+    "name": "Press Section",
+    "code": "PRESS",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 14,
+    "name": "Unirun Section",
+    "code": "UNIRUN",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 15,
+    "name": "Pre Dryer Section",
+    "code": "PRE_DRYER",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 16,
+    "name": "Size Press Section",
+    "code": "SIZE_PRESS",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 17,
+    "name": "Size kitchen Section",
+    "code": "SIZE_KITCHEN",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 18,
+    "name": "Post Dryer Section",
+    "code": "POST_DRYER",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 19,
+    "name": "Calender Section",
+    "code": "CALENDER",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 20,
+    "name": "Pope Reel Section",
+    "code": "POPE_REEL",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 21,
+    "name": "Rewinder Section",
+    "code": "REWINDER",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 22,
+    "name": "Starch kitchen Section",
+    "code": "STARCH_KITCHEN",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 23,
+    "name": "Steam & Condensate Section",
+    "code": "STEAM_COND",
+    "department_id": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 24,
+    "name": "ETP Section",
+    "code": "ETP",
+    "department_id": 17,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 25,
+    "name": "Boiler Section",
+    "code": "BOILER",
+    "department_id": 9,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 26,
+    "name": "Lab Section",
+    "code": "LAB",
+    "department_id": 14,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 27,
+    "name": "Cranes",
+    "code": "CRANES",
+    "department_id": 8,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 28,
+    "name": "Compressors & Air Dryer",
+    "code": "COMPRESSORS",
+    "department_id": 9,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  },
+  {
+    "id": 29,
+    "name": "Store Section",
+    "code": "STORE",
+    "department_id": 4,
+    "is_active": true,
+    "created_at": "2026-06-29T08:07:22.464Z"
+  }
+]

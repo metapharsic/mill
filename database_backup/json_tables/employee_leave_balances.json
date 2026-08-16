@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "employee_id": 4,
+    "leave_type_id": 1,
+    "year": 2026,
+    "opening_balance": "0.00",
+    "credited": "7.00",
+    "availed": "0.00",
+    "encashed": "0.00",
+    "lapsed": "0.00",
+    "closing_balance": "7.00",
+    "updated_at": "2026-06-30T18:22:53.118Z"
+  },
+  {
+    "id": 2,
+    "employee_id": 4,
+    "leave_type_id": 2,
+    "year": 2026,
+    "opening_balance": "0.00",
+    "credited": "7.00",
+    "availed": "0.00",
+    "encashed": "0.00",
+    "lapsed": "0.00",
+    "closing_balance": "7.00",
+    "updated_at": "2026-06-30T18:22:53.118Z"
+  },
+  {
+    "id": 3,
+    "employee_id": 4,
+    "leave_type_id": 3,
+    "year": 2026,
+    "opening_balance": "0.00",
+    "credited": "12.25",
+    "availed": "0.00",
+    "encashed": "0.00",
+    "lapsed": "0.00",
+    "closing_balance": "12.25",
+    "updated_at": "2026-06-30T18:22:53.118Z"
+  },
+  {
+    "id": 4,
+    "employee_id": 4,
+    "leave_type_id": 5,
+    "year": 2026,
+    "opening_balance": "0.00",
+    "credited": "106.17",
+    "availed": "0.00",
+    "encashed": "0.00",
+    "lapsed": "0.00",
+    "closing_balance": "106.17",
+    "updated_at": "2026-06-30T18:22:53.118Z"
+  },
+  {
+    "id": 5,
+    "employee_id": 4,
+    "leave_type_id": 6,
+    "year": 2026,
+    "opening_balance": "0.00",
+    "credited": "8.75",
+    "availed": "0.00",
+    "encashed": "0.00",
+    "lapsed": "0.00",
+    "closing_balance": "8.75",
+    "updated_at": "2026-06-30T18:22:53.118Z"
+  }
+]

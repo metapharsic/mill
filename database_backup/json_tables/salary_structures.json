@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "code": "STR-WORKER",
+    "name": "Worker Grade",
+    "grade": "W",
+    "basic_pct": "60.00",
+    "hra_pct": "40.00",
+    "da_pct": "20.00",
+    "conv_fixed": "1600.00",
+    "medical_fixed": "1250.00",
+    "special_pct": "0.00",
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.950Z"
+  },
+  {
+    "id": 2,
+    "code": "STR-SUPERVISOR",
+    "name": "Supervisor Grade",
+    "grade": "S",
+    "basic_pct": "50.00",
+    "hra_pct": "40.00",
+    "da_pct": "15.00",
+    "conv_fixed": "1600.00",
+    "medical_fixed": "1250.00",
+    "special_pct": "0.00",
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.950Z"
+  },
+  {
+    "id": 3,
+    "code": "STR-MANAGER",
+    "name": "Manager Grade",
+    "grade": "M",
+    "basic_pct": "45.00",
+    "hra_pct": "40.00",
+    "da_pct": "10.00",
+    "conv_fixed": "1600.00",
+    "medical_fixed": "1250.00",
+    "special_pct": "0.00",
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.950Z"
+  },
+  {
+    "id": 4,
+    "code": "STR-HEAD",
+    "name": "Department Head",
+    "grade": "H",
+    "basic_pct": "40.00",
+    "hra_pct": "40.00",
+    "da_pct": "10.00",
+    "conv_fixed": "2000.00",
+    "medical_fixed": "1250.00",
+    "special_pct": "0.00",
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.950Z"
+  },
+  {
+    "id": 5,
+    "code": "STR-ADMIN",
+    "name": "Admin / Senior Staff",
+    "grade": "A",
+    "basic_pct": "40.00",
+    "hra_pct": "40.00",
+    "da_pct": "10.00",
+    "conv_fixed": "2000.00",
+    "medical_fixed": "1250.00",
+    "special_pct": "0.00",
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.950Z"
+  }
+]

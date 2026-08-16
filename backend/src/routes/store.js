@@ -1,0 +1,2226 @@
+const express = require('express')
+const router = express.Router()
+const { pool, requireAuth, requireLevel, requireStore, ar } = require('../middleware/helpers')
+const { publish, TOPICS } = require('../kafka')
+
+// Helper: insert audit log row (inside a client transaction)
+async function auditLog(client, { userId, action, module, recordId, oldData, newData, ip }) {
+  await client.query(
+    `INSERT INTO audit_log (user_id, action, module, record_id, old_data, new_data, ip_address)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [userId, action, module, recordId, oldData ? JSON.stringify(oldData) : null,
+     newData ? JSON.stringify(newData) : null, ip || null]
+  );
+}
+
+// Raw materials & chemicals store endpoint
+router.get('/rawmaterials', requireAuth, ar(async (req, res) => {
+  const { category, search, low_stock, scope } = req.query;
+  const where = ['m.is_active = true'];
+  const vals = [];
+
+  // Default or requested scope: only raw materials, chemicals, waste paper, pulp
+  if (scope !== 'all') {
+    where.push(`(mc.type = 'Raw Material' OR mc.name ILIKE '%chemical%' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
+  }
+
+  if (category) {
+    vals.push(`%${category}%`);
+    where.push(`(mc.name ILIKE $${vals.length} OR mc.code ILIKE $${vals.length})`);
+  }
+
+  if (low_stock === 'true') {
+    where.push(`(m.current_stock <= m.min_stock)`);
+  }
+
+  if (search) {
+    vals.push(`%${search}%`);
+    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR mc.name ILIKE $${vals.length})`);
+  }
+
+  const query = `
+    SELECT m.id, m.name, m.code, m.uom AS unit, m.current_stock, m.min_stock, m.unit_price,
+           (m.current_stock * m.unit_price) AS valuation,
+           mc.name AS "categoryName",
+           mc.name AS category_name,
+           mc.type AS category_type,
+           (m.current_stock <= m.min_stock) AS "lowStock",
+           (m.current_stock <= m.min_stock) AS lowstock
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY mc.name, m.name
+  `;
+
+  const { rows } = await pool.query(query, vals);
+
+  // Compute live summary
+  const totalItems = rows.length;
+  const totalQty = rows.reduce((s, r) => s + parseFloat(r.current_stock || 0), 0);
+  const totalValuation = rows.reduce((s, r) => s + parseFloat(r.valuation || 0), 0);
+  const lowStockCount = rows.filter(r => r.lowStock).length;
+
+  res.json({
+    success: true,
+    data: rows,
+    summary: {
+      totalItems,
+      totalQty,
+      totalValuation,
+      lowStockCount
+    }
+  });
+}));
+
+// ── STORE MANAGEMENT REAL-TIME ANALYTICS DASHBOARD ─────────────────────────
+router.get('/dashboard-analytics', requireAuth, ar(async (req, res) => {
+  // 1. Core KPIs
+  const kpiQuery = `
+    SELECT
+      COALESCE(SUM(m.current_stock * m.unit_price), 0) AS total_valuation,
+      COALESCE(SUM(m.current_stock), 0) AS total_qty,
+      COUNT(m.id) AS total_items,
+      COUNT(CASE WHEN m.current_stock <= m.min_stock THEN 1 END) AS low_stock_count,
+      COUNT(CASE WHEN m.current_stock <= 0 THEN 1 END) AS out_of_stock_count
+    FROM materials m
+    WHERE m.is_active = true
+  `;
+  const { rows: [kpiStats] } = await pool.query(kpiQuery);
+
+  // 2. Today's movements
+  const todayMovesQuery = `
+    SELECT
+      COALESCE(SUM(CASE WHEN transaction_type IN ('grn', 'in') THEN in_qty ELSE 0 END), 0) AS today_in_qty,
+      COALESCE(SUM(CASE WHEN transaction_type IN ('grn', 'in') THEN value ELSE 0 END), 0) AS today_in_val,
+      COUNT(CASE WHEN transaction_type IN ('grn', 'in') THEN 1 END) AS today_in_count,
+      COALESCE(SUM(CASE WHEN transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS today_out_qty,
+      COALESCE(SUM(CASE WHEN transaction_type IN ('issue', 'out') THEN value ELSE 0 END), 0) AS today_out_val,
+      COUNT(CASE WHEN transaction_type IN ('issue', 'out') THEN 1 END) AS today_out_count
+    FROM stock_ledger
+    WHERE date = CURRENT_DATE
+  `;
+  const { rows: [todayMoves] } = await pool.query(todayMovesQuery);
+
+  // 3. Pending Indents & GRNs
+  const pendingIndentsQuery = `
+    SELECT
+      COUNT(*) AS count,
+      COALESCE(SUM(total_value), 0) AS value
+    FROM indents
+    WHERE status IN ('Submitted', 'L1 Approved', 'L2 Approved', 'Pending')
+  `;
+  const { rows: [pendingIndents] } = await pool.query(pendingIndentsQuery);
+
+  // 4. Category-wise valuation & distribution
+  const categoryQuery = `
+    SELECT
+      COALESCE(mc.name, 'General Store') AS category_name,
+      COALESCE(mc.code, 'GEN') AS category_code,
+      COALESCE(mc.type, 'General') AS category_type,
+      COUNT(m.id) AS item_count,
+      COALESCE(SUM(m.current_stock), 0) AS total_qty,
+      COALESCE(SUM(m.current_stock * m.unit_price), 0) AS valuation
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE m.is_active = true
+    GROUP BY mc.name, mc.code, mc.type
+    ORDER BY valuation DESC
+  `;
+  const { rows: categoryRows } = await pool.query(categoryQuery);
+  const grandVal = parseFloat(kpiStats?.total_valuation || 1);
+  const categories = categoryRows.map(c => ({
+    categoryName: c.category_name,
+    categoryCode: c.category_code,
+    categoryType: c.category_type,
+    itemCount: parseInt(c.item_count),
+    totalQty: parseFloat(c.total_qty),
+    valuation: parseFloat(c.valuation),
+    percentage: grandVal > 0 ? parseFloat(((parseFloat(c.valuation) / grandVal) * 100).toFixed(2)) : 0
+  }));
+
+  // 5. 14-Day Inward vs Outward Movement Trend
+  const trendQuery = `
+    SELECT
+      TO_CHAR(d::date, 'YYYY-MM-DD') AS date,
+      TO_CHAR(d::date, 'Mon DD') AS label,
+      COALESCE(SUM(CASE WHEN sl.transaction_type IN ('grn', 'in') THEN sl.in_qty ELSE 0 END), 0) AS inward_qty,
+      COALESCE(SUM(CASE WHEN sl.transaction_type IN ('issue', 'out') THEN sl.out_qty ELSE 0 END), 0) AS outward_qty,
+      COALESCE(SUM(CASE WHEN sl.transaction_type IN ('grn', 'in') THEN sl.value ELSE 0 END), 0) AS inward_val,
+      COALESCE(SUM(CASE WHEN sl.transaction_type IN ('issue', 'out') THEN sl.value ELSE 0 END), 0) AS outward_val
+    FROM generate_series(CURRENT_DATE - INTERVAL '13 days', CURRENT_DATE, '1 day'::interval) d
+    LEFT JOIN stock_ledger sl ON DATE(sl.date) = d::date
+    GROUP BY d::date
+    ORDER BY d::date ASC
+  `;
+  const { rows: trendRows } = await pool.query(trendQuery);
+
+  // 6. Department Consumption Share (Current Month)
+  const deptQuery = `
+    SELECT
+      d.name AS department_name,
+      COUNT(DISTINCT i.id) AS issue_count,
+      COALESCE(SUM(ii.issued_qty), 0) AS total_qty,
+      COALESCE(SUM(COALESCE(ii.line_value, i.total_value, 0)), 0) AS total_val
+    FROM departments d
+    LEFT JOIN indents i ON i.department_id = d.id AND i.status IN ('Issued', 'Partially Issued', 'Approved') AND i.date >= DATE_TRUNC('month', CURRENT_DATE)
+    LEFT JOIN indent_items ii ON ii.indent_id = i.id
+    GROUP BY d.name
+    ORDER BY total_val DESC, issue_count DESC
+    LIMIT 8
+  `;
+  const { rows: deptRows } = await pool.query(deptQuery);
+  const totalDeptVal = deptRows.reduce((acc, r) => acc + parseFloat(r.total_val || 0), 0) || 1;
+  const departments = deptRows.map(d => ({
+    departmentName: d.department_name,
+    issueCount: parseInt(d.issue_count || 0),
+    totalQty: parseFloat(d.total_qty || 0),
+    totalValue: parseFloat(d.total_val || 0),
+    percentage: parseFloat(((parseFloat(d.total_val || 0) / totalDeptVal) * 100).toFixed(1))
+  }));
+
+  // 7. Criticality (ABC Classification) & Health Matrix
+  const critQuery = `
+    SELECT
+      COALESCE(criticality_class, 'C') AS crit_class,
+      COUNT(*) AS count,
+      COALESCE(SUM(current_stock * unit_price), 0) AS valuation,
+      COUNT(CASE WHEN current_stock <= min_stock THEN 1 END) AS low_stock_count
+    FROM materials
+    WHERE is_active = true
+    GROUP BY COALESCE(criticality_class, 'C')
+  `;
+  const { rows: critRows } = await pool.query(critQuery);
+  const criticality = {
+    A: { count: 0, valuation: 0, lowStock: 0 },
+    B: { count: 0, valuation: 0, lowStock: 0 },
+    C: { count: 0, valuation: 0, lowStock: 0 }
+  };
+  critRows.forEach(r => {
+    const k = r.crit_class || 'C';
+    if (criticality[k]) {
+      criticality[k] = {
+        count: parseInt(r.count),
+        valuation: parseFloat(r.valuation),
+        lowStock: parseInt(r.low_stock_count)
+      };
+    }
+  });
+
+  // 8. Top Moving Materials (Fastest Turnover in last 30 days)
+  const topMovingQuery = `
+    SELECT
+      m.id,
+      m.name,
+      m.code,
+      m.uom,
+      m.current_stock,
+      m.unit_price,
+      (m.current_stock * m.unit_price) AS valuation,
+      COALESCE(mc.name, 'General') AS category_name,
+      COUNT(sl.id) AS movement_count,
+      COALESCE(SUM(CASE WHEN sl.transaction_type IN ('issue', 'out') THEN sl.out_qty ELSE 0 END), 0) AS total_issued_qty,
+      COALESCE(SUM(sl.value), 0) AS total_turnover_val
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN stock_ledger sl ON sl.material_id = m.id AND sl.date >= CURRENT_DATE - INTERVAL '30 days'
+    WHERE m.is_active = true
+    GROUP BY m.id, m.name, m.code, m.uom, m.current_stock, m.unit_price, mc.name
+    ORDER BY movement_count DESC, total_turnover_val DESC, valuation DESC
+    LIMIT 8
+  `;
+  const { rows: topMovingRows } = await pool.query(topMovingQuery);
+
+  // 9. Dead Stock / Slow-Moving Capital (>60 days inactive)
+  const deadStockQuery = `
+    SELECT
+      COUNT(m.id) AS dead_items_count,
+      COALESCE(SUM(m.current_stock * m.unit_price), 0) AS dead_capital_value
+    FROM materials m
+    WHERE m.is_active = true
+      AND m.current_stock > 0
+      AND m.id NOT IN (
+        SELECT DISTINCT material_id FROM stock_ledger WHERE date >= CURRENT_DATE - INTERVAL '60 days' AND material_id IS NOT NULL
+      )
+  `;
+  const { rows: [deadStock] } = await pool.query(deadStockQuery);
+
+  res.json({
+    success: true,
+    data: {
+      kpis: {
+        totalStockValuation: parseFloat(kpiStats?.total_valuation || 0),
+        totalStockQty: parseFloat(kpiStats?.total_qty || 0),
+        totalCatalogItems: parseInt(kpiStats?.total_items || 0),
+        lowStockCount: parseInt(kpiStats?.low_stock_count || 0),
+        outOfStockCount: parseInt(kpiStats?.out_of_stock_count || 0),
+        todayInwardCount: parseInt(todayMoves?.today_in_count || 0),
+        todayInwardQty: parseFloat(todayMoves?.today_in_qty || 0),
+        todayInwardVal: parseFloat(todayMoves?.today_in_val || 0),
+        todayOutwardCount: parseInt(todayMoves?.today_out_count || 0),
+        todayOutwardQty: parseFloat(todayMoves?.today_out_qty || 0),
+        todayOutwardVal: parseFloat(todayMoves?.today_out_val || 0),
+        pendingIndentsCount: parseInt(pendingIndents?.count || 0),
+        pendingIndentsVal: parseFloat(pendingIndents?.value || 0),
+        deadStockCount: parseInt(deadStock?.dead_items_count || 0),
+        deadStockVal: parseFloat(deadStock?.dead_capital_value || 0)
+      },
+      categories,
+      movementTrend: trendRows.map(r => ({
+        date: r.date,
+        label: r.label,
+        inwardQty: parseFloat(r.inward_qty),
+        outwardQty: parseFloat(r.outward_qty),
+        inwardVal: parseFloat(r.inward_val),
+        outwardVal: parseFloat(r.outward_val),
+        netQty: parseFloat(r.inward_qty) - parseFloat(r.outward_qty)
+      })),
+      departments,
+      criticality,
+      topMovingMaterials: topMovingRows.map(r => ({
+        id: r.id,
+        name: r.name,
+        code: r.code,
+        uom: r.uom,
+        currentStock: parseFloat(r.current_stock),
+        unitPrice: parseFloat(r.unit_price),
+        valuation: parseFloat(r.valuation),
+        categoryName: r.category_name,
+        movementCount: parseInt(r.movement_count),
+        totalIssuedQty: parseFloat(r.total_issued_qty),
+        totalTurnoverVal: parseFloat(r.total_turnover_val)
+      }))
+    }
+  });
+}));
+
+// List store issues / indents (unified with organization indents & store requests)
+router.get('/issues', requireAuth, ar(async (req, res) => {
+  const { from, to, status, departmentId } = req.query;
+  const where = ['1=1'];
+  const vals = [];
+
+  if (from) { vals.push(from); where.push(`i.date >= $${vals.length}`); }
+  if (to)   { vals.push(to);   where.push(`i.date <= $${vals.length}`); }
+  if (status) {
+    if (status === 'Pending') {
+      vals.push('Submitted');
+      where.push(`i.status = $${vals.length}`);
+    } else {
+      vals.push(status);
+      where.push(`i.status = $${vals.length}`);
+    }
+  }
+  if (departmentId) { vals.push(departmentId); where.push(`i.department_id = $${vals.length}`); }
+  if (req.user.role_level < 4 && req.user.dept_code !== 'STORE') {
+    vals.push(req.user.department_id);
+    where.push(`i.department_id = $${vals.length}`);
+  }
+
+  const { rows } = await pool.query(`
+    SELECT
+      i.id,
+      i.indent_number AS issue_number,
+      i.indent_number AS "issueNumber",
+      i.date AS issue_date,
+      i.date AS "createdAt",
+      i.department_id,
+      d.name AS "departmentName",
+      d.name AS department_name,
+      u.name AS "requestedByName",
+      u.name AS requested_by_name,
+      i.priority,
+      i.status,
+      i.remarks,
+      i.remarks AS purpose,
+      i.remarks AS justification,
+      i.created_at,
+      i.total_value AS estimated_value,
+      COALESCE(items_agg.item_count, 0) AS item_count,
+      COALESCE(items_agg.total_qty, 0) AS quantity,
+      items_agg.material_names AS "materialName",
+      items_agg.material_names AS material_name,
+      items_agg.primary_material_id AS material_id,
+      items_agg.primary_unit AS unit,
+      items_agg.items_json AS items
+    FROM indents i
+    LEFT JOIN departments d ON i.department_id = d.id
+    LEFT JOIN users u ON i.raised_by = u.id
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(ii.id) AS item_count,
+        SUM(ii.required_qty) AS total_qty,
+        STRING_AGG(m.name, ', ' ORDER BY ii.id) AS material_names,
+        MIN(ii.material_id) AS primary_material_id,
+        MIN(ii.uom) AS primary_unit,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'id', ii.id,
+            'material_id', ii.material_id,
+            'materialName', m.name,
+            'materialCode', m.code,
+            'required_qty', ii.required_qty,
+            'issued_qty', ii.issued_qty,
+            'uom', ii.uom,
+            'purpose', ii.purpose,
+            'batch_no', ii.batch_no,
+            'unit_price', m.unit_price,
+            'current_stock', m.current_stock
+          ) ORDER BY ii.id
+        ) AS items_json
+      FROM indent_items ii
+      LEFT JOIN materials m ON ii.material_id = m.id
+      WHERE ii.indent_id = i.id
+    ) items_agg ON true
+    WHERE ${where.join(' AND ')}
+    ORDER BY i.created_at DESC
+    LIMIT 200
+  `, vals);
+
+  res.json({ success: true, data: rows });
+}));
+
+// Dept-wise issue summary (step 11 tracking — "material issued to us this month")
+router.get('/issues/dept-summary', requireAuth, ar(async (req, res) => {
+  const { from, to } = req.query;
+  const vals = [];
+  const where = ["i.status IN ('Issued', 'Partially Issued')"];
+  if (from) { vals.push(from); where.push(`i.date >= $${vals.length}`); }
+  else      { where.push(`i.date >= date_trunc('month', CURRENT_DATE)`); }
+  if (to)   { vals.push(to);   where.push(`i.date <= $${vals.length}`); }
+  // Confidentiality: non-admins only ever see their own department's data, regardless of any client param
+  if (req.user.role_level < 4 && req.user.dept_code !== 'STORE') {
+    vals.push(req.user.department_id);
+    where.push(`i.department_id = $${vals.length}`);
+  }
+
+  const { rows } = await pool.query(`
+    SELECT d.id AS "departmentId", d.name AS "departmentName",
+           COUNT(DISTINCT i.id)::int AS "issueCount",
+           COALESCE(SUM(ii.issued_qty), 0) AS "totalQuantity",
+           COALESCE(SUM(ii.line_value), 0) AS "totalValue"
+    FROM indents i
+    JOIN indent_items ii ON i.id = ii.indent_id
+    LEFT JOIN departments d ON i.department_id = d.id
+    WHERE ${where.join(' AND ')}
+    GROUP BY d.id, d.name
+    ORDER BY d.name
+  `, vals);
+  res.json({ success: true, data: rows });
+}));
+
+// Update a pending/rejected issue request / indent
+router.put('/issues/:id', requireAuth, ar(async (req, res) => {
+  const { materialId, departmentId, quantity, purpose, remarks, priority } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query('SELECT * FROM indents WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (ind) {
+      if (!['Draft', 'Submitted', 'Rejected'].includes(ind.status)) {
+        throw new Error('Only Draft, Submitted or Rejected indents can be edited');
+      }
+      await client.query(`
+        UPDATE indents SET
+          department_id = COALESCE($1, department_id),
+          priority = COALESCE($2, priority),
+          remarks = COALESCE($3, remarks),
+          status = 'Submitted'
+        WHERE id = $4
+      `, [departmentId || null, priority || null, remarks || purpose || null, req.params.id]);
+
+      if (materialId && quantity) {
+        const mat = await client.query('SELECT uom, unit_price FROM materials WHERE id=$1', [materialId]);
+        const uom = mat.rows[0]?.uom || 'Nos';
+        await client.query(`
+          UPDATE indent_items SET material_id=$1, required_qty=$2, uom=$3, purpose=$4 WHERE indent_id=$5
+        `, [materialId, quantity, uom, purpose || null, req.params.id]);
+      }
+      await client.query('COMMIT');
+      return res.json({ success: true, data: { id: req.params.id } });
+    }
+
+    // Fallback store_issues
+    const { rows: [si] } = await client.query('SELECT * FROM store_issues WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (!si) throw new Error('Request not found');
+    await client.query(`
+      UPDATE store_issues SET
+        material_id = COALESCE($1, material_id),
+        department_id = COALESCE($2, department_id),
+        quantity = COALESCE($3, quantity),
+        purpose = COALESCE($4, purpose),
+        remarks = COALESCE($5, remarks),
+        status = 'Pending'
+      WHERE id = $6
+    `, [materialId || null, departmentId || null, quantity || null, purpose || null, remarks || null, req.params.id]);
+    await client.query('COMMIT');
+    res.json({ success: true, data: { id: req.params.id } });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// DELETE /api/store/issues/:id — Full DML Delete / Cancel Indent or Store Issue Request
+router.delete('/issues/:id', requireAuth, ar(async (req, res) => {
+  const isStore = req.user.dept_code === 'STORE' || ['Store Management', 'Raw Material Store', 'Inventory', 'Store'].includes(req.user.department);
+  const isElevated = (req.user.role_level || 1) >= 4;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query('SELECT * FROM indents WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (ind) {
+      if (ind.status === 'Issued' || ind.status === 'Closed') {
+        throw new Error('Cannot delete an already issued or closed indent');
+      }
+      await client.query('DELETE FROM indent_items WHERE indent_id = $1', [req.params.id]);
+      await client.query('DELETE FROM indent_audit_log WHERE indent_id = $1', [req.params.id]);
+      await client.query('DELETE FROM store_indent_log WHERE indent_id = $1', [req.params.id]);
+      await client.query('DELETE FROM indents WHERE id = $1', [req.params.id]);
+
+      await client.query('COMMIT');
+      publish(TOPICS.EVENTS_ALL, `indent-${req.params.id}`, { event: 'indent.deleted', id: req.params.id, userId: req.user.id });
+      return res.json({ success: true, message: `Indent ${ind.indent_number} deleted successfully` });
+    }
+
+    const { rows: [si] } = await client.query('SELECT * FROM store_issues WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (si) {
+      await client.query('DELETE FROM store_issues WHERE id = $1', [req.params.id]);
+      await client.query('COMMIT');
+      publish(TOPICS.EVENTS_ALL, `issue-${req.params.id}`, { event: 'store.issue.deleted', id: req.params.id, userId: req.user.id });
+      return res.json({ success: true, message: 'Issue request deleted successfully' });
+    }
+
+    await client.query('ROLLBACK');
+    res.status(404).json({ success: false, message: 'Indent or request not found' });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// Create issue / indent request
+router.post('/issues', requireAuth, ar(async (req, res) => {
+  const { materialId, departmentId, quantity, purpose, remarks, priority, machine_id, position_id } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`indent-${dateStr}`]);
+    const { rows: seqRows } = await client.query(
+      `SELECT LPAD((COALESCE(MAX(NULLIF(regexp_replace(indent_number, '^IND-[0-9]+-', ''), '')), '0')::int + 1)::text, 4, '0') AS seq
+       FROM indents WHERE indent_number LIKE $1`,
+      [`IND-${dateStr}-%`]
+    );
+    const num = `IND-${dateStr}-${seqRows[0].seq}`;
+
+    const { rows: [newInd] } = await client.query(`
+      INSERT INTO indents (
+        indent_number, date, department_id, priority, status, raised_by, remarks, machine_id
+      ) VALUES ($1, CURRENT_DATE, $2, $3, 'Submitted', $4, $5, $6) RETURNING id, indent_number
+    `, [num, departmentId || req.user.department_id, priority || 'Normal', req.user.id, remarks || purpose || null, machine_id || null]);
+
+    if (materialId) {
+      const mat = await client.query('SELECT uom, unit_price FROM materials WHERE id=$1', [materialId]);
+      const uom = mat.rows[0]?.uom || 'Nos';
+      await client.query(`
+        INSERT INTO indent_items (indent_id, material_id, required_qty, uom, purpose)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [newInd.id, materialId, quantity || 1, uom, purpose || null]);
+    }
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `indent-${newInd.id}`, { event: 'indent.created', id: newInd.id, indentNumber: num, userId: req.user.id });
+    res.json({ success: true, data: { id: newInd.id, issueNumber: num, indentNumber: num } });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// Approve + Issue + deduct stock + auto-create Installed Assets if serialized
+router.put('/issues/:id/approve', requireAuth, requireLevel(2), ar(async (req, res) => {
+  const { serial_number, batch_number, issue_option, substitute_material_id, items: reqItems } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query(
+      `SELECT * FROM indents WHERE id=$1 FOR UPDATE`, [req.params.id]
+    );
+
+    if (ind) {
+      // Indent Approval or Issue Flow
+      if (ind.status === 'Submitted' || ind.status === 'L1 Approved') {
+        // Direct L2 approval
+        await client.query(`
+          UPDATE indents SET status='Approved', l2_approved_by=$1, l2_approved_at=NOW()
+          WHERE id=$2
+        `, [req.user.id, ind.id]);
+        await client.query('COMMIT');
+        publish(TOPICS.EVENTS_ALL, `indent-${ind.id}`, { event: 'indent.approved', id: ind.id, userId: req.user.id });
+        return res.json({ success: true, message: 'Indent approved successfully' });
+      }
+
+      if (ind.status === 'Approved' || ind.status === 'Partially Issued' || (req.user.dept_code === 'STORE' || req.user.role_level >= 4)) {
+        // Store Manager Issue Execution
+        const { rows: indItems } = await client.query(
+          `SELECT * FROM indent_items WHERE indent_id=$1`, [ind.id]
+        );
+        for (const item of indItems) {
+          const issQty = parseFloat(item.required_qty);
+          const { rows: [mat] } = await client.query(`SELECT current_stock, unit_price, is_serialized, expected_lifespan_days FROM materials WHERE id=$1 FOR UPDATE`, [item.material_id]);
+          const currStock = parseFloat(mat?.current_stock || 0);
+          if (currStock < issQty) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: `Insufficient stock for material ID ${item.material_id}. Available: ${currStock}, Requested: ${issQty}` });
+          }
+          await client.query(`UPDATE materials SET current_stock = current_stock - $1 WHERE id=$2`, [issQty, item.material_id]);
+          const unitPrice = parseFloat(mat?.unit_price || 0);
+          const newBal = currStock - issQty;
+
+          await client.query(`
+            INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, out_qty, balance, unit_price, value, batch_number, remarks, created_by)
+            VALUES ($1, CURRENT_DATE, 'issue', 'indent', $2, $3, $4, $5, $6, $7, $8, $9)
+          `, [
+            item.material_id, ind.id, issQty, mat.current_stock, unitPrice,
+            issQty * unitPrice, batch_number || serial_number || null,
+            `Store Issue for Indent ${ind.indent_number}`, req.user.id
+          ]);
+
+          await client.query(`
+            UPDATE indent_items SET issued_qty=$1, batch_no=$2, unit_price=$3, line_value=$4, ack_status='pending' WHERE id=$5
+          `, [issQty, batch_number || serial_number || null, unitPrice, issQty * unitPrice, item.id]);
+
+          // Digital Twin: Auto-create Installed Assets row if serialized or machine provided
+          if (mat?.is_serialized || serial_number || ind.machine_id) {
+            const today = new Date();
+            const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
+            const { rows: assetSeq } = await client.query(
+              `SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets`
+            );
+            const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+            await client.query(`
+              INSERT INTO installed_assets (
+                asset_number, material_id, serial_number, batch_number, machine_id,
+                indent_id, requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
+              ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
+            `, [
+              assetNumber, item.material_id, serial_number || batch_number || `SN-${Date.now()}`,
+              batch_number || null, ind.machine_id || null, ind.id, ind.raised_by || req.user.id,
+              req.user.id, req.user.id, unitPrice, mat?.expected_lifespan_days || 365
+            ]);
+          }
+        }
+
+        await client.query(`
+          UPDATE indents SET status='Issued', issued_by=$1, issued_at=NOW() WHERE id=$2
+        `, [req.user.id, ind.id]);
+
+        await client.query('COMMIT');
+        publish(TOPICS.EVENTS_ALL, `indent-${ind.id}`, { event: 'indent.issued', id: ind.id, userId: req.user.id });
+        return res.json({ success: true, message: 'Indent issued and stock deducted successfully' });
+      }
+    }
+
+    // Fallback store_issues
+    const { rows: [si] } = await client.query('SELECT * FROM store_issues WHERE id=$1', [req.params.id]);
+    if (!si) throw new Error('Request not found');
+    const mat = await client.query('SELECT current_stock, is_serialized, expected_lifespan_days, unit_price FROM materials WHERE id=$1', [si.material_id]);
+    const material = mat.rows[0];
+    if (parseFloat(material.current_stock) < parseFloat(si.quantity)) throw new Error('Insufficient stock in store');
+
+    await client.query(`UPDATE materials SET current_stock = current_stock - $1 WHERE id=$2`, [si.quantity, si.material_id]);
+    const newBal = parseFloat(material.current_stock) - parseFloat(si.quantity);
+    const price = parseFloat(material.unit_price || 0);
+
+    await client.query(`
+      INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, out_qty, balance, unit_price, value, batch_number, remarks, created_by)
+      VALUES ($1, CURRENT_DATE, 'issue', 'indent', $2, $3, $4, $5, $6, $7, 'Store issue', $8)
+    `, [si.material_id, si.id, si.quantity, newBal, price, price * parseFloat(si.quantity), batch_number || serial_number || null, req.user.id]);
+
+    await client.query(`
+      UPDATE store_issues SET status='Issued', approved_by=$1, serial_number=$2, batch_number=$3 WHERE id=$4
+    `, [req.user.id, serial_number || null, batch_number || null, req.params.id]);
+
+    if (material.is_serialized || serial_number || si.machine_id) {
+      const today = new Date();
+      const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
+      const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets`);
+      const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+      await client.query(`
+        INSERT INTO installed_assets (
+          asset_number, material_id, serial_number, batch_number, machine_id, position_id,
+          requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
+      `, [
+        assetNumber, si.material_id, serial_number || batch_number || `SN-${Date.now()}`,
+        batch_number || null, si.machine_id || null, si.position_id || null, si.issued_by || req.user.id,
+        req.user.id, req.user.id, price, material.expected_lifespan_days || 365
+      ]);
+    }
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `issue-${req.params.id}`, { event: 'store.issue.approved', id: req.params.id, userId: req.user.id });
+    res.json({ success: true });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// Reject
+router.put('/issues/:id/reject', requireAuth, requireLevel(2), ar(async (req, res) => {
+  const { rejection_reason } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query('SELECT id FROM indents WHERE id=$1 FOR UPDATE', [req.params.id]);
+    if (ind) {
+      await client.query(`UPDATE indents SET status='Rejected', remarks=COALESCE($1, remarks) WHERE id=$2`, [rejection_reason || null, req.params.id]);
+      await client.query('COMMIT');
+      publish(TOPICS.EVENTS_ALL, `indent-${req.params.id}`, { event: 'indent.rejected', id: req.params.id, userId: req.user.id });
+      return res.json({ success: true });
+    }
+    await client.query(`UPDATE store_issues SET status='Rejected', remarks=COALESCE($1, remarks) WHERE id=$2`, [rejection_reason || null, req.params.id]);
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `issue-${req.params.id}`, { event: 'store.issue.rejected', id: req.params.id, userId: req.user.id });
+    res.json({ success: true });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// ── INSTALLED ASSETS TERM & ROOT CAUSE QUERIES ─────────────────────────────────
+
+// GET /assets - list installed assets
+router.get('/assets', requireAuth, ar(async (req, res) => {
+  const { machine_id, status } = req.query;
+  const conds = []; const params = []; let p = 1;
+  if (machine_id) { conds.push(`a.machine_id = $${p++}`); params.push(machine_id); }
+  if (status) { conds.push(`a.status = $${p++}`); params.push(status); }
+  const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
+
+  const { rows } = await pool.query(
+    `SELECT a.id, a.asset_number as "assetNumber", a.serial_number as "serialNumber",
+            a.batch_number as "batchNumber", a.purchase_price as "purchasePrice",
+            a.installed_at as "installedAt", a.status, a.expected_lifespan_days as "expectedLifespanDays",
+            m.name as "materialName", m.code as "materialCode",
+            mach.name as "machineName", pos.name as "positionName",
+            EXTRACT(DAY FROM (NOW() - a.installed_at))::int as "daysInService"
+     FROM installed_assets a
+     JOIN materials m ON a.material_id = m.id
+     LEFT JOIN machines mach ON a.machine_id = mach.id
+     LEFT JOIN machine_positions pos ON a.position_id = pos.id
+     ${where} ORDER BY a.installed_at DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// POST /assets/:id/retire - fail/remove asset
+router.post('/assets/:id/retire', requireAuth, ar(async (req, res) => {
+  const { status, failure_reason } = req.body;
+  if (!status) return res.status(400).json({ success: false, message: 'Status is required' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query(
+      `UPDATE installed_assets
+       SET status=$1, retired_at=NOW(), failure_reason=$2
+       WHERE id=$3 RETURNING *`,
+      [status, failure_reason || null, req.params.id]
+    );
+
+    if (!rows.length) throw new Error('Asset not found');
+
+    await client.query(
+      `INSERT INTO asset_events (asset_id, event_type, event_date, recorded_by, remarks)
+       VALUES ($1, $2, NOW(), $3, $4)`,
+      [req.params.id, status, req.user.id, failure_reason || 'Asset retired']
+    );
+
+    await client.query('COMMIT');
+    res.json({ success: true, data: rows[0] });
+  } catch(e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally { client.release(); }
+}));
+
+// GET /positions - get active machine positions list
+router.get('/positions', requireAuth, ar(async (req, res) => {
+  const { rows } = await pool.query('SELECT id, name, code, machine_id as "machineId" FROM machine_positions WHERE is_active=true ORDER BY name');
+  res.json({ success: true, data: rows });
+}));
+
+// GET /positions/:id/history - lifespan history for a machine position
+router.get('/positions/:id/history', requireAuth, ar(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT a.id, a.asset_number as "assetNumber", a.serial_number as "serialNumber",
+            a.installed_at as "installedAt", a.retired_at as "retiredAt", a.status,
+            a.failure_reason as "failureReason", m.name as "materialName",
+            EXTRACT(DAY FROM (COALESCE(a.retired_at, NOW()) - a.installed_at))::int as "daysInService"
+     FROM installed_assets a
+     JOIN materials m ON a.material_id = m.id
+     WHERE a.position_id = $1
+     ORDER BY a.installed_at DESC`,
+    [req.params.id]
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// GET /lots/:lotNumber/trace - find all assets and failures associated with a lot/batch
+router.get('/lots/:lotNumber/trace', requireAuth, ar(async (req, res) => {
+  const lot = req.params.lotNumber.trim();
+  const searchPattern = `%${lot}%`;
+
+  const { rows } = await pool.query(
+    `SELECT
+      a.installed_at AS date,
+      CASE WHEN a.status = 'Failed' THEN 'Asset Failure / Breakdown' ELSE 'Asset Installation (Digital Twin)' END AS transaction_type,
+      m.name AS "materialName",
+      m.code AS "materialCode",
+      mach.name AS "machineName",
+      pos.name AS "positionName",
+      COALESCE(u.name, 'Store & Maintenance') AS actor_name,
+      COALESCE(a.failure_reason, 'Installed in machine position: ' || COALESCE(pos.name, 'Main Line')) AS remarks,
+      a.asset_number AS reference,
+      1::numeric AS qty,
+      a.status AS status,
+      a.serial_number AS "serialNumber",
+      a.batch_number AS "batchNumber"
+    FROM installed_assets a
+    JOIN materials m ON a.material_id = m.id
+    LEFT JOIN machines mach ON a.machine_id = mach.id
+    LEFT JOIN machine_positions pos ON a.position_id = pos.id
+    LEFT JOIN users u ON a.issued_by = u.id
+    WHERE a.batch_number ILIKE $1 OR a.serial_number ILIKE $1 OR a.asset_number ILIKE $1
+
+    UNION ALL
+
+    SELECT
+      sl.date::timestamp AS date,
+      'Stock Movement: ' || sl.transaction_type AS transaction_type,
+      m.name AS "materialName",
+      m.code AS "materialCode",
+      NULL AS "machineName",
+      NULL AS "positionName",
+      COALESCE(u.name, 'System') AS actor_name,
+      COALESCE(sl.remarks, 'Stock ledger entry') || ' (Balance: ' || sl.balance || ' ' || m.uom || ')' AS remarks,
+      COALESCE(sl.reference_type, 'LEDGER') || ' #' || COALESCE(sl.reference_id::text, sl.id::text) AS reference,
+      COALESCE(sl.in_qty, sl.out_qty, 0) AS qty,
+      'Recorded' AS status,
+      NULL AS "serialNumber",
+      sl.batch_number AS "batchNumber"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN users u ON sl.created_by = u.id
+    WHERE sl.batch_number ILIKE $1 OR sl.remarks ILIKE $1
+
+    UNION ALL
+
+    SELECT
+      g.created_at AS date,
+      'Inward Intake (GRN)' AS transaction_type,
+      m.name AS "materialName",
+      m.code AS "materialCode",
+      NULL AS "machineName",
+      NULL AS "positionName",
+      COALESCE(u.name, 'Store Gate Officer') AS actor_name,
+      'Received from ' || COALESCE(v.name, 'Vendor') || ' | Inv: ' || COALESCE(g.invoice_number, 'N/A') || ' | Veh: ' || COALESCE(g.vehicle_number, 'N/A') AS remarks,
+      g.grn_number AS reference,
+      gi.received_qty AS qty,
+      g.status AS status,
+      NULL AS "serialNumber",
+      gi.batch_number AS "batchNumber"
+    FROM grn_items gi
+    JOIN grn g ON gi.grn_id = g.id
+    JOIN materials m ON gi.material_id = m.id
+    LEFT JOIN vendors v ON g.vendor_id = v.id
+    LEFT JOIN users u ON g.received_by = u.id
+    WHERE gi.batch_number ILIKE $1 OR g.grn_number ILIKE $1 OR g.invoice_number ILIKE $1
+
+    ORDER BY date DESC
+    LIMIT 200`,
+    [searchPattern]
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── P1: INDENT WORKFLOW ─────────────────────────────────────────────────────
+
+// POST /indents — dept raises indent
+router.post('/indents', requireAuth, ar(async (req, res) => {
+  const { materialId, departmentId, qtyRequested, purpose, priority, remarks } = req.body
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const d = new Date()
+    const seq = await client.query(
+      `SELECT COUNT(*)+1 AS n FROM store_indents WHERE indent_date::date = CURRENT_DATE`
+    )
+    const pad = (n, l) => String(n).padStart(l, '0')
+    const num = `INDT-${d.getFullYear()}${pad(d.getMonth()+1,2)}${pad(d.getDate(),2)}-${pad(seq.rows[0].n,4)}`
+    const mat = await client.query('SELECT uom AS unit FROM materials WHERE id=$1', [materialId])
+    const unit = mat.rows[0]?.unit || null
+
+    const ins = await client.query(`
+      INSERT INTO store_indents
+        (indent_number,department_id,material_id,qty_requested,unit,purpose,priority,remarks,requested_by,status)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'Requested') RETURNING id
+    `, [num, departmentId, materialId, qtyRequested, unit, purpose, priority||'Normal', remarks||null, req.user.id])
+    const indentId = ins.rows[0].id
+
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role)
+      VALUES ($1,'Raised',NULL,'Requested',$2,$3,$4)
+    `, [indentId, req.user.id, req.user.name, req.user.role])
+
+    await client.query('COMMIT')
+    res.json({ success: true, data: { id: indentId, indentNumber: num, status: 'Requested' } })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// GET /indents/:id — single indent + full progress timeline
+router.get('/indents/:id', requireAuth, ar(async (req, res) => {
+  const { rows: indRow } = await pool.query(`
+    SELECT i.id, i.indent_number AS "indentNumber", i.indent_date AS "indentDate",
+           i.qty_requested AS "qtyRequested", i.qty_issued AS "qtyIssued",
+           i.unit, i.purpose, i.priority, i.status, i.remarks,
+           i.reject_reason AS "rejectReason", i.created_at AS "createdAt",
+           m.name AS "materialName", m.code AS "materialCode",
+           d.name AS "departmentName",
+           ru.name AS "requestedByName",
+           au.name AS "approvedByName",
+           iu.name AS "issuedByName"
+    FROM store_indents i
+    LEFT JOIN materials m ON i.material_id = m.id
+    LEFT JOIN departments d ON i.department_id = d.id
+    LEFT JOIN users ru ON i.requested_by = ru.id
+    LEFT JOIN users au ON i.approved_by = au.id
+    LEFT JOIN users iu ON i.issued_by = iu.id
+    WHERE i.id = $1
+  `, [req.params.id])
+  if (!indRow[0]) return res.status(404).json({ success: false, message: 'Indent not found' })
+
+  const { rows: timeline } = await pool.query(`
+    SELECT action, from_status AS "fromStatus", to_status AS "toStatus",
+           actor_name AS "actorName", actor_role AS "actorRole",
+           qty, note, created_at AS "createdAt"
+    FROM store_indent_log
+    WHERE indent_id = $1
+    ORDER BY created_at ASC
+  `, [req.params.id])
+
+  res.json({ success: true, data: { indent: indRow[0], timeline } })
+}))
+
+// GET /indents — list with filters
+router.get('/indents', requireAuth, ar(async (req, res) => {
+  const { from, to, status, departmentId } = req.query
+  const vals = []
+  const where = ['1=1']
+  if (from)         { vals.push(from);         where.push(`i.indent_date >= $${vals.length}`) }
+  if (to)           { vals.push(to);           where.push(`i.indent_date <= $${vals.length}`) }
+  if (status)       { vals.push(status);       where.push(`i.status = $${vals.length}`) }
+  if (departmentId) { vals.push(departmentId); where.push(`i.department_id = $${vals.length}`) }
+
+  const { rows } = await pool.query(`
+    SELECT i.id, i.indent_number AS "indentNumber", i.indent_date AS "indentDate",
+           i.qty_requested AS "qtyRequested", i.qty_issued AS "qtyIssued",
+           i.unit, i.purpose, i.priority, i.status, i.remarks, i.created_at AS "createdAt",
+           m.name AS "materialName", m.code AS "materialCode",
+           d.name AS "departmentName", u.name AS "requestedByName"
+    FROM store_indents i
+    LEFT JOIN materials m ON i.material_id = m.id
+    LEFT JOIN departments d ON i.department_id = d.id
+    LEFT JOIN users u ON i.requested_by = u.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY i.created_at DESC
+  `, vals)
+  res.json({ success: true, data: rows })
+}))
+
+// PUT /indents/:id/reject — supervisor rejects indent (PERMISSION GATE deny)
+router.put('/indents/:id/reject', requireAuth, requireLevel(2), ar(async (req, res) => {
+  const { reason } = req.body
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query('SELECT * FROM store_indents WHERE id=$1 FOR UPDATE', [req.params.id])
+    const ind = rows[0]
+    if (!ind) throw new Error('Not found')
+    if (ind.status !== 'Requested') throw new Error('Only Requested indents can be rejected')
+
+    await client.query(
+      `UPDATE store_indents SET status='Rejected', reject_reason=$1, approved_by=$2, approved_at=NOW() WHERE id=$3`,
+      [reason || null, req.user.id, ind.id]
+    )
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+      VALUES ($1,'Rejected','Requested','Rejected',$2,$3,$4,$5)
+    `, [ind.id, req.user.id, req.user.name, req.user.role, reason || null])
+
+    await client.query('COMMIT')
+    res.json({ success: true })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// PUT /indents/:id/approve — dept-scoped supervisor approves, maker != checker (matches indent.js strength)
+router.put('/indents/:id/approve', requireAuth, requireLevel(3), ar(async (req, res) => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query('SELECT * FROM store_indents WHERE id=$1 FOR UPDATE', [req.params.id])
+    const ind = rows[0]
+    if (!ind) throw new Error('Not found')
+    if (ind.status !== 'Requested') throw new Error('Only Requested indents can be approved')
+    if (req.user.role_level < 4 && ind.department_id !== req.user.department_id) throw new Error('Can only approve indents from your own department (or level4+ override)')
+    if (ind.requested_by === req.user.id && req.user.role_level < 4) throw new Error('Cannot approve own indent — needs different approver (or level4+ override)')
+
+    await client.query(
+      `UPDATE store_indents SET status='Approved', approved_by=$1, approved_at=NOW() WHERE id=$2`,
+      [req.user.id, ind.id]
+    )
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+      VALUES ($1,'Approved','Requested','Approved',$2,$3,$4,$5)
+    `, [ind.id, req.user.id, req.user.name, req.user.role, req.body.note||null])
+
+    await client.query('COMMIT')
+    res.json({ success: true })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// PUT /indents/:id/issue — STORE ONLY issues stock (requireStore guard)
+router.put('/indents/:id/issue', requireAuth, requireStore, ar(async (req, res) => {
+  const { qty } = req.body
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query('SELECT * FROM store_indents WHERE id=$1 FOR UPDATE', [req.params.id])
+    const ind = rows[0]
+    if (!ind) throw new Error('Not found')
+    if (ind.status !== 'Approved' && ind.status !== 'PartIssued')
+      throw new Error('Only Approved/PartIssued indents can be issued')
+
+    const currentIssued = parseFloat(ind.qty_issued || 0)
+    const issueQty = parseFloat(qty || 0)
+    if (issueQty <= 0) throw new Error('Issue quantity must be positive')
+
+    const newIssued = currentIssued + issueQty
+    const requested = parseFloat(ind.qty_requested)
+    if (newIssued > requested) throw new Error('Cannot issue more than requested')
+
+    // check material stock
+    const m = await client.query('SELECT current_stock, unit_price FROM materials WHERE id=$1 FOR UPDATE', [ind.material_id])
+    const material = m.rows[0]
+    if (!material || parseFloat(material.current_stock) < issueQty)
+      throw new Error('Insufficient stock in materials store')
+
+    // deduct stock
+    const nextStock = parseFloat(material.current_stock) - issueQty
+    await client.query('UPDATE materials SET current_stock=$1 WHERE id=$2', [nextStock, ind.material_id])
+
+    // log stock ledger (out)
+    const ledgerSeq = await client.query('SELECT balance FROM stock_ledger WHERE material_id=$1 ORDER BY id DESC LIMIT 1', [ind.material_id])
+    const bal = parseFloat(ledgerSeq.rows[0]?.balance || 0) - issueQty
+    await client.query(`
+      INSERT INTO stock_ledger (material_id, date, transaction_type, reference_id, reference_type, out_qty, balance, unit_price, value, remarks, created_by)
+      VALUES ($1,CURRENT_DATE,'Issue',$2,'StoreIndent',$3,$4,$5,$6,$7,$8)
+    `, [ind.material_id, ind.id, issueQty, bal, material.unit_price||0, issueQty * parseFloat(material.unit_price||0), `Issued against Indent ${ind.indent_number}`, req.user.id])
+
+    const full = newIssued === requested
+    const newStatus = full ? 'Issued' : 'PartIssued'
+
+    await client.query(
+      `UPDATE store_indents SET status=$1, qty_issued=$2, issued_by=$3, issued_at=NOW() WHERE id=$4`,
+      [newStatus, newIssued, req.user.id, ind.id]
+    )
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,qty_issued,note)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+    `, [ind.id, full?'Issued':'PartIssued', ind.status, newStatus, req.user.id, req.user.name, req.user.role, qty, req.body.note||null])
+
+    await client.query('COMMIT')
+    res.json({ success: true, data: { status: newStatus, qtyIssued: newIssued } })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// PUT /indents/:id/close — dept acknowledge receipt
+router.put('/indents/:id/close', requireAuth, ar(async (req, res) => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query('SELECT * FROM store_indents WHERE id=$1 FOR UPDATE', [req.params.id])
+    const ind = rows[0]
+    if (!ind) throw new Error('Not found')
+    if (ind.status !== 'Issued') throw new Error('Only Issued indents can be closed')
+
+    await client.query(
+      `UPDATE store_indents SET status='Closed', closed_by=$1, closed_at=NOW() WHERE id=$2`,
+      [req.user.id, ind.id]
+    )
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+      VALUES ($1,'Closed','Issued','Closed',$2,$3,$4,$5)
+    `, [ind.id, req.user.id, req.user.name, req.user.role, req.body.note||null])
+
+    await client.query('COMMIT')
+    res.json({ success: true })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// PUT /indents/:id/cancel — requester pulls back (Requested only)
+router.put('/indents/:id/cancel', requireAuth, ar(async (req, res) => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query('SELECT * FROM store_indents WHERE id=$1 FOR UPDATE', [req.params.id])
+    const ind = rows[0]
+    if (!ind) throw new Error('Not found')
+    if (ind.status !== 'Requested') throw new Error('Can only cancel Requested indents')
+    if (ind.requested_by !== req.user.id && req.user.role_level < 4)
+      throw new Error('Can only cancel your own indent')
+
+    await client.query(`UPDATE store_indents SET status='Cancelled' WHERE id=$1`, [ind.id])
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+      VALUES ($1,'Cancelled','Requested','Cancelled',$2,$3,$4,$5)
+    `, [ind.id, req.user.id, req.user.name, req.user.role, req.body.note||null])
+
+    await client.query('COMMIT')
+    res.json({ success: true })
+  } catch(e) {
+    await client.query('ROLLBACK')
+    res.status(400).json({ success: false, message: e.message })
+  } finally { client.release() }
+}))
+
+// GET /admin/progress — admin control tower (level 4+)
+router.get('/admin/progress', requireAuth, requireLevel(4), ar(async (req, res) => {
+  const { status, department_id, from, to } = req.query
+  const vals = []
+  const where = ['1=1']
+  if (status)        { vals.push(status);        where.push(`i.status = $${vals.length}`) }
+  if (department_id) { vals.push(department_id); where.push(`i.department_id = $${vals.length}`) }
+  if (from)          { vals.push(from);          where.push(`i.indent_date >= $${vals.length}`) }
+  if (to)            { vals.push(to);            where.push(`i.indent_date <= $${vals.length}`) }
+
+  const { rows } = await pool.query(`
+    SELECT i.id, i.indent_number, i.indent_date, i.status, i.priority,
+           i.qty_requested, i.qty_issued, i.unit,
+           m.name AS materialname,
+           d.name AS departmentname,
+           ru.name AS requestedbyname,
+           au.name AS approvedbyname,
+           iu.name AS issuedbyname,
+           (SELECT l.action || ' by ' || l.actor_name
+              FROM store_indent_log l WHERE l.indent_id=i.id
+              ORDER BY l.created_at DESC LIMIT 1) AS laststep,
+           (SELECT l.created_at FROM store_indent_log l WHERE l.indent_id=i.id
+              ORDER BY l.created_at DESC LIMIT 1) AS laststepat
+    FROM store_indents i
+    LEFT JOIN materials m   ON i.material_id  = m.id
+    LEFT JOIN departments d ON i.department_id = d.id
+    LEFT JOIN users ru ON i.requested_by = ru.id
+    LEFT JOIN users au ON i.approved_by  = au.id
+    LEFT JOIN users iu ON i.issued_by    = iu.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY i.created_at DESC LIMIT 200
+  `, vals)
+
+  const { rows: summary } = await pool.query(
+    `SELECT status, COUNT(*)::int AS count FROM store_indents GROUP BY status`
+  )
+  const summaryMap = {}
+  for (const r of summary) summaryMap[r.status] = r.count
+
+  res.json({ success: true, data: { indents: rows, summary: summaryMap } })
+}))
+
+// ── INWARD DESK ─────────────────────────────────────────────────────────────
+// GET /api/store/inward
+router.get('/inward', requireAuth, ar(async (req, res) => {
+  const { from, to, store_type, category_id, search, limit = 100, page = 1 } = req.query;
+  const where = ["sl.transaction_type IN ('grn', 'return', 'in')"];
+  const vals = [];
+
+  if (from) { vals.push(from); where.push(`sl.date >= $${vals.length}`); }
+  if (to)   { vals.push(to);   where.push(`sl.date <= $${vals.length}`); }
+  if (category_id) {
+    vals.push(category_id);
+    where.push(`m.category_id IN (SELECT id FROM material_categories WHERE id = $${vals.length} OR parent_id = $${vals.length})`);
+  }
+  if (store_type) {
+    if (store_type === 'mechanical') {
+      where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
+    } else if (store_type === 'electrical') {
+      where.push(`(mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical'))`);
+    } else if (store_type === 'chemical' || store_type === 'raw' || store_type === 'rawmaterial') {
+      where.push(`(mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
+    } else if (store_type === 'consumable') {
+      where.push(`(mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing'))`);
+    }
+  }
+  if (search) {
+    vals.push(`%${search}%`);
+    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length})`);
+  }
+
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const whereClause = where.join(' AND ');
+
+  const { rows } = await pool.query(`
+    SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
+           sl.in_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
+           sl.remarks, sl.created_at,
+           m.name AS "materialName", m.code AS "materialCode", m.uom,
+           mc.name AS "categoryName",
+           u.name AS "createdByName"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN users u ON sl.created_by = u.id
+    WHERE ${whereClause}
+    ORDER BY sl.id DESC
+    LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
+  `, [...vals, parseInt(limit), offset]);
+
+  const countRes = await pool.query(`
+    SELECT COUNT(*) as total_count, COALESCE(SUM(sl.in_qty), 0) as total_qty, COALESCE(SUM(sl.value), 0) as total_value
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE ${whereClause}
+  `, vals);
+
+  const todayRes = await pool.query(`
+    SELECT COUNT(*) as today_count, COALESCE(SUM(sl.in_qty), 0) as today_qty, COALESCE(SUM(sl.value), 0) as today_value
+    FROM stock_ledger sl
+    WHERE sl.transaction_type IN ('grn', 'return', 'in') AND sl.date = CURRENT_DATE
+  `);
+
+  res.json({
+    success: true,
+    data: rows,
+    total: parseInt(countRes.rows[0].total_count),
+    summary: {
+      totalCount: parseInt(countRes.rows[0].total_count),
+      totalQty: parseFloat(countRes.rows[0].total_qty),
+      totalValue: parseFloat(countRes.rows[0].total_value),
+      todayCount: parseInt(todayRes.rows[0].today_count),
+      todayQty: parseFloat(todayRes.rows[0].today_qty),
+      todayValue: parseFloat(todayRes.rows[0].today_value),
+    }
+  });
+}));
+
+// POST /api/store/inward — Fast Inward (GRN / Vendor / Return)
+router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
+  const { material_id, in_qty, unit_price, inward_type = 'grn', reference_type, reference_id,
+          department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks } = req.body;
+
+  if (!material_id || !in_qty || Number(in_qty) <= 0) {
+    return res.status(400).json({ success: false, message: 'Valid material and quantity (> 0) required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const qty = parseFloat(in_qty);
+    const price = unit_price !== undefined && unit_price !== '' ? parseFloat(unit_price) : parseFloat(mat.unit_price || 0);
+    const newStock = parseFloat(mat.current_stock || 0) + qty;
+    const totalVal = qty * price;
+    const finalBin = bin_location || mat.bin_location;
+
+    await client.query(`
+      UPDATE materials
+      SET current_stock = $1,
+          bin_location = COALESCE($2, bin_location),
+          unit_price = CASE WHEN $3 > 0 THEN $3 ELSE unit_price END
+      WHERE id = $4
+    `, [newStock, finalBin, price, material_id]);
+
+    let deptName = '';
+    if (department_id) {
+      const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
+      if (dept) deptName = dept.name;
+    }
+
+    const refIdNum = /^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null;
+    const remarkFull = [
+      inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : '[Vendor GRN]',
+      reference_id && !refIdNum ? `Ref: ${reference_id}` : null,
+      vendor_name ? `Party: ${vendor_name}` : null,
+      quality_status ? `QC: ${quality_status}` : null,
+      remarks
+    ].filter(Boolean).join(' | ');
+
+    const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : null;
+
+    const { rows: [ledger] } = await client.query(`
+      INSERT INTO stock_ledger (
+        material_id, date, transaction_type, reference_type, reference_id,
+        in_qty, out_qty, balance, unit_price, value,
+        batch_number, bin_location, remarks, created_by
+      ) VALUES (
+        $1, CURRENT_DATE, $2, $3, $4,
+        $5, 0, $6, $7, $8,
+        $9, $10, $11, $12
+      ) RETURNING *
+    `, [
+      material_id, inward_type === 'return' ? 'return' : 'grn', reference_type || 'GRN', refIdNum,
+      qty, newStock, price, totalVal,
+      batch_number || null, finalBin || null, remarkFull, req.user.id
+    ]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.inward',
+      module: 'store',
+      recordId: ledger.id,
+      newData: { material_id, qty, price, newStock, inward_type, reference_id },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `inward-${ledger.id}`, { event: 'store.inward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: `Inward recorded successfully. New balance: ${newStock} ${mat.uom}`, data: ledger });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// ── OUTWARD DESK ────────────────────────────────────────────────────────────
+// GET /api/store/outward
+router.get('/outward', requireAuth, ar(async (req, res) => {
+  const { from, to, store_type, department_id, search, limit = 100, page = 1 } = req.query;
+  const where = ["sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')"];
+  const vals = [];
+
+  if (from) { vals.push(from); where.push(`sl.date >= $${vals.length}`); }
+  if (to)   { vals.push(to);   where.push(`sl.date <= $${vals.length}`); }
+  if (store_type) {
+    if (store_type === 'mechanical') {
+      where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
+    } else if (store_type === 'electrical') {
+      where.push(`(mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical'))`);
+    } else if (store_type === 'chemical' || store_type === 'raw' || store_type === 'rawmaterial') {
+      where.push(`(mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
+    } else if (store_type === 'consumable') {
+      where.push(`(mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing'))`);
+    }
+  }
+  if (search) {
+    vals.push(`%${search}%`);
+    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length})`);
+  }
+
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const whereClause = where.join(' AND ');
+
+  const { rows } = await pool.query(`
+    SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
+           sl.out_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
+           sl.remarks, sl.created_at,
+           m.name AS "materialName", m.code AS "materialCode", m.uom,
+           mc.name AS "categoryName",
+           u.name AS "createdByName"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN users u ON sl.created_by = u.id
+    WHERE ${whereClause}
+    ORDER BY sl.id DESC
+    LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
+  `, [...vals, parseInt(limit), offset]);
+
+  const countRes = await pool.query(`
+    SELECT COUNT(*) as total_count, COALESCE(SUM(sl.out_qty), 0) as total_qty, COALESCE(SUM(sl.value), 0) as total_value
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE ${whereClause}
+  `, vals);
+
+  const todayRes = await pool.query(`
+    SELECT COUNT(*) as today_count, COALESCE(SUM(sl.out_qty), 0) as today_qty, COALESCE(SUM(sl.value), 0) as today_value
+    FROM stock_ledger sl
+    WHERE sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer') AND sl.date = CURRENT_DATE
+  `);
+
+  res.json({
+    success: true,
+    data: rows,
+    total: parseInt(countRes.rows[0].total_count),
+    summary: {
+      totalCount: parseInt(countRes.rows[0].total_count),
+      totalQty: parseFloat(countRes.rows[0].total_qty),
+      totalValue: parseFloat(countRes.rows[0].total_value),
+      todayCount: parseInt(todayRes.rows[0].today_count),
+      todayQty: parseFloat(todayRes.rows[0].today_qty),
+      todayValue: parseFloat(todayRes.rows[0].today_value),
+    }
+  });
+}));
+
+// POST /api/store/outward — Fast Outward Issue / Dispatch / RTV
+router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
+  const { material_id, out_qty, department_id, machine_id, position_id, outward_type = 'issue',
+          issued_to, purpose, serial_number, batch_number, reference_type, reference_id, remarks } = req.body;
+
+  if (!material_id || !out_qty || Number(out_qty) <= 0) {
+    return res.status(400).json({ success: false, message: 'Valid material and quantity (> 0) required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const qty = parseFloat(out_qty);
+    const curStock = parseFloat(mat.current_stock || 0);
+
+    if (curStock < qty) {
+      throw new Error(`Insufficient stock. Available: ${curStock} ${mat.uom}, Requested: ${qty} ${mat.uom}`);
+    }
+
+    const newStock = curStock - qty;
+    const price = parseFloat(mat.unit_price || 0);
+    const totalVal = qty * price;
+
+    await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, material_id]);
+
+    let deptName = '';
+    if (department_id) {
+      const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
+      if (dept) deptName = dept.name;
+    }
+
+    const refIdNum = /^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null;
+    const remarkFull = [
+      outward_type === 'return_to_vendor' ? '[RTV Outward]' : '[Store Issue]',
+      reference_id && !refIdNum ? `Ref: ${reference_id}` : null,
+      deptName ? `Dept: ${deptName}` : null,
+      issued_to ? `To: ${issued_to}` : null,
+      purpose ? `Purpose: ${purpose}` : null,
+      remarks
+    ].filter(Boolean).join(' | ');
+
+    const { rows: [ledger] } = await client.query(`
+      INSERT INTO stock_ledger (
+        material_id, date, transaction_type, reference_type, reference_id,
+        in_qty, out_qty, balance, unit_price, value,
+        batch_number, remarks, created_by
+      ) VALUES (
+        $1, CURRENT_DATE, $2, $3, $4,
+        0, $5, $6, $7, $8,
+        $9, $10, $11
+      ) RETURNING *
+    `, [
+      material_id, outward_type === 'return_to_vendor' ? 'return_to_vendor' : 'issue',
+      reference_type || 'ISSUE', refIdNum,
+      qty, newStock, price, totalVal,
+      batch_number || serial_number || null, remarkFull, req.user.id
+    ]);
+
+    if (mat.is_serialized || machine_id || serial_number) {
+      const today = new Date();
+      const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
+      const { rows: assetSeq } = await client.query(
+        `SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets`
+      );
+      const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+      await client.query(`
+        INSERT INTO installed_assets (
+          asset_number, material_id, serial_number, batch_number, machine_id, position_id,
+          requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
+      `, [
+        assetNumber, material_id, serial_number || batch_number || `SN-${Date.now()}`,
+        batch_number || null, machine_id || null, position_id || null, req.user.id,
+        req.user.id, req.user.id, price, mat.expected_lifespan_days || 365
+      ]);
+    }
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.outward',
+      module: 'store',
+      recordId: ledger.id,
+      newData: { material_id, qty, price, newStock, outward_type, department_id, issued_to },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `outward-${ledger.id}`, { event: 'store.outward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: `Outward issue recorded. New balance: ${newStock} ${mat.uom}`, data: ledger });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/inward/:id — DML Update Inward GRN
+router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
+  const { id } = req.params;
+  const { in_qty, unit_price, reference_type, reference_id, vendor_name, bin_location, batch_number, quality_status, remarks, date } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
+    if (!ledger) throw new Error('Inward record not found');
+    if (!['grn', 'return', 'in'].includes(ledger.transaction_type)) {
+      throw new Error('Record is not an inward transaction');
+    }
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [ledger.material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const oldQty = parseFloat(ledger.in_qty || 0);
+    const newQty = in_qty !== undefined ? parseFloat(in_qty) : oldQty;
+    const oldPrice = parseFloat(ledger.unit_price || 0);
+    const newPrice = unit_price !== undefined && unit_price !== '' ? parseFloat(unit_price) : oldPrice;
+    const curStock = parseFloat(mat.current_stock || 0);
+
+    const delta = newQty - oldQty;
+    const newStock = curStock + delta;
+    if (newStock < 0) {
+      throw new Error(`Cannot update inward quantity: resulting material stock would be negative (${newStock} ${mat.uom})`);
+    }
+
+    const totalVal = newQty * newPrice;
+
+    // Update material current_stock and unit_price
+    await client.query(`
+      UPDATE materials
+      SET current_stock = $1,
+          unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
+          bin_location = COALESCE($3, bin_location)
+      WHERE id = $4
+    `, [newStock, newPrice, bin_location || null, mat.id]);
+
+    const refIdNum = reference_id !== undefined ? (/^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null) : ledger.reference_id;
+    const remarkFull = remarks !== undefined ? remarks : ledger.remarks;
+
+    const { rows: [updatedLedger] } = await client.query(`
+      UPDATE stock_ledger
+      SET in_qty = $1,
+          balance = balance + $2,
+          unit_price = $3,
+          value = $4,
+          reference_type = COALESCE($5, reference_type),
+          reference_id = $6,
+          batch_number = COALESCE($7, batch_number),
+          bin_location = COALESCE($8, bin_location),
+          remarks = $9,
+          date = COALESCE($10::date, date)
+      WHERE id = $11
+      RETURNING *
+    `, [
+      newQty, delta, newPrice, totalVal, reference_type || null, refIdNum,
+      batch_number || null, bin_location || null, remarkFull, date || null, id
+    ]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.inward.update',
+      module: 'store',
+      recordId: id,
+      oldData: { in_qty: oldQty, unit_price: oldPrice },
+      newData: { in_qty: newQty, unit_price: newPrice, newStock },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `inward-${id}`, { event: 'store.inward.updated', id, materialId: mat.id, newQty, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: 'Inward entry updated successfully', data: updatedLedger });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/store/inward/:id — DML Delete / Void Inward GRN
+router.delete('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
+  const { id } = req.params;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
+    if (!ledger) throw new Error('Inward record not found');
+    if (!['grn', 'return', 'in'].includes(ledger.transaction_type)) {
+      throw new Error('Record is not an inward transaction');
+    }
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [ledger.material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const inQty = parseFloat(ledger.in_qty || 0);
+    const curStock = parseFloat(mat.current_stock || 0);
+    const newStock = curStock - inQty;
+
+    if (newStock < 0) {
+      throw new Error(`Cannot delete inward record: subsequent issues already consumed this stock (Remaining: ${curStock} ${mat.uom})`);
+    }
+
+    await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, mat.id]);
+    await client.query('DELETE FROM stock_ledger WHERE id = $1', [id]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.inward.delete',
+      module: 'store',
+      recordId: id,
+      oldData: { material_id: mat.id, in_qty: inQty, curStock },
+      newData: { newStock },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `inward-${id}`, { event: 'store.inward.deleted', id, materialId: mat.id, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: `Inward record removed. Restored balance: ${newStock} ${mat.uom}` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/outward/:id — DML Update Outward Issue
+router.put('/outward/:id', requireAuth, requireStore, ar(async (req, res) => {
+  const { id } = req.params;
+  const { out_qty, department_id, machine_id, issued_to, purpose, remarks, date } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
+    if (!ledger) throw new Error('Outward record not found');
+    if (!['issue', 'out', 'return_to_vendor', 'transfer'].includes(ledger.transaction_type)) {
+      throw new Error('Record is not an outward transaction');
+    }
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [ledger.material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const oldQty = parseFloat(ledger.out_qty || 0);
+    const newQty = out_qty !== undefined ? parseFloat(out_qty) : oldQty;
+    const curStock = parseFloat(mat.current_stock || 0);
+
+    // Revert old issue and apply new issue
+    const newStock = curStock + oldQty - newQty;
+    if (newStock < 0) {
+      throw new Error(`Insufficient stock for update. Available: ${curStock + oldQty} ${mat.uom}, Requested: ${newQty} ${mat.uom}`);
+    }
+
+    const price = parseFloat(ledger.unit_price || mat.unit_price || 0);
+    const totalVal = newQty * price;
+
+    await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, mat.id]);
+
+    let deptName = '';
+    if (department_id) {
+      const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
+      if (dept) deptName = dept.name;
+    }
+
+    const remarkParts = [
+      ledger.remarks?.includes('[RTV Outward]') ? '[RTV Outward]' : '[Store Issue]',
+      deptName ? `Dept: ${deptName}` : null,
+      issued_to ? `To: ${issued_to}` : null,
+      purpose ? `Purpose: ${purpose}` : null,
+      remarks
+    ].filter(Boolean).join(' | ');
+
+    const { rows: [updatedLedger] } = await client.query(`
+      UPDATE stock_ledger
+      SET out_qty = $1,
+          balance = $2,
+          value = $3,
+          remarks = $4,
+          date = COALESCE($5::date, date)
+      WHERE id = $6
+      RETURNING *
+    `, [newQty, newStock, totalVal, remarkParts || ledger.remarks, date || null, id]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.outward.update',
+      module: 'store',
+      recordId: id,
+      oldData: { out_qty: oldQty },
+      newData: { out_qty: newQty, newStock },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `outward-${id}`, { event: 'store.outward.updated', id, materialId: mat.id, newQty, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: 'Outward issue updated successfully', data: updatedLedger });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/store/outward/:id — DML Delete / Cancel Outward Issue
+router.delete('/outward/:id', requireAuth, requireStore, ar(async (req, res) => {
+  const { id } = req.params;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
+    if (!ledger) throw new Error('Outward record not found');
+    if (!['issue', 'out', 'return_to_vendor', 'transfer'].includes(ledger.transaction_type)) {
+      throw new Error('Record is not an outward transaction');
+    }
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [ledger.material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const outQty = parseFloat(ledger.out_qty || 0);
+    const curStock = parseFloat(mat.current_stock || 0);
+    const newStock = curStock + outQty; // Restore back into store stock
+
+    await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, mat.id]);
+    await client.query('DELETE FROM stock_ledger WHERE id = $1', [id]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.outward.delete',
+      module: 'store',
+      recordId: id,
+      oldData: { material_id: mat.id, out_qty: outQty, curStock },
+      newData: { newStock },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `outward-${id}`, { event: 'store.outward.deleted', id, materialId: mat.id, newStock, userId: req.user.id });
+
+    res.json({ success: true, message: `Outward issue cancelled. Stock restored to store: ${newStock} ${mat.uom}` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// ── STORE DEPARTMENT-WISE REPORTING ──────────────────────────────────────────
+// GET /api/store/reports/department-wise
+router.get('/reports/department-wise', requireAuth, ar(async (req, res) => {
+  const { from, to } = req.query;
+
+  const dateFilter = [];
+  const p = [];
+  if (from) { p.push(from); dateFilter.push(`sl.date >= $${p.length}`); }
+  if (to)   { p.push(to);   dateFilter.push(`sl.date <= $${p.length}`); }
+  const dateClause = dateFilter.length ? 'AND ' + dateFilter.join(' AND ') : '';
+
+  // Confidentiality: non-admins only ever see their own department's data, regardless of any client param
+  const isAdmin = req.user.role_level >= 4;
+  const deptScopeD = isAdmin ? '' : `AND d.id = $${p.length + 1}`;
+  const deptScopeParams = isAdmin ? p : [...p, req.user.department_id];
+
+  // 1. Department-wise summary aggregates
+  const deptSummary = await pool.query(`
+    SELECT
+      d.id AS "departmentId",
+      d.name AS "departmentName",
+      d.code AS "departmentCode",
+      COUNT(sl.id) AS "totalIssues",
+      COALESCE(SUM(sl.out_qty), 0) AS "totalQuantity",
+      COALESCE(SUM(sl.value), 0) AS "totalValuation",
+      COUNT(DISTINCT sl.material_id) AS "distinctMaterials"
+    FROM departments d
+    LEFT JOIN stock_ledger sl ON (
+      (
+        sl.remarks ILIKE '%' || d.name || '%'
+        OR (
+          sl.reference_type = 'indent'
+          AND EXISTS (
+            SELECT 1 FROM indents ind2
+            WHERE ind2.department_id = d.id
+              AND sl.remarks ILIKE '%' || ind2.indent_number || '%'
+          )
+        )
+      )
+      AND sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')
+      ${dateClause}
+    )
+    WHERE 1=1 ${deptScopeD}
+    GROUP BY d.id, d.name, d.code
+    ORDER BY "totalValuation" DESC, "totalIssues" DESC, d.name ASC
+  `, deptScopeParams);
+
+  // 2. Department Category Breakdown
+  const catBreakdown = await pool.query(`
+    SELECT
+      d.name AS "departmentName",
+      COALESCE(mc.type, 'General') AS "categoryType",
+      COUNT(sl.id) AS "issuesCount",
+      COALESCE(SUM(sl.out_qty), 0) AS "categoryQty",
+      COALESCE(SUM(sl.value), 0) AS "categoryValuation"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    CROSS JOIN departments d
+    WHERE (
+        sl.remarks ILIKE '%' || d.name || '%'
+        OR (
+          sl.reference_type = 'indent'
+          AND EXISTS (
+            SELECT 1 FROM indents ind2
+            WHERE ind2.department_id = d.id
+              AND sl.remarks ILIKE '%' || ind2.indent_number || '%'
+          )
+        )
+      )
+      AND sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')
+      ${dateClause}
+      ${deptScopeD}
+    GROUP BY d.name, COALESCE(mc.type, 'General')
+    ORDER BY d.name, "categoryValuation" DESC
+  `, deptScopeParams);
+
+  // 3. Top Consumed Spares Across Mill
+  const topConsumed = await pool.query(`
+    SELECT 
+      m.id, m.code, m.name, m.uom,
+      mc.name AS "categoryName",
+      COUNT(sl.id) AS "frequency",
+      COALESCE(SUM(sl.out_qty), 0) AS "totalIssuedQty",
+      COALESCE(SUM(sl.value), 0) AS "totalCost"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')
+      ${dateClause}
+    GROUP BY m.id, m.code, m.name, m.uom, mc.name
+    ORDER BY "totalCost" DESC, "totalIssuedQty" DESC
+    LIMIT 15
+  `, p);
+
+  // 4. Granular Issue Transactions by Department (for drilldown)
+  // Confidentiality: non-admins only see rows attributable to their own department (matched via remarks, same convention as above)
+  const deptIssuesScope = isAdmin ? '' : `AND (
+        sl.remarks ILIKE '%' || $${p.length + 1} || '%'
+        OR (
+          sl.reference_type = 'indent'
+          AND EXISTS (
+            SELECT 1 FROM indents ind2
+            WHERE ind2.department_id = $${p.length + 2}
+              AND sl.remarks ILIKE '%' || ind2.indent_number || '%'
+          )
+        )
+      )`;
+  const deptIssuesParams = isAdmin ? p : [...p, req.user.department, req.user.department_id];
+  const deptIssues = await pool.query(`
+    SELECT
+      sl.id, sl.date, sl.material_id, sl.out_qty, sl.balance, sl.unit_price, sl.value,
+      sl.batch_number, sl.remarks, sl.created_at,
+      m.name AS "materialName", m.code AS "materialCode", m.uom,
+      mc.name AS "categoryName",
+      COALESCE(u.name, 'Store Keeper') AS "issuedByName"
+    FROM stock_ledger sl
+    JOIN materials m ON sl.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN users u ON sl.created_by = u.id
+    WHERE sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')
+      ${dateClause}
+      ${deptIssuesScope}
+    ORDER BY sl.id DESC
+    LIMIT 100
+  `, deptIssuesParams);
+
+  res.json({
+    success: true,
+    data: {
+      departments: deptSummary.rows,
+      categoryBreakdown: catBreakdown.rows,
+      topConsumed: topConsumed.rows,
+      recentIssues: deptIssues.rows
+    }
+  });
+}));
+
+// GET /api/store/reports/store-analytics — Specialized Store Intelligence
+router.get('/reports/store-analytics', requireAuth, ar(async (req, res) => {
+  // 1. ABC Material Valuation Classification
+  const abcSummary = await pool.query(`
+    SELECT 
+      CASE 
+        WHEN (current_stock * unit_price) >= 50000 OR unit_price >= 25000 THEN 'A (High Value)'
+        WHEN (current_stock * unit_price) >= 10000 OR unit_price >= 5000 THEN 'B (Medium Value)'
+        ELSE 'C (Standard / Bulk)'
+      END AS "abcClass",
+      COUNT(id) AS "itemCount",
+      COALESCE(SUM(current_stock), 0) AS "totalStock",
+      COALESCE(SUM(current_stock * unit_price), 0) AS "totalValuation"
+    FROM materials
+    WHERE is_active = true
+    GROUP BY 1
+    ORDER BY "totalValuation" DESC
+  `);
+
+  // 2. Dead / Non-Moving Inventory (In stock, but 0 issues in stock ledger)
+  const deadStock = await pool.query(`
+    SELECT 
+      m.id, m.code, m.name, m.uom, m.current_stock, m.unit_price,
+      (m.current_stock * m.unit_price) AS "blockedValue",
+      m.bin_location,
+      mc.name AS "categoryName",
+      COALESCE(MAX(sl.date), m.created_at::date) AS "lastActivityDate",
+      CURRENT_DATE - COALESCE(MAX(sl.date), m.created_at::date) AS "daysInactive"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN stock_ledger sl ON m.id = sl.material_id AND sl.transaction_type IN ('issue', 'out')
+    WHERE m.is_active = true AND m.current_stock > 0
+    GROUP BY m.id, m.code, m.name, m.uom, m.current_stock, m.unit_price, m.bin_location, mc.name, m.created_at
+    HAVING MAX(sl.date) IS NULL OR (CURRENT_DATE - MAX(sl.date)) >= 30
+    ORDER BY "blockedValue" DESC, "daysInactive" DESC
+    LIMIT 25
+  `);
+
+  // 3. Reorder & Fast Depletion Critical Alerts
+  const reorderAlerts = await pool.query(`
+    SELECT 
+      m.id, m.code, m.name, m.uom, m.current_stock, m.min_stock, m.reorder_level, m.unit_price,
+      mc.name AS "categoryName",
+      m.bin_location,
+      CASE 
+        WHEN m.current_stock = 0 THEN 'STOCKOUT'
+        WHEN m.current_stock <= m.min_stock THEN 'CRITICAL MINIMUM'
+        WHEN m.current_stock <= m.reorder_level THEN 'REORDER REQUIRED'
+        ELSE 'NORMAL'
+      END AS "alertLevel"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE m.is_active = true 
+      AND (m.current_stock <= COALESCE(m.reorder_level, 0) OR m.current_stock <= COALESCE(m.min_stock, 0) OR m.current_stock = 0)
+    ORDER BY (m.current_stock - COALESCE(m.reorder_level, 0)) ASC, m.current_stock ASC
+    LIMIT 30
+  `);
+
+  // 4. Inward vs Outward Monthly Reconciliation
+  const flowReconciliation = await pool.query(`
+    SELECT 
+      TO_CHAR(date, 'YYYY-MM') AS "month",
+      COUNT(*) FILTER (WHERE transaction_type IN ('grn', 'return', 'in')) AS "inwardTxnCount",
+      COALESCE(SUM(in_qty) FILTER (WHERE transaction_type IN ('grn', 'return', 'in')), 0) AS "inwardQty",
+      COALESCE(SUM(value) FILTER (WHERE transaction_type IN ('grn', 'return', 'in')), 0) AS "inwardValue",
+      COUNT(*) FILTER (WHERE transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')) AS "outwardTxnCount",
+      COALESCE(SUM(out_qty) FILTER (WHERE transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')), 0) AS "outwardQty",
+      COALESCE(SUM(value) FILTER (WHERE transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')), 0) AS "outwardValue"
+    FROM stock_ledger
+    WHERE transaction_type != 'opening'
+    GROUP BY TO_CHAR(date, 'YYYY-MM')
+    ORDER BY "month" DESC
+    LIMIT 12
+  `);
+
+  res.json({
+    success: true,
+    data: {
+      abcSummary: abcSummary.rows,
+      deadStock: deadStock.rows,
+      reorderAlerts: reorderAlerts.rows,
+      flowReconciliation: flowReconciliation.rows
+    }
+  });
+}));
+
+// GET /api/store/reports/item-wise — per-material consumption drill-down
+router.get('/reports/item-wise', requireAuth, ar(async (req, res) => {
+  const { from, to, materialId, categoryId } = req.query;
+  const p = [];
+  const dateFilter = [];
+  if (from) { p.push(from); dateFilter.push(`sl.date >= $${p.length}`); }
+  if (to)   { p.push(to);   dateFilter.push(`sl.date <= $${p.length}`); }
+  const dateClause = dateFilter.length ? 'AND ' + dateFilter.join(' AND ') : '';
+
+  const matFilter = [];
+  if (materialId) { p.push(materialId); matFilter.push(`m.id = $${p.length}`); }
+  if (categoryId) { p.push(categoryId); matFilter.push(`m.category_id = $${p.length}`); }
+  const matClause = matFilter.length ? 'AND ' + matFilter.join(' AND ') : '';
+
+  // Per-item consumption summary
+  const items = await pool.query(`
+    SELECT
+      m.id, m.code, m.name, m.uom, m.current_stock, m.min_stock, m.reorder_level, m.unit_price,
+      m.bin_location, mc.name AS "categoryName", mc.id AS "categoryId",
+      COUNT(sl.id) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) AS "issueCount",
+      COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "totalIssuedQty",
+      COALESCE(SUM(sl.value) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "totalIssuedValue",
+      COALESCE(SUM(sl.in_qty) FILTER (WHERE sl.transaction_type IN ('grn','return','in')), 0) AS "totalReceivedQty",
+      CASE WHEN m.current_stock > 0
+        THEN ROUND(COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) / m.current_stock, 2)
+        ELSE 0 END AS "turnoverRate"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN stock_ledger sl ON sl.material_id = m.id ${dateClause}
+    WHERE m.is_active = true ${matClause}
+    GROUP BY m.id, m.code, m.name, m.uom, m.current_stock, m.min_stock, m.reorder_level, m.unit_price, m.bin_location, mc.name, mc.id
+    ORDER BY "totalIssuedValue" DESC, "totalIssuedQty" DESC
+    LIMIT 300
+  `, p);
+
+  // Top issuing departments per item (only when a single material is requested, to keep it fast)
+  // Confidentiality: non-admins only see their own department's slice of this breakdown, never other departments'
+  let topDepartments = [];
+  if (materialId) {
+    const p2 = [materialId];
+    const dateFilter2 = [];
+    if (from) { p2.push(from); dateFilter2.push(`sl.date >= $${p2.length}`); }
+    if (to)   { p2.push(to);   dateFilter2.push(`sl.date <= $${p2.length}`); }
+    const dateClause2 = dateFilter2.length ? 'AND ' + dateFilter2.join(' AND ') : '';
+    const deptScope2 = req.user.role_level >= 4 ? '' : `AND si.department_id = $${p2.length + 1}`;
+    if (req.user.role_level < 4) p2.push(req.user.department_id);
+    const dq = await pool.query(`
+      SELECT d.id AS "departmentId", d.name AS "departmentName",
+        COUNT(si.id)::int AS "issueCount",
+        COALESCE(SUM(si.quantity), 0) AS "totalQty",
+        COALESCE(SUM(si.estimated_value), 0) AS "totalValue"
+      FROM store_issues si
+      LEFT JOIN departments d ON si.department_id = d.id
+      LEFT JOIN stock_ledger sl ON sl.material_id = si.material_id AND sl.date = si.issue_date
+      WHERE si.material_id = $1 AND si.status = 'Issued' ${dateClause2} ${deptScope2}
+      GROUP BY d.id, d.name
+      ORDER BY "totalValue" DESC
+      LIMIT 10
+    `, p2);
+    topDepartments = dq.rows;
+  }
+
+  res.json({ success: true, data: { items: items.rows, topDepartments } });
+}));
+
+// GET /api/store/reports/category-wise — category/subcategory hierarchy drill-down
+router.get('/reports/category-wise', requireAuth, ar(async (req, res) => {
+  const { from, to } = req.query;
+  const p = [];
+  const dateFilter = [];
+  if (from) { p.push(from); dateFilter.push(`sl.date >= $${p.length}`); }
+  if (to)   { p.push(to);   dateFilter.push(`sl.date <= $${p.length}`); }
+  const dateClause = dateFilter.length ? 'AND ' + dateFilter.join(' AND ') : '';
+
+  const rows = await pool.query(`
+    WITH mat_agg AS (
+      SELECT category_id,
+             COUNT(*) AS item_count,
+             COALESCE(SUM(current_stock * unit_price), 0) AS stock_value
+      FROM materials
+      WHERE is_active = true
+      GROUP BY category_id
+    )
+    SELECT
+      mc.id AS "categoryId", mc.name AS "categoryName", mc.code AS "categoryCode",
+      mc.parent_id AS "parentId", pc.name AS "parentName",
+      COALESCE(ma.item_count, 0) AS "itemCount",
+      COALESCE(ma.stock_value, 0) AS "stockValue",
+      COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "issueVolume",
+      COALESCE(SUM(sl.value) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "issueValue",
+      COALESCE(SUM(sl.in_qty) FILTER (WHERE sl.transaction_type IN ('grn','return','in')), 0) AS "grnInflowVolume",
+      COALESCE(SUM(sl.value) FILTER (WHERE sl.transaction_type IN ('grn','return','in')), 0) AS "grnInflowValue"
+    FROM material_categories mc
+    LEFT JOIN material_categories pc ON pc.id = mc.parent_id
+    LEFT JOIN mat_agg ma ON ma.category_id = mc.id
+    LEFT JOIN materials m ON m.category_id = mc.id AND m.is_active = true
+    LEFT JOIN stock_ledger sl ON sl.material_id = m.id ${dateClause}
+    GROUP BY mc.id, mc.name, mc.code, mc.parent_id, pc.name, ma.item_count, ma.stock_value
+    ORDER BY "stockValue" DESC, mc.name
+  `, p);
+
+  res.json({ success: true, data: rows.rows });
+}));
+
+// GET /api/store/reports/bin-location — physical bin/rack location report for stock-take
+router.get('/reports/bin-location', requireAuth, ar(async (req, res) => {
+  const { binLocation } = req.query;
+  const p = [];
+  const where = ["m.is_active = true"];
+  if (binLocation) { p.push(`%${binLocation}%`); where.push(`m.bin_location ILIKE $${p.length}`); }
+
+  const byBin = await pool.query(`
+    SELECT
+      COALESCE(m.bin_location, 'UNASSIGNED') AS "binLocation",
+      COUNT(m.id) AS "itemCount",
+      COALESCE(SUM(m.current_stock), 0) AS "totalStock",
+      COALESCE(SUM(m.current_stock * m.unit_price), 0) AS "totalValue"
+    FROM materials m
+    WHERE ${where.join(' AND ')}
+    GROUP BY COALESCE(m.bin_location, 'UNASSIGNED')
+    ORDER BY "binLocation"
+  `, p);
+
+  const items = await pool.query(`
+    SELECT
+      m.id, m.code, m.name, m.uom, m.current_stock, m.unit_price, m.bin_location,
+      mc.name AS "categoryName",
+      (m.current_stock * m.unit_price) AS "stockValue"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY COALESCE(m.bin_location, 'UNASSIGNED'), m.name
+    LIMIT 500
+  `, p);
+
+  res.json({ success: true, data: { byBin: byBin.rows, items: items.rows } });
+}));
+
+// GET /api/store/reports/vendor-wise — GRN inward volume/value per vendor, price trend
+router.get('/reports/vendor-wise', requireAuth, ar(async (req, res) => {
+  const { from, to, vendorId } = req.query;
+  const p = [];
+  const gWhere = ["1=1"];
+  if (from) { p.push(from); gWhere.push(`g.date >= $${p.length}`); }
+  if (to)   { p.push(to);   gWhere.push(`g.date <= $${p.length}`); }
+  if (vendorId) { p.push(vendorId); gWhere.push(`g.vendor_id = $${p.length}`); }
+
+  const vendors = await pool.query(`
+    SELECT
+      v.id AS "vendorId", v.name AS "vendorName", v.code AS "vendorCode", v.rating,
+      COALESCE(g_agg."grnCount", 0) AS "grnCount",
+      COALESCE(g_agg."totalAcceptedQty", 0) AS "totalAcceptedQty",
+      COALESCE(g_agg."totalRejectedQty", 0) AS "totalRejectedQty",
+      COALESCE(g_agg."totalInwardValue", 0) AS "totalInwardValue",
+      COALESCE(g_agg."distinctMaterials", 0) AS "distinctMaterials",
+      COALESCE(g_agg."poCount", 0) AS "poCount",
+      COALESCE(g_agg."onTimeDeliveries", 0) AS "onTimeDeliveries"
+    FROM vendors v
+    LEFT JOIN (
+      SELECT g.vendor_id,
+        COUNT(DISTINCT g.id) AS "grnCount",
+        COALESCE(SUM(gi.accepted_qty), 0) AS "totalAcceptedQty",
+        COALESCE(SUM(gi.rejected_qty), 0) AS "totalRejectedQty",
+        COALESCE(SUM(gi.accepted_qty * gi.unit_price), 0) AS "totalInwardValue",
+        COUNT(DISTINCT gi.material_id) AS "distinctMaterials",
+        COUNT(DISTINCT po.id) AS "poCount",
+        COUNT(DISTINCT po.id) FILTER (WHERE po.delivery_date IS NOT NULL AND g.date <= po.delivery_date) AS "onTimeDeliveries"
+      FROM grn g
+      LEFT JOIN grn_items gi ON gi.grn_id = g.id
+      LEFT JOIN purchase_orders po ON po.id = g.po_id
+      WHERE ${gWhere.join(' AND ')}
+      GROUP BY g.vendor_id
+    ) g_agg ON g_agg.vendor_id = v.id
+    WHERE COALESCE(g_agg."grnCount", 0) > 0
+    ORDER BY "totalInwardValue" DESC
+  `, p);
+
+  // Price trend per material per vendor (only when a specific vendor is requested)
+  let priceTrend = [];
+  if (vendorId) {
+    const p2 = [vendorId];
+    const dateFilter2 = [];
+    if (from) { p2.push(from); dateFilter2.push(`g.date >= $${p2.length}`); }
+    if (to)   { p2.push(to);   dateFilter2.push(`g.date <= $${p2.length}`); }
+    const dateClause2 = dateFilter2.length ? 'AND ' + dateFilter2.join(' AND ') : '';
+    const pt = await pool.query(`
+      SELECT
+        m.id AS "materialId", m.name AS "materialName", m.code AS "materialCode",
+        g.date, gi.unit_price, gi.accepted_qty, g.grn_number
+      FROM grn_items gi
+      JOIN grn g ON gi.grn_id = g.id
+      JOIN materials m ON gi.material_id = m.id
+      WHERE g.vendor_id = $1 ${dateClause2}
+      ORDER BY m.name, g.date
+      LIMIT 500
+    `, p2);
+    priceTrend = pt.rows;
+  }
+
+  res.json({ success: true, data: { vendors: vendors.rows, priceTrend } });
+}));
+
+// GET /api/store/reports/movement-analysis — fast/slow/dead-stock movement classification
+router.get('/reports/movement-analysis', requireAuth, ar(async (req, res) => {
+  const { from, to } = req.query;
+  const p = [];
+  const dateFilter = [];
+  if (from) { p.push(from); dateFilter.push(`sl.date >= $${p.length}`); }
+  else      { dateFilter.push(`sl.date >= (CURRENT_DATE - INTERVAL '90 days')`); }
+  if (to)   { p.push(to);   dateFilter.push(`sl.date <= $${p.length}`); }
+  const dateClause = 'AND ' + dateFilter.join(' AND ');
+  const params = p;
+
+  const rows = await pool.query(`
+    SELECT
+      m.id, m.code, m.name, m.uom, m.current_stock, m.unit_price, m.bin_location,
+      mc.name AS "categoryName",
+      (m.current_stock * m.unit_price) AS "stockValue",
+      COUNT(sl.id) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) AS "movementCount",
+      COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "movementQty",
+      MAX(sl.date) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) AS "lastIssueDate",
+      CASE
+        WHEN COUNT(sl.id) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) = 0 THEN 'DEAD'
+        WHEN COUNT(sl.id) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) >= 5 THEN 'FAST'
+        ELSE 'SLOW'
+      END AS "movementClass"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN stock_ledger sl ON sl.material_id = m.id ${dateClause}
+    WHERE m.is_active = true
+    GROUP BY m.id, m.code, m.name, m.uom, m.current_stock, m.unit_price, m.bin_location, mc.name
+    ORDER BY "movementCount" DESC, "stockValue" DESC
+    LIMIT 500
+  `, params);
+
+  const summary = {
+    fast: rows.rows.filter(r => r.movementClass === 'FAST').length,
+    slow: rows.rows.filter(r => r.movementClass === 'SLOW').length,
+    dead: rows.rows.filter(r => r.movementClass === 'DEAD').length,
+    deadStockValue: rows.rows.filter(r => r.movementClass === 'DEAD').reduce((a, r) => a + parseFloat(r.stockValue || 0), 0)
+  };
+
+  res.json({ success: true, data: { items: rows.rows, summary } });
+}));
+
+module.exports = router;
+

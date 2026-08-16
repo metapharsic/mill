@@ -1,0 +1,29 @@
+# MK Paper Mill ERP — nginx reverse proxy + TLS
+# Put at /etc/nginx/sites-available/mkerp , symlink to sites-enabled, then: nginx -t && systemctl reload nginx
+# TLS via certbot:  certbot --nginx -d erp.mkpapermill.com
+
+server {
+    listen 80;
+    server_name erp.mkpapermill.com;
+    return 301 https://$host$request_uri;     # force HTTPS
+}
+
+server {
+    listen 443 ssl http2;
+    server_name erp.mkpapermill.com;
+
+    ssl_certificate     /etc/letsencrypt/live/erp.mkpapermill.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/erp.mkpapermill.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    client_max_body_size 25m;                  # PDF/scan uploads
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;      # PM2 backend (serves API + React dist)
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

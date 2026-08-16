@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "Kraft Paper",
+    "code": "KP",
+    "gsm_min": "70.00",
+    "gsm_max": "200.00",
+    "description": null,
+    "is_active": true,
+    "deleted_by": null
+  },
+  {
+    "id": 2,
+    "name": "Writing Paper",
+    "code": "WP",
+    "gsm_min": "60.00",
+    "gsm_max": "90.00",
+    "description": null,
+    "is_active": true,
+    "deleted_by": null
+  },
+  {
+    "id": 3,
+    "name": "Newsprint",
+    "code": "NP",
+    "gsm_min": "45.00",
+    "gsm_max": "52.00",
+    "description": null,
+    "is_active": true,
+    "deleted_by": null
+  },
+  {
+    "id": 4,
+    "name": "Board",
+    "code": "BRD",
+    "gsm_min": "200.00",
+    "gsm_max": "400.00",
+    "description": null,
+    "is_active": true,
+    "deleted_by": null
+  },
+  {
+    "id": 5,
+    "name": "Tissue",
+    "code": "TIS",
+    "gsm_min": "15.00",
+    "gsm_max": "35.00",
+    "description": null,
+    "is_active": true,
+    "deleted_by": null
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "tier": 1,
+    "label": "Small",
+    "min_value": "0.00",
+    "max_value": "10000.00",
+    "required_level": 2,
+    "description": "Under Rs 10,000 — L1 supervisor only"
+  },
+  {
+    "id": 2,
+    "tier": 2,
+    "label": "Medium",
+    "min_value": "10000.00",
+    "max_value": "100000.00",
+    "required_level": 3,
+    "description": "Rs 10k to Rs 1L — L1 + dept head (L2)"
+  },
+  {
+    "id": 3,
+    "tier": 3,
+    "label": "Large",
+    "min_value": "100000.00",
+    "max_value": null,
+    "required_level": 4,
+    "description": "Above Rs 1L — L1 + dept head + plant head (L3)"
+  }
+]

@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "name": "Production",
+    "code": "PROD",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Production & Operations"
+  },
+  {
+    "id": 8,
+    "name": "Maintenance",
+    "code": "MAINT",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Production & Operations"
+  },
+  {
+    "id": 9,
+    "name": "Utility",
+    "code": "UTIL",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Production & Operations"
+  },
+  {
+    "id": 2,
+    "name": "Raw Material Store",
+    "code": "RMS",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 3,
+    "name": "Inventory",
+    "code": "INV",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 4,
+    "name": "Store Management",
+    "code": "STORE",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 5,
+    "name": "Indent Management",
+    "code": "INDENT",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 19,
+    "name": "Packing",
+    "code": "PACK",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 20,
+    "name": "Finished Goods Warehouse",
+    "code": "FGW",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
+    "id": 7,
+    "name": "Quality",
+    "code": "QC",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Quality & Lab"
+  },
+  {
+    "id": 14,
+    "name": "Laboratory",
+    "code": "LAB",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Quality & Lab"
+  },
+  {
+    "id": 6,
+    "name": "Purchase",
+    "code": "PUR",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Supply Chain"
+  },
+  {
+    "id": 10,
+    "name": "Dispatch",
+    "code": "DISP",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Supply Chain"
+  },
+  {
+    "id": 11,
+    "name": "Sales",
+    "code": "SALES",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Supply Chain"
+  },
+  {
+    "id": 12,
+    "name": "HR & Payroll",
+    "code": "HR",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Commercial & Admin"
+  },
+  {
+    "id": 15,
+    "name": "Finance",
+    "code": "FIN",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Commercial & Admin"
+  },
+  {
+    "id": 16,
+    "name": "Administration",
+    "code": "ADMIN",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Commercial & Admin"
+  },
+  {
+    "id": 13,
+    "name": "Security",
+    "code": "SEC",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Safety & Compliance"
+  },
+  {
+    "id": 17,
+    "name": "EHS",
+    "code": "EHS",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Safety & Compliance"
+  },
+  {
+    "id": 18,
+    "name": "Scrap Management",
+    "code": "SCRAP",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Safety & Compliance"
+  }
+]

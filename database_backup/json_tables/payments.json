@@ -1,0 +1,32 @@
+[
+  {
+    "id": 2,
+    "payment_number": "PY-20260710-0001",
+    "sales_order_id": 1,
+    "amount": "5000.00",
+    "payment_date": "2026-07-09T18:30:00.000Z",
+    "payment_mode": "Bank",
+    "reference_number": null,
+    "recorded_by": 1,
+    "remarks": null,
+    "created_at": "2026-07-10T14:29:54.597Z",
+    "status": "Confirmed",
+    "confirmed_by": 1,
+    "confirmed_at": "2026-07-10T14:29:54.864Z"
+  },
+  {
+    "id": 3,
+    "payment_number": "PY-20260710-0002",
+    "sales_order_id": 1,
+    "amount": "1000.00",
+    "payment_date": "2026-07-09T18:30:00.000Z",
+    "payment_mode": "Cash",
+    "reference_number": null,
+    "recorded_by": 6,
+    "remarks": null,
+    "created_at": "2026-07-10T14:30:06.376Z",
+    "status": "Pending",
+    "confirmed_by": null,
+    "confirmed_at": null
+  }
+]

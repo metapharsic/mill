@@ -1,0 +1,227 @@
+[
+  {
+    "id": 12,
+    "report_id": 1,
+    "gsm": "150.0",
+    "bf": "22.0",
+    "sets": 3,
+    "production_mt": "5.000",
+    "sort_order": 0
+  },
+  {
+    "id": 13,
+    "report_id": 1,
+    "gsm": "140.0",
+    "bf": "22.0",
+    "sets": 23,
+    "production_mt": "39.000",
+    "sort_order": 1
+  },
+  {
+    "id": 14,
+    "report_id": 1,
+    "gsm": "180.0",
+    "bf": "22.0",
+    "sets": 13,
+    "production_mt": "22.000",
+    "sort_order": 2
+  },
+  {
+    "id": 15,
+    "report_id": 1,
+    "gsm": "150.0",
+    "bf": "20.0",
+    "sets": 1,
+    "production_mt": "1.500",
+    "sort_order": 3
+  },
+  {
+    "id": 16,
+    "report_id": 1,
+    "gsm": "140.0",
+    "bf": "20.0",
+    "sets": 10,
+    "production_mt": "17.000",
+    "sort_order": 4
+  },
+  {
+    "id": 17,
+    "report_id": 1,
+    "gsm": "180.0",
+    "bf": "20.0",
+    "sets": 7,
+    "production_mt": "12.000",
+    "sort_order": 5
+  },
+  {
+    "id": 18,
+    "report_id": 1,
+    "gsm": "180.0",
+    "bf": "18.0",
+    "sets": 1,
+    "production_mt": "1.500",
+    "sort_order": 6
+  },
+  {
+    "id": 19,
+    "report_id": 1,
+    "gsm": "140.0",
+    "bf": "18.0",
+    "sets": 40,
+    "production_mt": "67.000",
+    "sort_order": 7
+  },
+  {
+    "id": 23,
+    "report_id": 7,
+    "gsm": "120.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 24,
+    "report_id": 7,
+    "gsm": "140.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 1
+  },
+  {
+    "id": 25,
+    "report_id": 7,
+    "gsm": "150.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 2
+  },
+  {
+    "id": 26,
+    "report_id": 7,
+    "gsm": "180.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 3
+  },
+  {
+    "id": 77,
+    "report_id": 9,
+    "gsm": "120.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 78,
+    "report_id": 9,
+    "gsm": "140.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 1
+  },
+  {
+    "id": 79,
+    "report_id": 9,
+    "gsm": "150.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 2
+  },
+  {
+    "id": 80,
+    "report_id": 9,
+    "gsm": "180.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 3
+  },
+  {
+    "id": 81,
+    "report_id": 16,
+    "gsm": "180.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 82,
+    "report_id": 16,
+    "gsm": "200.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 1
+  },
+  {
+    "id": 83,
+    "report_id": 16,
+    "gsm": "250.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 2
+  },
+  {
+    "id": 84,
+    "report_id": 8,
+    "gsm": "180.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 85,
+    "report_id": 8,
+    "gsm": "150.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 1
+  },
+  {
+    "id": 86,
+    "report_id": 8,
+    "gsm": "120.0",
+    "bf": null,
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 2
+  },
+  {
+    "id": 87,
+    "report_id": 10,
+    "gsm": "120.0",
+    "bf": "20.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 88,
+    "report_id": 19,
+    "gsm": "120.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 0
+  },
+  {
+    "id": 89,
+    "report_id": 19,
+    "gsm": "140.0",
+    "bf": "18.0",
+    "sets": 0,
+    "production_mt": "0.000",
+    "sort_order": 1
+  }
+]

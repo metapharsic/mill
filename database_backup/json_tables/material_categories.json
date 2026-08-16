@@ -1,0 +1,254 @@
+[
+  {
+    "id": 29,
+    "name": "Clothing",
+    "code": "CLOTH",
+    "type": "Consumable",
+    "parent_id": null
+  },
+  {
+    "id": 30,
+    "name": "Electrical",
+    "code": "ELEC",
+    "type": "Spare Part",
+    "parent_id": null
+  },
+  {
+    "id": 31,
+    "name": "Mechanical",
+    "code": "MECH",
+    "type": "Spare Part",
+    "parent_id": null
+  },
+  {
+    "id": 32,
+    "name": "Spare Parts",
+    "code": "SPARE",
+    "type": "Spare Part",
+    "parent_id": null
+  },
+  {
+    "id": 33,
+    "name": "Stationary",
+    "code": "STAT",
+    "type": "Consumable",
+    "parent_id": null
+  },
+  {
+    "id": 34,
+    "name": "Packing",
+    "code": "PACK",
+    "type": "Consumable",
+    "parent_id": null
+  },
+  {
+    "id": 35,
+    "name": "General",
+    "code": "GEN",
+    "type": "Consumable",
+    "parent_id": null
+  },
+  {
+    "id": 36,
+    "name": "Hydraulic & Pneumatic",
+    "code": "HYDPNEU",
+    "type": "Spare Part",
+    "parent_id": null
+  },
+  {
+    "id": 37,
+    "name": "Drive & Motors",
+    "code": "DRIVE",
+    "type": "Spare Part",
+    "parent_id": null
+  },
+  {
+    "id": 38,
+    "name": "Capital Goods",
+    "code": "CAPEX",
+    "type": "Asset",
+    "parent_id": null
+  },
+  {
+    "id": 39,
+    "name": "Bearing",
+    "code": "MECH-BRG",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 40,
+    "name": "Oil Seal",
+    "code": "MECH-OSL",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 41,
+    "name": "Tyre Coupling & Pin Bush",
+    "code": "MECH-TCP",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 42,
+    "name": "Pump Sleeve",
+    "code": "MECH-PSL",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 43,
+    "name": "V-Belt",
+    "code": "MECH-VBT",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 44,
+    "name": "Welding Rods",
+    "code": "MECH-WLD",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 45,
+    "name": "Blade/Cutting Wheel & Grinding",
+    "code": "MECH-BLD",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 46,
+    "name": "Valve",
+    "code": "MECH-VLV",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 47,
+    "name": "Check Nut & Washer",
+    "code": "MECH-CNW",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 48,
+    "name": "Gauges",
+    "code": "MECH-GUG",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 49,
+    "name": "Shaft & Impeller",
+    "code": "MECH-SFT",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 50,
+    "name": "SS/MS Pipe Fitting",
+    "code": "MECH-PIP",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 51,
+    "name": "Nozzles",
+    "code": "MECH-NOZ",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 52,
+    "name": "Lubricants",
+    "code": "MECH-LUB",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 53,
+    "name": "Compressor",
+    "code": "MECH-CMP",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 54,
+    "name": "Pulley",
+    "code": "MECH-PUL",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 55,
+    "name": "Bolts & Nuts/Washers",
+    "code": "MECH-BNW",
+    "type": "Mechanical",
+    "parent_id": 31
+  },
+  {
+    "id": 56,
+    "name": "Contactor",
+    "code": "ELEC-CNT",
+    "type": "Electrical",
+    "parent_id": 30
+  },
+  {
+    "id": 57,
+    "name": "Relay",
+    "code": "ELEC-RLY",
+    "type": "Electrical",
+    "parent_id": 30
+  },
+  {
+    "id": 58,
+    "name": "MCB & Fuses",
+    "code": "ELEC-MCB",
+    "type": "Electrical",
+    "parent_id": 30
+  },
+  {
+    "id": 59,
+    "name": "Electrical General",
+    "code": "ELEC-GEN",
+    "type": "Electrical",
+    "parent_id": 30
+  },
+  {
+    "id": 60,
+    "name": "VFD Drive & Spares",
+    "code": "ELEC-VFD",
+    "type": "Electrical",
+    "parent_id": 30
+  },
+  {
+    "id": 61,
+    "name": "Waste Paper",
+    "code": "WASTE",
+    "type": "Raw Material",
+    "parent_id": null
+  },
+  {
+    "id": 62,
+    "name": "Wood Pulp",
+    "code": "PULP",
+    "type": "Raw Material",
+    "parent_id": null
+  },
+  {
+    "id": 28,
+    "name": "Chemical",
+    "code": "CHEM",
+    "type": "Raw Material",
+    "parent_id": null
+  },
+  {
+    "id": 63,
+    "name": "Quality Control",
+    "code": "QC",
+    "type": "Consumable",
+    "parent_id": null
+  }
+]

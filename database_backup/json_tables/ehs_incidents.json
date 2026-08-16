@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "incident_number": "EHS-20260710-0001",
+    "date": "2026-07-09T18:30:00.000Z",
+    "incident_time": null,
+    "incident_type": "Near Miss",
+    "severity": "Low",
+    "location": "Test",
+    "department_id": null,
+    "description": "test",
+    "injured_person": null,
+    "root_cause": null,
+    "corrective_action": null,
+    "reported_by": 1,
+    "status": "Open",
+    "closure_date": null,
+    "created_at": "2026-07-10T14:19:50.686Z"
+  }
+]

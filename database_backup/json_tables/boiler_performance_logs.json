@@ -1,0 +1,15 @@
+[
+  {
+    "id": 2,
+    "log_time": "2026-07-06T12:00:00.000Z",
+    "steam_flow_kgh": "15000.00",
+    "steam_pressure_bar": "10.00",
+    "feedwater_temp_c": "60.00",
+    "flue_gas_temp_c": null,
+    "husk_consumed_kg": "3000.00",
+    "blowdown_rate_pct": "0.00",
+    "efficiency_pct": "93.75",
+    "logged_by": null,
+    "created_at": "2026-07-05T19:55:54.147Z"
+  }
+]

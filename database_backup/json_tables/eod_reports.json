@@ -1,0 +1,70 @@
+[
+  {
+    "id": 1,
+    "report_date": "2026-08-12T18:30:00.000Z",
+    "summary_json": {
+      "hr": {
+        "absent": 0,
+        "onLeave": 0,
+        "present": 0
+      },
+      "date": "2026-08-13",
+      "safety": {
+        "totalAlarms": 0,
+        "activeAlarms": 0
+      },
+      "quality": {
+        "held": 0,
+        "failed": 0,
+        "passed": 0,
+        "passRate": 100,
+        "totalTests": 0
+      },
+      "utility": {
+        "coalKg": 0,
+        "steamMt": 0,
+        "waterKl": 0,
+        "boilerTemp": 0,
+        "powerUnits": 0,
+        "boilerPressure": 0
+      },
+      "commercial": {
+        "bookedMt": 0,
+        "bookedValue": 0,
+        "dispatchedMt": 0,
+        "ordersBooked": 0,
+        "dispatchedValue": 0,
+        "dispatchesCount": 0
+      },
+      "compiledAt": "2026-08-13T11:14:16.857Z",
+      "production": {
+        "avgGsm": 0,
+        "totalKg": 0,
+        "totalMt": 0,
+        "byMachine": [],
+        "totalReels": 0,
+        "avgMoisture": 0,
+        "downtimeMin": 0,
+        "avgEfficiency": 0
+      },
+      "maintenance": {
+        "breakdowns": 0,
+        "downtimeMin": 0,
+        "affectedMachines": "None"
+      },
+      "storeAndIndents": {
+        "indentsValue": 0,
+        "indentsIssued": 0,
+        "indentsRaised": 1,
+        "stockIssuedQty": 7,
+        "stockIssueValue": 0,
+        "stockReceivedQty": 12
+      }
+    },
+    "status": "Sent",
+    "sent_by": 6,
+    "sent_at": "2026-08-13T11:14:16.858Z",
+    "recipients": "Board of Directors & Plant Heads",
+    "notes": "All plant systems operational."
+  }
+]

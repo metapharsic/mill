@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ui-ux-pro-max": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:\\Users\\Dell\\.gemini\\antigravity\\mcp-servers\\ui-ux-pro-max-mcp\\build\\index.js"
+      ],
+      "cwd": "C:\\Users\\Dell\\.gemini\\antigravity\\mcp-servers\\ui-ux-pro-max-mcp"
+    }
+  }
+}

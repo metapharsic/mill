@@ -1,0 +1,173 @@
+[
+  {
+    "id": 1,
+    "holiday_date": "2025-01-25T18:30:00.000Z",
+    "name": "Republic Day",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 2,
+    "holiday_date": "2025-03-13T18:30:00.000Z",
+    "name": "Holi",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 3,
+    "holiday_date": "2025-04-13T18:30:00.000Z",
+    "name": "Dr Ambedkar Jayanti",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 4,
+    "holiday_date": "2025-04-17T18:30:00.000Z",
+    "name": "Good Friday",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 5,
+    "holiday_date": "2025-04-30T18:30:00.000Z",
+    "name": "Maharashtra Day",
+    "holiday_type": "State",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 6,
+    "holiday_date": "2025-08-14T18:30:00.000Z",
+    "name": "Independence Day",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 7,
+    "holiday_date": "2025-10-01T18:30:00.000Z",
+    "name": "Gandhi Jayanti",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 9,
+    "holiday_date": "2025-10-19T18:30:00.000Z",
+    "name": "Diwali",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 10,
+    "holiday_date": "2025-11-04T18:30:00.000Z",
+    "name": "Guru Nanak Jayanti",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 11,
+    "holiday_date": "2025-12-24T18:30:00.000Z",
+    "name": "Christmas",
+    "holiday_type": "National",
+    "year": 2025,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 12,
+    "holiday_date": "2026-01-25T18:30:00.000Z",
+    "name": "Republic Day",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 13,
+    "holiday_date": "2026-03-02T18:30:00.000Z",
+    "name": "Holi",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 14,
+    "holiday_date": "2026-04-02T18:30:00.000Z",
+    "name": "Good Friday",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 15,
+    "holiday_date": "2026-04-13T18:30:00.000Z",
+    "name": "Dr Ambedkar Jayanti",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 16,
+    "holiday_date": "2026-04-30T18:30:00.000Z",
+    "name": "Maharashtra Day",
+    "holiday_type": "State",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 17,
+    "holiday_date": "2026-08-14T18:30:00.000Z",
+    "name": "Independence Day",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 18,
+    "holiday_date": "2026-10-01T18:30:00.000Z",
+    "name": "Gandhi Jayanti",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 19,
+    "holiday_date": "2026-11-09T18:30:00.000Z",
+    "name": "Diwali",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  },
+  {
+    "id": 20,
+    "holiday_date": "2026-12-24T18:30:00.000Z",
+    "name": "Christmas",
+    "holiday_type": "National",
+    "year": 2026,
+    "is_active": true,
+    "created_at": "2026-06-30T18:22:52.863Z"
+  }
+]

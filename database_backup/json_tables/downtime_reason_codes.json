@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "reason_code": "MECH-VBOX-001",
+    "category": "Mechanical",
+    "subcategory": "Breakdown",
+    "component": "1st Press Vacuum Box",
+    "description": "Vacuum box bolt broken/cracked",
+    "is_breakdown": true,
+    "severity": "Medium",
+    "typical_minutes": 60,
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "reason_code": "MECH-VBOX-002",
+    "category": "Mechanical",
+    "subcategory": "Breakdown",
+    "component": "1st Press Vacuum Box",
+    "description": "Vacuum box seal strip worn",
+    "is_breakdown": true,
+    "severity": "Medium",
+    "typical_minutes": 45,
+    "is_active": true
+  },
+  {
+    "id": 3,
+    "reason_code": "MECH-PRESS-001",
+    "category": "Mechanical",
+    "subcategory": "Breakdown",
+    "component": "Press Section",
+    "description": "Press roll bearing failure",
+    "is_breakdown": true,
+    "severity": "High",
+    "typical_minutes": 120,
+    "is_active": true
+  },
+  {
+    "id": 4,
+    "reason_code": "MECH-DRYER-001",
+    "category": "Mechanical",
+    "subcategory": "Breakdown",
+    "component": "Dryer Section",
+    "description": "Dryer steam joint leak",
+    "is_breakdown": true,
+    "severity": "High",
+    "typical_minutes": 90,
+    "is_active": true
+  },
+  {
+    "id": 5,
+    "reason_code": "PROC-PBRK-001",
+    "category": "Process",
+    "subcategory": "Paper Break",
+    "component": "Press Section",
+    "description": "Paper break at press",
+    "is_breakdown": false,
+    "severity": "Low",
+    "typical_minutes": 25,
+    "is_active": true
+  },
+  {
+    "id": 6,
+    "reason_code": "PROC-PBRK-002",
+    "category": "Process",
+    "subcategory": "Paper Break",
+    "component": "Dryer Section",
+    "description": "Paper break at dryer",
+    "is_breakdown": false,
+    "severity": "Low",
+    "typical_minutes": 30,
+    "is_active": true
+  },
+  {
+    "id": 7,
+    "reason_code": "PROC-GRDCHG-001",
+    "category": "Process",
+    "subcategory": "Grade Change",
+    "component": null,
+    "description": "Grade change (GSM/width)",
+    "is_breakdown": false,
+    "severity": "Low",
+    "typical_minutes": 45,
+    "is_active": true
+  },
+  {
+    "id": 8,
+    "reason_code": "UTIL-POWERCUT-001",
+    "category": "Utility",
+    "subcategory": "Power Failure",
+    "component": null,
+    "description": "External power failure (grid)",
+    "is_breakdown": true,
+    "severity": "High",
+    "typical_minutes": 65,
+    "is_active": true
+  },
+  {
+    "id": 9,
+    "reason_code": "UTIL-STEAM-001",
+    "category": "Utility",
+    "subcategory": "Steam Failure",
+    "component": null,
+    "description": "Low steam pressure",
+    "is_breakdown": true,
+    "severity": "Medium",
+    "typical_minutes": 30,
+    "is_active": true
+  },
+  {
+    "id": 10,
+    "reason_code": "PLAN-MAINT-001",
+    "category": "Planned",
+    "subcategory": "Maintenance",
+    "component": null,
+    "description": "Planned maintenance stop",
+    "is_breakdown": false,
+    "severity": "Low",
+    "typical_minutes": null,
+    "is_active": true
+  }
+]

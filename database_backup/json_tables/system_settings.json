@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1,
+    "key": "company_name",
+    "value": "MK Paper Mill",
+    "category": "Company",
+    "label": "Company Name",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 2,
+    "key": "company_address",
+    "value": "",
+    "category": "Company",
+    "label": "Address",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 3,
+    "key": "company_phone",
+    "value": "",
+    "category": "Company",
+    "label": "Phone",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 4,
+    "key": "company_email",
+    "value": "",
+    "category": "Company",
+    "label": "Email",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 5,
+    "key": "company_gst",
+    "value": "",
+    "category": "Company",
+    "label": "GST Number",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 6,
+    "key": "company_pan",
+    "value": "",
+    "category": "Company",
+    "label": "PAN",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 7,
+    "key": "financial_year_start",
+    "value": "04",
+    "category": "System",
+    "label": "Financial Year Start Month",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 8,
+    "key": "low_stock_alert_days",
+    "value": "7",
+    "category": "System",
+    "label": "Low Stock Alert Days",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 9,
+    "key": "sequence_prefix_indent",
+    "value": "IND",
+    "category": "System",
+    "label": "Indent Prefix",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 10,
+    "key": "sequence_prefix_po",
+    "value": "PO",
+    "category": "System",
+    "label": "PO Prefix",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 11,
+    "key": "sequence_prefix_so",
+    "value": "SO",
+    "category": "System",
+    "label": "SO Prefix",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 12,
+    "key": "sequence_prefix_do",
+    "value": "DO",
+    "category": "System",
+    "label": "DO Prefix",
+    "updated_by": null,
+    "updated_at": "2026-06-28T18:44:06.266Z"
+  },
+  {
+    "id": 13,
+    "key": "approval_threshold_value",
+    "value": "50000",
+    "category": "Approvals",
+    "label": "High Value Threshold (INR) — needs Plant Head",
+    "updated_by": null,
+    "updated_at": "2026-06-29T04:18:42.907Z"
+  },
+  {
+    "id": 14,
+    "key": "approval_threshold_qty",
+    "value": "1000",
+    "category": "Approvals",
+    "label": "High Qty Threshold (units) — needs Plant Head",
+    "updated_by": null,
+    "updated_at": "2026-06-29T04:18:42.907Z"
+  }
+]

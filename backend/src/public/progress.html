@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MK Paper Mill ERP — Progress</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0d1117; color:#e6edf3; font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif; }
+  .wrap { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:#8b949e; font-size:12px; margin-bottom:20px; }
+  .last { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:12px 14px; margin-bottom:20px; }
+  .last b { color:#58a6ff; }
+  .bars { display:grid; gap:8px; margin-bottom:24px; }
+  .bar { display:grid; grid-template-columns:90px 1fr 80px; align-items:center; gap:10px; }
+  .bar .lbl { color:#8b949e; font-size:12px; }
+  .track { background:#21262d; border-radius:6px; height:14px; overflow:hidden; }
+  .fill { height:100%; background:linear-gradient(90deg,#238636,#2ea043); }
+  .pct { text-align:right; font-variant-numeric:tabular-nums; color:#8b949e; font-size:12px; }
+  h2 { font-size:14px; text-transform:uppercase; letter-spacing:.05em; color:#8b949e; margin:24px 0 8px; border-bottom:1px solid #30363d; padding-bottom:4px; }
+  table { width:100%; border-collapse:collapse; }
+  td,th { text-align:left; padding:5px 8px; border-bottom:1px solid #21262d; font-size:13px; }
+  th { color:#8b949e; font-weight:600; font-size:11px; text-transform:uppercase; }
+  .ic { width:24px; text-align:center; }
+  .muted { color:#6e7681; }
+  .err { color:#f85149; }
+  .foot { margin-top:32px; color:#6e7681; font-size:12px; }
+  code { background:#161b22; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏭 MK Paper Mill ERP — Progress</h1>
+  <div class="sub" id="sub">loading…</div>
+  <div class="last" id="last"></div>
+  <div class="bars" id="bars"></div>
+  <div id="sections"></div>
+  <div class="foot">Source: <code>checkpoint.json</code> · auto-refresh 15s · <span id="ts"></span></div>
+</div>
+<script>
+const ICON = { done:'✅', partial:'🟡', proposed:'🔵', todo:'⬜', reserved:'➖' };
+const cnt = arr => { const r=(arr||[]).filter(x=>x.status!=='reserved'); return { done:r.filter(x=>x.status==='done').length, total:r.length }; };
+
+function barRow(label, c){
+  const pct = c.total ? Math.round(c.done/c.total*100) : 0;
+  return `<div class="bar"><span class="lbl">${label}</span>
+    <span class="track"><span class="fill" style="width:${pct}%"></span></span>
+    <span class="pct">${c.done}/${c.total} (${pct}%)</span></div>`;
+}
+function tbl(title, rows, cols){
+  if(!rows || !rows.length) return '';
+  let h = `<h2>${title}</h2><table><tr>`+cols.map(c=>`<th>${c.h}</th>`).join('')+`</tr>`;
+  for(const r of rows){
+    h += '<tr>'+cols.map(c=>{
+      if(c.k==='__ic') return `<td class="ic">${ICON[r.status]||'?'}</td>`;
+      const v = r[c.k]; return `<td class="${v==null?'muted':''}">${v==null?'—':v}</td>`;
+    }).join('')+'</tr>';
+  }
+  return h+'</table>';
+}
+async function load(){
+  try{
+    const res = await fetch('/api/dev/progress');
+    const j = await res.json();
+    if(!j.success) throw new Error(j.message||'failed');
+    const s = j.data;
+    document.getElementById('sub').textContent = `updated ${s.updated}`;
+    document.getElementById('last').innerHTML = `<b>⏱ Last Done</b> — <b>${s.lastDone?.date||''}</b> ${s.lastDone?.summary||''}`;
+
+    const all = [s.phases,s.proposed,s.forms,s.migrations,s.deploy].flat().filter(Boolean).filter(x=>x.status!=='reserved');
+    const allC = { done: all.filter(x=>x.status==='done').length, total: all.length };
+    document.getElementById('bars').innerHTML =
+      barRow('OVERALL',allC)+barRow('Deploy',cnt(s.deploy))+barRow('Phases',cnt(s.phases))+
+      barRow('Proposed',cnt(s.proposed))+barRow('Paper Forms',cnt(s.forms))+barRow('Migrations',cnt(s.migrations));
+
+    document.getElementById('sections').innerHTML =
+      tbl('🚀 Deploy Track', s.deploy, [{h:'',k:'__ic'},{h:'ID',k:'id'},{h:'Step',k:'name'}])+
+      tbl('Phases', s.phases, [{h:'',k:'__ic'},{h:'#',k:'id'},{h:'Module',k:'name'},{h:'Route',k:'route'},{h:'Doc',k:'doc'}])+
+      tbl('Proposed', s.proposed, [{h:'',k:'__ic'},{h:'ID',k:'id'},{h:'Feature',k:'name'},{h:'Doc',k:'doc'}])+
+      tbl('Paper Forms → ERP', s.forms, [{h:'',k:'__ic'},{h:'ID',k:'id'},{h:'Form',k:'name'},{h:'Table',k:'table'}])+
+      tbl('DB Migrations', s.migrations, [{h:'',k:'__ic'},{h:'ID',k:'id'},{h:'File',k:'name'}]);
+    document.getElementById('ts').textContent = new Date().toLocaleTimeString();
+  }catch(e){
+    document.getElementById('sub').innerHTML = `<span class="err">error: ${e.message}</span>`;
+  }
+}
+load(); setInterval(load, 15000);
+</script>
+</body>
+</html>

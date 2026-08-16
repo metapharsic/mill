@@ -1,0 +1,12 @@
+{
+  "name": "mk-mill-erp",
+  "version": "1.0.0",
+  "description": "MK Paper Mill ERP",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "start.bat"
+  },
+  "author": "",
+  "license": "ISC"
+}
