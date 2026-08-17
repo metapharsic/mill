@@ -37,14 +37,14 @@ async function runClothingSerializationTest() {
       [grnNum]
     );
 
-    // Register Inward Serialized Asset via helper logic
+    const assetNum = `AST-${stamp}-${Date.now().toString().slice(-6)}`;
     const { rows: [newAsset] } = await pool.query(
       `INSERT INTO installed_assets (
          asset_number, material_id, serial_number, grn_id, vendor_id,
          purchase_price, status, expected_lifespan_days, created_at
        ) VALUES ($1, $2, $3, $4, 2, $5, 'In Stock', $6, NOW())
        RETURNING *`,
-      [`AST-${stamp}-9999`, clothMat.id, testSn, grn.id, clothMat.unit_price, clothMat.expected_lifespan_days]
+      [assetNum, clothMat.id, testSn, grn.id, clothMat.unit_price, clothMat.expected_lifespan_days]
     );
 
     console.log(`✓ Phase 2: Clothing Roll Registered via GRN #${grnNum}:`);
@@ -60,7 +60,7 @@ async function runClothingSerializationTest() {
         `INSERT INTO installed_assets (
            asset_number, material_id, serial_number, status, expected_lifespan_days
          ) VALUES ($1, $2, $3, 'In Stock', 60)`,
-        [`AST-${stamp}-8888`, clothMat.id, testSn]
+        [`AST-${stamp}-DUP-${Date.now().toString().slice(-6)}`, clothMat.id, testSn]
       );
     } catch (err) {
       dupCaught = true;
