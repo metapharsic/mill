@@ -521,7 +521,7 @@ router.post('/issues', requireAuth, ar(async (req, res) => {
 
     if (materialId) {
       const mat = await client.query('SELECT uom, unit_price FROM materials WHERE id=$1', [materialId]);
-      const uom = mat.rows[0]?.uom || 'Nos';
+      const uom = mat.rows[0]?.uom || 'NOS';
       await client.query(`
         INSERT INTO indent_items (indent_id, material_id, required_qty, uom, purpose)
         VALUES ($1, $2, $3, $4, $5)

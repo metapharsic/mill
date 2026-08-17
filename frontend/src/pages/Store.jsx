@@ -112,7 +112,7 @@ export default function Store({ onNavigate }) {
     fromWarehouseId: '',
     toWarehouseId: '',
     remarks: '',
-    items: [{ materialId: '', qty: '', uom: 'Nos', batchNumber: '', remarks: '' }]
+    items: [{ materialId: '', qty: '', uom: 'NOS', batchNumber: '', remarks: '' }]
   })
   const [warehouses, setWarehouses] = useState([])
 
@@ -123,7 +123,7 @@ export default function Store({ onNavigate }) {
     departmentId: '',
     indentId: '',
     remarks: '',
-    items: [{ materialId: '', qty: '', uom: 'Nos', conditionGrade: 'Good', remarks: '' }]
+    items: [{ materialId: '', qty: '', uom: 'NOS', conditionGrade: 'Good', remarks: '' }]
   })
 
   // Open Gate Passes for Inward prefill
@@ -729,7 +729,7 @@ export default function Store({ onNavigate }) {
         setTransferModal(false)
         setTransferForm({
           fromWarehouseId: '', toWarehouseId: '', remarks: '',
-          items: [{ materialId: '', qty: '', uom: 'Nos', batchNumber: '', remarks: '' }]
+          items: [{ materialId: '', qty: '', uom: 'NOS', batchNumber: '', remarks: '' }]
         })
         loadTransfers()
       } else {
@@ -787,7 +787,7 @@ export default function Store({ onNavigate }) {
         setReturnModal(false)
         setReturnForm({
           departmentId: '', indentId: '', remarks: '',
-          items: [{ materialId: '', qty: '', uom: 'Nos', conditionGrade: 'Good', remarks: '' }]
+          items: [{ materialId: '', qty: '', uom: 'NOS', conditionGrade: 'Good', remarks: '' }]
         })
         loadReturns()
       } else {
@@ -2834,7 +2834,12 @@ export default function Store({ onNavigate }) {
               </select>
 
               <label style={S.label}>Quantity *</label>
-              <input type="number" step="0.01" style={S.input} value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} required />
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="number" step="0.01" style={{ ...S.input, flex: 1 }} value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} required />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', minWidth: 45 }}>
+                  {mats.find(m => String(m.id) === String(form.materialId))?.uom || 'NOS'}
+                </span>
+              </div>
 
               <label style={S.label}>Justification / Reason (min 10 chars) *</label>
               <textarea style={S.input} rows={2} placeholder="Explain why this item is needed..." value={form.justification} onChange={e => setForm({ ...form, justification: e.target.value })} required minLength={10} />
@@ -2881,7 +2886,12 @@ export default function Store({ onNavigate }) {
               </select>
 
               <label style={S.label}>Quantity *</label>
-              <input type="number" step="0.01" style={S.input} value={editForm.quantity} onChange={e => setEditForm({ ...editForm, quantity: e.target.value })} required />
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="number" step="0.01" style={{ ...S.input, flex: 1 }} value={editForm.quantity} onChange={e => setEditForm({ ...editForm, quantity: e.target.value })} required />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', minWidth: 45 }}>
+                  {mats.find(m => String(m.id) === String(editForm.materialId))?.uom || 'NOS'}
+                </span>
+              </div>
 
               <label style={S.label}>Justification</label>
               <textarea style={S.input} rows={2} value={editForm.justification} onChange={e => setEditForm({ ...editForm, justification: e.target.value })} minLength={10} />
@@ -3032,7 +3042,7 @@ export default function Store({ onNavigate }) {
                         const next = [...transferForm.items]
                         next[idx].materialId = e.target.value
                         const m = mats.find(x => String(x.id) === String(e.target.value))
-                        if (m) next[idx].uom = m.unit || m.uom || 'Nos'
+                        if (m) next[idx].uom = m.uom || m.unit || 'NOS'
                         setTransferForm({ ...transferForm, items: next })
                       }}
                       required
@@ -3130,7 +3140,7 @@ export default function Store({ onNavigate }) {
                           const next = [...returnForm.items]
                           next[idx].materialId = e.target.value
                           const m = mats.find(x => String(x.id) === String(e.target.value))
-                          if (m) next[idx].uom = m.unit || m.uom || 'Nos'
+                          if (m) next[idx].uom = m.uom || m.unit || 'NOS'
                           setReturnForm({ ...returnForm, items: next })
                         }}
                         required

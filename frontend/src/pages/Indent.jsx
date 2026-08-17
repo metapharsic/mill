@@ -854,7 +854,7 @@ export default function Indent() {
       const m = matByID(it.material_id)
       return {
         ...it,
-        uom: m?.uom || it.uom,
+        uom: m?.uom || it.uom || 'NOS',
         unit_price: it.unit_price !== '' && it.unit_price !== undefined ? parseFloat(it.unit_price) : parseFloat(m?.unit_price || 0),
         gst_pct: parseFloat(it.gst_pct ?? 18)
       }
@@ -897,7 +897,7 @@ export default function Indent() {
       items: (d.items || []).map(it => ({
         material_id: it.material_id,
         required_qty: it.required_qty,
-        uom: it.uom,
+        uom: it.matUom || it.uom || matByID(it.material_id)?.uom || 'NOS',
         unit_price: it.matPrice || it.unit_price || '',
         gst_pct: 18,
         purpose: it.purpose || '',

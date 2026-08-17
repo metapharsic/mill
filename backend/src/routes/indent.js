@@ -270,12 +270,13 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
       const lVal = qty * price;
       totalVal += lVal;
 
+      const itemUom = mat[0]?.uom || it.uom || 'NOS';
       const { rows: [iItem] } = await client.query(
         `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-        [id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
+        [id, it.material_id, qty, itemUom, it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
       );
-      insertedItems.push({ ...iItem, current_stock: mat[0]?.current_stock, is_serialized: mat[0]?.is_serialized, expected_lifespan_days: mat[0]?.expected_lifespan_days });
+      insertedItems.push({ ...iItem, uom: itemUom, current_stock: mat[0]?.current_stock, is_serialized: mat[0]?.is_serialized, expected_lifespan_days: mat[0]?.expected_lifespan_days });
     }
 
     await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, id]);
@@ -313,15 +314,17 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
       createdPo = po;
 
       for (const it of items) {
-        const p = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : (insertedItems.find(x => x.material_id === it.material_id)?.unit_price || 0);
+        const matched = insertedItems.find(x => x.material_id === it.material_id);
+        const p = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : (matched?.unit_price || 0);
         const q = parseFloat(it.required_qty || 0);
         const gstPct = parseFloat(it.gst_pct ?? 18);
         const lineTot = (p * q) * (1 + gstPct / 100);
+        const lineUom = matched?.uom || it.uom || 'NOS';
 
         await client.query(
           `INSERT INTO po_items (po_id, material_id, qty, received_qty, uom, unit_price, gst_pct, total)
            VALUES ($1, $2, $3, 0, $4, $5, $6, $7)`,
-          [po.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTot]
+          [po.id, it.material_id, q, lineUom, p, gstPct, lineTot]
         );
       }
 
@@ -342,7 +345,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
 
       const matDesc = items.map(it => {
         const mat = insertedItems.find(x => x.material_id === it.material_id);
-        return `${it.required_qty} ${it.uom || 'NOS'} of ${it.material_id}`;
+        return `${it.required_qty} ${mat?.uom || it.uom || 'NOS'} of ${it.material_id}`;
       }).join(', ');
 
       const { rows: [gp] } = await client.query(`
@@ -439,10 +442,12 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
         const lineTaxable = p * q;
         const lineTot = lineTaxable * (1 + gstPct / 100);
 
+        const matched = insertedItems.find(x => x.material_id === it.material_id);
+        const itemUom = matched?.uom || it.uom || 'NOS';
         await client.query(
           `INSERT INTO cash_purchase_items (cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [cp.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTaxable, lineTot]
+          [cp.id, it.material_id, q, itemUom, p, gstPct, lineTaxable, lineTot]
         );
 
         // Atomically increment stock
@@ -555,10 +560,11 @@ router.put('/:id', auth, ar(async (req, res) => {
         const lVal = qty * price;
         totalVal += lVal;
 
+        const itemUom = mat[0]?.uom || it.uom || 'NOS';
         await client.query(
           `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-          [req.params.id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
+          [req.params.id, it.material_id, qty, itemUom, it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
         );
       }
       await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, req.params.id]);
@@ -589,7 +595,7 @@ router.post('/:id/items', auth, ar(async (req, res) => {
     const { rows: mat } = await client.query('SELECT current_stock, unit_price, uom FROM materials WHERE id=$1', [material_id]);
     const price = parseFloat(mat[0]?.unit_price || 0);
     const qty = parseFloat(required_qty || 0);
-    const finalUom = uom || mat[0]?.uom || 'NOS';
+    const finalUom = mat[0]?.uom || uom || 'NOS';
     const lVal = qty * price;
 
     const { rows: [inserted] } = await client.query(
@@ -1229,10 +1235,11 @@ router.post('/:id/convert-to-po', auth, requireLevel(2), ar(async (req, res) => 
       const gstPct = 18;
       const lineTot = (p * q) * 1.18;
 
+      const itemUom = it.uom || it.matUom || 'NOS';
       await client.query(
         `INSERT INTO po_items (po_id, material_id, qty, received_qty, uom, unit_price, gst_pct, total)
          VALUES ($1, $2, $3, 0, $4, $5, $6, $7)`,
-        [po.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTot]
+        [po.id, it.material_id, q, itemUom, p, gstPct, lineTot]
       );
     }
 
@@ -1360,10 +1367,11 @@ router.post('/:id/convert-to-cash-purchase', auth, requireLevel(2), ar(async (re
       const lineTaxable = p * q;
       const lineTot = lineTaxable * 1.18;
 
+      const itemUom = it.uom || it.matUom || 'NOS';
       await client.query(
         `INSERT INTO cash_purchase_items (cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total)
          VALUES ($1, $2, $3, $4, $5, 18, $6, $7)`,
-        [cp.id, it.material_id, q, it.uom || 'NOS', p, lineTaxable, lineTot]
+        [cp.id, it.material_id, q, itemUom, p, lineTaxable, lineTot]
       );
 
       // Atomically increment stock

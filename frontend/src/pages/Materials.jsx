@@ -8,7 +8,7 @@ const API = (path, opts) => fetch(path, {
   catch { return { success: false, message: `Server error (HTTP ${r.status})` } }
 })
 
-const UOM_LIST = ['NOS', 'KG', 'MT', 'LTR', 'PKT', 'DRUM', 'BAG', 'ROLL', 'MTR', 'SHT', 'SET', 'PAIR', 'BOX', 'KGS', 'Nos', 'Pkt', 'Mtr', 'Ltr']
+const UOM_LIST = ['NOS', 'KGS', 'MT', 'LTR', 'MTR', 'PKT', 'BOX', 'SET', 'PAIR', 'ROLL', 'DRUM', 'BAG', 'SHT']
 const GST_RATES = [0, 5, 12, 18, 28]
 const CRIT_COLORS = {
   A: { bg: '#ef444422', color: '#ef4444', border: '#ef444444', label: '🔴 Class A (Critical)' },

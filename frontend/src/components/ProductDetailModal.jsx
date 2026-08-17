@@ -31,7 +31,7 @@ export default function ProductDetailModal({
     name: '',
     code: '',
     category_id: '',
-    uom: 'Kgs',
+    uom: 'NOS',
     unit_price: '',
     min_stock: '',
     max_stock: '',
@@ -423,7 +423,7 @@ export default function ProductDetailModal({
                   value={form.uom}
                   onChange={e => setForm({ ...form, uom: e.target.value })}
                 >
-                  {['MT', 'Kgs', 'Nos', 'Ltr', 'Mtr', 'Pkt', 'Box', 'Set', 'Pair', 'Roll', 'Drum'].map(u => (
+                  {['NOS', 'KGS', 'MT', 'LTR', 'MTR', 'PKT', 'BOX', 'SET', 'PAIR', 'ROLL', 'DRUM', 'BAG', 'SHT'].map(u => (
                     <option key={u} value={u}>{u}</option>
                   ))}
                 </select>

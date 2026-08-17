@@ -292,15 +292,18 @@ export default function Purchase() {
 
   const openNew = (preselectedIndent = null) => {
     const items = preselectedIndent?.items?.length
-      ? preselectedIndent.items.map(it => ({
-          material_id: it.material_id,
-          description: it.materialName || it.material_name || it.description || '',
-          qty: String(it.required_qty || it.qty || 1),
-          uom: it.matUom || it.uom || '',
-          unit_price: String(it.matPrice || it.unit_price || 0),
-          gst_pct: it.gst_pct != null ? it.gst_pct : 18,
-          _search: it.materialName || it.material_name || ''
-        }))
+      ? preselectedIndent.items.map(it => {
+          const m = mats.find(x => String(x.id) === String(it.material_id))
+          return {
+            material_id: it.material_id,
+            description: it.materialName || it.material_name || m?.name || it.description || '',
+            qty: String(it.required_qty || it.qty || 1),
+            uom: m?.uom || it.matUom || it.uom || 'NOS',
+            unit_price: String(it.matPrice || it.unit_price || m?.unit_price || 0),
+            gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+            _search: it.materialName || it.material_name || m?.name || ''
+          }
+        })
       : [blankItem()]
 
     setPoMatSearch({})
@@ -332,15 +335,18 @@ export default function Purchase() {
       payment_mode: 'Cash',
       payment_ref: '',
       remarks: `Direct Cash Purchase against PR ${ind.indentNumber || ind.indent_number} (${ind.deptName || ''})`,
-      items: (ind.items || []).length ? ind.items.map(it => ({
-        material_id: it.material_id,
-        description: it.materialName || '',
-        qty: String(it.required_qty || 1),
-        uom: it.matUom || it.uom || '',
-        unit_price: String(it.unit_price || 0),
-        gst_pct: 18,
-        _search: it.materialName || ''
-      })) : [blankItem()]
+      items: (ind.items || []).length ? ind.items.map(it => {
+        const m = mats.find(x => String(x.id) === String(it.material_id))
+        return {
+          material_id: it.material_id,
+          description: it.materialName || m?.name || '',
+          qty: String(it.required_qty || 1),
+          uom: m?.uom || it.matUom || it.uom || 'NOS',
+          unit_price: String(it.unit_price || m?.unit_price || 0),
+          gst_pct: 18,
+          _search: it.materialName || m?.name || ''
+        }
+      }) : [blankItem()]
     })
     setCashErr('')
     setCashSuccess('')
@@ -2594,7 +2600,7 @@ export default function Purchase() {
                                                     ...it2,
                                                     material_id: m.id,
                                                     description: m.name || '',
-                                                    uom: m.uom || '',
+                                                    uom: m.uom || 'NOS',
                                                     unit_price: price > 0 ? price.toString() : it2.unit_price
                                                   } : it2)
                                                 }))
