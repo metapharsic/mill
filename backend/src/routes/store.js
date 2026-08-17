@@ -310,9 +310,8 @@ router.get('/issues', requireAuth, ar(async (req, res) => {
       where.push(`i.status = $${vals.length}`);
     }
   }
-  if (departmentId) { vals.push(departmentId); where.push(`i.department_id = $${vals.length}`); }
-  if (req.user.role_level < 4 && req.user.dept_code !== 'STORE') {
-    vals.push(req.user.department_id);
+  if (departmentId && departmentId !== 'all' && departmentId !== 'undefined') {
+    vals.push(parseInt(departmentId));
     where.push(`i.department_id = $${vals.length}`);
   }
 

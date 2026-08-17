@@ -1953,6 +1953,160 @@ export default function Indent() {
               </button>
             </div>
           </form>
+
+          {/* ══════════════════════════════════════════════════════════════════ */}
+          {/* ── LIVE RAISED INDENTS HISTORY UNDER RAISE FORM ───────────────── */}
+          {/* ══════════════════════════════════════════════════════════════════ */}
+          <div style={{ marginTop: 32, borderTop: '2px solid #0f766e', paddingTop: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>📋</span> Raised Indents &amp; Requisition Register ({total || rows.length} Total)
+                </div>
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                  Live tracking of all indents raised across departments with instant PO / DC / Cash conversion and voucher printing.
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  type="button"
+                  style={{ ...S.btnSm('#0f766e'), padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 4 }}
+                  onClick={load}
+                  title="Reload Indents"
+                >
+                  ↻ Refresh Indents
+                </button>
+                <button
+                  type="button"
+                  style={{ ...S.btnSm('#1e293b'), padding: '6px 12px' }}
+                  onClick={() => setTabKey('list')}
+                  title="Switch to Full Register View"
+                >
+                  View Full Grid ➔
+                </button>
+              </div>
+            </div>
+
+            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: 8, background: '#ffffff' }}>
+              <table style={S.tbl}>
+                <thead>
+                  <tr>
+                    {['Indent #', 'Date & Time', 'Dept / Section', 'Machine Context', 'Primary Reason & Purpose', 'Items', 'Valuation (₹)', 'Status & Fulfillment', 'Actions'].map(h => (
+                      <th key={h} style={S.th}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.slice(0, 10).map((r) => {
+                    const rc = REASON_COLORS[r.reasonCode] || { bg: '#f1f5f9', color: '#475569', border: '#cbd5e1', icon: '📝' }
+                    return (
+                      <tr key={r.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={S.td}>
+                          <span
+                            style={{ ...S.code, cursor: 'pointer', textDecoration: 'underline', color: '#0f766e', fontWeight: 800 }}
+                            onClick={() => openDetail(r.id)}
+                            title="Click to view full indent voucher and audit trail"
+                          >
+                            {r.indentNumber}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{r.date?.slice(0, 10)}</div>
+                          <div style={{ fontSize: 10, color: '#64748b' }}>by {r.raisedByName || r.raisedBy || 'Staff'}</div>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{r.deptName || '—'}</div>
+                          <div style={{ fontSize: 10, color: '#64748b' }}>{r.sectionCode ? `[${r.sectionCode}] ${r.sectionName || ''}` : 'Plant Area'}</div>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ fontSize: 11, color: '#334155' }}>
+                            {r.machineName ? `[${r.machineCode}] ${r.machineName}` : (r.machine_id || 'General Spares')}
+                          </div>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: rc.bg, color: rc.color, border: `1px solid ${rc.border}`, borderRadius: 12, padding: '2px 8px', fontSize: 10, fontWeight: 700 }}>
+                            <span>{rc.icon}</span> {r.reasonCode || 'Routine Replacement'}
+                          </div>
+                          {r.itemPurpose && <div style={{ fontSize: 11, color: '#475569', marginTop: 2, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.itemPurpose}</div>}
+                        </td>
+                        <td style={S.td}>
+                          <span style={{ fontWeight: 700, color: '#0f766e' }}>{r.itemCount || 1}</span> <span style={{ fontSize: 11, color: '#64748b' }}>items</span>
+                        </td>
+                        <td style={S.td}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#0f766e' }}>
+                            {r.total_value > 0 ? fmt(r.total_value) : '—'}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          <span style={S.badge(SC[r.status] || '#94a3b8')}>{r.status}</span>
+                          {r.linkedPoNumber && <div style={{ fontSize: 10, color: '#0369a1', fontWeight: 600, marginTop: 2 }}>PO: {r.linkedPoNumber}</div>}
+                          {r.linkedCpNumber && <div style={{ fontSize: 10, color: '#16a34a', fontWeight: 600, marginTop: 2 }}>Cash: {r.linkedCpNumber}</div>}
+                          {r.linkedGpNumber && <div style={{ fontSize: 10, color: '#d97706', fontWeight: 600, marginTop: 2 }}>DC: {r.linkedGpNumber}</div>}
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              style={{ ...S.btnSm('#0f766e'), padding: '3px 6px', fontSize: 11 }}
+                              onClick={() => printCompanyInvoice(r.id)}
+                              title="Print Official Voucher"
+                            >
+                              🖨️ Voucher
+                            </button>
+                            <button
+                              type="button"
+                              style={{ ...S.btnSm('#1e293b'), padding: '3px 6px', fontSize: 11 }}
+                              onClick={() => openDetail(r.id)}
+                              title="View Details"
+                            >
+                              👁 View
+                            </button>
+                            {r.status !== 'Issued' && r.status !== 'Closed' && r.status !== 'Cancelled' && (
+                              <button
+                                type="button"
+                                style={{ ...S.btnSm('#2563eb'), padding: '3px 6px', fontSize: 11 }}
+                                onClick={() => openEdit(r.id)}
+                                title="Edit this Indent"
+                              >
+                                ✏️ Edit
+                              </button>
+                            )}
+                            {!r.linkedPoId && !['Rejected', 'Cancelled', 'Issued', 'Closed'].includes(r.status) && (
+                              <button
+                                type="button"
+                                style={{ ...S.btnSm('#0284c7'), padding: '3px 6px', fontSize: 11, fontWeight: 700 }}
+                                onClick={() => openConvertPo(r)}
+                                title="1-Click Convert Indent to Purchase Order"
+                              >
+                                🛒 +PO
+                              </button>
+                            )}
+                            {!r.linkedCpId && !r.linkedPoId && !['Rejected', 'Cancelled', 'Issued', 'Closed'].includes(r.status) && (
+                              <button
+                                type="button"
+                                style={{ ...S.btnSm('#16a34a'), padding: '3px 6px', fontSize: 11, fontWeight: 700 }}
+                                onClick={() => openConvertCash(r)}
+                                title="1-Click Convert Indent to Cash Purchase"
+                              >
+                                💵 +Cash
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {rows.length === 0 && (
+                    <tr>
+                      <td colSpan={9} style={{ ...S.td, textAlign: 'center', color: '#64748b', padding: '24px' }}>
+                        No indents raised yet. Fill the form above to raise your first requisition!
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
