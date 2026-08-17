@@ -9,14 +9,11 @@ const isStoreManager = (user) =>
 
 const logStoreIndent = async (clientOrPool, indentId, action, fromStatus, toStatus, actorId, actorName, actorRole, note = null) => {
   try {
-    const { rows } = await clientOrPool.query('SELECT 1 FROM store_indents WHERE id = $1', [indentId]);
-    if (rows.length) {
-      await clientOrPool.query(
-        `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-        [indentId, action, fromStatus, toStatus, actorId, actorName, actorRole, note]
-      );
-    }
+    await clientOrPool.query(
+      `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [indentId, action, fromStatus, toStatus, actorId, actorName, actorRole, note]
+    );
   } catch (err) {
     console.error('store_indent_log write error:', err.message);
   }

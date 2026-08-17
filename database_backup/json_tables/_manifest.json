@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-08-17T05:39:42.771Z",
+  "exportedAt": "2026-08-17T05:58:03.397Z",
   "database": "mk_paper_mill",
   "totalTables": 108,
   "tables": {
@@ -336,7 +336,7 @@
       "file": "section_equipment.json"
     },
     "section_kpi_snapshots": {
-      "rowCount": 3932,
+      "rowCount": 3954,
       "file": "section_kpi_snapshots.json"
     },
     "section_process_readings": {

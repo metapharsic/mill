@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict EzOggepPFJQZG3Fnp9TAeeIvzC537ssmXtx65InDVl8k9ZxToscL2dbFnSF0Ey8
+\restrict GfJ2kgLdhBQktAR60ys0kniV3AZb07QAc8ITPZFoZU9QHSKTeXZH72f2phjwDki
 
 -- Dumped from database version 18.2
 -- Dumped by pg_dump version 18.2
@@ -4204,7 +4204,8 @@ CREATE TABLE public.store_indent_log (
     actor_role character varying(50),
     qty numeric(12,3),
     note text,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    qty_issued numeric(12,2)
 );
 
 
@@ -6582,8 +6583,8 @@ COPY public.indents (id, indent_number, date, department_id, required_date, prio
 8	IND-20260813-0001	2026-08-13	8	2026-08-13	Urgent	Closed	6	\N	\N	\N	\N	\N	\N	\N	2026-08-13 15:37:06.991085	\N	\N	0.00	6	2026-08-13 17:01:32.356616+05:30	2026-08-13 18:11:27.92091+05:30	f	\N	\N	\N
 14	IND-20260813-0002	2026-08-13	1	2026-08-13	Normal	Closed	6	\N	\N	\N	\N	\N	\N	\N	2026-08-13 22:14:44.54647	\N	\N	0.00	6	2026-08-13 22:15:07.470584+05:30	2026-08-14 00:13:10.479441+05:30	f	\N	\N	\N
 36	IND-20260815-0001	2026-08-15	8	2026-08-14	Normal	Closed	6	\N	\N	\N	\N	\N	\N	vaccume line	2026-08-15 15:07:41.096594	\N	\N	0.00	6	2026-08-15 15:10:37.056553+05:30	2026-08-15 15:11:07.548563+05:30	f	\N	\N	\N
-27	IND-20260813-0014	2026-08-14	10	2026-08-13	High	Issued	10	1	2026-08-14 01:54:00.130268	\N	\N	\N	\N	Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]	2026-08-14 01:54:00.115492	\N	\N	216000.00	6	2026-08-14 01:54:00.145124+05:30	\N	f	\N	\N	\N
 38	IND-20260817-0001	2026-08-17	1	2026-08-17	Normal	Submitted	6	\N	\N	\N	\N	\N	\N	\N	2026-08-17 10:59:51.407621	2	\N	1015032.00	\N	\N	\N	f	\N	\N	\N
+27	IND-20260813-0014	2026-08-14	10	2026-08-13	High	Issued	10	1	2026-08-14 01:54:00.130268	\N	\N	\N	\N	Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]	2026-08-14 01:54:00.115492	\N	\N	216000.00	6	2026-08-14 01:54:00.145124+05:30	\N	f	\N	\N	\N
 \.
 
 
@@ -12559,6 +12560,28 @@ COPY public.section_kpi_snapshots (id, section_id, snapshot_time, kpi_data, crea
 9426	21	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.502303
 9427	19	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.513305
 9428	85	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.51855
+9451	1	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.795729
+9452	2	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.838006
+9453	3	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.844096
+9454	4	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.850998
+9455	5	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.855241
+9456	6	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.858999
+9457	7	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.864801
+9458	8	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.87545
+9459	9	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.879613
+9460	10	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.885248
+9461	11	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.889631
+9462	12	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.893314
+9463	13	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.897146
+9464	14	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.902637
+9465	15	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.90692
+9466	20	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.910657
+9467	16	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.915552
+9468	17	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.920845
+9469	18	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.923724
+9470	21	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.926958
+9471	19	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.929616
+9472	85	2026-08-17 11:00:00	{"_alarms": {}}	2026-08-17 11:11:17.9321
 \.
 
 
@@ -13633,7 +13656,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 -- Data for Name: store_indent_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.store_indent_log (id, indent_id, action, from_status, to_status, actor_id, actor_name, actor_role, qty, note, created_at) FROM stdin;
+COPY public.store_indent_log (id, indent_id, action, from_status, to_status, actor_id, actor_name, actor_role, qty, note, created_at, qty_issued) FROM stdin;
 \.
 
 
@@ -14407,7 +14430,7 @@ SELECT pg_catalog.setval('public.section_equipment_id_seq', 43, true);
 -- Name: section_kpi_snapshots_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 9450, true);
+SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 9472, true);
 
 
 --
@@ -14463,7 +14486,7 @@ SELECT pg_catalog.setval('public.stock_ledger_id_seq', 2730, true);
 -- Name: store_indent_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.store_indent_log_id_seq', 9, true);
+SELECT pg_catalog.setval('public.store_indent_log_id_seq', 10, true);
 
 
 --
@@ -16338,6 +16361,13 @@ CREATE INDEX idx_stock_ledger_vendor ON public.stock_ledger USING btree (vendor_
 
 
 --
+-- Name: idx_store_indent_log_indent_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_store_indent_log_indent_id ON public.store_indent_log USING btree (indent_id);
+
+
+--
 -- Name: idx_store_indents_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -17942,14 +17972,6 @@ ALTER TABLE ONLY public.store_indent_log
 
 
 --
--- Name: store_indent_log store_indent_log_indent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.store_indent_log
-    ADD CONSTRAINT store_indent_log_indent_id_fkey FOREIGN KEY (indent_id) REFERENCES public.store_indents(id) ON DELETE CASCADE;
-
-
---
 -- Name: store_indents store_indents_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18329,5 +18351,5 @@ ALTER TABLE ONLY public.vendors
 -- PostgreSQL database dump complete
 --
 
-\unrestrict EzOggepPFJQZG3Fnp9TAeeIvzC537ssmXtx65InDVl8k9ZxToscL2dbFnSF0Ey8
+\unrestrict GfJ2kgLdhBQktAR60ys0kniV3AZb07QAc8ITPZFoZU9QHSKTeXZH72f2phjwDki
 

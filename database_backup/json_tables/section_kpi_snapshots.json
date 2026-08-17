@@ -35461,5 +35461,203 @@
       "_alarms": {}
     },
     "created_at": "2026-08-17T05:08:48.518Z"
+  },
+  {
+    "id": 9451,
+    "section_id": 1,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.795Z"
+  },
+  {
+    "id": 9452,
+    "section_id": 2,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.838Z"
+  },
+  {
+    "id": 9453,
+    "section_id": 3,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.844Z"
+  },
+  {
+    "id": 9454,
+    "section_id": 4,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.850Z"
+  },
+  {
+    "id": 9455,
+    "section_id": 5,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.855Z"
+  },
+  {
+    "id": 9456,
+    "section_id": 6,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.858Z"
+  },
+  {
+    "id": 9457,
+    "section_id": 7,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.864Z"
+  },
+  {
+    "id": 9458,
+    "section_id": 8,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.875Z"
+  },
+  {
+    "id": 9459,
+    "section_id": 9,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.879Z"
+  },
+  {
+    "id": 9460,
+    "section_id": 10,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.885Z"
+  },
+  {
+    "id": 9461,
+    "section_id": 11,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.889Z"
+  },
+  {
+    "id": 9462,
+    "section_id": 12,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.893Z"
+  },
+  {
+    "id": 9463,
+    "section_id": 13,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.897Z"
+  },
+  {
+    "id": 9464,
+    "section_id": 14,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.902Z"
+  },
+  {
+    "id": 9465,
+    "section_id": 15,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.906Z"
+  },
+  {
+    "id": 9466,
+    "section_id": 20,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.910Z"
+  },
+  {
+    "id": 9467,
+    "section_id": 16,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.915Z"
+  },
+  {
+    "id": 9468,
+    "section_id": 17,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.920Z"
+  },
+  {
+    "id": 9469,
+    "section_id": 18,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.923Z"
+  },
+  {
+    "id": 9470,
+    "section_id": 21,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.926Z"
+  },
+  {
+    "id": 9471,
+    "section_id": 19,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.929Z"
+  },
+  {
+    "id": 9472,
+    "section_id": 85,
+    "snapshot_time": "2026-08-17T05:30:00.000Z",
+    "kpi_data": {
+      "_alarms": {}
+    },
+    "created_at": "2026-08-17T05:41:17.932Z"
   }
 ]
