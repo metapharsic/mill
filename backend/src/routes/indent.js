@@ -41,7 +41,7 @@ router.get('/', auth, ar(async (req, res) => {
   if (status) { conds.push(`i.status=$${p++}`); params.push(status); }
   if (dept)   { conds.push(`i.department_id=$${p++}`); params.push(dept); }
   if (search) {
-    conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR i.remarks ILIKE $${p} OR i.cancellation_reason ILIKE $${p} OR u.name ILIKE $${p} OR u.employee_code ILIKE $${p} OR mch.name ILIKE $${p} OR ps.section_code ILIKE $${p} OR ps.name ILIKE $${p} OR EXISTS (SELECT 1 FROM indent_items ii JOIN materials m ON m.id=ii.material_id WHERE ii.indent_id=i.id AND (m.name ILIKE $${p} OR m.code ILIKE $${p} OR ii.purpose ILIKE $${p} OR ii.reason_code ILIKE $${p})))`);
+    conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR i.remarks ILIKE $${p} OR i.cancellation_reason ILIKE $${p} OR u.name ILIKE $${p} OR u.employee_code ILIKE $${p} OR mch.name ILIKE $${p} OR ps.section_code ILIKE $${p} OR ps.name ILIKE $${p} OR po.po_number ILIKE $${p} OR v_po.name ILIKE $${p} OR gp.gp_number ILIKE $${p} OR EXISTS (SELECT 1 FROM indent_items ii JOIN materials m ON m.id=ii.material_id WHERE ii.indent_id=i.id AND (m.name ILIKE $${p} OR m.code ILIKE $${p} OR ii.purpose ILIKE $${p} OR ii.reason_code ILIKE $${p})))`);
     params.push(`%${search}%`);
     p++;
   }
@@ -59,6 +59,9 @@ router.get('/', auth, ar(async (req, res) => {
             d.name as "deptName", d.code as "deptCode",
             u.name as "raisedBy", u.name as "raisedByName", u.employee_code as "raisedByEmpCode",
             r.name as "raisedByRole", u.email as "raisedByEmail", u.mobile as "raisedByMobile",
+            po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
+            po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
+            gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType",
             (SELECT ii.reason_code FROM indent_items ii WHERE ii.indent_id = i.id ORDER BY ii.id ASC LIMIT 1) AS "reasonCode",
             (SELECT ii.purpose FROM indent_items ii WHERE ii.indent_id = i.id ORDER BY ii.id ASC LIMIT 1) AS "itemPurpose",
             (SELECT COUNT(*) FROM indent_items ii WHERE ii.indent_id = i.id)::int AS "itemCount"
@@ -69,15 +72,21 @@ router.get('/', auth, ar(async (req, res) => {
      LEFT JOIN users cu ON cu.id=i.cancelled_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
+     LEFT JOIN purchase_orders po ON po.indent_id=i.id
+     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
+     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
      ${where} ORDER BY i.created_at DESC LIMIT $${p} OFFSET $${p+1}`,
     [...params, parseInt(limit), offset]
   );
   const { rows: cnt } = await pool.query(
-    `SELECT COUNT(*) FROM indents i
+    `SELECT COUNT(DISTINCT i.id) FROM indents i
      LEFT JOIN departments d ON d.id=i.department_id
      LEFT JOIN users u ON u.id=i.raised_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
+     LEFT JOIN purchase_orders po ON po.indent_id=i.id
+     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
+     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
      ${where}`, params
   );
   res.json({ success:true, data:rows, total:parseInt(cnt[0].count) });
@@ -167,7 +176,10 @@ router.get('/:id', auth, ar(async (req, res) => {
             u.name as "raisedByName", u.name as "raisedBy", u.employee_code as "raisedByEmpCode",
             r.name as "raisedByRole", u.email as "raisedByEmail", u.mobile as "raisedByMobile",
             ps.section_code as "sectionCode", ps.name as "sectionName",
-            mch.name as "machineName", mch.code as "machineCode", mch.type as "machineType"
+            mch.name as "machineName", mch.code as "machineCode", mch.type as "machineType",
+            po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
+            po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
+            gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType"
      FROM indents i
      LEFT JOIN departments d ON d.id=i.department_id
      LEFT JOIN users u ON u.id=i.raised_by
@@ -175,6 +187,9 @@ router.get('/:id', auth, ar(async (req, res) => {
      LEFT JOIN users cu ON cu.id=i.cancelled_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
+     LEFT JOIN purchase_orders po ON po.indent_id=i.id
+     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
+     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
      WHERE i.id=$1`,
     [req.params.id]
   );
@@ -195,10 +210,13 @@ router.get('/:id', auth, ar(async (req, res) => {
   res.json({ success:true, data:{ ...rows[0], items } });
 }));
 
-// CREATE INDENT (Priority optional, defaults to 'Normal')
+// CREATE INDENT (Supports Multi-Mode Fulfillment: PR, Direct PO, Direct DC / Gate Pass, Immediate Store Issuance)
 router.post('/', auth, requireLevel(1), ar(async (req, res) => {
-  const { department_id, required_date, priority='Normal', remarks, items=[], section, machine_id } = req.body;
+  const { department_id, required_date, priority='Normal', remarks, items=[], section, machine_id,
+          fulfillment_mode = 'pr', vendor_id, payment_terms, delivery_date,
+          dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type, driver_name, to_party, consignee_vendor_id, dc_purpose } = req.body;
   if (!department_id || !items.length) return res.json({ success:false, message:'Department and items are required' });
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -219,43 +237,185 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
     let machId = null;
     if (machine_id && !isNaN(parseInt(machine_id))) machId = parseInt(machine_id);
 
+    let initialStatus = 'Submitted';
+    if (fulfillment_mode === 'po') initialStatus = 'PO Created';
+    else if (fulfillment_mode === 'dc') initialStatus = 'DC Generated';
+    else if (fulfillment_mode === 'issue') initialStatus = 'Issued';
+
     const { rows } = await client.query(
       `INSERT INTO indents (indent_number,date,department_id,required_date,priority,status,raised_by,remarks,section_id,machine_id)
-       VALUES ($1,NOW(),$2,$3,$4,'Submitted',$5,$6,$7,$8) RETURNING *`,
-      [num, department_id, required_date||null, priority||'Normal', req.user.id, remarks||null, secId, machId]
+       VALUES ($1,NOW(),$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+      [num, department_id, required_date||null, priority||'Normal', initialStatus, req.user.id, remarks||null, secId, machId]
     );
     const id = rows[0].id;
 
+    const insertedItems = [];
     for (const it of items) {
-      const { rows: mat } = await client.query(`SELECT current_stock, unit_price, uom FROM materials WHERE id=$1`, [it.material_id]);
-      const price = parseFloat(mat[0]?.unit_price || 0);
+      const { rows: mat } = await client.query(`SELECT current_stock, unit_price, uom, is_serialized, expected_lifespan_days FROM materials WHERE id=$1`, [it.material_id]);
+      const price = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : parseFloat(mat[0]?.unit_price || 0);
       const qty = parseFloat(it.required_qty || 0);
       const lVal = qty * price;
       totalVal += lVal;
 
-      await client.query(
+      const { rows: [iItem] } = await client.query(
         `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
         [id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
       );
+      insertedItems.push({ ...iItem, current_stock: mat[0]?.current_stock, is_serialized: mat[0]?.is_serialized, expected_lifespan_days: mat[0]?.expected_lifespan_days });
     }
 
     await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, id]);
+
+    let createdPo = null;
+    let createdGp = null;
+
+    // ── Fulfillment Branch 1: DIRECT PURCHASE ORDER (PO) ──
+    if (fulfillment_mode === 'po') {
+      if (!vendor_id) throw new Error('Vendor is required for Direct Purchase Order generation');
+      const d = new Date();
+      const stamp = d.toISOString().slice(0, 10).replace(/-/g, '');
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`po-${stamp}`]);
+      const seqRes = await client.query(`SELECT LPAD((COUNT(*)+1)::text,4,'0') as seq FROM purchase_orders WHERE po_number LIKE $1`, [`PO-${stamp}-%`]);
+      const poNum = `PO-${stamp}-${seqRes.rows[0].seq}`;
+
+      let poTotalVal = 0;
+      let poGstVal = 0;
+      for (const it of items) {
+        const p = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : (insertedItems.find(x => x.material_id === it.material_id)?.unit_price || 0);
+        const q = parseFloat(it.required_qty || 0);
+        const lineBase = p * q;
+        const gstPct = parseFloat(it.gst_pct ?? 18);
+        const lineGst = (lineBase * gstPct) / 100;
+        poTotalVal += lineBase;
+        poGstVal += lineGst;
+      }
+      const poGrandTotal = poTotalVal + poGstVal;
+
+      const { rows: [po] } = await client.query(
+        `INSERT INTO purchase_orders (po_number, date, vendor_id, indent_id, delivery_date, payment_terms, status, total_value, gst_value, grand_total, created_by, remarks)
+         VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, 'Approved', $6, $7, $8, $9, $10) RETURNING *`,
+        [poNum, vendor_id, id, delivery_date || required_date || null, payment_terms || 'Net 30 Days', poTotalVal, poGstVal, poGrandTotal, req.user.id, remarks ? `Direct PO from Indent ${num}: ${remarks}` : `Direct PO from Indent ${num}`]
+      );
+      createdPo = po;
+
+      for (const it of items) {
+        const p = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : (insertedItems.find(x => x.material_id === it.material_id)?.unit_price || 0);
+        const q = parseFloat(it.required_qty || 0);
+        const gstPct = parseFloat(it.gst_pct ?? 18);
+        const lineTot = (p * q) * (1 + gstPct / 100);
+
+        await client.query(
+          `INSERT INTO po_items (po_id, material_id, qty, received_qty, uom, unit_price, gst_pct, total)
+           VALUES ($1, $2, $3, 0, $4, $5, $6, $7)`,
+          [po.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTot]
+        );
+      }
+
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'create_po', 'Submitted', 'PO Created', $2, $3)`,
+        [id, req.user.id, `Direct Purchase Order ${poNum} created with Vendor ID ${vendor_id}`]
+      );
+    }
+
+    // ── Fulfillment Branch 2: DIRECT DELIVERY CHALLAN (DC / GATE PASS) ──
+    else if (fulfillment_mode === 'dc') {
+      const d = new Date();
+      const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-${stamp}`]);
+      const seq = await client.query('SELECT COUNT(*)+1 AS n FROM gate_passes WHERE date::date = CURRENT_DATE');
+      const gpNum = `GP-${stamp}-${String(seq.rows[0].n).padStart(4,'0')}`;
+
+      const matDesc = items.map(it => {
+        const mat = insertedItems.find(x => x.material_id === it.material_id);
+        return `${it.required_qty} ${it.uom || 'NOS'} of ${it.material_id}`;
+      }).join(', ');
+
+      const { rows: [gp] } = await client.query(`
+        INSERT INTO gate_passes (gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
+          material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open') RETURNING *
+      `, [gpNum, dc_type || 'MATERIAL_OUT', vehicle_type || 'Truck', vehicle_number || null, driver_name || null,
+          dc_purpose || remarks || 'Indent Delivery Challan / Material Dispatch',
+          matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan generated from Indent ${num}`, consignee_vendor_id || null]);
+      createdGp = gp;
+
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'create_dc', 'Submitted', 'DC Generated', $2, $3)`,
+        [id, req.user.id, `Outward Delivery Challan / Gate Pass ${gpNum} generated`]
+      );
+    }
+
+    // ── Fulfillment Branch 3: IMMEDIATE STORE ISSUANCE (SIV) ──
+    else if (fulfillment_mode === 'issue') {
+      for (const it of insertedItems) {
+        const qty = parseFloat(it.required_qty || 0);
+        const avail = parseFloat(it.current_stock || 0);
+        if (avail < qty) {
+          throw new Error(`Insufficient stock for material ID ${it.material_id} (Available: ${avail}, Requested: ${qty})`);
+        }
+
+        await client.query(`UPDATE materials SET current_stock = current_stock - $1 WHERE id = $2`, [qty, it.material_id]);
+
+        const { rows: [matAfter] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id = $1`, [it.material_id]);
+        const price = parseFloat(matAfter?.unit_price || it.unit_price || 0);
+
+        await client.query(
+          `INSERT INTO stock_ledger (material_id, transaction_type, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
+           VALUES ($1, 'issue', $2, $3, $4, $5, CURRENT_DATE, 'indent', $6, $7, $8)`,
+          [it.material_id, qty, matAfter.current_stock, price, qty * price, id, `Immediate Issuance from Indent ${num}`, req.user.id]
+        );
+
+        await client.query(
+          `UPDATE indent_items SET issued_qty = $1, unit_price = $2, line_value = $3, ack_status = 'pending' WHERE id = $4`,
+          [qty, price, qty * price, it.id]
+        );
+      }
+
+      await client.query(
+        `UPDATE indents SET status = 'Issued', issued_by = $1, issued_at = NOW() WHERE id = $2`,
+        [req.user.id, id]
+      );
+
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'issue', 'Submitted', 'Issued', $2, $3)`,
+        [id, req.user.id, `Immediate store issuance executed on indent creation`]
+      );
+    }
+
     await client.query('COMMIT');
 
     publish('mkpm.indent.events', String(id), {
       event: 'indent.created',
       id: id,
       indentNumber: num,
-      status: 'Submitted',
+      status: initialStatus,
+      fulfillmentMode: fulfillment_mode,
       userId: req.user.id,
       timestamp: new Date()
     });
 
-    res.json({ success:true, data:rows[0] });
+    res.json({
+      success: true,
+      data: rows[0],
+      po: createdPo,
+      gatePass: createdGp,
+      fulfillmentMode: fulfillment_mode,
+      message: fulfillment_mode === 'po'
+        ? `Indent ${num} created & Purchase Order ${createdPo?.po_number} generated successfully!`
+        : (fulfillment_mode === 'dc'
+            ? `Indent ${num} created & Delivery Challan ${createdGp?.gp_number} generated!`
+            : (fulfillment_mode === 'issue'
+                ? `Indent ${num} created & immediate stock issuance recorded!`
+                : `Indent ${num} submitted for approval workflow!`))
+    });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
 }));
+
 
 // EDIT / UPDATE INDENT (Supports Draft, Submitted, L1 Approved before issuance)
 router.put('/:id', auth, ar(async (req, res) => {
@@ -938,4 +1098,130 @@ router.delete('/:id', auth, ar(async (req, res) => {
   }
 }));
 
+// CONVERT EXISTING INDENT TO PO
+router.post('/:id/convert-to-po', auth, requireLevel(2), ar(async (req, res) => {
+  const { vendor_id, payment_terms = 'Net 30 Days', delivery_date, remarks } = req.body;
+  if (!vendor_id) return res.status(400).json({ success: false, message: 'Vendor is required' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query(`SELECT * FROM indents WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!ind) throw new Error('Indent not found');
+
+    const { rows: existingPo } = await client.query(`SELECT id, po_number FROM purchase_orders WHERE indent_id = $1`, [ind.id]);
+    if (existingPo.length > 0) {
+      throw new Error(`A Purchase Order (${existingPo[0].po_number}) is already linked to this Indent.`);
+    }
+
+    const { rows: items } = await client.query(`SELECT * FROM indent_items WHERE indent_id = $1`, [ind.id]);
+    if (!items.length) throw new Error('Indent has no line items');
+
+    const d = new Date();
+    const stamp = d.toISOString().slice(0, 10).replace(/-/g, '');
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`po-${stamp}`]);
+    const seqRes = await client.query(`SELECT LPAD((COUNT(*)+1)::text,4,'0') as seq FROM purchase_orders WHERE po_number LIKE $1`, [`PO-${stamp}-%`]);
+    const poNum = `PO-${stamp}-${seqRes.rows[0].seq}`;
+
+    let poTotalVal = 0;
+    let poGstVal = 0;
+    for (const it of items) {
+      const p = parseFloat(it.unit_price || 0);
+      const q = parseFloat(it.required_qty || 0);
+      const lineBase = p * q;
+      const gstPct = 18;
+      const lineGst = (lineBase * gstPct) / 100;
+      poTotalVal += lineBase;
+      poGstVal += lineGst;
+    }
+    const poGrandTotal = poTotalVal + poGstVal;
+
+    const { rows: [po] } = await client.query(
+      `INSERT INTO purchase_orders (po_number, date, vendor_id, indent_id, delivery_date, payment_terms, status, total_value, gst_value, grand_total, created_by, remarks)
+       VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, 'Approved', $6, $7, $8, $9, $10) RETURNING *`,
+      [poNum, vendor_id, ind.id, delivery_date || ind.required_date || null, payment_terms, poTotalVal, poGstVal, poGrandTotal, req.user.id, remarks || `PO converted from Indent ${ind.indent_number}`]
+    );
+
+    for (const it of items) {
+      const p = parseFloat(it.unit_price || 0);
+      const q = parseFloat(it.required_qty || 0);
+      const gstPct = 18;
+      const lineTot = (p * q) * 1.18;
+
+      await client.query(
+        `INSERT INTO po_items (po_id, material_id, qty, received_qty, uom, unit_price, gst_pct, total)
+         VALUES ($1, $2, $3, 0, $4, $5, $6, $7)`,
+        [po.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTot]
+      );
+    }
+
+    await client.query(`UPDATE indents SET status = 'PO Created' WHERE id = $1`, [ind.id]);
+    await client.query(
+      `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+       VALUES ($1, 'convert_to_po', $2, 'PO Created', $3, $4)`,
+      [ind.id, ind.status, req.user.id, `Converted to Purchase Order ${poNum}`]
+    );
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Indent ${ind.indent_number} converted to PO ${poNum}`, data: po });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// CONVERT EXISTING INDENT TO DELIVERY CHALLAN (DC / GATE PASS)
+router.post('/:id/convert-to-dc', auth, requireLevel(2), ar(async (req, res) => {
+  const { dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type = 'Truck', driver_name, to_party, consignee_vendor_id, dc_purpose } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query(`SELECT * FROM indents WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!ind) throw new Error('Indent not found');
+
+    const { rows: items } = await client.query(`
+      SELECT ii.*, m.name as "materialName", m.code as "materialCode" 
+      FROM indent_items ii 
+      JOIN materials m ON ii.material_id = m.id 
+      WHERE ii.indent_id = $1
+    `, [ind.id]);
+    if (!items.length) throw new Error('Indent has no line items');
+
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-${stamp}`]);
+    const seq = await client.query('SELECT COUNT(*)+1 AS n FROM gate_passes WHERE date::date = CURRENT_DATE');
+    const gpNum = `GP-${stamp}-${String(seq.rows[0].n).padStart(4,'0')}`;
+
+    const matDesc = items.map(it => `${it.required_qty} ${it.uom || 'NOS'} of ${it.materialName} (${it.materialCode})`).join(', ');
+
+    const { rows: [gp] } = await client.query(`
+      INSERT INTO gate_passes (gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
+        material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open') RETURNING *
+    `, [gpNum, dc_type, vehicle_type, vehicle_number || null, driver_name || null,
+        dc_purpose || `Outward Dispatch for Indent ${ind.indent_number}`,
+        matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan for Indent ${ind.indent_number}`, consignee_vendor_id || null]);
+
+    await client.query(`UPDATE indents SET status = 'DC Generated' WHERE id = $1`, [ind.id]);
+    await client.query(
+      `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+       VALUES ($1, 'convert_to_dc', $2, 'DC Generated', $3, $4)`,
+      [ind.id, ind.status, req.user.id, `Delivery Challan / Gate Pass ${gpNum} generated`]
+    );
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Delivery Challan ${gpNum} generated for Indent ${ind.indent_number}`, data: gp });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
 module.exports = router;
+

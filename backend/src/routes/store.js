@@ -1208,7 +1208,7 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
   }
   if (search) {
     vals.push(`%${search}%`);
-    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length})`);
+    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length} OR v.name ILIKE $${vals.length} OR po_v.name ILIKE $${vals.length} OR g_v.name ILIKE $${vals.length})`);
   }
 
   const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -1217,14 +1217,23 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
   const { rows } = await pool.query(`
     SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
            sl.in_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
-           sl.remarks, sl.created_at,
-           m.name AS "materialName", m.code AS "materialCode", m.uom,
+           sl.remarks, sl.created_at, sl.vendor_id,
+           m.name AS "materialName", m.code AS "materialCode", m.uom, m.hsn_code AS "hsnCode",
            mc.name AS "categoryName",
-           u.name AS "createdByName"
+           u.name AS "createdByName",
+           COALESCE(v.name, po_v.name, g_v.name) AS "vendorName",
+           COALESCE(v.code, po_v.code, g_v.code) AS "vendorCode",
+           COALESCE(v.gstin, po_v.gstin, g_v.gstin) AS "vendorGstin",
+           COALESCE(v.state, po_v.state, g_v.state) AS "vendorState"
     FROM stock_ledger sl
     JOIN materials m ON sl.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
     LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
+    LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
+    LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
+    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
+    LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
     WHERE ${whereClause}
     ORDER BY sl.id DESC
     LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
@@ -1235,6 +1244,11 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
     FROM stock_ledger sl
     JOIN materials m ON sl.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
+    LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
+    LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
+    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
+    LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
     WHERE ${whereClause}
   `, vals);
 
@@ -1291,11 +1305,11 @@ async function syncPoReceived(client, poRef, materialId, qtyDelta) {
   return po.id;
 }
 
-// POST /api/store/inward — Fast Inward (GRN / Vendor / Return) with Single & Batch Support + PO Sync
+// POST /api/store/inward — Fast Inward (GRN / Vendor / Return) with Unified Single-GRN Intake & Batch Support
 router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
   const { material_id, in_qty, unit_price, inward_type = 'grn', reference_type, reference_id,
           department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks, items,
-          gate_pass_id, challan_number, invoice_number, vehicle_number } = req.body;
+          gate_pass_id, grn_id, challan_number, invoice_number, vehicle_number } = req.body;
 
   // Prepare normalized item list (support both single-item and multi-item batch payloads)
   let itemList = [];
@@ -1329,35 +1343,82 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
 
     // Resolve PO ID if reference is a PO
     let resolvedPoId = null;
+    let poVendorId = null;
+    let poVendorName = null;
     if (reference_type === 'PO' && reference_id) {
       const isNum = /^\d+$/.test(String(reference_id));
       const { rows: [po] } = await client.query(
-        isNum ? `SELECT id FROM purchase_orders WHERE id = $1` : `SELECT id FROM purchase_orders WHERE po_number = $1`,
+        isNum ? `SELECT po.id, po.vendor_id, v.name as vendor_name FROM purchase_orders po LEFT JOIN vendors v ON po.vendor_id = v.id WHERE po.id = $1`
+              : `SELECT po.id, po.vendor_id, v.name as vendor_name FROM purchase_orders po LEFT JOIN vendors v ON po.vendor_id = v.id WHERE po.po_number = $1`,
         [isNum ? parseInt(reference_id) : String(reference_id)]
       );
-      if (po) resolvedPoId = po.id;
+      if (po) {
+        resolvedPoId = po.id;
+        poVendorId = po.vendor_id;
+        poVendorName = po.vendor_name;
+      }
     }
 
     const refIdNum = resolvedPoId || (/^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null);
-    const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : null;
+    const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : (poVendorId || null);
+    const resolvedVendorName = vendor_name || poVendorName || '';
     const gatePassIdNum = /^\d+$/.test(String(gate_pass_id)) ? parseInt(gate_pass_id) : null;
     const results = [];
 
-    // If inward is a GRN or from PO, create a formal GRN record
+    // Unified Single-GRN Intake: Reuse existing active GRN for this PO/GatePass or create 1 new GRN head
     let createdGrnId = null;
     let grnNum = null;
-    if (inward_type === 'grn' || reference_type === 'PO' || gatePassIdNum) {
-      const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`grn-${stamp}`]);
-      const { rows: seqRows } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM grn WHERE grn_number LIKE $1`, [`GRN-${stamp}-%`]);
-      grnNum = `GRN-${stamp}-${seqRows[0].seq}`;
+    if (inward_type === 'grn' || reference_type === 'PO' || gatePassIdNum || grn_id) {
+      if (grn_id) {
+        const { rows: [existG] } = await client.query('SELECT id, grn_number FROM grn WHERE id = $1', [grn_id]);
+        if (existG) {
+          createdGrnId = existG.id;
+          grnNum = existG.grn_number;
+        }
+      }
 
-      const { rows: [grnHead] } = await client.query(
-        `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
-         VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, 'Received', $9) RETURNING id`,
-        [grnNum, vendorIdNum, resolvedPoId || null, gatePassIdNum || null, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
-      );
-      createdGrnId = grnHead.id;
+      // Check if open GRN already created today for this PO
+      if (!createdGrnId && resolvedPoId) {
+        const { rows: [samePoGrn] } = await client.query(
+          `SELECT id, grn_number FROM grn 
+           WHERE po_id = $1 AND date = CURRENT_DATE AND status IN ('Draft', 'Received') 
+           ORDER BY id DESC LIMIT 1`,
+          [resolvedPoId]
+        );
+        if (samePoGrn) {
+          createdGrnId = samePoGrn.id;
+          grnNum = samePoGrn.grn_number;
+        }
+      }
+
+      // Check if open GRN already created today for this Gate Pass
+      if (!createdGrnId && gatePassIdNum) {
+        const { rows: [sameGpGrn] } = await client.query(
+          `SELECT id, grn_number FROM grn 
+           WHERE gate_pass_id = $1 AND date = CURRENT_DATE AND status IN ('Draft', 'Received') 
+           ORDER BY id DESC LIMIT 1`,
+          [gatePassIdNum]
+        );
+        if (sameGpGrn) {
+          createdGrnId = sameGpGrn.id;
+          grnNum = sameGpGrn.grn_number;
+        }
+      }
+
+      // If no existing active GRN found, create exactly ONE formal GRN record
+      if (!createdGrnId) {
+        const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`grn-${stamp}`]);
+        const { rows: seqRows } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM grn WHERE grn_number LIKE $1`, [`GRN-${stamp}-%`]);
+        grnNum = `GRN-${stamp}-${seqRows[0].seq}`;
+
+        const { rows: [grnHead] } = await client.query(
+          `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
+           VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, 'Received', $9) RETURNING id`,
+          [grnNum, vendorIdNum, resolvedPoId || null, gatePassIdNum || null, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
+        );
+        createdGrnId = grnHead.id;
+      }
 
       // Close the Inward Gate Pass if linked
       if (gatePassIdNum) {
@@ -1391,7 +1452,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
       const remarkFull = [
         inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : (grnNum ? `[Vendor GRN ${grnNum}]` : '[Vendor GRN]'),
         reference_id ? `Ref: ${reference_id}` : null,
-        vendor_name ? `Party: ${vendor_name}` : null,
+        resolvedVendorName ? `Party: ${resolvedVendorName}` : null,
         itemQC ? `QC: ${itemQC}` : null,
         itemRemarks
       ].filter(Boolean).join(' | ');
@@ -1412,7 +1473,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         itemBatch, finalBin || null, remarkFull, req.user.id, vendorIdNum
       ]);
 
-      // If GRN was created, add grn_items
+      // If GRN was created, attach grn_items under the single GRN
       if (createdGrnId) {
         await client.query(
           `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, bin_location, batch_number, remarks)
@@ -1479,21 +1540,21 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         action: 'store.inward',
         module: 'store',
         recordId: ledger.id,
-        newData: { material_id: mat.id, qty, price, newStock, inward_type, reference_id },
+        newData: { material_id: mat.id, qty, price, newStock, inward_type, reference_id, grn_number: grnNum },
         ip: req.ip
       });
 
       publish(TOPICS.EVENTS_ALL, `inward-${ledger.id}`, { event: 'store.inward.created', id: ledger.id, materialId: mat.id, qty, newStock, userId: req.user.id });
-      results.push(ledger);
+      results.push({ ...ledger, grnNumber: grnNum, grnId: createdGrnId });
     }
 
     await client.query('COMMIT');
 
     const msg = itemList.length === 1
-      ? `Inward recorded successfully for ${itemList[0].material_id}. Stock updated.`
-      : `Batch inward successfully recorded (${itemList.length} items received).`;
+      ? `Inward recorded successfully under GRN ${grnNum || 'GRN'}. Stock updated.`
+      : `Batch inward successfully recorded under single GRN ${grnNum || 'GRN'} (${itemList.length} items received).`;
 
-    res.json({ success: true, message: msg, data: results.length === 1 ? results[0] : results });
+    res.json({ success: true, message: msg, data: results.length === 1 ? results[0] : results, grnNumber: grnNum, grnId: createdGrnId });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });

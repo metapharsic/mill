@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import AgentStatusBanner from '../components/AgentStatusBanner'
 const API=(p,o)=>fetch(p,{headers:{Authorization:`Bearer ${localStorage.getItem('mk_token')}`,'Content-Type':'application/json',...(o?.headers||{})},...o}).then(r=>r.json())
 const STATUS_COLOR={Draft:'#8a8a90',Approved:'#22c55e',Sent:'#6366f1',Partial:'#f97316',Received:'#0ea5e9',Closed:'#64748b',Cancelled:'#ef4444'}
 const fmt=v=>v?`₹${Number(v).toLocaleString('en-IN',{minimumFractionDigits:2})}`:'—'
@@ -645,28 +646,76 @@ export default function Purchase() {
     const r = await API(`/api/purchase/grn/${grnRow.id}`)
     if (!r.success) return alert(r.message || 'Failed to load GRN details')
     const g = r.data
-    const total = (g.items || []).reduce((acc, it) => acc + (Number(it.accepted_qty || 0) * Number(it.unit_price || 0)), 0)
+
+    const vendorState = (g.vendorState || '').toLowerCase()
+    const vendorGstin = g.vendorGstin || ''
+    const isInterState = (vendorState && vendorState !== 'karnataka') || (vendorGstin && !vendorGstin.startsWith('29'))
+
+    let totalTaxable = 0
+    let totalCgst = 0
+    let totalSgst = 0
+    let totalIgst = 0
+
+    const itemsCalculated = (g.items || []).map(it => {
+      const uPrice = Number(it.unit_price || 0)
+      const accQty = Number(it.accepted_qty || 0)
+      const lineTaxable = accQty * uPrice
+      const gstPct = Number(it.gst_pct ?? 18)
+
+      const cgstPct = isInterState ? 0 : gstPct / 2
+      const sgstPct = isInterState ? 0 : gstPct / 2
+      const igstPct = isInterState ? gstPct : 0
+
+      const cgstAmt = (lineTaxable * cgstPct) / 100
+      const sgstAmt = (lineTaxable * sgstPct) / 100
+      const igstAmt = (lineTaxable * igstPct) / 100
+      const lineTotal = lineTaxable + cgstAmt + sgstAmt + igstAmt
+
+      totalTaxable += lineTaxable
+      totalCgst += cgstAmt
+      totalSgst += sgstAmt
+      totalIgst += igstAmt
+
+      return {
+        ...it,
+        uPrice,
+        accQty,
+        lineTaxable,
+        gstPct,
+        cgstPct,
+        sgstPct,
+        igstPct,
+        cgstAmt,
+        sgstAmt,
+        igstAmt,
+        lineTotal
+      }
+    })
+
+    const totalGst = totalCgst + totalSgst + totalIgst
+    const grandTotal = totalTaxable + totalGst
 
     const content = (
       <div>
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
-              MK PAPER MILL PRIVATE LIMITED
+              SRI M.K. PAPER MILLS PRIVATE LIMITED
             </div>
             <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
-              Store Department — Goods Receipt Note (Inward Commercial Voucher)
+              Store Department — Goods Receipt Note (Inward Commercial Tax Voucher)
             </div>
             <div style={{ fontSize: 11, color: '#475569' }}>
-              Factory: Sy. No. 42/1, Mill Road, Industrial Area, Karnataka - 560001
+              Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka
             </div>
-            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
-              GSTIN: <code>29AABCM1234F1Z5</code>
+            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 2 }}>
+              GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: <code>U21012KA2015PTC081234</code>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ display: 'inline-block', background: '#0f766e', color: '#fff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 14, textTransform: 'uppercase' }}>
-              GOODS RECEIPT NOTE
+            <div style={{ display: 'inline-block', background: '#0f766e', color: '#fff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 13, textTransform: 'uppercase' }}>
+              GOODS RECEIPT NOTE (GRN)
             </div>
             <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
               GRN #: {g.grnNumber || g.grn_number}
@@ -681,21 +730,25 @@ export default function Purchase() {
         </div>
 
         {/* 2-Column Vendor & Order Specifications */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginBottom: 16 }}>
           <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
-              SUPPLIER DETAILS
+              🏢 SUPPLIER / VENDOR DETAILS
             </div>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{g.vendorName}</div>
             {g.vendorCode && <div style={{ fontSize: 11, color: '#64748b' }}>Vendor Code: <code>{g.vendorCode}</code></div>}
             <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
               GSTIN: <strong>{g.vendorGstin || 'Unregistered / Exempt'}</strong>
             </div>
+            <div style={{ fontSize: 11, color: '#334155' }}>
+              State: <strong>{g.vendorState || (isInterState ? 'Inter-State' : 'Karnataka (Code 29)')}</strong> ({isInterState ? 'IGST Applicable' : 'CGST + SGST Applicable'})
+            </div>
+            {g.vendorAddress && <div style={{ fontSize: 10, color: '#64748b', marginTop: 2 }}>{g.vendorAddress}</div>}
           </div>
 
           <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
-              LOGISTICS &amp; INVOICE REFERENCES
+              📋 LOGISTICS &amp; INVOICE REFERENCES
             </div>
             <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
               PO Reference: <strong>{g.poNumber || 'Direct Inward'}</strong>
@@ -712,57 +765,102 @@ export default function Purchase() {
           </div>
         </div>
 
-        {/* Line Items Table */}
+        {/* Line Items Table with CGST, SGST, IGST Breakdown */}
         <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
           <thead>
             <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
               <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
-              <th style={{ padding: '8px 6px' }}>Material Code &amp; Specification</th>
+              <th style={{ padding: '8px 6px' }}>Material Description &amp; Specifications</th>
+              <th style={{ padding: '8px 6px', width: 65 }}>HSN/SAC</th>
               <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>PO Qty</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Received</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Accepted</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Rejected</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Unit Rate</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Accepted Val (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 60 }}>Accepted</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>Unit Rate</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>Taxable Val</th>
+              {!isInterState ? (
+                <>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>CGST</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>SGST</th>
+                </>
+              ) : (
+                <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>IGST</th>
+              )}
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Total Val (₹)</th>
             </tr>
           </thead>
           <tbody>
-            {(g.items || []).map((it, i) => {
-              const uPrice = Number(it.unit_price || 0)
-              const accQty = Number(it.accepted_qty || 0)
-              const lineVal = accQty * uPrice
-              return (
-                <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
-                  <td style={{ padding: '8px 6px' }}>
-                    <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName}</div>
-                    <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
-                    {it.batch_number && <div style={{ fontSize: 10, color: '#0f766e' }}>Batch: {it.batch_number}</div>}
-                  </td>
-                  <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right' }}>{parseFloat(it.po_qty || 0).toFixed(2)}</td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600 }}>{parseFloat(it.received_qty || 0).toFixed(2)}</td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{parseFloat(it.accepted_qty || 0).toFixed(2)}</td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: Number(it.rejected_qty) > 0 ? '#dc2626' : '#64748b' }}>
-                    {parseFloat(it.rejected_qty || 0).toFixed(2)}
-                  </td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{uPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>₹{lineVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                </tr>
-              )
-            })}
+            {itemsCalculated.map((it, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
+                <td style={{ padding: '8px 6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName}</div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
+                  {it.batch_number && <div style={{ fontSize: 10, color: '#0f766e' }}>Batch: {it.batch_number}</div>}
+                </td>
+                <td style={{ padding: '8px 6px', fontFamily: 'monospace' }}>{it.hsnCode || '8439'}</td>
+                <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{it.accQty.toFixed(2)}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{it.uPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{it.lineTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                {!isInterState ? (
+                  <>
+                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{it.cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{it.sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </>
+                ) : (
+                  <td style={{ padding: '8px 6px', textAlign: 'right', color: '#d97706' }}>₹{it.igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                )}
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 800, color: '#0f766e' }}>₹{it.lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        {/* Commercial Total */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', marginBottom: 20 }}>
-          <div style={{ fontSize: 11, color: '#475569' }}>
-            <strong>Remarks:</strong> {g.remarks || 'Material physically verified at store dock.'}
+        {/* Tax Matrix Summary Box & Amount in Words */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px 16px', marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+              AMOUNT IN WORDS:
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
+              {numberToWords(grandTotal)}
+            </div>
+            {g.remarks && (
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 8 }}>
+                <strong>Remarks:</strong> {g.remarks}
+              </div>
+            )}
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, color: '#64748b' }}>Total Accepted Valuation:</div>
-            <div style={{ fontSize: 16, fontWeight: 900, color: '#0f766e' }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#64748b' }}>Taxable Subtotal:</span>
+              <strong>₹{totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+            </div>
+            {!isInterState ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#64748b' }}>CGST Total:</span>
+                  <span>₹{totalCgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#64748b' }}>SGST Total:</span>
+                  <span>₹{totalSgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#d97706' }}>IGST Total:</span>
+                <span style={{ color: '#d97706', fontWeight: 600 }}>₹{totalIgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #cbd5e1', paddingTop: 4 }}>
+              <span style={{ color: '#64748b' }}>Total GST Tax:</span>
+              <strong>₹{totalGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #0f766e', paddingTop: 4, fontSize: 14 }}>
+              <span style={{ fontWeight: 800, color: '#0f766e' }}>Grand Total Valuation:</span>
+              <span style={{ fontWeight: 900, color: '#0f766e' }}>₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            </div>
           </div>
         </div>
 
@@ -1058,38 +1156,7 @@ export default function Purchase() {
       </div>
 
       {/* ── MULTI-AGENT SYNCHRONIZATION & TELEMETRY BAR ── */}
-      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 16px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 11 }}>
-          <span style={{ fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-            Multi-Agent P2P Architecture:
-          </span>
-          <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bae6fd' }}>
-            🤖 PR Agent: Active
-          </span>
-          <span style={{ background: '#ccfbf1', color: '#0f766e', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #99f6e4' }}>
-            📋 PO Agent: Synced
-          </span>
-          <span style={{ background: '#fef3c7', color: '#b45309', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #fde68a' }}>
-            📦 GRN Desk: Ready
-          </span>
-          <span style={{ background: '#f0fdf4', color: '#15803d', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bbf7d0' }}>
-            ⚡ Ledger Agent: Live
-          </span>
-          <span style={{ background: '#ede9fe', color: '#6d28d9', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #ddd6fe' }}>
-            🛡️ Orchestrator: 100% Health
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            style={{ ...S.btnSecondary, fontSize: 11, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 5, background: '#ffffff', fontWeight: 600 }}
-            onClick={exportOrdersToCSV}
-            title="Export filtered purchase orders to CSV"
-          >
-            📊 Export POs (CSV)
-          </button>
-        </div>
-      </div>
+      <AgentStatusBanner currentModule="procurement" />
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #e7e6df', overflowX: 'auto' }}>

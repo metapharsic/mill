@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
+import AgentStatusBanner from '../components/AgentStatusBanner'
 
 const API = async (path, opts = {}) => {
   try {
@@ -168,7 +169,13 @@ export default function Indent() {
   const [cancelNotes, setCancelNotes] = useState('')
   const [cancelling, setCancelling] = useState(false)
 
-  // Form state for Raise / Edit (Priority removed per user requirement)
+  // 1-Click Conversion Modals for Existing Indents
+  const [vendors, setVendors] = useState([])
+  const [poModal, setPoModal] = useState(null)
+  const [dcModal, setDcModal] = useState(null)
+  const [converting, setConverting] = useState(false)
+
+  // Form state for Raise / Edit with Multi-Mode Fulfillment
   const blankForm = () => ({
     department_id: user?.department_id || '',
     required_date: '',
@@ -176,7 +183,20 @@ export default function Indent() {
     section: '',
     machine_id: '',
     machine_context: '',
-    items: [{ material_id: '', required_qty: '', uom: '', purpose: '', component_position: '', reason_code: 'Routine Replacement' }]
+    fulfillment_mode: 'pr', // 'pr' | 'po' | 'dc' | 'issue'
+    // PO fields
+    vendor_id: '',
+    payment_terms: 'Net 30 Days',
+    delivery_date: '',
+    // DC fields
+    dc_type: 'MATERIAL_OUT',
+    vehicle_number: '',
+    vehicle_type: 'Truck',
+    driver_name: '',
+    to_party: '',
+    consignee_vendor_id: '',
+    dc_purpose: '',
+    items: [{ material_id: '', required_qty: '', uom: '', unit_price: '', gst_pct: 18, purpose: '', component_position: '', reason_code: 'Routine Replacement' }]
   })
   const [form, setForm] = useState(blankForm())
   const [saving, setSaving] = useState(false)
@@ -213,7 +233,9 @@ export default function Indent() {
     API('/master/materials?limit=2500').then(r => { if (r.success) setMats(r.data) })
     API('/sections').then(r => { if (r.success) setSections(r.data) })
     API('/master/machines').then(r => { if (r.success) setMachines(r.data) })
+    API('/master/vendors').then(r => { if (r.success) setVendors(r.data) })
   }, [])
+
 
   useEffect(() => { if (tabKey === 'analytics') loadAnalytics() }, [tabKey])
   useEffect(() => { if (tabKey === 'calendar') loadCalendar() }, [tabKey, calMonth, calYear])
@@ -623,15 +645,106 @@ export default function Indent() {
     }
   }
 
+  // ── 1-Click PO and DC Conversion Handlers ──────────────────────────────────
+  const openConvertPo = (ind) => {
+    setPoModal({
+      id: ind.id,
+      num: ind.indentNumber || ind.indent_number,
+      total_value: ind.total_value,
+      vendor_id: '',
+      payment_terms: 'Net 30 Days',
+      delivery_date: (ind.requiredDate || ind.required_date || '').slice(0, 10),
+      remarks: `Direct PO generated from Indent ${ind.indentNumber || ind.indent_number}`
+    })
+  }
+
+  const handleConvertPoSubmit = async (e) => {
+    e.preventDefault()
+    if (!poModal?.vendor_id) return alert('Please select a Vendor for the Purchase Order')
+    setConverting(true)
+    const res = await API(`/indent/${poModal.id}/convert-to-po`, {
+      method: 'POST',
+      body: JSON.stringify({
+        vendor_id: poModal.vendor_id,
+        payment_terms: poModal.payment_terms,
+        delivery_date: poModal.delivery_date,
+        remarks: poModal.remarks
+      })
+    })
+    setConverting(false)
+    if (res.success) {
+      flash(true, res.message || 'Purchase Order generated successfully')
+      setPoModal(null)
+      if (detail?.id === poModal.id) openDetail(poModal.id)
+      load()
+    } else {
+      alert(res.message || 'Failed to convert Indent to PO')
+    }
+  }
+
+  const openConvertDc = (ind) => {
+    setDcModal({
+      id: ind.id,
+      num: ind.indentNumber || ind.indent_number,
+      total_value: ind.total_value,
+      dc_type: 'MATERIAL_OUT',
+      vehicle_number: '',
+      vehicle_type: 'Truck',
+      driver_name: '',
+      to_party: '',
+      consignee_vendor_id: '',
+      dc_purpose: `Outward Dispatch for Indent ${ind.indentNumber || ind.indent_number}`
+    })
+  }
+
+  const handleConvertDcSubmit = async (e) => {
+    e.preventDefault()
+    if (!dcModal?.to_party) return alert('Please specify the Consignee / Destination Party Name')
+    setConverting(true)
+    const res = await API(`/indent/${dcModal.id}/convert-to-dc`, {
+      method: 'POST',
+      body: JSON.stringify({
+        dc_type: dcModal.dc_type,
+        vehicle_number: dcModal.vehicle_number,
+        vehicle_type: dcModal.vehicle_type,
+        driver_name: dcModal.driver_name,
+        to_party: dcModal.to_party,
+        consignee_vendor_id: dcModal.consignee_vendor_id || null,
+        dc_purpose: dcModal.dc_purpose
+      })
+    })
+    setConverting(false)
+    if (res.success) {
+      flash(true, res.message || 'Delivery Challan generated successfully')
+      setDcModal(null)
+      if (detail?.id === dcModal.id) openDetail(dcModal.id)
+      load()
+    } else {
+      alert(res.message || 'Failed to generate Delivery Challan')
+    }
+  }
+
   // ── Form Actions ─────────────────────────────────────────────────────────────
   const validateForm = () => {
     const errs = {}
     if (!form.department_id) errs.department_id = 'Select department'
     if (!form.required_date) errs.required_date = 'Pick required date'
+    if (form.fulfillment_mode === 'po' && !form.vendor_id) {
+      errs.vendor_id = 'Select a vendor for direct PO creation'
+    }
+    if (form.fulfillment_mode === 'dc' && !form.to_party) {
+      errs.to_party = 'Consignee / Destination party is required for DC'
+    }
     const itemErrs = form.items.map(it => {
       const e = {}
       if (!it.material_id) e.material_id = 'Pick a material from dropdown'
       if (!it.required_qty || Number(it.required_qty) <= 0) e.required_qty = 'Qty must be > 0'
+      if (form.fulfillment_mode === 'issue') {
+        const mat = matByID(it.material_id)
+        if (mat && Number(mat.current_stock || 0) < Number(it.required_qty)) {
+          e.required_qty = `Insufficient stock (Avail: ${mat.current_stock})`
+        }
+      }
       return e
     })
     if (itemErrs.some(e => Object.keys(e).length)) errs.items = itemErrs
@@ -648,14 +761,22 @@ export default function Indent() {
 
   const save = async () => {
     setSaving(true)
-    const items = form.items.map(it => ({ ...it, uom: matByID(it.material_id)?.uom || it.uom }))
+    const items = form.items.map(it => {
+      const m = matByID(it.material_id)
+      return {
+        ...it,
+        uom: m?.uom || it.uom,
+        unit_price: it.unit_price !== '' && it.unit_price !== undefined ? parseFloat(it.unit_price) : parseFloat(m?.unit_price || 0),
+        gst_pct: parseFloat(it.gst_pct ?? 18)
+      }
+    })
     const r = editId
       ? await API(`/indent/${editId}`, { method: 'PUT', body: JSON.stringify({ ...form, items }) })
       : await API('/indent', { method: 'POST', body: JSON.stringify({ ...form, items }) })
     setSaving(false)
     if (r.success) {
       setForm(blankForm()); setEditId(null); setTabKey('list'); setReviewMode(false); setFormErrors({}); load()
-      flash(true, editId ? `Indent updated: ${r.data?.indent_number || editId}` : `Indent created: ${r.data?.indent_number}`)
+      flash(true, r.message || (editId ? `Indent updated: ${r.data?.indent_number || editId}` : `Indent created: ${r.data?.indent_number}`))
     } else {
       flash(false, r.message || 'Failed to save indent')
     }
@@ -673,10 +794,23 @@ export default function Indent() {
       section: d.section_id || '',
       machine_id: d.machine_id || '',
       machine_context: '',
+      fulfillment_mode: 'pr',
+      vendor_id: '',
+      payment_terms: 'Net 30 Days',
+      delivery_date: '',
+      dc_type: 'MATERIAL_OUT',
+      vehicle_number: '',
+      vehicle_type: 'Truck',
+      driver_name: '',
+      to_party: '',
+      consignee_vendor_id: '',
+      dc_purpose: '',
       items: (d.items || []).map(it => ({
         material_id: it.material_id,
         required_qty: it.required_qty,
         uom: it.uom,
+        unit_price: it.matPrice || it.unit_price || '',
+        gst_pct: 18,
         purpose: it.purpose || '',
         component_position: it.component_position || '',
         reason_code: it.reason_code || 'Routine Replacement'
@@ -686,6 +820,7 @@ export default function Indent() {
     setFormErrors({})
     setTabKey('raise')
   }
+
 
   const action = async (id, path, body) => {
     const r = await API(`/indent/${id}/${path}`, { method: 'PUT', body: body ? JSON.stringify(body) : undefined })
@@ -758,26 +893,8 @@ export default function Indent() {
       </div>
 
       {/* ── MULTI-AGENT SYNCHRONIZATION & TELEMETRY BAR ── */}
-      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 16px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 11 }}>
-          <span style={{ fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-            Multi-Agent PR &amp; PO Engine:
-          </span>
-          <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bae6fd' }}>
-            🤖 PR Agent: Requisition Active
-          </span>
-          <span style={{ background: '#ccfbf1', color: '#0f766e', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #99f6e4' }}>
-            📋 PO Agent: 1-Click Conversion Ready
-          </span>
-          <span style={{ background: '#f0fdf4', color: '#15803d', padding: '3px 9px', borderRadius: 12, fontWeight: 700, border: '1px solid #bbf7d0' }}>
-            ⚡ Store Ledger: Auto-Linked
-          </span>
-        </div>
-        <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>
-          🔄 Real-time P2P Synchronization Active
-        </div>
-      </div>
+      <AgentStatusBanner currentModule="indent" />
+
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* ── TAB 1: ALL INDENTS LIST (With Detailed Indentor & Equipment Views) ── */}
@@ -839,15 +956,36 @@ export default function Indent() {
                             </button>
                           </td>
 
-                          {/* Indent No */}
+                          {/* Indent No & Linked Documents */}
                           <td style={S.td}>
                             <span
                               onClick={() => openDetail(r.id)}
                               style={{ fontFamily: 'monospace', fontSize: 12, color: '#0f766e', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
-                              title="Click to View Full Details & Append Spares"
+                              title="Click to View Full Details & Associated Documents"
                             >
                               {r.indentNumber}
                             </span>
+                            {r.linkedPoNumber && (
+                              <div style={{ marginTop: 3 }}>
+                                <span style={{ fontSize: 10, background: '#e0f2fe', color: '#0369a1', padding: '1px 6px', borderRadius: 4, border: '1px solid #bae6fd', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                  🛒 PO: {r.linkedPoNumber}
+                                </span>
+                              </div>
+                            )}
+                            {r.linkedGpNumber && (
+                              <div style={{ marginTop: 3 }}>
+                                <span style={{ fontSize: 10, background: '#fef3c7', color: '#b45309', padding: '1px 6px', borderRadius: 4, border: '1px solid #fde68a', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                  🚛 DC: {r.linkedGpNumber}
+                                </span>
+                              </div>
+                            )}
+                            {['Issued', 'Partially Issued'].includes(r.status) && (
+                              <div style={{ marginTop: 3 }}>
+                                <span style={{ fontSize: 10, background: '#dcfce7', color: '#15803d', padding: '1px 6px', borderRadius: 4, border: '1px solid #bbf7d0', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                  📦 SIV Issued
+                                </span>
+                              </div>
+                            )}
                           </td>
 
                           {/* Date & Time Raised */}
@@ -957,19 +1095,41 @@ export default function Indent() {
                                 onClick={() => printCompanyInvoice(r.id)}
                                 title="Print Official Company Invoice Voucher"
                               >
-                                🖨️ Invoice
+                                🖨️ Voucher
                               </button>
                               <button style={S.btnSm('#1e293b')} onClick={() => openDetail(r.id)}>View</button>
 
-                              {/* Approvals — GAP-5 FIX: L2 at level 3, L3 added for level 4 */}
+                              {/* 1-Click Convert to PO */}
+                              {!r.linkedPoId && !['Rejected', 'Cancelled'].includes(r.status) && (
+                                <button
+                                  style={{ ...S.btnSm('#0284c7'), padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700 }}
+                                  onClick={() => openConvertPo(r)}
+                                  title="1-Click Convert Indent to Purchase Order (PO)"
+                                >
+                                  🛒 +PO
+                                </button>
+                              )}
+
+                              {/* 1-Click Convert to DC */}
+                              {!r.linkedGpId && !['Rejected', 'Cancelled'].includes(r.status) && (
+                                <button
+                                  style={{ ...S.btnSm('#d97706'), padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700 }}
+                                  onClick={() => openConvertDc(r)}
+                                  title="1-Click Generate Delivery Challan (DC / Gate Pass)"
+                                >
+                                  🚛 +DC
+                                </button>
+                              )}
+
+                              {/* Approvals */}
                               {r.status === 'Submitted' && (user?.role_level >= 3) && (
-                                <button style={S.btnSm('#0891b2')} onClick={() => action(r.id, 'approve/l1')} title="L1 Approve — Store Head">✓ L1 Approve</button>
+                                <button style={S.btnSm('#0891b2')} onClick={() => action(r.id, 'approve/l1')} title="L1 Approve — Store Head">✓ L1</button>
                               )}
                               {r.status === 'L1 Approved' && (user?.role_level >= 3) && (
-                                <button style={S.btnSm('#7c3aed')} onClick={() => action(r.id, 'approve/l2')} title="L2 Approve — Store Manager">✓ L2 Approve</button>
+                                <button style={S.btnSm('#7c3aed')} onClick={() => action(r.id, 'approve/l2')} title="L2 Approve — Store Manager">✓ L2</button>
                               )}
                               {['L1 Approved', 'L2 Approved'].includes(r.status) && (user?.role_level >= 4) && (
-                                <button style={S.btnSm('#065f46')} onClick={() => action(r.id, 'approve/l3')} title="L3 Approve — Plant Head / MD (Final)">✓ L3 MD Approve</button>
+                                <button style={S.btnSm('#065f46')} onClick={() => action(r.id, 'approve/l3')} title="L3 Approve — Plant Head / MD (Final)">✓ L3 MD</button>
                               )}
                               {['Submitted', 'L1 Approved', 'L2 Approved'].includes(r.status) && (user?.role_level >= 3) && (
                                 <button
@@ -996,31 +1156,7 @@ export default function Indent() {
                                   📦 Issue
                                 </button>
                               )}
-                              {/* Create PO from Approved Indent */}
-                              {['Approved', 'L2 Approved'].includes(r.status) && (
-                                <button
-                                  style={{ ...S.btnSm('#0284c7'), padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
-                                  onClick={() => {
-                                    window.location.href = `/purchase?indent_id=${r.id}`
-                                  }}
-                                  title="Convert this approved Purchase Request to a Purchase Order"
-                                >
-                                  🛒 + Convert to PO
-                                </button>
-                              )}
 
-                              {/* View PO Link when status is PO Created */}
-                              {r.status === 'PO Created' && (
-                                <button
-                                  style={{ ...S.btnSm('#6366f1'), padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
-                                  onClick={() => {
-                                    window.location.href = `/purchase`
-                                  }}
-                                  title="View created Purchase Order in Procurement Desk"
-                                >
-                                  📋 View PO →
-                                </button>
-                              )}
 
                               {/* Store Manager & Admin Cancellation / Force Delete Dialog */}
                               {(isStore || isElevated || r.raised_by === user?.id) && (
@@ -1126,6 +1262,240 @@ export default function Indent() {
           </div>
 
           <form onSubmit={goToReview}>
+            {/* ── Downstream Fulfillment Workflow Selector ── */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>⚡</span> Downstream Fulfillment &amp; Workflow Mode
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b', marginBottom: 12 }}>
+                Select whether this indent will follow the standard approval chain, generate an instant Purchase Order, create an outward Delivery Challan, or issue directly from mill stock.
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+                {/* Card 1: Standard PR */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'pr' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'pr' ? '2px solid #0284c7' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'pr' ? '#f0f9ff' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'pr' ? '0 2px 8px rgba(2, 132, 199, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#0369a1' }}>📋 Standard PR</span>
+                    {form.fulfillment_mode === 'pr' && <span style={{ background: '#0284c7', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Plant Requisition Workflow</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Standard multi-tier approval hierarchy (L1 Store → L2 Dept Head → L3 Plant Head) before PO issuance.
+                  </div>
+                </div>
+
+                {/* Card 2: Direct PO */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'po' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'po' ? '2px solid #0f766e' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'po' ? '#f0fdfa' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'po' ? '0 2px 8px rgba(15, 118, 110, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#0f766e' }}>🛒 Direct PO</span>
+                    {form.fulfillment_mode === 'po' && <span style={{ background: '#0f766e', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>1-Click Procurement Generation</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Auto-approves indent and directly generates linked PO with Supplier selection and GST matrix.
+                  </div>
+                </div>
+
+                {/* Card 3: Direct DC */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'dc' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'dc' ? '2px solid #d97706' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'dc' ? '#fffbeb' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'dc' ? '0 2px 8px rgba(217, 119, 6, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#b45309' }}>🚛 Delivery Challan (DC)</span>
+                    {form.fulfillment_mode === 'dc' && <span style={{ background: '#d97706', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Outward Gate Pass Dispatch</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Generates Outward / Returnable Delivery Challan &amp; Gate Pass for job work, refurbishment or transfer.
+                  </div>
+                </div>
+
+                {/* Card 4: Immediate Store Issuance */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'issue' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'issue' ? '2px solid #16a34a' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'issue' ? '#f0fdf4' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'issue' ? '0 2px 8px rgba(22, 163, 74, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#15803d' }}>📦 Store Issuance (SIV)</span>
+                    {form.fulfillment_mode === 'issue' && <span style={{ background: '#16a34a', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Immediate In-Stock Issuance</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Directly deducts stock from mill store, writes to stock ledger, and generates official SIV Voucher.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Contextual Configuration: DIRECT PO ── */}
+            {form.fulfillment_mode === 'po' && (
+              <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: 8, padding: 14, marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#0f766e', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>🛒</span> Direct Purchase Order (PO) Details &amp; Commercial Terms
+                </div>
+                <div style={S.grid3}>
+                  <label style={S.lbl}>Assign Vendor / Supplier *
+                    <select
+                      style={{ ...S.sel, ...(formErrors.vendor_id ? { border: '1px solid #ef4444' } : {}) }}
+                      value={form.vendor_id}
+                      onChange={e => setForm(f => ({ ...f, vendor_id: e.target.value }))}
+                    >
+                      <option value="">-- Select Vendor / Supplier --</option>
+                      {vendors.map(v => (
+                        <option key={v.id} value={v.id}>
+                          {v.name} {v.gstin ? `[GSTIN: ${v.gstin}]` : ''} ({v.city || 'Vendor'})
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.vendor_id && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.vendor_id}</span>}
+                  </label>
+                  <label style={S.lbl}>Payment Terms
+                    <select
+                      style={S.sel}
+                      value={form.payment_terms}
+                      onChange={e => setForm(f => ({ ...f, payment_terms: e.target.value }))}
+                    >
+                      <option value="Net 30 Days">Net 30 Days</option>
+                      <option value="Net 15 Days">Net 15 Days</option>
+                      <option value="Net 45 Days">Net 45 Days</option>
+                      <option value="Immediate / COD">Immediate / COD</option>
+                      <option value="100% Advance">100% Advance</option>
+                      <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
+                    </select>
+                  </label>
+                  <label style={S.lbl}>Expected Delivery Date
+                    <input
+                      type="date"
+                      style={S.inp}
+                      value={form.delivery_date || form.required_date}
+                      onChange={e => setForm(f => ({ ...f, delivery_date: e.target.value }))}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* ── Contextual Configuration: DELIVERY CHALLAN (DC / GATE PASS) ── */}
+            {form.fulfillment_mode === 'dc' && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 14, marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#b45309', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>🚛</span> Delivery Challan (DC / Gate Pass) Dispatch Details
+                </div>
+                <div style={S.grid3}>
+                  <label style={S.lbl}>Gate Pass / DC Type *
+                    <select
+                      style={S.sel}
+                      value={form.dc_type}
+                      onChange={e => setForm(f => ({ ...f, dc_type: e.target.value }))}
+                    >
+                      <option value="MATERIAL_OUT">Material Outward DC (Non-Returnable)</option>
+                      <option value="RETURNABLE">Returnable Gate Pass (Job Work / Repair)</option>
+                      <option value="OUT">Outward Vehicle &amp; Goods Dispatch</option>
+                    </select>
+                  </label>
+                  <label style={S.lbl}>Consignee / Destination Party Name *
+                    <input
+                      style={{ ...S.inp, ...(formErrors.to_party ? { border: '1px solid #ef4444' } : {}) }}
+                      placeholder="e.g. Apex Engineering Works, Hubli"
+                      value={form.to_party}
+                      onChange={e => setForm(f => ({ ...f, to_party: e.target.value }))}
+                    />
+                    {formErrors.to_party && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.to_party}</span>}
+                  </label>
+                  <label style={S.lbl}>Vehicle Number
+                    <input
+                      style={S.inp}
+                      placeholder="e.g. KA-25-AB-1234"
+                      value={form.vehicle_number}
+                      onChange={e => setForm(f => ({ ...f, vehicle_number: e.target.value }))}
+                    />
+                  </label>
+                </div>
+                <div style={{ ...S.grid3, marginTop: 8 }}>
+                  <label style={S.lbl}>Vehicle Type
+                    <select
+                      style={S.sel}
+                      value={form.vehicle_type}
+                      onChange={e => setForm(f => ({ ...f, vehicle_type: e.target.value }))}
+                    >
+                      <option value="Truck">Truck / Lorry</option>
+                      <option value="Tempo">Tempo / Mini Truck</option>
+                      <option value="Pickup">Pickup Van</option>
+                      <option value="Tractor">Tractor</option>
+                      <option value="Hand Carry">Hand Carry / Courier</option>
+                    </select>
+                  </label>
+                  <label style={S.lbl}>Driver / Handover Person
+                    <input
+                      style={S.inp}
+                      placeholder="e.g. Ramesh Kumar"
+                      value={form.driver_name}
+                      onChange={e => setForm(f => ({ ...f, driver_name: e.target.value }))}
+                    />
+                  </label>
+                  <label style={S.lbl}>DC Technical Purpose
+                    <input
+                      style={S.inp}
+                      placeholder="e.g. Dynamic Roll Balancing & Rubber Lining"
+                      value={form.dc_purpose}
+                      onChange={e => setForm(f => ({ ...f, dc_purpose: e.target.value }))}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* ── Contextual Configuration: IMMEDIATE STORE ISSUANCE ── */}
+            {form.fulfillment_mode === 'issue' && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 14, marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#15803d', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>📦</span> Immediate Store Issuance (SIV) Notice
+                </div>
+                <div style={{ fontSize: 11, color: '#166534', marginTop: 4 }}>
+                  Submitting this form will automatically deduct the required quantities directly from mill store stock and generate an official SIV issue voucher. Ensure sufficient physical stock is verified.
+                </div>
+              </div>
+            )}
+
             <div style={S.grid3}>
               <label style={S.lbl}>Department *
                 <select
@@ -1208,7 +1578,7 @@ export default function Indent() {
 
             {form.items.map((it, i) => {
               const mat = matByID(it.material_id)
-              const price = matPrice(mat)
+              const price = it.unit_price !== '' && it.unit_price !== undefined ? parseFloat(it.unit_price) : matPrice(mat)
               const filtered = mats.filter(m =>
                 !(matSearch[i] || '') ||
                 (m.name || '').toLowerCase().includes((matSearch[i] || '').toLowerCase()) ||
@@ -1256,6 +1626,7 @@ export default function Indent() {
                               onMouseDown={() => {
                                 setItem(i, 'material_id', m.id)
                                 setItem(i, 'uom', m.uom || 'NOS')
+                                setItem(i, 'unit_price', m.unit_price || '')
                                 setMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
                                 setMatDropOpen(d => ({ ...d, [i]: false }))
                               }}
@@ -1304,7 +1675,34 @@ export default function Indent() {
                     </label>
                   </div>
 
-                  <div style={{ ...S.grid2, marginTop: 8 }}>
+                  <div style={{ ...S.grid3, marginTop: 8 }}>
+                    <label style={S.lbl}>Unit Rate (INR)
+                      <input
+                        style={S.inp}
+                        type="number"
+                        step="0.01"
+                        placeholder="Estimated Unit Price"
+                        value={it.unit_price !== undefined ? it.unit_price : (mat?.unit_price || '')}
+                        onChange={e => setItem(i, 'unit_price', e.target.value)}
+                      />
+                    </label>
+
+                    {form.fulfillment_mode === 'po' && (
+                      <label style={S.lbl}>GST Rate (%)
+                        <select
+                          style={S.sel}
+                          value={it.gst_pct ?? 18}
+                          onChange={e => setItem(i, 'gst_pct', Number(e.target.value))}
+                        >
+                          <option value="0">0% (Nil / Exempted)</option>
+                          <option value="5">5% GST (2.5% CGST + 2.5% SGST)</option>
+                          <option value="12">12% GST (6% CGST + 6% SGST)</option>
+                          <option value="18">18% GST (9% CGST + 9% SGST)</option>
+                          <option value="28">28% GST (14% CGST + 14% SGST)</option>
+                        </select>
+                      </label>
+                    )}
+
                     <label style={S.lbl}>Position / Mechanical Fitment Location
                       <input
                         style={S.inp}
@@ -1313,7 +1711,9 @@ export default function Indent() {
                         onChange={e => setItem(i, 'component_position', e.target.value)}
                       />
                     </label>
+                  </div>
 
+                  <div style={{ marginTop: 8 }}>
                     <label style={S.lbl}>Technical Purpose / Failure Observations (Descriptive Reason)
                       <textarea
                         style={{ ...S.inp, minHeight: 36, resize: 'vertical' }}
@@ -1357,7 +1757,7 @@ export default function Indent() {
                 Cancel
               </button>
               <button id="btn-submit-raise" type="submit" style={S.btnPrimary}>
-                👁 Review &amp; Confirm Indent
+                👁 Review &amp; Confirm ({form.fulfillment_mode.toUpperCase()})
               </button>
             </div>
           </form>
@@ -1371,12 +1771,18 @@ export default function Indent() {
         <div style={S.ovl} onClick={() => setReviewMode(false)}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#0f766e' }}>Review Indent Voucher Before Submission</div>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#0f766e' }}>
+                Review Indent &amp; {form.fulfillment_mode === 'po' ? 'Direct Purchase Order' : (form.fulfillment_mode === 'dc' ? 'Delivery Challan' : (form.fulfillment_mode === 'issue' ? 'Immediate Store Issuance' : 'Standard Requisition'))}
+              </div>
               <button style={S.close} onClick={() => setReviewMode(false)}>✕</button>
             </div>
 
             <div style={{ fontSize: 12, color: '#0369a1', background: '#e0f2fe', border: '1px solid #bae6fd', borderRadius: 6, padding: '10px 14px', marginBottom: 16 }}>
-              ℹ️ Please verify the indentor profile, equipment context, line items, and technical justifications below. Once confirmed, this indent will enter the approval workflow.
+              ℹ️ Fulfillment Mode: <strong>{form.fulfillment_mode.toUpperCase()}</strong>.
+              {form.fulfillment_mode === 'po' && ' This will auto-approve the indent and generate a formal Purchase Order.'}
+              {form.fulfillment_mode === 'dc' && ' This will generate a Delivery Challan / Gate Pass for outward material dispatch.'}
+              {form.fulfillment_mode === 'issue' && ' This will immediately deduct stock and generate an official SIV issue voucher.'}
+              {form.fulfillment_mode === 'pr' && ' This will submit the indent into the plant multi-tier approval matrix.'}
             </div>
 
             <div style={S.grid4}>
@@ -1388,6 +1794,25 @@ export default function Indent() {
                 return s ? `[${s.sectionCode || s.code}] ${s.name}` : 'Plant General'
               })()}</div></div>
             </div>
+
+            {/* If Direct PO, show Vendor and Terms */}
+            {form.fulfillment_mode === 'po' && (
+              <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: 6, padding: 10, marginTop: 10, fontSize: 12, display: 'flex', gap: 20 }}>
+                <div><strong>Assigned Vendor:</strong> {vendors.find(v => String(v.id) === String(form.vendor_id))?.name || '—'}</div>
+                <div><strong>Payment Terms:</strong> {form.payment_terms}</div>
+                <div><strong>Delivery Date:</strong> {form.delivery_date || form.required_date || 'Immediate'}</div>
+              </div>
+            )}
+
+            {/* If Delivery Challan, show DC info */}
+            {form.fulfillment_mode === 'dc' && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 6, padding: 10, marginTop: 10, fontSize: 12, display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                <div><strong>DC Type:</strong> {form.dc_type}</div>
+                <div><strong>Consignee:</strong> {form.to_party}</div>
+                <div><strong>Vehicle No:</strong> {form.vehicle_number || '—'}</div>
+                <div><strong>Driver:</strong> {form.driver_name || '—'}</div>
+              </div>
+            )}
 
             {form.remarks && (
               <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: 10, marginTop: 10, fontSize: 12 }}>
@@ -1420,7 +1845,7 @@ export default function Indent() {
                         {it.purpose && <div style={{ fontSize: 11, color: '#475569', marginTop: 3, fontWeight: 500 }}>{it.purpose}</div>}
                       </td>
                       <td style={S.td}><strong>{it.required_qty} {mat?.uom}</strong></td>
-                      <td style={S.td}>{fmt(matPrice(mat))}</td>
+                      <td style={S.td}>{fmt(it.unit_price !== '' && it.unit_price !== undefined ? parseFloat(it.unit_price) : matPrice(mat))}</td>
                       <td style={S.td}><strong style={{ color: '#0f766e' }}>{fmt(lineTotal(it))}</strong></td>
                     </tr>
                   )
@@ -1436,12 +1861,13 @@ export default function Indent() {
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 18 }}>
               <button type="button" style={S.btnSecondary} onClick={() => setReviewMode(false)}>← Back &amp; Edit</button>
               <button type="button" style={S.btnPrimary} disabled={saving} onClick={save}>
-                {saving ? 'Saving...' : (editId ? '✓ Save Changes' : '✓ Confirm & Raise Indent')}
+                {saving ? 'Processing...' : (editId ? '✓ Save Changes' : `✓ Confirm & Submit (${form.fulfillment_mode.toUpperCase()})`)}
               </button>
             </div>
           </div>
         </div>
       )}
+
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* ── DETAIL MODAL (With Full Indentor Profile & Append Spares) ───────── */}
@@ -1520,6 +1946,96 @@ export default function Indent() {
                 <div style={{ color: '#1e293b', marginTop: 2, fontWeight: 500 }}>{detail.remarks}</div>
               </div>
             )}
+
+            {/* ── Downstream Linked Documents & Flow Status ── */}
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, marginTop: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>🔗</span> Associated Enterprise Documents &amp; Workflow Trace
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+                {/* Linked Purchase Order */}
+                <div style={{ background: '#ffffff', border: detail.linkedPoNumber ? '1px solid #bae6fd' : '1px dashed #cbd5e1', borderRadius: 6, padding: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#0369a1', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>🛒 Purchase Order</span>
+                    {detail.linkedPoNumber && <span style={{ ...S.badge('#0284c7'), fontSize: 9 }}>{detail.linkedPoStatus || 'Active'}</span>}
+                  </div>
+                  {detail.linkedPoNumber ? (
+                    <div style={{ marginTop: 4 }}>
+                      <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 12, color: '#0f766e' }}>{detail.linkedPoNumber}</div>
+                      <div style={{ fontSize: 10, color: '#64748b' }}>Vendor: <strong>{detail.linkedPoVendorName || 'Assigned Vendor'}</strong></div>
+                      {detail.linkedPoGrandTotal > 0 && <div style={{ fontSize: 10, color: '#0f766e', fontWeight: 600 }}>Value: {fmt(detail.linkedPoGrandTotal)}</div>}
+                      <button
+                        style={{ ...S.btnSm('#0284c7'), padding: '2px 8px', fontSize: 10, marginTop: 6 }}
+                        onClick={() => { window.location.href = `/purchase` }}
+                      >
+                        Open PO Desk →
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Not converted to PO</span>
+                      {!['Rejected', 'Cancelled'].includes(detail.status) && (
+                        <button style={{ ...S.btnSm('#0284c7'), padding: '2px 6px', fontSize: 10 }} onClick={() => openConvertPo(detail)}>
+                          + Convert
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Linked Delivery Challan / Gate Pass */}
+                <div style={{ background: '#ffffff', border: detail.linkedGpNumber ? '1px solid #fde68a' : '1px dashed #cbd5e1', borderRadius: 6, padding: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#b45309', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>🚛 Delivery Challan / GP</span>
+                    {detail.linkedGpNumber && <span style={{ ...S.badge('#d97706'), fontSize: 9 }}>{detail.linkedGpStatus || 'Generated'}</span>}
+                  </div>
+                  {detail.linkedGpNumber ? (
+                    <div style={{ marginTop: 4 }}>
+                      <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 12, color: '#b45309' }}>{detail.linkedGpNumber}</div>
+                      <div style={{ fontSize: 10, color: '#64748b' }}>Type: <strong>{detail.linkedGpType || 'Material Outward DC'}</strong></div>
+                      <button
+                        style={{ ...S.btnSm('#d97706'), padding: '2px 8px', fontSize: 10, marginTop: 6 }}
+                        onClick={() => { window.location.href = `/security` }}
+                      >
+                        Open Gate Pass Desk →
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Not dispatched via DC</span>
+                      {!['Rejected', 'Cancelled'].includes(detail.status) && (
+                        <button style={{ ...S.btnSm('#d97706'), padding: '2px 6px', fontSize: 10 }} onClick={() => openConvertDc(detail)}>
+                          + Generate DC
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Store Issuance SIV Status */}
+                <div style={{ background: '#ffffff', border: ['Issued', 'Partially Issued'].includes(detail.status) ? '1px solid #bbf7d0' : '1px dashed #cbd5e1', borderRadius: 6, padding: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>📦 Store Issuance (SIV)</span>
+                    <span style={{ ...S.badge(detail.status === 'Issued' ? '#16a34a' : '#64748b'), fontSize: 9 }}>{detail.status}</span>
+                  </div>
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: '#334155' }}>
+                      {['Issued', 'Partially Issued'].includes(detail.status)
+                        ? `Items issued from mill stores with atomic ledger deduction.`
+                        : `Stock ready for warehouse dispatch.`}
+                    </div>
+                    {['Submitted', 'Approved', 'Partially Issued'].includes(detail.status) && visibleTabs.some(t => t.key === 'issue') && (
+                      <button
+                        style={{ ...S.btnSm('#16a34a'), padding: '2px 8px', fontSize: 10, marginTop: 6 }}
+                        onClick={() => { setDetail(null); setTabKey('issue'); }}
+                      >
+                        Proceed to Issue →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Line Items Table */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 8 }}>
@@ -1638,17 +2154,27 @@ export default function Indent() {
               </tbody>
             </table>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
-              {['Approved', 'L2 Approved'].includes(detail.status) && (
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, flexWrap: 'wrap' }}>
+              {/* 1-Click Convert to PO */}
+              {!detail.linkedPoId && !['Rejected', 'Cancelled'].includes(detail.status) && (
                 <button
-                  style={{ ...S.btnSm('#0284c7'), padding: '6px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
-                  onClick={() => {
-                    window.location.href = `/purchase?indent_id=${detail.id}`
-                  }}
+                  style={{ ...S.btnSm('#0284c7'), padding: '6px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
+                  onClick={() => openConvertPo(detail)}
                 >
-                  🛒 Create Purchase Order (PO)
+                  🛒 1-Click Convert to PO
                 </button>
               )}
+
+              {/* 1-Click Convert to DC */}
+              {!detail.linkedGpId && !['Rejected', 'Cancelled'].includes(detail.status) && (
+                <button
+                  style={{ ...S.btnSm('#d97706'), padding: '6px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
+                  onClick={() => openConvertDc(detail)}
+                >
+                  🚛 1-Click Generate DC
+                </button>
+              )}
+
               {(isStore || isElevated || detail.raised_by === user?.id) && (
                 <button
                   style={{ ...S.btnSm(detail.status === 'Cancelled' ? '#64748b' : (detail.status === 'Issued' || detail.status === 'Closed' ? '#b91c1c' : '#ef4444')), padding: '6px 14px', fontSize: 12 }}
@@ -2116,6 +2642,272 @@ export default function Indent() {
                     {cancelling ? 'Processing...' : '🚫 Mark as Cancelled (Audit Log)'}
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── 1-CLICK CONVERT TO PURCHASE ORDER (PO) MODAL ───────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {poModal && (
+        <div style={S.ovl} onClick={() => setPoModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#0369a1', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>🛒</span> 1-Click Convert to Purchase Order (PO)
+              </div>
+              <button style={S.close} onClick={() => setPoModal(null)}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 12, color: '#0369a1', background: '#e0f2fe', border: '1px solid #bae6fd', borderRadius: 6, padding: '10px 14px', marginBottom: 16 }}>
+              Converting Indent <strong>{poModal.indentNumber}</strong> ({poModal.items?.length || 0} items) into a formal Purchase Order. Procurement and Finance multi-agents will sync this PO automatically.
+            </div>
+
+            <form onSubmit={handleConvertPoSubmit}>
+              <label style={S.lbl}>Assign Vendor / Supplier *
+                <select
+                  style={{ ...S.sel, fontSize: 13, fontWeight: 600 }}
+                  value={poModal.vendor_id}
+                  onChange={e => setPoModal(m => ({ ...m, vendor_id: e.target.value }))}
+                  required
+                >
+                  <option value="">-- Select Registered Vendor --</option>
+                  {vendors.map(v => (
+                    <option key={v.id} value={v.id}>
+                      {v.name} {v.gstin ? `[GSTIN: ${v.gstin}]` : ''} ({v.city || 'Supplier'})
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div style={{ ...S.grid2, marginTop: 12 }}>
+                <label style={S.lbl}>Payment Terms
+                  <select
+                    style={S.sel}
+                    value={poModal.payment_terms}
+                    onChange={e => setPoModal(m => ({ ...m, payment_terms: e.target.value }))}
+                  >
+                    <option value="Net 30 Days">Net 30 Days</option>
+                    <option value="Net 15 Days">Net 15 Days</option>
+                    <option value="Net 45 Days">Net 45 Days</option>
+                    <option value="Immediate / COD">Immediate / COD</option>
+                    <option value="100% Advance">100% Advance</option>
+                    <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
+                  </select>
+                </label>
+
+                <label style={S.lbl}>Expected Delivery Date
+                  <input
+                    type="date"
+                    style={S.inp}
+                    value={poModal.delivery_date}
+                    onChange={e => setPoModal(m => ({ ...m, delivery_date: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <div style={{ marginTop: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>
+                  Items to Include in PO
+                </div>
+                <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 6 }}>
+                  <table style={S.tbl}>
+                    <thead>
+                      <tr>
+                        <th style={S.th}>Item</th>
+                        <th style={S.th}>Req Qty</th>
+                        <th style={S.th}>Rate (₹)</th>
+                        <th style={S.th}>GST %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(poModal.items || []).map((it, idx) => (
+                        <tr key={it.id || idx}>
+                          <td style={S.td}>
+                            <strong>{it.materialName}</strong>
+                            <div style={{ fontSize: 10, color: '#64748b' }}>[{it.materialCode}]</div>
+                          </td>
+                          <td style={S.td}>{it.required_qty} {it.uom}</td>
+                          <td style={S.td}>
+                            <input
+                              type="number"
+                              step="0.01"
+                              style={{ ...S.inp, width: 90, padding: '4px 6px' }}
+                              value={it.unit_price}
+                              onChange={e => {
+                                const val = e.target.value
+                                setPoModal(m => ({
+                                  ...m,
+                                  items: m.items.map((x, j) => j === idx ? { ...x, unit_price: val } : x)
+                                }))
+                              }}
+                            />
+                          </td>
+                          <td style={S.td}>
+                            <select
+                              style={{ ...S.sel, width: 80, padding: '4px 6px' }}
+                              value={it.gst_pct ?? 18}
+                              onChange={e => {
+                                const val = Number(e.target.value)
+                                setPoModal(m => ({
+                                  ...m,
+                                  items: m.items.map((x, j) => j === idx ? { ...x, gst_pct: val } : x)
+                                }))
+                              }}
+                            >
+                              <option value="0">0%</option>
+                              <option value="5">5%</option>
+                              <option value="12">12%</option>
+                              <option value="18">18%</option>
+                              <option value="28">28%</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+                <button type="button" style={S.btnSecondary} onClick={() => setPoModal(null)}>Cancel</button>
+                <button
+                  type="submit"
+                  style={{ ...S.btnPrimary, background: '#0284c7' }}
+                  disabled={poConverting}
+                >
+                  {poConverting ? 'Generating PO...' : '✓ Generate Purchase Order'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── 1-CLICK GENERATE DELIVERY CHALLAN (DC / GATE PASS) MODAL ───────── */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {dcModal && (
+        <div style={S.ovl} onClick={() => setDcModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#b45309', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>🚛</span> 1-Click Generate Delivery Challan / Gate Pass
+              </div>
+              <button style={S.close} onClick={() => setDcModal(null)}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 12, color: '#b45309', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 6, padding: '10px 14px', marginBottom: 16 }}>
+              Dispatching materials from Indent <strong>{dcModal.indentNumber}</strong> via Outward Delivery Challan / Gate Pass. Logistics Multi-Agent will track gate verification.
+            </div>
+
+            <form onSubmit={handleConvertDcSubmit}>
+              <div style={S.grid2}>
+                <label style={S.lbl}>Gate Pass / DC Type *
+                  <select
+                    style={S.sel}
+                    value={dcModal.dc_type}
+                    onChange={e => setDcModal(m => ({ ...m, dc_type: e.target.value }))}
+                  >
+                    <option value="MATERIAL_OUT">Material Outward DC (Non-Returnable)</option>
+                    <option value="RETURNABLE">Returnable Gate Pass (Job Work / Repair)</option>
+                    <option value="OUT">Outward Vehicle &amp; Goods Dispatch</option>
+                  </select>
+                </label>
+
+                <label style={S.lbl}>Consignee / Destination Party Name *
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. Precision Grinding &amp; Repairs Ltd"
+                    value={dcModal.to_party}
+                    onChange={e => setDcModal(m => ({ ...m, to_party: e.target.value }))}
+                    required
+                  />
+                </label>
+              </div>
+
+              <div style={{ ...S.grid3, marginTop: 12 }}>
+                <label style={S.lbl}>Vehicle Number
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. KA-25-AB-1234"
+                    value={dcModal.vehicle_number}
+                    onChange={e => setDcModal(m => ({ ...m, vehicle_number: e.target.value }))}
+                  />
+                </label>
+
+                <label style={S.lbl}>Vehicle Type
+                  <select
+                    style={S.sel}
+                    value={dcModal.vehicle_type}
+                    onChange={e => setDcModal(m => ({ ...m, vehicle_type: e.target.value }))}
+                  >
+                    <option value="Truck">Truck / Lorry</option>
+                    <option value="Tempo">Tempo / Mini Truck</option>
+                    <option value="Pickup">Pickup Van</option>
+                    <option value="Tractor">Tractor</option>
+                    <option value="Hand Carry">Hand Carry / Courier</option>
+                  </select>
+                </label>
+
+                <label style={S.lbl}>Driver / Handover Name
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. Ramesh Kumar"
+                    value={dcModal.driver_name}
+                    onChange={e => setDcModal(m => ({ ...m, driver_name: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <label style={{ ...S.lbl, marginTop: 12 }}>Technical Dispatch Purpose
+                <input
+                  style={S.inp}
+                  placeholder="e.g. Urgent machine overhaul and Dynamic Balancing at vendor workshop"
+                  value={dcModal.dc_purpose}
+                  onChange={e => setDcModal(m => ({ ...m, dc_purpose: e.target.value }))}
+                />
+              </label>
+
+              <div style={{ marginTop: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>
+                  Items in Delivery Challan ({dcModal.items?.length || 0})
+                </div>
+                <div style={{ maxHeight: 150, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 6 }}>
+                  <table style={S.tbl}>
+                    <thead>
+                      <tr>
+                        <th style={S.th}>Item &amp; Code</th>
+                        <th style={S.th}>Position</th>
+                        <th style={S.th}>Dispatch Qty</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(dcModal.items || []).map((it, idx) => (
+                        <tr key={it.id || idx}>
+                          <td style={S.td}>
+                            <strong>{it.materialName}</strong>
+                            <div style={{ fontSize: 10, color: '#64748b' }}>[{it.materialCode}]</div>
+                          </td>
+                          <td style={S.td}>{it.component_position || '—'}</td>
+                          <td style={S.td}><strong>{it.required_qty} {it.uom}</strong></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+                <button type="button" style={S.btnSecondary} onClick={() => setDcModal(null)}>Cancel</button>
+                <button
+                  type="submit"
+                  style={{ ...S.btnPrimary, background: '#d97706' }}
+                  disabled={dcConverting}
+                >
+                  {dcConverting ? 'Generating DC...' : '✓ Generate Delivery Challan'}
+                </button>
               </div>
             </form>
           </div>

@@ -4,12 +4,47 @@ import { useToast } from '../context/ToastContext'
 import { ConfirmModal } from '../components/ui/Modal'
 import { FormField } from '../components/ui/FormField'
 import ProductDetailModal from '../components/ProductDetailModal'
+import AgentStatusBanner from '../components/AgentStatusBanner'
 import { ExternalLink } from 'lucide-react'
 import { GST_SLABS } from './Purchase'
 
 const API = '/api'
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem('mk_token')}` })
 const json = () => ({ ...h(), 'Content-Type': 'application/json' })
+
+function numberToWords(num) {
+  if (!num || isNaN(num)) return 'Zero Rupees Only'
+  const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+  const inWords = (n) => {
+    if (n < 20) return a[n] + ' '
+    const digit = n % 10
+    return b[Math.floor(n / 10)] + (digit ? ' ' + a[digit] : '')
+  }
+  let str = ''
+  let n = Math.floor(num)
+  const crore = Math.floor(n / 10000000)
+  n %= 10000000
+  const lakh = Math.floor(n / 100000)
+  n %= 100000
+  const thousand = Math.floor(n / 1000)
+  n %= 1000
+  const hundred = Math.floor(n / 100)
+  n %= 100
+  if (crore) str += inWords(crore) + 'Crore '
+  if (lakh) str += inWords(lakh) + 'Lakh '
+  if (thousand) str += inWords(thousand) + 'Thousand '
+  if (hundred) str += inWords(hundred) + 'Hundred '
+  if (n) {
+    if (str !== '') str += 'and '
+    str += inWords(n)
+  }
+  const paise = Math.round((num - Math.floor(num)) * 100)
+  if (paise > 0) {
+    str += `and ${inWords(paise)}Paise `
+  }
+  return str.trim() + ' Rupees Only'
+}
 
 const STATUS_COLOR = {
   Requested:        { bg: '#fef9c3', color: '#854d0e' },
@@ -992,6 +1027,9 @@ export default function Store({ onNavigate }) {
       {/* ── 1. INWARD DESK TAB ── */}
       {tab === 'inward' && (
         <div>
+          {/* Multi-Agent Live Orchestration Status */}
+          <AgentStatusBanner currentModule="store" />
+
           {/* Inward KPI Cards */}
           <div style={S.kpiGrid}>
             <div style={S.kpiCard}>
@@ -1048,16 +1086,16 @@ export default function Store({ onNavigate }) {
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
-                  {['Date', 'Type', 'Ref / PO / Invoice', 'Material', 'Category', 'Inward Qty', 'Unit Price', 'Total Value', 'Batch / Serial', 'Bin / Rack', 'Remarks / Party', 'Received By', 'Voucher'].map(h => (
+                  {['Date', 'Type', 'Ref / PO / Invoice', 'Vendor / Supplier', 'Material', 'Category', 'Inward Qty', 'Unit Price', 'Total Value', 'Batch / Serial', 'Bin / Rack', 'Remarks', 'Received By', 'Voucher'].map(h => (
                     <th key={h} style={S.th}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {inwardLoading ? (
-                  <tr><td colSpan={13} style={S.loading}>Loading inward entries...</td></tr>
+                  <tr><td colSpan={14} style={S.loading}>Loading inward entries...</td></tr>
                 ) : inwardList.length === 0 ? (
-                  <tr><td colSpan={13} style={S.empty}>No inward records found. Click "+ Fast Inward Entry" to record receipts.</td></tr>
+                  <tr><td colSpan={14} style={S.empty}>No inward records found. Click "+ Fast Inward Entry" to record receipts.</td></tr>
                 ) : inwardList.map(inw => (
                   <tr key={inw.id} style={S.tr}>
                     <td style={S.td}><span style={S.code}>{new Date(inw.date).toLocaleDateString('en-IN')}</span></td>
@@ -1067,6 +1105,19 @@ export default function Store({ onNavigate }) {
                       </span>
                     </td>
                     <td style={S.td}><span style={{ fontWeight: 600 }}>{inw.reference_id || inw.reference_type || '—'}</span></td>
+                    <td style={S.td}>
+                      {inw.vendorName ? (
+                        <div>
+                          <div style={{ fontWeight: 600, color: '#1b1b1d' }}>{inw.vendorName}</div>
+                          <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 4, marginTop: 1 }}>
+                            {inw.vendorCode && <span>Code: <code>{inw.vendorCode}</code></span>}
+                            {inw.vendorGstin && <span>· GSTIN: <strong>{inw.vendorGstin}</strong></span>}
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={S.muted}>—</span>
+                      )}
+                    </td>
                     <td style={S.td}>
                       <div
                         onClick={() => (inw.material_id || inw.materialId) && setSelectedProductModalId(inw.material_id || inw.materialId)}
@@ -1084,7 +1135,7 @@ export default function Store({ onNavigate }) {
                     <td style={S.td}><b>₹{Number(inw.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></td>
                     <td style={S.td}><span style={S.code}>{inw.batch_number || '—'}</span></td>
                     <td style={S.td}>{inw.bin_location || '—'}</td>
-                    <td style={{ ...S.td, maxWidth: 220, fontSize: 12 }}>{inw.remarks || '—'}</td>
+                    <td style={{ ...S.td, maxWidth: 200, fontSize: 12 }}>{inw.remarks || '—'}</td>
                     <td style={S.td}><span style={S.muted}>{inw.createdByName || 'Store Keeper'}</span></td>
                     <td style={S.td}>
                       <div style={{ display: 'flex', gap: 4 }}>
@@ -2316,171 +2367,258 @@ export default function Store({ onNavigate }) {
       )}
 
       {/* ── MODAL: PRINTABLE A3/A4 INWARD GOODS RECEIPT NOTE (GRN) INVOICE ── */}
-      {inwardVoucher && (
-        <div style={S.overlay} onClick={() => setInwardVoucher(null)}>
-          <div style={{ ...S.modal, maxWidth: 840, background: '#ffffff', padding: 32, position: 'relative', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
-            
-            {/* Diagonal Watermark */}
-            <div style={{
-              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-35deg)',
-              fontSize: 48, fontWeight: 900, color: 'rgba(0,0,0,0.035)', pointerEvents: 'none',
-              whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: 8, userSelect: 'none', zIndex: 0
-            }}>
-              SRI M.K. PAPER MILLS — VERIFIED GRN
-            </div>
+      {inwardVoucher && (() => {
+        const qty = Number(inwardVoucher.in_qty || 0)
+        const price = Number(inwardVoucher.unit_price || 0)
+        const taxable = qty * price
+        const gstPct = Number(inwardVoucher.gst_pct ?? 18)
 
-            {/* Document Container */}
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #1b1b1d', paddingBottom: 14, marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#1b1b1d', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
-                  <div style={{ fontSize: 12, color: '#4b5563', marginTop: 2, fontWeight: 500 }}>
-                    Manufacturers of High-Strength Kraft Paper & Multi-Layer Packaging Board
-                  </div>
-                  <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
-                    Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka, India
-                  </div>
-                  <div style={{ fontSize: 11, color: '#1b1b1d', fontWeight: 600, marginTop: 4 }}>
-                    GSTIN: 29AABCS1234F1Z8 | CIN: U21012KA2015PTC081234 | State Code: 29
+        // Determine Interstate vs Intrastate from Vendor State / GSTIN (Company State Code: 29)
+        const vendorState = (inwardVoucher.vendorState || '').toLowerCase()
+        const vendorGstin = inwardVoucher.vendorGstin || ''
+        const isInterState = (vendorState && vendorState !== 'karnataka') || (vendorGstin && !vendorGstin.startsWith('29'))
+
+        const cgstPct = isInterState ? 0 : gstPct / 2
+        const sgstPct = isInterState ? 0 : gstPct / 2
+        const igstPct = isInterState ? gstPct : 0
+
+        const cgstAmt = (taxable * cgstPct) / 100
+        const sgstAmt = (taxable * sgstPct) / 100
+        const igstAmt = (taxable * igstPct) / 100
+        const totalGst = cgstAmt + sgstAmt + igstAmt
+        const grandTotal = taxable + totalGst
+
+        const grnDisplayNum = inwardVoucher.grnNumber || inwardVoucher.reference_id || `GRN-${inwardVoucher.id}`
+
+        return (
+          <div style={S.overlay} onClick={() => setInwardVoucher(null)}>
+            <div style={{ ...S.modal, maxWidth: 900, background: '#ffffff', padding: 36, position: 'relative', overflow: 'hidden', color: '#1b1b1d' }} onClick={e => e.stopPropagation()}>
+              
+              {/* Top Floating Control Bar */}
+              <div className="no-print" style={{ background: '#1e293b', color: '#fff', padding: '10px 18px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 16 }}>📥</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 13 }}>Official Inward GRN Tax Invoice Preview</div>
+                    <div style={{ fontSize: 11, color: '#94a3b8' }}>A4 Official Commercial Format · Comprehensive CGST/SGST/IGST breakdown</div>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ background: '#0f766e', color: '#ffffff', padding: '4px 12px', borderRadius: 4, fontWeight: 700, fontSize: 12, display: 'inline-block', textTransform: 'uppercase' }}>
-                    GOODS RECEIPT NOTE (GRN)
-                  </div>
-                  <div style={{ fontSize: 11, color: '#059669', fontWeight: 700, marginTop: 6 }}>
-                    ✓ ORIGINAL FOR STORE & ACCOUNTS
-                  </div>
-                </div>
-              </div>
-
-              {/* 2-Column Info Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
-                <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
-                  <div style={{ fontWeight: 700, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', fontSize: 11 }}>
-                    🏢 Vendor & Consignor Particulars
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1b1b1d' }}>
-                    {inwardVoucher.remarks?.includes('Party:') ? inwardVoucher.remarks.split('Party:')[1]?.split('|')[0]?.trim() : (inwardVoucher.vendor_name || 'Direct / OEM Supplier')}
-                  </div>
-                  <div style={{ marginTop: 4, color: '#64748b' }}>
-                    Supplier Reference: <b>{inwardVoucher.reference_id || 'PO-REGULAR'}</b>
-                  </div>
-                  <div style={{ color: '#64748b', marginTop: 2 }}>
-                    {inwardVoucher.remarks?.includes('Inv:') ? `Invoice Ref: ${inwardVoucher.remarks.split('Inv:')[1]?.split('|')[0]?.trim()}` : `Ref Type: ${inwardVoucher.reference_type || 'Vendor Invoice'}`}
-                  </div>
-                  <div style={{ color: '#64748b', marginTop: 2 }}>
-                    {inwardVoucher.remarks?.includes('Transport:') ? `Transporter: ${inwardVoucher.remarks.split('Transport:')[1]?.split('|')[0]?.trim()}` : 'Dispatch: Mill Store Inward Gate'}
-                  </div>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
-                  <div style={{ fontWeight: 700, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', fontSize: 11 }}>
-                    📋 Receipt & Inspection Details
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 4 }}>
-                    <span style={{ color: '#64748b' }}>IGRN Number:</span>
-                    <b>{inwardVoucher.reference_id && String(inwardVoucher.reference_id).startsWith('2026') ? `IGRN-${inwardVoucher.reference_id}` : `IGRN-${inwardVoucher.id.toString().padStart(5, '0')}`}</b>
-                    
-                    <span style={{ color: '#64748b' }}>Inward Date:</span>
-                    <b>{new Date(inwardVoucher.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</b>
-                    
-                    <span style={{ color: '#64748b' }}>Storage Bin/Rack:</span>
-                    <b>{inwardVoucher.bin_location || 'Main Store Floor (Rack M-1)'}</b>
-                    
-                    <span style={{ color: '#64748b' }}>Batch/Serial #:</span>
-                    <b>{inwardVoucher.batch_number || 'LOT-2026-AUG'}</b>
-
-                    <span style={{ color: '#64748b' }}>QC Status:</span>
-                    <span style={{ color: '#059669', fontWeight: 700 }}>✓ Passed Quality Inspection</span>
-                  </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => window.print()}
+                    style={{ background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    🖨 Print / Save PDF
+                  </button>
+                  <button
+                    onClick={() => setInwardVoucher(null)}
+                    style={{ background: '#334155', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 12px', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
+                  >
+                    ✕ Close
+                  </button>
                 </div>
               </div>
 
-              {/* Line Items Table */}
-              <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                  <thead>
-                    <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #cbd5e1', color: '#475569', fontWeight: 700, textAlign: 'left' }}>
-                      <th style={{ padding: '8px 10px', width: 40 }}>S.No</th>
-                      <th style={{ padding: '8px 10px', width: 100 }}>Material Code</th>
-                      <th style={{ padding: '8px 10px' }}>Material Description & Specification</th>
-                      <th style={{ padding: '8px 10px', width: 90 }}>Category</th>
-                      <th style={{ padding: '8px 10px', width: 60, textAlign: 'center' }}>UOM</th>
-                      <th style={{ padding: '8px 10px', width: 80, textAlign: 'right' }}>Recv Qty</th>
-                      <th style={{ padding: '8px 10px', width: 90, textAlign: 'right' }}>Unit Rate (₹)</th>
-                      <th style={{ padding: '8px 10px', width: 100, textAlign: 'right' }}>Net Value (₹)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                      <td style={{ padding: '10px' }}>1</td>
-                      <td style={{ padding: '10px' }}><span style={S.code}>{inwardVoucher.materialCode}</span></td>
-                      <td style={{ padding: '10px' }}>
-                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{inwardVoucher.materialName}</div>
-                        <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{inwardVoucher.remarks || 'Standard Plant Store Inward'}</div>
-                      </td>
-                      <td style={{ padding: '10px', color: '#475569' }}>{inwardVoucher.categoryName || 'General'}</td>
-                      <td style={{ padding: '10px', textAlign: 'center', fontWeight: 600 }}>{inwardVoucher.uom}</td>
-                      <td style={{ padding: '10px', textAlign: 'right', fontWeight: 700, color: '#059669' }}>{Number(inwardVoucher.in_qty).toFixed(3)}</td>
-                      <td style={{ padding: '10px', textAlign: 'right' }}>₹{Number(inwardVoucher.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                      <td style={{ padding: '10px', textAlign: 'right', fontWeight: 800 }}>₹{Number(inwardVoucher.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr style={{ background: '#f8fafc', fontWeight: 800, borderTop: '2px solid #cbd5e1' }}>
-                      <td colSpan={5} style={{ padding: '10px', textAlign: 'right' }}>GRAND TOTAL VALUATION (₹):</td>
-                      <td style={{ padding: '10px', textAlign: 'right', color: '#059669' }}>{Number(inwardVoucher.in_qty).toFixed(3)}</td>
-                      <td style={{ padding: '10px' }}></td>
-                      <td style={{ padding: '10px', textAlign: 'right', fontSize: 13, color: '#0f766e' }}>
-                        ₹{Number(inwardVoucher.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+              {/* Document Paper Container */}
+              <div id="print-document" style={{ border: '1px solid #cbd5e1', borderRadius: 8, padding: '24px 28px', background: '#fff' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
+                    <div style={{ fontSize: 11, color: '#475569', marginTop: 2, fontWeight: 600 }}>
+                      Manufacturers of High-Strength Kraft Paper & Multi-Layer Packaging Board
+                    </div>
+                    <div style={{ fontSize: 11, color: '#475569' }}>
+                      Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka, India
+                    </div>
+                    <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 4 }}>
+                      GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: U21012KA2015PTC081234
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ background: '#0f766e', color: '#ffffff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 13, display: 'inline-block', textTransform: 'uppercase' }}>
+                      GOODS RECEIPT NOTE (GRN)
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
+                      GRN #: {grnDisplayNum}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b' }}>
+                      Date: <strong>{new Date(inwardVoucher.date).toLocaleDateString('en-IN')}</strong>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#059669', fontWeight: 700 }}>
+                      ✓ ORIGINAL FOR STORE & ACCOUNTS
+                    </div>
+                  </div>
+                </div>
 
-              {/* Quality & Terms Note */}
-              <div style={{ background: '#f8fafc', padding: '10px 12px', borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 11, color: '#475569', marginBottom: 24 }}>
-                <b>Store & Quality Certification:</b> Certified that the materials listed above have been physically inspected, counted, weight-verified, checked against Purchase Order specifications, and taken into store inventory records at the specified bin location.
-              </div>
+                {/* 2-Column Info Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 14, marginBottom: 16 }}>
+                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
+                    <div style={{ fontWeight: 800, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', fontSize: 11 }}>
+                      🏢 SUPPLIER / VENDOR PARTICULAR DETAILS
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
+                      {inwardVoucher.vendorName || (inwardVoucher.remarks?.includes('Party:') ? inwardVoucher.remarks.split('Party:')[1]?.split('|')[0]?.trim() : 'Registered Vendor')}
+                    </div>
+                    {inwardVoucher.vendorCode && <div style={{ fontSize: 11, color: '#64748b' }}>Vendor Code: <code>{inwardVoucher.vendorCode}</code></div>}
+                    <div style={{ fontSize: 11, color: '#334155', marginTop: 3 }}>
+                      GSTIN: <strong>{inwardVoucher.vendorGstin || 'Unregistered / Exempt'}</strong>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#334155' }}>
+                      State of Supply: <strong>{inwardVoucher.vendorState || (isInterState ? 'Inter-State' : 'Karnataka (Code 29)')}</strong>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                      GST Mode: <span style={{ fontWeight: 700, color: isInterState ? '#d97706' : '#0f766e' }}>{isInterState ? 'Inter-State (IGST Applicable)' : 'Intra-State (CGST + SGST Applicable)'}</span>
+                    </div>
+                  </div>
 
-              {/* 4-Column Signatures */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, paddingTop: 16, borderTop: '1px solid #cbd5e1', textAlign: 'center', fontSize: 11 }}>
-                <div>
-                  <div style={{ height: 36 }}></div>
-                  <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>{inwardVoucher.createdByName || 'Store Clerk'}</div>
-                  <div style={{ color: '#64748b' }}>Received By</div>
-                </div>
-                <div>
-                  <div style={{ height: 36 }}></div>
-                  <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>QC Lead Inspector</div>
-                  <div style={{ color: '#64748b' }}>Inspected & Verified</div>
-                </div>
-                <div>
-                  <div style={{ height: 36 }}></div>
-                  <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>Head of Stores</div>
-                  <div style={{ color: '#64748b' }}>Store In-Charge</div>
-                </div>
-                <div>
-                  <div style={{ height: 36 }}></div>
-                  <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>Accounts & Finance</div>
-                  <div style={{ color: '#64748b' }}>Authorized Signatory</div>
-                </div>
-              </div>
+                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
+                    <div style={{ fontWeight: 800, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', fontSize: 11 }}>
+                      📋 LOGISTICS & INSPECTION REFERENCES
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 4 }}>
+                      <span style={{ color: '#64748b' }}>PO Reference:</span>
+                      <strong>{inwardVoucher.reference_id || 'PO-REGULAR'}</strong>
+                      
+                      <span style={{ color: '#64748b' }}>Storage Bin/Rack:</span>
+                      <strong>{inwardVoucher.bin_location || 'Main Store Floor (Rack M-1)'}</strong>
+                      
+                      <span style={{ color: '#64748b' }}>Batch/Serial #:</span>
+                      <strong>{inwardVoucher.batch_number || 'LOT-2026-AUG'}</strong>
 
-              {/* Modal Footer Controls */}
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24, borderTop: '1px solid #e2e8f0', paddingTop: 14 }}>
-                <button type="button" style={S.btnGhost} onClick={() => setInwardVoucher(null)}>Close Slip</button>
-                <button type="button" style={{ ...S.btn, background: '#0f766e' }} onClick={() => window.print()}>
-                  🖨️ Print A3 / A4 Official Invoice
-                </button>
+                      <span style={{ color: '#64748b' }}>QC Inspection:</span>
+                      <span style={{ color: '#059669', fontWeight: 700 }}>✓ Passed Quality Inspection</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comprehensive Line Items Table with CGST, SGST, IGST Breakdown */}
+                <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                    <thead>
+                      <tr style={{ background: '#f1f5f9', borderBottom: '2px solid #0f766e', color: '#0f766e', fontWeight: 800, textAlign: 'left' }}>
+                        <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
+                        <th style={{ padding: '8px 6px' }}>Material Description & Specifications</th>
+                        <th style={{ padding: '8px 6px', width: 65 }}>HSN/SAC</th>
+                        <th style={{ padding: '8px 6px', width: 45, textAlign: 'center' }}>UOM</th>
+                        <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>Recv Qty</th>
+                        <th style={{ padding: '8px 6px', width: 75, textAlign: 'right' }}>Unit Rate</th>
+                        <th style={{ padding: '8px 6px', width: 85, textAlign: 'right' }}>Taxable Val</th>
+                        {!isInterState ? (
+                          <>
+                            <th style={{ padding: '8px 6px', width: 70, textAlign: 'right' }}>CGST ({cgstPct}%)</th>
+                            <th style={{ padding: '8px 6px', width: 70, textAlign: 'right' }}>SGST ({sgstPct}%)</th>
+                          </>
+                        ) : (
+                          <th style={{ padding: '8px 6px', width: 85, textAlign: 'right' }}>IGST ({igstPct}%)</th>
+                        )}
+                        <th style={{ padding: '8px 6px', width: 95, textAlign: 'right' }}>Total Val (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>1</td>
+                        <td style={{ padding: '8px 6px' }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{inwardVoucher.materialName}</div>
+                          <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 6, marginTop: 1 }}>
+                            <span>Code: <code>{inwardVoucher.materialCode}</code></span>
+                            {inwardVoucher.categoryName && <span>· Cat: {inwardVoucher.categoryName}</span>}
+                          </div>
+                        </td>
+                        <td style={{ padding: '8px 6px', fontFamily: 'monospace' }}>{inwardVoucher.hsnCode || '8439'}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', fontWeight: 600 }}>{inwardVoucher.uom}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{qty.toFixed(3)}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        {!isInterState ? (
+                          <>
+                            <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                            <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                          </>
+                        ) : (
+                          <td style={{ padding: '8px 6px', textAlign: 'right', color: '#d97706' }}>₹{igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        )}
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 800, color: '#0f766e' }}>₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Tax Matrix Summary Box & Amount in Words */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 14, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+                      AMOUNT CHARGEABLE IN WORDS:
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
+                      {numberToWords(grandTotal)}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#64748b', marginTop: 8 }}>
+                      Certified that all items listed in this Goods Receipt Note have been physically verified, counted, quality inspected, and recorded in live store inventory.
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#64748b' }}>Taxable Subtotal:</span>
+                      <strong>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+                    </div>
+                    {!isInterState ? (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: '#64748b' }}>CGST ({cgstPct}%):</span>
+                          <span>₹{cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: '#64748b' }}>SGST ({sgstPct}%):</span>
+                          <span>₹{sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#d97706' }}>IGST ({igstPct}%):</span>
+                        <span style={{ color: '#d97706', fontWeight: 600 }}>₹{igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #cbd5e1', paddingTop: 4 }}>
+                      <span style={{ color: '#64748b' }}>Total GST Tax:</span>
+                      <strong>₹{totalGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #0f766e', paddingTop: 4, fontSize: 14 }}>
+                      <span style={{ fontWeight: 800, color: '#0f766e' }}>Grand Total Valuation:</span>
+                      <span style={{ fontWeight: 900, color: '#0f766e' }}>₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4 Official Signatures */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, paddingTop: 16, borderTop: '1px solid #cbd5e1', textAlign: 'center', fontSize: 11, marginTop: 24 }}>
+                  <div>
+                    <div style={{ height: 36 }}></div>
+                    <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>{inwardVoucher.createdByName || 'Store Clerk'}</div>
+                    <div style={{ color: '#64748b' }}>Received By</div>
+                  </div>
+                  <div>
+                    <div style={{ height: 36 }}></div>
+                    <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>QC Lead Inspector</div>
+                    <div style={{ color: '#64748b' }}>Inspected & Verified</div>
+                  </div>
+                  <div>
+                    <div style={{ height: 36 }}></div>
+                    <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>Head of Stores</div>
+                    <div style={{ color: '#64748b' }}>Store In-Charge</div>
+                  </div>
+                  <div>
+                    <div style={{ height: 36 }}></div>
+                    <div style={{ borderTop: '1px dashed #94a3b8', paddingTop: 4, fontWeight: 700 }}>Accounts & Finance</div>
+                    <div style={{ color: '#64748b' }}>Authorized Signatory</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* ── MODAL: PRINTABLE OUTWARD VOUCHER ── */}
       {outwardVoucher && (

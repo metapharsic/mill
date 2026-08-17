@@ -61,7 +61,9 @@ router.get('/po/:id', auth, ar(async (req, res) => {
 
   const { rows } = await pool.query(
     `SELECT po.*, po.po_number as "poNumber", v.name as "vendorName", v.code as "vendorCode", v.gstin as "vendorGstin",
-            v.address as "vendorAddress", v.bank_name as "vendorBankName", v.account_number as "vendorAccountNumber",
+            v.state as "vendorState", v.city as "vendorCity", v.address as "vendorAddress", v.pincode as "vendorPincode",
+            v.contact_person as "vendorContactPerson", v.mobile as "vendorMobile", v.email as "vendorEmail",
+            v.bank_name as "vendorBankName", v.account_number as "vendorAccountNumber",
             v.ifsc_code as "vendorIfscCode", v.branch_name as "vendorBranchName",
             ind.indent_number as "indentNumber", ind.date as "indentDate", dept.name as "deptName"
      FROM purchase_orders po
@@ -75,7 +77,7 @@ router.get('/po/:id', auth, ar(async (req, res) => {
   const poId = rows[0].id;
   const { rows: items } = await pool.query(
     `SELECT pi.*, m.name as "materialName", m.code as "materialCode", m.uom,
-            m.current_stock as "currentStock", m.bin_location as "binLocation"
+            m.hsn_code as "hsnCode", m.current_stock as "currentStock", m.bin_location as "binLocation"
      FROM po_items pi
      LEFT JOIN materials m ON m.id=pi.material_id
      WHERE pi.po_id=$1
@@ -374,8 +376,9 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
 
   const { rows } = await pool.query(
     `SELECT g.*, g.grn_number as "grnNumber",
-            po.po_number as "poNumber", po.date as "poDate",
+            po.po_number as "poNumber", po.date as "poDate", po.grand_total as "poGrandTotal",
             v.name as "vendorName", v.code as "vendorCode", v.gstin as "vendorGstin",
+            v.state as "vendorState", v.city as "vendorCity", v.address as "vendorAddress", v.pincode as "vendorPincode",
             u.name as "receivedByName"
      FROM grn g
      LEFT JOIN purchase_orders po ON po.id = g.po_id
@@ -387,9 +390,12 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
 
   const grnId = rows[0].id;
   const { rows: items } = await pool.query(
-    `SELECT gi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom"
+    `SELECT gi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom", m.hsn_code as "hsnCode",
+            COALESCE(pi.gst_pct, 18) as "gst_pct"
      FROM grn_items gi
      LEFT JOIN materials m ON m.id = gi.material_id
+     LEFT JOIN grn g ON g.id = gi.grn_id
+     LEFT JOIN po_items pi ON pi.po_id = g.po_id AND pi.material_id = gi.material_id
      WHERE gi.grn_id = $1
      ORDER BY gi.id ASC`, [grnId]
   );
