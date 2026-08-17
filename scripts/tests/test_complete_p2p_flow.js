@@ -140,10 +140,10 @@ async function runEndToEndVerification() {
     // 6. [A_FIN] Finance AP Agent: Verify Debit Note Offset
     console.log('\n--- 6. [A_FIN] Finance Agent: Accounts Payable Debit Note Offset ---')
     const billRes = await client.query(
-      `INSERT INTO vendor_bills (bill_number, vendor_id, invoice_date, due_date, total_amount, paid_amount, balance_amount, status)
-       VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE + 30, 50000, 0, 50000, 'Approved')
+      `INSERT INTO vendor_bills (bill_number, vendor_id, vendor_invoice_number, invoice_date, due_date, total_amount, paid_amount, balance_amount, status)
+       VALUES ($1, $2, $3, CURRENT_DATE, CURRENT_DATE + 30, 50000, 0, 50000, 'Approved')
        RETURNING id, bill_number, balance_amount`,
-      [`BILL-TEST-${Date.now().toString().slice(-6)}`, vendor.id]
+      [`BILL-TEST-${Date.now().toString().slice(-6)}`, vendor.id, `INV-TEST-${Date.now().toString().slice(-6)}`]
     )
     const bill = billRes.rows[0]
     
