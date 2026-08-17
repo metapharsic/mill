@@ -62,6 +62,7 @@ router.get('/', auth, ar(async (req, res) => {
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
             po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
             gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType",
+            cp.id as "linkedCpId", cp.voucher_number as "linkedCpNumber", cp.total_amount as "linkedCpTotalAmount", cp.vendor_name as "linkedCpVendorName",
             (SELECT ii.reason_code FROM indent_items ii WHERE ii.indent_id = i.id ORDER BY ii.id ASC LIMIT 1) AS "reasonCode",
             (SELECT ii.purpose FROM indent_items ii WHERE ii.indent_id = i.id ORDER BY ii.id ASC LIMIT 1) AS "itemPurpose",
             (SELECT COUNT(*) FROM indent_items ii WHERE ii.indent_id = i.id)::int AS "itemCount"
@@ -75,6 +76,7 @@ router.get('/', auth, ar(async (req, res) => {
      LEFT JOIN purchase_orders po ON po.indent_id=i.id
      LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
      LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
+     LEFT JOIN cash_purchases cp ON cp.indent_id = i.id
      ${where} ORDER BY i.created_at DESC LIMIT $${p} OFFSET $${p+1}`,
     [...params, parseInt(limit), offset]
   );
@@ -179,7 +181,8 @@ router.get('/:id', auth, ar(async (req, res) => {
             mch.name as "machineName", mch.code as "machineCode", mch.type as "machineType",
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
             po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
-            gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType"
+            gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType",
+            cp.id as "linkedCpId", cp.voucher_number as "linkedCpNumber", cp.total_amount as "linkedCpTotalAmount", cp.vendor_name as "linkedCpVendorName"
      FROM indents i
      LEFT JOIN departments d ON d.id=i.department_id
      LEFT JOIN users u ON u.id=i.raised_by
@@ -190,6 +193,7 @@ router.get('/:id', auth, ar(async (req, res) => {
      LEFT JOIN purchase_orders po ON po.indent_id=i.id
      LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
      LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
+     LEFT JOIN cash_purchases cp ON cp.indent_id = i.id
      WHERE i.id=$1`,
     [req.params.id]
   );
@@ -383,6 +387,74 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
         `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
          VALUES ($1, 'issue', 'Submitted', 'Issued', $2, $3)`,
         [id, req.user.id, `Immediate store issuance executed on indent creation`]
+      );
+    }
+
+    // ── Fulfillment Branch 4: DIRECT CASH PURCHASE (SPOT PROCUREMENT) ──
+    else if (fulfillment_mode === 'cash') {
+      const d = new Date();
+      const stamp = d.toISOString().slice(0, 10).replace(/-/g, '');
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`cp-${stamp}`]);
+      const seqRes = await client.query(`SELECT LPAD((COUNT(*)+1)::text,4,'0') as seq FROM cash_purchases WHERE voucher_number LIKE $1`, [`CP-${stamp}-%`]);
+      const cpNum = `CP-${stamp}-${seqRes.rows[0].seq}`;
+
+      let cpTaxable = 0, cpTax = 0;
+      for (const it of items) {
+        const p = parseFloat(it.unit_price || 0);
+        const q = parseFloat(it.required_qty || 0);
+        const lineBase = p * q;
+        const gstPct = parseFloat(it.gst_pct ?? 18);
+        cpTaxable += lineBase;
+        cpTax += lineBase * (gstPct / 100);
+      }
+      const cpGrandTotal = cpTaxable + cpTax;
+
+      const { rows: [cp] } = await client.query(
+        `INSERT INTO cash_purchases (
+           voucher_number, date, indent_id, vendor_name, vendor_gstin, invoice_number,
+           invoice_date, payment_mode, payment_ref, taxable_amount, cgst_amount, sgst_amount,
+           igst_amount, total_tax, total_amount, remarks, created_by
+         ) VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, CURRENT_DATE, $6, $7, $8, $9, $9, 0, $10, $11, $12, $13)
+         RETURNING *`,
+        [
+          cpNum, id, req.body.vendor_name || 'Cash Supplier / Local Vendor', req.body.vendor_gstin || null,
+          req.body.invoice_number || cpNum, req.body.payment_mode || 'Cash', req.body.payment_ref || null,
+          cpTaxable, cpTax / 2, cpTax, cpGrandTotal, remarks || `Direct Cash Purchase for Indent ${num}`, req.user.id
+        ]
+      );
+
+      for (const it of items) {
+        const p = parseFloat(it.unit_price || 0);
+        const q = parseFloat(it.required_qty || 0);
+        const gstPct = parseFloat(it.gst_pct ?? 18);
+        const lineTaxable = p * q;
+        const lineTot = lineTaxable * (1 + gstPct / 100);
+
+        await client.query(
+          `INSERT INTO cash_purchase_items (cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [cp.id, it.material_id, q, it.uom || 'NOS', p, gstPct, lineTaxable, lineTot]
+        );
+
+        // Atomically increment stock
+        const { rows: [mat] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+        const curStock = parseFloat(mat?.current_stock || 0);
+        const newStock = curStock + q;
+        await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`, [newStock, p, it.material_id]);
+
+        // Record in stock_ledger
+        await client.query(
+          `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
+           VALUES ($1, CURRENT_DATE, 'cash_purchase', 'cash_purchase', $2, $3, 0, $4, $5, $6, $7, $8)`,
+          [it.material_id, cp.id, q, newStock, p, lineTaxable, `Cash Purchase ${cpNum} for Indent ${num}`, req.user.id]
+        );
+      }
+
+      await client.query(`UPDATE indents SET status = 'Cash Purchased' WHERE id = $1`, [id]);
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'cash_purchase', 'Submitted', 'Cash Purchased', $2, $3)`,
+        [id, req.user.id, `Direct Cash Purchase ${cpNum} generated and stock incremented`]
       );
     }
 
@@ -1223,5 +1295,119 @@ router.post('/:id/convert-to-dc', auth, requireLevel(2), ar(async (req, res) => 
   }
 }));
 
+// 1-CLICK CONVERT INDENT TO CASH PURCHASE (SPOT PROCUREMENT)
+router.post('/:id/convert-to-cash-purchase', auth, requireLevel(2), ar(async (req, res) => {
+  const { vendor_name, vendor_gstin, invoice_number, payment_mode, payment_ref, remarks } = req.body;
+  if (!vendor_name) return res.status(400).json({ success: false, message: 'Vendor / Supplier Name is required' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query(`SELECT * FROM indents WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!ind) throw new Error('Indent not found');
+
+    const { rows: items } = await client.query(`
+      SELECT ii.*, m.name as "materialName", m.code as "materialCode", COALESCE(ii.unit_price, m.unit_price, 0) as price
+      FROM indent_items ii
+      JOIN materials m ON ii.material_id = m.id
+      WHERE ii.indent_id = $1
+    `, [ind.id]);
+    if (!items.length) throw new Error('Indent has no line items');
+
+    const d = new Date();
+    const stamp = d.toISOString().slice(0, 10).replace(/-/g, '');
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`cp-${stamp}`]);
+    const seqRes = await client.query(`SELECT LPAD((COUNT(*)+1)::text,4,'0') as seq FROM cash_purchases WHERE voucher_number LIKE $1`, [`CP-${stamp}-%`]);
+    const cpNum = `CP-${stamp}-${seqRes.rows[0].seq}`;
+
+    let cpTaxable = 0, cpTax = 0;
+    for (const it of items) {
+      const p = parseFloat(it.price || 0);
+      const q = parseFloat(it.required_qty || 0);
+      const lineBase = p * q;
+      const gstPct = 18;
+      cpTaxable += lineBase;
+      cpTax += lineBase * (gstPct / 100);
+    }
+    const cpGrandTotal = cpTaxable + cpTax;
+
+    const { rows: [cp] } = await client.query(
+      `INSERT INTO cash_purchases (
+         voucher_number, date, indent_id, vendor_name, vendor_gstin, invoice_number,
+         invoice_date, payment_mode, payment_ref, taxable_amount, cgst_amount, sgst_amount,
+         igst_amount, total_tax, total_amount, remarks, created_by
+       ) VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, CURRENT_DATE, $6, $7, $8, $9, $9, 0, $10, $11, $12, $13)
+       RETURNING *`,
+      [
+        cpNum, ind.id, vendor_name, vendor_gstin || null, invoice_number || cpNum,
+        payment_mode || 'Cash', payment_ref || null, cpTaxable, cpTax / 2, cpTax,
+        cpGrandTotal, remarks || `Cash Purchase against Indent ${ind.indent_number}`, req.user.id
+      ]
+    );
+
+    for (const it of items) {
+      const p = parseFloat(it.price || 0);
+      const q = parseFloat(it.required_qty || 0);
+      const lineTaxable = p * q;
+      const lineTot = lineTaxable * 1.18;
+
+      await client.query(
+        `INSERT INTO cash_purchase_items (cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total)
+         VALUES ($1, $2, $3, $4, $5, 18, $6, $7)`,
+        [cp.id, it.material_id, q, it.uom || 'NOS', p, lineTaxable, lineTot]
+      );
+
+      // Atomically increment stock
+      const { rows: [mat] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+      const curStock = parseFloat(mat?.current_stock || 0);
+      const newStock = curStock + q;
+      await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`, [newStock, p, it.material_id]);
+
+      // Stock ledger
+      await client.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
+         VALUES ($1, CURRENT_DATE, 'cash_purchase', 'cash_purchase', $2, $3, 0, $4, $5, $6, $7, $8)`,
+        [it.material_id, cp.id, q, newStock, p, lineTaxable, `Cash Purchase ${cpNum} against Indent ${ind.indent_number}`, req.user.id]
+      );
+    }
+
+    await client.query(`UPDATE indents SET status = 'Cash Purchased' WHERE id = $1`, [ind.id]);
+    await client.query(
+      `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+       VALUES ($1, 'convert_to_cash_purchase', $2, 'Cash Purchased', $3, $4)`,
+      [ind.id, ind.status, req.user.id, `Converted to Cash Purchase Voucher ${cpNum}`]
+    );
+
+    // Auto-record paid vendor bill for Finance synchronization
+    try {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`bill-${stamp}`]);
+      const { rows: seqRowsBill } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM vendor_bills WHERE bill_number LIKE $1`, [`BILL-${stamp}-%`]);
+      const billNum = `BILL-${stamp}-${seqRowsBill[0].seq}`;
+
+      await client.query(
+        `INSERT INTO vendor_bills (
+           bill_number, vendor_id, po_id, grn_id, vendor_invoice_number,
+           invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount,
+           igst_amount, total_tax, roundoff, total_amount, paid_amount,
+           balance_amount, status, remarks, created_by
+         ) VALUES ($1, NULL, NULL, NULL, $2, CURRENT_DATE, CURRENT_DATE, $3, $4, $5, 0, $6, 0, $7, $7, 0, 'Paid', $8, $9)`,
+        [
+          billNum, invoice_number || cpNum, cpTaxable, cpTax / 2, cpTax / 2,
+          cpTax, cpGrandTotal, `Cash Purchase ${cpNum} against Indent ${ind.indent_number}`, req.user.id
+        ]
+      );
+    } catch(err) { /* non-blocking */ }
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Cash Purchase Voucher ${cpNum} generated and stock updated!`, data: cp });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
 module.exports = router;
+
 

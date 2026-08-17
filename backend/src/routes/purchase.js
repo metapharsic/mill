@@ -21,7 +21,55 @@ router.get('/vendors', auth, ar(async (req, res) => {
   res.json({ success: true, data: rows });
 }));
 
-// LIST POs
+// GET ALL PENDING INDENTS / PURCHASE REQUISITIONS (PR)
+router.get('/pending-indents', auth, ar(async (req, res) => {
+  const { search } = req.query;
+  const conds = [`i.status NOT IN ('Closed', 'Cancelled', 'Rejected')`];
+  const params = [];
+  let p = 1;
+  if (search) {
+    conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR u.name ILIKE $${p} OR i.remarks ILIKE $${p})`);
+    params.push(`%${search}%`);
+    p++;
+  }
+  const where = conds.join(' AND ');
+  const { rows } = await pool.query(
+    `SELECT i.id, i.indent_number as "indentNumber", i.date, i.required_date as "requiredDate",
+            i.status, i.priority, i.remarks, i.total_value as "totalValue",
+            d.name as "deptName", d.code as "deptCode",
+            u.name as "raisedByName", u.employee_code as "raisedByEmpCode",
+            po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
+            (
+              SELECT json_agg(json_build_object(
+                'id', ii.id,
+                'material_id', ii.material_id,
+                'materialName', m.name,
+                'materialCode', m.code,
+                'required_qty', ii.required_qty,
+                'approved_qty', ii.approved_qty,
+                'uom', COALESCE(ii.uom, m.uom),
+                'unit_price', COALESCE(m.unit_price, 0),
+                'current_stock', COALESCE(m.current_stock, 0),
+                'component_position', ii.component_position,
+                'reason_code', ii.reason_code,
+                'purpose', ii.purpose
+              ))
+              FROM indent_items ii
+              LEFT JOIN materials m ON m.id = ii.material_id
+              WHERE ii.indent_id = i.id
+            ) as items
+     FROM indents i
+     LEFT JOIN departments d ON d.id = i.department_id
+     LEFT JOIN users u ON u.id = i.raised_by
+     LEFT JOIN purchase_orders po ON po.indent_id = i.id AND po.status != 'Cancelled'
+     WHERE ${where}
+     ORDER BY CASE WHEN po.id IS NULL THEN 0 ELSE 1 END ASC, i.created_at DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// LIST POs WITH FULL LIFECYCLE LINKAGES (PR, GRN, PURCHASE BILLS)
 router.get('/po', auth, ar(async (req, res) => {
   const { status, vendor_id, search, page=1, limit=50 } = req.query;
   const conds=[]; const params=[]; let p=1;
@@ -36,11 +84,19 @@ router.get('/po', auth, ar(async (req, res) => {
             po.vendor_id as "vendor_id", po.vendor_id as "vendorId", po.indent_id as "indentId",
             v.name as "vendorName", v.code as "vendorCode", v.gstin as "vendorGstin",
             ind.indent_number as "indentNumber", dept.name as "deptName",
+            g.grn_number as "grnNumber", g.status as "grnStatus", g.id as "grnId",
+            vb.bill_number as "billNumber", vb.status as "billStatus", vb.id as "billId",
             COALESCE((SELECT COUNT(*) FROM po_items pi WHERE pi.po_id = po.id), 0)::int AS "itemCount"
      FROM purchase_orders po
      LEFT JOIN vendors v ON v.id=po.vendor_id
      LEFT JOIN indents ind ON ind.id=po.indent_id
      LEFT JOIN departments dept ON dept.id=ind.department_id
+     LEFT JOIN LATERAL (
+       SELECT id, grn_number, status FROM grn WHERE po_id = po.id ORDER BY created_at DESC LIMIT 1
+     ) g ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT id, bill_number, status FROM vendor_bills WHERE po_id = po.id OR grn_id = g.id ORDER BY created_at DESC LIMIT 1
+     ) vb ON TRUE
      ${where} ORDER BY po.created_at DESC LIMIT $${p} OFFSET $${p+1}`,
     [...params, parseInt(limit), offset]
   );
@@ -800,4 +856,270 @@ router.get('/p2p-pipeline', auth, ar(async (req, res) => {
   res.json({ success: true, data: mapped, total: mapped.length });
 }));
 
+// ══════════════════════════════════════════════════════════════════════
+// CASH PURCHASES / SPOT PROCUREMENT (BRANCH 2: INDENT -> CASH PURCHASE -> PURCHASE)
+// ══════════════════════════════════════════════════════════════════════
+
+// Auto-ensure cash_purchases tables exist
+const ensureCashPurchaseTable = async (client) => {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS cash_purchases (
+      id SERIAL PRIMARY KEY,
+      voucher_number VARCHAR(50) UNIQUE NOT NULL,
+      date DATE NOT NULL,
+      indent_id INTEGER,
+      vendor_name VARCHAR(150) NOT NULL,
+      vendor_gstin VARCHAR(20),
+      invoice_number VARCHAR(100),
+      invoice_date DATE,
+      payment_mode VARCHAR(50) DEFAULT 'Cash',
+      payment_ref VARCHAR(100),
+      taxable_amount NUMERIC(15,2) DEFAULT 0,
+      cgst_amount NUMERIC(12,2) DEFAULT 0,
+      sgst_amount NUMERIC(12,2) DEFAULT 0,
+      igst_amount NUMERIC(12,2) DEFAULT 0,
+      total_tax NUMERIC(12,2) DEFAULT 0,
+      total_amount NUMERIC(15,2) NOT NULL,
+      remarks TEXT,
+      created_by INTEGER,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS cash_purchase_items (
+      id SERIAL PRIMARY KEY,
+      cash_purchase_id INTEGER REFERENCES cash_purchases(id) ON DELETE CASCADE,
+      material_id INTEGER,
+      qty NUMERIC(12,3) NOT NULL,
+      uom VARCHAR(20),
+      unit_price NUMERIC(12,2) NOT NULL,
+      gst_pct NUMERIC(5,2) DEFAULT 18,
+      line_taxable NUMERIC(15,2) NOT NULL,
+      line_total NUMERIC(15,2) NOT NULL
+    );
+  `);
+};
+
+// LIST CASH PURCHASES
+router.get('/cash-purchases', auth, ar(async (req, res) => {
+  const { search, page = 1, limit = 50 } = req.query;
+  const client = await pool.connect();
+  try {
+    await ensureCashPurchaseTable(client);
+    const conds = [];
+    const params = [];
+    let p = 1;
+    if (search) {
+      conds.push(`(cp.voucher_number ILIKE $${p} OR cp.vendor_name ILIKE $${p} OR cp.invoice_number ILIKE $${p} OR ind.indent_number ILIKE $${p})`);
+      params.push(`%${search}%`);
+      p++;
+    }
+    const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { rows } = await client.query(
+      `SELECT cp.*, cp.voucher_number as "voucherNumber", cp.vendor_name as "vendorName",
+              cp.vendor_gstin as "vendorGstin", cp.invoice_number as "invoiceNumber",
+              cp.taxable_amount as "taxableAmount", cp.total_amount as "totalAmount",
+              ind.indent_number as "indentNumber", dept.name as "deptName", u.name as "createdByName",
+              COALESCE((SELECT COUNT(*) FROM cash_purchase_items cpi WHERE cpi.cash_purchase_id = cp.id), 0)::int AS "itemCount"
+       FROM cash_purchases cp
+       LEFT JOIN indents ind ON ind.id = cp.indent_id
+       LEFT JOIN departments dept ON dept.id = ind.department_id
+       LEFT JOIN users u ON u.id = cp.created_by
+       ${where}
+       ORDER BY cp.created_at DESC
+       LIMIT $${p} OFFSET $${p + 1}`,
+      [...params, parseInt(limit), offset]
+    );
+    const { rows: cnt } = await client.query(`SELECT COUNT(*) FROM cash_purchases cp LEFT JOIN indents ind ON ind.id = cp.indent_id ${where}`, params);
+    res.json({ success: true, data: rows, total: parseInt(cnt[0].count) });
+  } finally {
+    client.release();
+  }
+}));
+
+// GET ONE CASH PURCHASE
+router.get('/cash-purchases/:id', auth, ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await ensureCashPurchaseTable(client);
+    const isNum = /^\d+$/.test(String(req.params.id));
+    const where = isNum ? `WHERE cp.id = $1` : `WHERE cp.voucher_number = $1`;
+    const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+    const { rows } = await client.query(
+      `SELECT cp.*, cp.voucher_number as "voucherNumber", cp.vendor_name as "vendorName",
+              cp.vendor_gstin as "vendorGstin", cp.invoice_number as "invoiceNumber",
+              ind.indent_number as "indentNumber", dept.name as "deptName", u.name as "createdByName"
+       FROM cash_purchases cp
+       LEFT JOIN indents ind ON ind.id = cp.indent_id
+       LEFT JOIN departments dept ON dept.id = ind.department_id
+       LEFT JOIN users u ON u.id = cp.created_by
+       ${where}`,
+      [paramVal]
+    );
+    if (!rows.length) return res.status(404).json({ success: false, message: 'Cash purchase voucher not found' });
+
+    const cpId = rows[0].id;
+    const { rows: items } = await client.query(
+      `SELECT cpi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom", m.hsn_code as "hsnCode"
+       FROM cash_purchase_items cpi
+       LEFT JOIN materials m ON m.id = cpi.material_id
+       WHERE cpi.cash_purchase_id = $1
+       ORDER BY cpi.id ASC`,
+      [cpId]
+    );
+    res.json({ success: true, data: { ...rows[0], items } });
+  } finally {
+    client.release();
+  }
+}));
+
+// CREATE CASH PURCHASE (ATOMIC STOCK INCREMENT + STOCK LEDGER + BILL ENTRY)
+router.post('/cash-purchase', auth, requireLevel(2), ar(async (req, res) => {
+  const { indent_id, vendor_name, vendor_gstin, invoice_number, invoice_date, payment_mode, payment_ref, remarks, items = [] } = req.body;
+  if (!vendor_name || !items.length) {
+    return res.status(400).json({ success: false, message: 'Vendor / Supplier name and items are required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await ensureCashPurchaseTable(client);
+
+    const isInter = vendor_gstin && !vendor_gstin.startsWith('29');
+    let totalTaxable = 0, totalCgst = 0, totalSgst = 0, totalIgst = 0;
+
+    for (const it of items) {
+      if (!it.material_id) throw new Error('Material is required on each line item');
+      const qty = parseFloat(it.qty || 0);
+      const unitPrice = parseFloat(it.unit_price || 0);
+      const gstPct = parseFloat(it.gst_pct ?? 18);
+      if (qty <= 0) throw new Error(`Invalid quantity ${qty} for item`);
+      const lineTaxable = qty * unitPrice;
+      const lineGst = lineTaxable * (gstPct / 100);
+      totalTaxable += lineTaxable;
+      if (isInter) {
+        totalIgst += lineGst;
+      } else {
+        totalCgst += lineGst / 2;
+        totalSgst += lineGst / 2;
+      }
+    }
+
+    const totalTax = totalCgst + totalSgst + totalIgst;
+    const grandTotal = totalTaxable + totalTax;
+
+    // Sequence Generator for Cash Purchase (CP-YYYYMMDD-XXXX)
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`cp-${stamp}`]);
+    const { rows: seqRows } = await client.query(
+      `SELECT LPAD((COUNT(*) + 1)::text, 4, '0') as seq FROM cash_purchases WHERE voucher_number LIKE $1`,
+      [`CP-${stamp}-%`]
+    );
+    const cpNum = `CP-${stamp}-${seqRows[0].seq}`;
+
+    // Insert Header
+    const { rows: [cpHead] } = await client.query(
+      `INSERT INTO cash_purchases (
+         voucher_number, date, indent_id, vendor_name, vendor_gstin, invoice_number,
+         invoice_date, payment_mode, payment_ref, taxable_amount, cgst_amount, sgst_amount,
+         igst_amount, total_tax, total_amount, remarks, created_by
+       ) VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+       RETURNING *`,
+      [
+        cpNum, indent_id || null, vendor_name, vendor_gstin || null, invoice_number || null,
+        invoice_date || new Date().toISOString().slice(0, 10), payment_mode || 'Cash',
+        payment_ref || null, totalTaxable, totalCgst, totalSgst, totalIgst, totalTax, grandTotal,
+        remarks || null, req.user.id
+      ]
+    );
+
+    const cpId = cpHead.id;
+
+    // Process Line Items + Stock Increment + Stock Ledger
+    for (const it of items) {
+      const qty = parseFloat(it.qty);
+      const unitPrice = parseFloat(it.unit_price || 0);
+      const gstPct = parseFloat(it.gst_pct ?? 18);
+      const lineTaxable = qty * unitPrice;
+      const lineTotal = lineTaxable * (1 + gstPct / 100);
+
+      await client.query(
+        `INSERT INTO cash_purchase_items (cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [cpId, it.material_id, qty, it.uom || 'NOS', unitPrice, gstPct, lineTaxable, lineTotal]
+      );
+
+      // Atomically update materials stock
+      const { rows: [mat] } = await client.query(
+        `SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`,
+        [it.material_id]
+      );
+      const curStock = parseFloat(mat?.current_stock || 0);
+      const newStock = curStock + qty;
+
+      await client.query(
+        `UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`,
+        [newStock, unitPrice, it.material_id]
+      );
+
+      // Record in stock_ledger
+      await client.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
+         VALUES ($1, CURRENT_DATE, 'cash_purchase', 'cash_purchase', $2, $3, 0, $4, $5, $6, $7, $8)`,
+        [it.material_id, cpId, qty, newStock, unitPrice, lineTaxable, `Cash Purchase ${cpNum} from ${vendor_name}`, req.user.id]
+      );
+    }
+
+    // If linked to an Indent, update indent status to 'Cash Purchased'
+    if (indent_id) {
+      const { rows: [ind] } = await client.query(`SELECT status, indent_number FROM indents WHERE id = $1`, [indent_id]);
+      await client.query(`UPDATE indents SET status = 'Cash Purchased' WHERE id = $1`, [indent_id]);
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'Cash Purchased', $2, 'Cash Purchased', $3, $4)`,
+        [indent_id, ind?.status || null, req.user.id, `Fulfilled via Cash Purchase Voucher ${cpNum}`]
+      );
+      await client.query(
+        `INSERT INTO store_indent_log (indent_id, action, from_status, to_status, actor_id, actor_name, actor_role, note)
+         VALUES ($1, 'Cash Purchased', $2, 'Cash Purchased', $3, $4, $5, $6)
+         ON CONFLICT DO NOTHING`,
+        [indent_id, ind?.status || null, req.user.id, req.user.name || 'Purchaser', req.user.role || 'Staff', `Fulfilled via Cash Purchase ${cpNum}`]
+      );
+    }
+
+    // Auto-record paid vendor bill for Finance synchronization
+    try {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`bill-${stamp}`]);
+      const { rows: seqRowsBill } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM vendor_bills WHERE bill_number LIKE $1`, [`BILL-${stamp}-%`]);
+      const billNum = `BILL-${stamp}-${seqRowsBill[0].seq}`;
+
+      await client.query(
+        `INSERT INTO vendor_bills (
+           bill_number, vendor_id, po_id, grn_id, vendor_invoice_number,
+           invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount,
+           igst_amount, total_tax, roundoff, total_amount, paid_amount,
+           balance_amount, status, remarks, created_by
+         ) VALUES ($1, NULL, NULL, NULL, $2, CURRENT_DATE, CURRENT_DATE, $3, $4, $5, $6, $7, 0, $8, $8, 0, 'Paid', $9, $10)`,
+        [
+          billNum, invoice_number || cpNum, totalTaxable, totalCgst, totalSgst, totalIgst,
+          totalTax, grandTotal, `Cash Purchase ${cpNum} (${payment_mode || 'Cash'}) - ${vendor_name}`, req.user.id
+        ]
+      );
+    } catch(err) { /* non-blocking */ }
+
+    await client.query('COMMIT');
+    res.status(201).json({
+      success: true,
+      data: { ...cpHead, items_count: items.length },
+      message: `Cash Purchase Voucher ${cpNum} generated successfully! Stock incremented and recorded in ledger.`
+    });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    return res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
 module.exports = router;
+

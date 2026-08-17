@@ -204,20 +204,69 @@ export default function Purchase() {
     setPipeLoading(false)
   }, [pipeSearch])
 
+  const [prList, setPrList] = useState([])
+  const [prLoading, setPrLoading] = useState(false)
+  const [prSearch, setPrSearch] = useState('')
+  const [prFilterStatus, setPrFilterStatus] = useState('')
+
+  const [cashList, setCashList] = useState([])
+  const [cashLoading, setCashLoading] = useState(false)
+  const [cashSearch, setCashSearch] = useState('')
+  const [cashTotal, setCashTotal] = useState(0)
+  const [cashPage, setCashPage] = useState(1)
+
+  const [cashModal, setCashModal] = useState(false)
+  const [cashForm, setCashForm] = useState({
+    indent_id: '',
+    vendor_name: '',
+    vendor_gstin: '',
+    invoice_number: '',
+    invoice_date: new Date().toISOString().slice(0, 10),
+    payment_mode: 'Cash',
+    payment_ref: '',
+    remarks: '',
+    items: [{ material_id: '', description: '', qty: '', uom: '', unit_price: '', gst_pct: 18, _search: '' }]
+  })
+  const [cashErr, setCashErr] = useState('')
+  const [cashSuccess, setCashSuccess] = useState('')
+  const [cashSaving, setCashSaving] = useState(false)
+
+  const [approvedIndents, setApprovedIndents] = useState([])
+
+  const loadPendingIndents = useCallback(async () => {
+    setPrLoading(true)
+    const r = await API(`/api/purchase/pending-indents?search=${encodeURIComponent(prSearch)}`)
+    if (r.success) {
+      setPrList(r.data)
+      setApprovedIndents(r.data)
+    }
+    setPrLoading(false)
+  }, [prSearch])
+
+  const loadCashPurchases = useCallback(async () => {
+    setCashLoading(true)
+    const r = await API(`/api/purchase/cash-purchases?page=${cashPage}&search=${encodeURIComponent(cashSearch)}`)
+    if (r.success) {
+      setCashList(r.data)
+      setCashTotal(r.total)
+    }
+    setCashLoading(false)
+  }, [cashPage, cashSearch])
+
   useEffect(() => {
+    if (tab === 'pr') loadPendingIndents()
     if (tab === 'orders') load()
+    if (tab === 'cash') loadCashPurchases()
     if (tab === 'grn') loadGRNs()
     if (tab === 'bills') loadBills()
     if (tab === 'pipeline') loadPipeline()
-  }, [tab, load, loadGRNs, loadBills, loadPipeline])
+  }, [tab, loadPendingIndents, load, loadCashPurchases, loadGRNs, loadBills, loadPipeline])
 
   const [poMatSearch, setPoMatSearch] = useState({})
   const [poMatDropOpen, setPoMatDropOpen] = useState({})
 
-  const [approvedIndents, setApprovedIndents] = useState([])
-
   const loadApprovedIndents = useCallback(async () => {
-    const r = await API('/api/indent?status=Approved&limit=100')
+    const r = await API('/api/purchase/pending-indents')
     if (r.success) setApprovedIndents(r.data)
   }, [])
 
@@ -269,6 +318,78 @@ export default function Purchase() {
     setFormErrors({})
     loadApprovedIndents()
     setModal(true)
+  }
+
+  const openCashFromIndent = (ind) => {
+    setCashForm({
+      indent_id: ind.id,
+      vendor_name: '',
+      vendor_gstin: '',
+      invoice_number: '',
+      invoice_date: today(),
+      payment_mode: 'Cash',
+      payment_ref: '',
+      remarks: `Direct Cash Purchase against PR ${ind.indentNumber || ind.indent_number} (${ind.deptName || ''})`,
+      items: (ind.items || []).length ? ind.items.map(it => ({
+        material_id: it.material_id,
+        description: it.materialName || '',
+        qty: String(it.required_qty || 1),
+        uom: it.matUom || it.uom || '',
+        unit_price: String(it.unit_price || 0),
+        gst_pct: 18,
+        _search: it.materialName || ''
+      })) : [blankItem()]
+    })
+    setCashErr('')
+    setCashSuccess('')
+    setCashModal(true)
+  }
+
+  const openNewCashPurchase = () => {
+    setCashForm({
+      indent_id: '',
+      vendor_name: '',
+      vendor_gstin: '',
+      invoice_number: '',
+      invoice_date: today(),
+      payment_mode: 'Cash',
+      payment_ref: '',
+      remarks: '',
+      items: [blankItem()]
+    })
+    setCashErr('')
+    setCashSuccess('')
+    setCashModal(true)
+  }
+
+  const saveCashPurchase = async (e) => {
+    e.preventDefault()
+    if (!cashForm.vendor_name) {
+      setCashErr('Supplier / Vendor Name is required')
+      return
+    }
+    const validItems = cashForm.items.filter(it => it.material_id && parseFloat(it.qty) > 0)
+    if (!validItems.length) {
+      setCashErr('Please add at least one material with quantity > 0')
+      return
+    }
+    setCashSaving(true)
+    setCashErr('')
+    const r = await API('/api/purchase/cash-purchase', {
+      method: 'POST',
+      body: JSON.stringify({ ...cashForm, items: validItems })
+    })
+    setCashSaving(false)
+    if (r.success) {
+      setCashSuccess(r.message || 'Cash Purchase Voucher created and inventory updated!')
+      setTimeout(() => {
+        setCashModal(false)
+        loadCashPurchases()
+        loadPendingIndents()
+      }, 1400)
+    } else {
+      setCashErr(r.message || 'Failed to save cash purchase')
+    }
   }
 
   const handleSelectIndent = async (indentId) => {
@@ -938,6 +1059,148 @@ export default function Purchase() {
     }
   }
 
+  // Print Official Cash Purchase Voucher
+  const printCashVoucher = async (cpRow) => {
+    let cp = cpRow
+    if (!cp.items || !cp.items.length) {
+      const r = await API(`/api/purchase/cash-purchases/${cpRow.id}`)
+      if (r.success) cp = r.data
+    }
+    const isInter = cp.vendor_gstin && !cp.vendor_gstin.startsWith('29')
+    const sub = Number(cp.taxable_amount || cp.taxableAmount || 0)
+    const cgst = Number(cp.cgst_amount || 0)
+    const sgst = Number(cp.sgst_amount || 0)
+    const igst = Number(cp.igst_amount || 0)
+    const grand = Number(cp.total_amount || cp.totalAmount || 0)
+
+    const content = (
+      <div id="print-document" style={{ fontFamily: 'Inter, system-ui, sans-serif', color: '#0f172a', lineHeight: 1.4, padding: '16px' }}>
+        {/* Letterhead */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f766e', paddingBottom: 12, marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
+            <div style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>CASH PURCHASE &amp; SPOT PROCUREMENT VOUCHER</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Plant: Survey No. 42/1, Mill Road, Industrial Area, Karnataka | GSTIN: 29AABCS1429B1Z8</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#0f766e' }}>{cp.voucher_number || cp.voucherNumber}</div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>Date: <strong>{cp.date ? new Date(cp.date).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong></div>
+            <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700 }}>PAID ({cp.payment_mode || cp.paymentMode || 'Cash'})</div>
+          </div>
+        </div>
+
+        {/* Vendor & Details */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 12px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>SUPPLIER / SHOP DETAILS</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{cp.vendor_name || cp.vendorName}</div>
+            <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>GSTIN: <strong>{cp.vendor_gstin || cp.vendorGstin || 'Unregistered / Cash Vendor'}</strong></div>
+            <div style={{ fontSize: 11, color: '#334155' }}>Cash Memo / Invoice: <strong>{cp.invoice_number || cp.invoiceNumber || '—'}</strong></div>
+          </div>
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 12px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>PROCUREMENT &amp; PAYMENT INFO</div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>PR / Indent Ref: <strong>{cp.indentNumber || cp.indent_number || 'Direct Spot Purchase'}</strong></div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>Payment Mode: <strong>{cp.payment_mode || cp.paymentMode || 'Cash'}</strong> {cp.payment_ref ? `(Ref: ${cp.payment_ref})` : ''}</div>
+            <div style={{ fontSize: 11, color: '#334155' }}>Inventory Status: <strong style={{ color: '#16a34a' }}>✓ Stock Added to Central Store</strong></div>
+          </div>
+        </div>
+
+        {/* Items Table */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
+          <thead>
+            <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
+              <th style={{ padding: '8px 6px', width: 30, textAlign: 'center' }}>#</th>
+              <th style={{ padding: '8px 6px' }}>Item Description &amp; Part Code</th>
+              <th style={{ padding: '8px 6px', textAlign: 'center', width: 70 }}>HSN</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 60 }}>Qty</th>
+              <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Unit Rate</th>
+              <th style={{ padding: '8px 6px', textAlign: 'center', width: 50 }}>GST%</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Total (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(cp.items || []).map((it, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
+                <td style={{ padding: '8px 6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName || it.description}</div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
+                </td>
+                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{it.hsnCode || '8439'}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
+                <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(it.line_total || it.lineTotal || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * 1.18)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Valuation and Signatures */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', marginBottom: 4 }}>Amount in Words:</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
+              {numberToWords(grand)}
+            </div>
+            {cp.remarks && <div style={{ fontSize: 11, color: '#475569', marginTop: 8 }}><strong>Remarks:</strong> {cp.remarks}</div>}
+          </div>
+          <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={{ padding: '4px 6px', color: '#64748b' }}>Taxable Amount:</td>
+                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600 }}>₹{sub.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+              {isInter ? (
+                <tr>
+                  <td style={{ padding: '4px 6px', color: '#d97706' }}>IGST Amount:</td>
+                  <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#d97706' }}>₹{igst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              ) : (
+                <>
+                  <tr>
+                    <td style={{ padding: '4px 6px', color: '#059669' }}>CGST Amount:</td>
+                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '4px 6px', color: '#059669' }}>SGST Amount:</td>
+                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                </>
+              )}
+              <tr style={{ borderTop: '1px solid #cbd5e1', background: '#f0fdf4' }}>
+                <td style={{ padding: '6px 6px', fontWeight: 800, fontSize: 13, color: '#0f766e' }}>Total Paid:</td>
+                <td style={{ padding: '6px 6px', textAlign: 'right', fontWeight: 900, fontSize: 14, color: '#0f766e' }}>₹{grand.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 3 Signatures */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, textAlign: 'center', fontSize: 11, color: '#334155', marginTop: 32 }}>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Purchaser / Indentor</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>{cp.createdByName || 'Purchaser'}</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Store Keeper (Stock Verified)</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Central Stores</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Finance / Accounts Incharge</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>Accounts Department</div>
+          </div>
+        </div>
+      </div>
+    )
+    setPrintContent(content)
+  }
+
   // Print PO with Corporate Letterhead, Tax Breakdowns, and Signatures
   const printPO = async (poRow) => {
     let po = poRow
@@ -1161,7 +1424,9 @@ export default function Purchase() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #e7e6df', overflowX: 'auto' }}>
         {[
-          ['orders', '📋 Purchase Orders (PO)'],
+          ['pr', '📋 Purchase Requisitions (PR / Indents)'],
+          ['orders', '🛒 Purchase Orders (PO)'],
+          ['cash', '💵 Cash Purchases (Spot Procurement)'],
           ['grn', '📥 Goods Receipt Notes (GRN)'],
           ['bills', '🧾 Purchase Invoices & Bills (Purchase Entry)'],
           ['pipeline', '📊 P2P Full Lifecycle Pipeline']
@@ -1177,9 +1442,155 @@ export default function Purchase() {
             onClick={() => setTab(k)}
           >
             {l}
+            {k === 'pr' && prList.filter(x => !x.linkedPoId).length > 0 && (
+              <span style={{ marginLeft: 6, background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 999 }}>
+                {prList.filter(x => !x.linkedPoId).length}
+              </span>
+            )}
           </button>
         ))}
       </div>
+
+      {/* ── TAB 0: PURCHASE REQUISITIONS (PR / INDENTS) ── */}
+      {tab === 'pr' && (
+        <div>
+          <div style={S.filterBar}>
+            <input
+              style={{ ...S.input, maxWidth: 320 }}
+              placeholder="🔍 Search PR No, Department, Raised By, Purpose..."
+              value={prSearch}
+              onChange={e => setPrSearch(e.target.value)}
+            />
+            <select style={S.select} value={prFilterStatus} onChange={e => setPrFilterStatus(e.target.value)}>
+              <option value="">All Fulfillment Statuses</option>
+              <option value="pending">Pending PO Conversion</option>
+              <option value="po_created">PO Created</option>
+              <option value="cash_purchased">Cash Purchased</option>
+            </select>
+            <button style={S.btnSecondary} onClick={loadPendingIndents}>↻ Refresh Requisitions</button>
+            <button style={{ ...S.btnPrimary, marginLeft: 'auto', background: '#0f766e' }} onClick={() => openNew()}>+ Create Direct PO</button>
+          </div>
+
+          <div style={S.tableWrap}>
+            {prLoading ? <div style={S.loading}>Loading Purchase Requisitions...</div> : (
+              <table style={S.table}>
+                <thead>
+                  <tr style={S.thead}>
+                    {['PR Number', 'Date', 'Department', 'Indentor', 'Priority', 'Items Summary', 'Est. Value', 'Status', 'Linked Document', 'Actions'].map(h => (
+                      <th key={h} style={S.th}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {prList
+                    .filter(ind => {
+                      if (prFilterStatus === 'pending') return !ind.linkedPoId && ind.status !== 'Cash Purchased'
+                      if (prFilterStatus === 'po_created') return !!ind.linkedPoId
+                      if (prFilterStatus === 'cash_purchased') return ind.status === 'Cash Purchased'
+                      return true
+                    })
+                    .map(ind => (
+                      <tr key={ind.id} style={S.tr}>
+                        <td style={S.td}>
+                          <a
+                            href={`/indent`}
+                            onClick={e => { e.preventDefault(); window.location.href = `/indent` }}
+                            style={{ color: '#0f766e', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}
+                          >
+                            📋 {ind.indentNumber}
+                          </a>
+                        </td>
+                        <td style={S.td}><span style={S.muted}>{ind.date?.slice(0, 10)}</span></td>
+                        <td style={S.td}>
+                          <strong>{ind.deptName || 'Department'}</strong>
+                          {ind.deptCode && <span style={{ fontSize: 10, color: '#64748b', marginLeft: 4 }}>({ind.deptCode})</span>}
+                        </td>
+                        <td style={S.td}>
+                          <div>{ind.raisedByName || 'Indentor'}</div>
+                          {ind.raisedByEmpCode && <div style={{ fontSize: 10, color: '#64748b' }}>{ind.raisedByEmpCode}</div>}
+                        </td>
+                        <td style={S.td}>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 700,
+                            background: ind.priority === 'Urgent' ? '#fee2e2' : (ind.priority === 'High' ? '#fef3c7' : '#f1f5f9'),
+                            color: ind.priority === 'Urgent' ? '#dc2626' : (ind.priority === 'High' ? '#b45309' : '#475569')
+                          }}>
+                            {ind.priority}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ fontWeight: 600, color: '#0f172a' }}>{ind.items?.length || 0} Material Line(s)</div>
+                          <div style={{ fontSize: 11, color: '#64748b', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {(ind.items || []).map(x => `${x.materialName} (${x.required_qty} ${x.uom})`).join(', ')}
+                          </div>
+                        </td>
+                        <td style={S.td}><span style={{ color: '#15803d', fontWeight: 700 }}>{fmt(ind.totalValue)}</span></td>
+                        <td style={S.td}>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 700,
+                            background: ind.linkedPoId ? '#e0f2fe' : (ind.status === 'Cash Purchased' ? '#dcfce7' : '#fef9c3'),
+                            color: ind.linkedPoId ? '#0369a1' : (ind.status === 'Cash Purchased' ? '#15803d' : '#854d0e')
+                          }}>
+                            {ind.linkedPoId ? 'PO Created' : (ind.status || 'Submitted')}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          {ind.linkedPoNumber ? (
+                            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
+                              🛒 {ind.linkedPoNumber}
+                            </span>
+                          ) : (
+                            ind.status === 'Cash Purchased' ? (
+                              <span style={{ background: '#dcfce7', color: '#15803d', padding: '2px 6px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
+                                💵 Cash Purchased
+                              </span>
+                            ) : (
+                              <span style={{ color: '#94a3b8', fontSize: 11, fontStyle: 'italic' }}>Pending Fulfillment</span>
+                            )
+                          )}
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            {!ind.linkedPoId && ind.status !== 'Cash Purchased' && (
+                              <>
+                                <button
+                                  style={{ ...S.btnPrimary, background: '#0f766e', padding: '4px 10px', fontSize: 11, fontWeight: 700 }}
+                                  onClick={() => openNew(ind)}
+                                  title="1-Click Convert PR to Purchase Order"
+                                >
+                                  🛒 Convert to PO
+                                </button>
+                                <button
+                                  style={{ ...S.btnSecondary, borderColor: '#16a34a', color: '#16a34a', padding: '4px 8px', fontSize: 11, fontWeight: 700 }}
+                                  onClick={() => openCashFromIndent(ind)}
+                                  title="Direct Cash / Spot Purchase with Stock Update"
+                                >
+                                  💵 Cash Purchase
+                                </button>
+                              </>
+                            )}
+                            {ind.linkedPoId && (
+                              <button
+                                style={{ ...S.btnIcon, color: '#0369a1' }}
+                                onClick={() => { setTab('orders'); setFStatus('') }}
+                                title="View in PO Register"
+                              >
+                                👁️ View PO
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  {prList.length === 0 && (
+                    <tr><td colSpan={10} style={S.empty}>No purchase requisitions found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── TAB 1: PURCHASE ORDERS ── */}
       {tab === 'orders' && (
@@ -1247,6 +1658,91 @@ export default function Purchase() {
               <span style={S.pgInfo}>{page}/{totalPages||1}</span>
               <button style={S.pgBtn} disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)}>Next ›</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 1B: CASH PURCHASES / SPOT PROCUREMENT ── */}
+      {tab === 'cash' && (
+        <div>
+          <div style={S.filterBar}>
+            <input
+              style={{ ...S.input, maxWidth: 320 }}
+              placeholder="🔍 Search Voucher No, Supplier, Memo No, Indent..."
+              value={cashSearch}
+              onChange={e => setCashSearch(e.target.value)}
+            />
+            <button style={S.btnSecondary} onClick={loadCashPurchases}>↻ Refresh Cash Purchases</button>
+            <button style={{ ...S.btnPrimary, marginLeft: 'auto', background: '#16a34a' }} onClick={openNewCashPurchase}>
+              💵 + New Cash Purchase
+            </button>
+          </div>
+
+          <div style={S.tableWrap}>
+            {cashLoading ? <div style={S.loading}>Loading Cash Purchases...</div> : (
+              <table style={S.table}>
+                <thead>
+                  <tr style={S.thead}>
+                    {['Voucher No', 'Date', 'Supplier / Shop', 'Cash Memo / Inv', 'Items', 'Taxable Amt', 'Total Paid', 'Mode', 'PR Link', 'Purchaser', 'Actions'].map(h => (
+                      <th key={h} style={S.th}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {cashList.map(cp => (
+                    <tr key={cp.id} style={S.tr}>
+                      <td style={S.td}>
+                        <span
+                          style={{ ...S.code, color: '#16a34a', cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => printCashVoucher(cp)}
+                          title="Click to Print Official Cash Purchase Voucher"
+                        >
+                          {cp.voucherNumber || cp.voucher_number}
+                        </span>
+                      </td>
+                      <td style={S.td}><span style={S.muted}>{cp.date?.slice(0, 10)}</span></td>
+                      <td style={S.td}>
+                        <strong>{cp.vendorName || cp.vendor_name}</strong>
+                        {cp.vendorGstin && <div style={{ fontSize: 10, color: '#64748b' }}>GST: {cp.vendorGstin}</div>}
+                      </td>
+                      <td style={S.td}>
+                        <div>{cp.invoiceNumber || cp.invoice_number || 'Cash Memo'}</div>
+                      </td>
+                      <td style={S.td}>
+                        <span style={{ fontWeight: 600 }}>{cp.itemCount || 0} Part(s)</span>
+                      </td>
+                      <td style={S.td}>{fmt(cp.taxableAmount || cp.taxable_amount)}</td>
+                      <td style={S.td}><span style={{ color: '#15803d', fontWeight: 800 }}>{fmt(cp.totalAmount || cp.total_amount)}</span></td>
+                      <td style={S.td}>
+                        <span style={{ background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 700 }}>
+                          {cp.payment_mode || cp.paymentMode || 'Cash'}
+                        </span>
+                      </td>
+                      <td style={S.td}>
+                        {cp.indentNumber ? (
+                          <span style={{ color: '#0f766e', fontWeight: 600 }}>📋 {cp.indentNumber}</span>
+                        ) : (
+                          <span style={{ color: '#94a3b8', fontSize: 11, fontStyle: 'italic' }}>Direct</span>
+                        )}
+                      </td>
+                      <td style={S.td}><span style={S.muted}>{cp.createdByName || 'Staff'}</span></td>
+                      <td style={S.td}>
+                        <button
+                          style={{ ...S.btnIcon, color: '#16a34a', fontWeight: 700, fontSize: 12 }}
+                          onClick={() => printCashVoucher(cp)}
+                          title="Print Cash Purchase Voucher"
+                        >
+                          🖨️ Voucher
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {cashList.length === 0 && (
+                    <tr><td colSpan={11} style={S.empty}>No cash purchases recorded yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       )}
@@ -2575,6 +3071,281 @@ export default function Purchase() {
           </div>
         </div>
       )}
+
+      {/* ═══════ CREATE CASH PURCHASE MODAL ═══════ */}
+      {cashModal && (() => {
+        const isInter = cashForm.vendor_gstin && !cashForm.vendor_gstin.startsWith('29')
+        const calcCpLine = it => {
+          const q = parseFloat(it.qty) || 0, p = parseFloat(it.unit_price) || 0, g = parseFloat(it.gst_pct) || 18
+          const base = q * p
+          const tax = (base * g) / 100
+          const cgst = isInter ? 0 : tax / 2
+          const sgst = isInter ? 0 : tax / 2
+          const igst = isInter ? tax : 0
+          return { base, tax, cgst, sgst, igst, total: base + tax }
+        }
+        const subtotal = cashForm.items.reduce((a, it) => a + calcCpLine(it).base, 0)
+        const totalCgst = cashForm.items.reduce((a, it) => a + calcCpLine(it).cgst, 0)
+        const totalSgst = cashForm.items.reduce((a, it) => a + calcCpLine(it).sgst, 0)
+        const totalIgst = cashForm.items.reduce((a, it) => a + calcCpLine(it).igst, 0)
+        const totalTax = cashForm.items.reduce((a, it) => a + calcCpLine(it).tax, 0)
+        const grandTotal = subtotal + totalTax
+
+        const addCpItem = () => setCashForm(f => ({ ...f, items: [...f.items, blankItem()] }))
+        const removeCpItem = i => setCashForm(f => ({ ...f, items: f.items.filter((_, j) => j !== i) }))
+        const setCpItem = (i, k, v) => setCashForm(f => ({ ...f, items: f.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }))
+
+        return (
+          <div style={S.overlay} onClick={() => setCashModal(false)}>
+            <div style={{ ...S.modal, maxWidth: 900, maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+              <div style={S.modalHeader}>
+                <div>
+                  <div style={{ ...S.modalTitle, display: 'flex', alignItems: 'center', gap: 8, color: '#16a34a' }}>
+                    <span>💵</span> Direct Cash Purchase &amp; Spot Procurement
+                  </div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                    Instant stock increment · Automatic Stock Ledger posting · Paid Vendor Bill generation
+                  </div>
+                </div>
+                <button style={S.close} onClick={() => setCashModal(false)}>✕</button>
+              </div>
+
+              {cashErr && <div style={S.error}>{cashErr}</div>}
+              {cashSuccess && <div style={{ background: '#dcfce7', color: '#15803d', padding: '10px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, marginBottom: 14 }}>{cashSuccess}</div>}
+
+              <form onSubmit={saveCashPurchase} style={S.form}>
+                {/* Optional PR Linkage Banner */}
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '10px 14px' }}>
+                  <label style={{ ...S.label, color: '#166534', fontWeight: 700 }}>
+                    📋 Optional: Link Purchase Requisition (PR / Indent) to Fulfill:
+                    <select
+                      style={{ ...S.select, marginTop: 4, background: '#ffffff', borderColor: '#86efac' }}
+                      value={cashForm.indent_id || ''}
+                      onChange={async e => {
+                        const indId = e.target.value
+                        if (!indId) {
+                          setCashForm(f => ({ ...f, indent_id: '' }))
+                          return
+                        }
+                        const r = await API(`/api/indent/${indId}`)
+                        if (r.success) {
+                          const ind = r.data
+                          setCashForm(f => ({
+                            ...f,
+                            indent_id: ind.id,
+                            remarks: f.remarks || `Cash Purchase against PR ${ind.indent_number} (${ind.deptName || ''})`,
+                            items: (ind.items || []).length ? ind.items.map(it => ({
+                              material_id: it.material_id,
+                              description: it.materialName || '',
+                              qty: String(it.required_qty || 1),
+                              uom: it.matUom || it.uom || '',
+                              unit_price: String(it.unit_price || 0),
+                              gst_pct: 18,
+                              _search: it.materialName || ''
+                            })) : [blankItem()]
+                          }))
+                        }
+                      }}
+                    >
+                      <option value="">-- Direct Walk-in / Spot Cash Purchase (No Indent) --</option>
+                      {approvedIndents.map(ind => (
+                        <option key={ind.id} value={ind.id}>
+                          {ind.indentNumber || ind.indent_number} — {ind.deptName || 'Dept'} ({ind.itemCount || ind.items?.length || 0} items)
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {/* Supplier and Invoice Info */}
+                <div style={S.grid2}>
+                  <label style={S.label}>Supplier / Local Vendor Name *
+                    <input
+                      style={S.input}
+                      placeholder="e.g. Local Hardware &amp; Bearing Store"
+                      value={cashForm.vendor_name}
+                      onChange={e => setCashForm({ ...cashForm, vendor_name: e.target.value })}
+                      required
+                    />
+                  </label>
+                  <label style={S.label}>Vendor GSTIN (Optional)
+                    <input
+                      style={S.input}
+                      placeholder="29AAAAA0000A1Z5 (or blank for exempt/unreg)"
+                      value={cashForm.vendor_gstin}
+                      onChange={e => setCashForm({ ...cashForm, vendor_gstin: e.target.value })}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                  <label style={S.label}>Cash Memo / Receipt No
+                    <input
+                      style={S.input}
+                      placeholder="Memo # / Bill #"
+                      value={cashForm.invoice_number}
+                      onChange={e => setCashForm({ ...cashForm, invoice_number: e.target.value })}
+                    />
+                  </label>
+                  <label style={S.label}>Purchase Date *
+                    <input
+                      style={S.input}
+                      type="date"
+                      value={cashForm.invoice_date}
+                      onChange={e => setCashForm({ ...cashForm, invoice_date: e.target.value })}
+                      required
+                    />
+                  </label>
+                  <label style={S.label}>Payment Method *
+                    <select
+                      style={S.select}
+                      value={cashForm.payment_mode}
+                      onChange={e => setCashForm({ ...cashForm, payment_mode: e.target.value })}
+                    >
+                      {['Cash', 'Petty Cash', 'UPI / GPay / PhonePe', 'Company Debit Card', 'Bank Transfer (IMPS)'].map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {/* Line items */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <span style={{ fontWeight: 700, color: '#166534', fontSize: 12, textTransform: 'uppercase' }}>Purchased Materials (Direct Stock Intake)</span>
+                    <button type="button" style={{ ...S.btnPrimary, background: '#16a34a', padding: '4px 12px', fontSize: 11 }} onClick={addCpItem}>
+                      ＋ Add Material
+                    </button>
+                  </div>
+
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: '#f0fdf4', borderBottom: '1px solid #bbf7d0', color: '#166534' }}>
+                        <th style={{ padding: '8px 6px', textAlign: 'left' }}>Material *</th>
+                        <th style={{ padding: '8px 6px', width: 90, textAlign: 'right' }}>Qty *</th>
+                        <th style={{ padding: '8px 6px', width: 70 }}>UOM</th>
+                        <th style={{ padding: '8px 6px', width: 100, textAlign: 'right' }}>Rate (₹) *</th>
+                        <th style={{ padding: '8px 6px', width: 80, textAlign: 'center' }}>GST%</th>
+                        <th style={{ padding: '8px 6px', width: 110, textAlign: 'right' }}>Total (₹)</th>
+                        <th style={{ padding: '8px 6px', width: 36 }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cashForm.items.map((it, idx) => {
+                        const line = calcCpLine(it)
+                        const selMat = mats.find(m => String(m.id) === String(it.material_id))
+                        return (
+                          <tr key={idx} style={{ borderBottom: '1px solid #e7e6df' }}>
+                            <td style={{ padding: '6px 4px' }}>
+                              <select
+                                style={{ ...S.select, width: '100%', fontSize: 12 }}
+                                value={it.material_id}
+                                onChange={e => {
+                                  const mId = e.target.value
+                                  const m = mats.find(x => String(x.id) === String(mId))
+                                  setCpItem(idx, 'material_id', mId)
+                                  if (m) {
+                                    setCpItem(idx, 'uom', m.uom || 'NOS')
+                                    if (parseFloat(m.unit_price) > 0) setCpItem(idx, 'unit_price', String(m.unit_price))
+                                  }
+                                }}
+                                required
+                              >
+                                <option value="">Select material from inventory catalog...</option>
+                                {mats.map(m => (
+                                  <option key={m.id} value={m.id}>
+                                    {m.name} [{m.code}] (Current Stock: {m.current_stock || 0} {m.uom})
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td style={{ padding: '6px 4px' }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 4px' }}
+                                type="number"
+                                step="0.001"
+                                min="0.001"
+                                placeholder="Qty"
+                                value={it.qty}
+                                onChange={e => setCpItem(idx, 'qty', e.target.value)}
+                                required
+                              />
+                            </td>
+                            <td style={{ padding: '6px 4px' }}>
+                              <span style={{ fontSize: 11, color: '#64748b' }}>{it.uom || selMat?.uom || 'NOS'}</span>
+                            </td>
+                            <td style={{ padding: '6px 4px' }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 4px' }}
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="Rate"
+                                value={it.unit_price}
+                                onChange={e => setCpItem(idx, 'unit_price', e.target.value)}
+                                required
+                              />
+                            </td>
+                            <td style={{ padding: '6px 4px' }}>
+                              <select
+                                style={{ ...S.select, width: '100%', fontSize: 11, padding: '4px 2px' }}
+                                value={it.gst_pct}
+                                onChange={e => setCpItem(idx, 'gst_pct', parseFloat(e.target.value))}
+                              >
+                                {[0, 5, 12, 18, 28].map(g => (
+                                  <option key={g} value={g}>{g}%</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td style={{ padding: '6px 4px', textAlign: 'right', fontWeight: 700, color: '#15803d' }}>
+                              {fmt(line.total)}
+                            </td>
+                            <td style={{ padding: '6px 4px', textAlign: 'center' }}>
+                              {cashForm.items.length > 1 && (
+                                <button type="button" style={{ ...S.btnIcon, color: '#dc2626' }} onClick={() => removeCpItem(idx)}>
+                                  ✕
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Valuation Summary Card */}
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>
+                    <div>Taxable: <strong>{fmt(subtotal)}</strong></div>
+                    <div>Total GST: <strong>{fmt(totalTax)}</strong> {!isInter ? `(CGST ${fmt(totalCgst)} + SGST ${fmt(totalSgst)})` : `(IGST ${fmt(totalIgst)})`}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Total Cash Outflow:</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: '#15803d' }}>{fmt(grandTotal)}</div>
+                  </div>
+                </div>
+
+                <label style={S.label}>Remarks / Payment Reference Notes
+                  <input
+                    style={S.input}
+                    placeholder="e.g. Paid from Petty Cash Voucher #PC-442 for PM-2 emergency bearing replacement"
+                    value={cashForm.remarks}
+                    onChange={e => setCashForm({ ...cashForm, remarks: e.target.value })}
+                  />
+                </label>
+
+                <div style={S.modalFooter}>
+                  <button type="button" style={S.btnSecondary} onClick={() => setCashModal(false)}>Cancel</button>
+                  <button type="submit" style={{ ...S.btnPrimary, background: '#16a34a' }} disabled={cashSaving}>
+                    {cashSaving ? 'Processing Cash Purchase…' : '✓ Record Cash Purchase & Update Stock'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

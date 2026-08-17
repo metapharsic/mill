@@ -173,6 +173,7 @@ export default function Indent() {
   const [vendors, setVendors] = useState([])
   const [poModal, setPoModal] = useState(null)
   const [dcModal, setDcModal] = useState(null)
+  const [cashModal, setCashModal] = useState(null)
   const [converting, setConverting] = useState(false)
 
   // Form state for Raise / Edit with Multi-Mode Fulfillment
@@ -183,11 +184,17 @@ export default function Indent() {
     section: '',
     machine_id: '',
     machine_context: '',
-    fulfillment_mode: 'pr', // 'pr' | 'po' | 'dc' | 'issue'
+    fulfillment_mode: 'pr', // 'pr' | 'po' | 'cash' | 'issue' | 'dc'
     // PO fields
     vendor_id: '',
     payment_terms: 'Net 30 Days',
     delivery_date: '',
+    // Cash Purchase fields
+    vendor_name: '',
+    vendor_gstin: '',
+    invoice_number: '',
+    payment_mode: 'Cash',
+    payment_ref: '',
     // DC fields
     dc_type: 'MATERIAL_OUT',
     vehicle_number: '',
@@ -724,6 +731,46 @@ export default function Indent() {
     }
   }
 
+  const openConvertCash = (ind) => {
+    setCashModal({
+      id: ind.id,
+      num: ind.indentNumber || ind.indent_number,
+      total_value: ind.total_value,
+      vendor_name: '',
+      vendor_gstin: '',
+      invoice_number: '',
+      payment_mode: 'Cash',
+      payment_ref: '',
+      remarks: `Spot Cash Purchase against Indent ${ind.indentNumber || ind.indent_number}`
+    })
+  }
+
+  const handleConvertCashSubmit = async (e) => {
+    e.preventDefault()
+    if (!cashModal?.vendor_name) return alert('Please specify the Supplier / Shop Name')
+    setConverting(true)
+    const res = await API(`/indent/${cashModal.id}/convert-to-cash-purchase`, {
+      method: 'POST',
+      body: JSON.stringify({
+        vendor_name: cashModal.vendor_name,
+        vendor_gstin: cashModal.vendor_gstin || null,
+        invoice_number: cashModal.invoice_number,
+        payment_mode: cashModal.payment_mode || 'Cash',
+        payment_ref: cashModal.payment_ref || null,
+        remarks: cashModal.remarks
+      })
+    })
+    setConverting(false)
+    if (res.success) {
+      flash(true, res.message || 'Cash Purchase Voucher generated & stock updated successfully!')
+      setCashModal(null)
+      if (detail?.id === cashModal.id) openDetail(cashModal.id)
+      load()
+    } else {
+      alert(res.message || 'Failed to convert Indent to Cash Purchase')
+    }
+  }
+
   // ── Form Actions ─────────────────────────────────────────────────────────────
   const validateForm = () => {
     const errs = {}
@@ -731,6 +778,9 @@ export default function Indent() {
     if (!form.required_date) errs.required_date = 'Pick required date'
     if (form.fulfillment_mode === 'po' && !form.vendor_id) {
       errs.vendor_id = 'Select a vendor for direct PO creation'
+    }
+    if (form.fulfillment_mode === 'cash' && !form.vendor_name) {
+      errs.vendor_name = 'Supplier / Vendor name is required for Cash Purchase'
     }
     if (form.fulfillment_mode === 'dc' && !form.to_party) {
       errs.to_party = 'Consignee / Destination party is required for DC'
@@ -972,6 +1022,13 @@ export default function Indent() {
                                 </span>
                               </div>
                             )}
+                            {r.linkedCpNumber && (
+                              <div style={{ marginTop: 3 }}>
+                                <span style={{ fontSize: 10, background: '#dcfce7', color: '#15803d', padding: '1px 6px', borderRadius: 4, border: '1px solid #86efac', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                  💵 CP: {r.linkedCpNumber}
+                                </span>
+                              </div>
+                            )}
                             {r.linkedGpNumber && (
                               <div style={{ marginTop: 3 }}>
                                 <span style={{ fontSize: 10, background: '#fef3c7', color: '#b45309', padding: '1px 6px', borderRadius: 4, border: '1px solid #fde68a', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
@@ -1100,13 +1157,24 @@ export default function Indent() {
                               <button style={S.btnSm('#1e293b')} onClick={() => openDetail(r.id)}>View</button>
 
                               {/* 1-Click Convert to PO */}
-                              {!r.linkedPoId && !['Rejected', 'Cancelled'].includes(r.status) && (
+                              {!r.linkedPoId && !['Rejected', 'Cancelled', 'Issued', 'Closed'].includes(r.status) && (
                                 <button
                                   style={{ ...S.btnSm('#0284c7'), padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700 }}
                                   onClick={() => openConvertPo(r)}
                                   title="1-Click Convert Indent to Purchase Order (PO)"
                                 >
                                   🛒 +PO
+                                </button>
+                              )}
+
+                              {/* 1-Click Convert to Cash Purchase */}
+                              {!r.linkedCpId && !r.linkedPoId && !['Rejected', 'Cancelled', 'Issued', 'Closed'].includes(r.status) && (
+                                <button
+                                  style={{ ...S.btnSm('#16a34a'), padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700 }}
+                                  onClick={() => openConvertCash(r)}
+                                  title="1-Click Convert Indent to Direct Cash Purchase (Instant Stock Intake)"
+                                >
+                                  💵 +Cash
                                 </button>
                               )}
 
@@ -1271,7 +1339,7 @@ export default function Indent() {
                 Select whether this indent will follow the standard approval chain, generate an instant Purchase Order, create an outward Delivery Challan, or issue directly from mill stock.
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                 {/* Card 1: Standard PR */}
                 <div
                   onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'pr' }))}
@@ -1286,7 +1354,7 @@ export default function Indent() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#0369a1' }}>📋 Standard PR</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0369a1' }}>📋 Standard PR</span>
                     {form.fulfillment_mode === 'pr' && <span style={{ background: '#0284c7', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
                   </div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Plant Requisition Workflow</div>
@@ -1309,16 +1377,62 @@ export default function Indent() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#0f766e' }}>🛒 Direct PO</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0f766e' }}>🛒 Direct PO</span>
                     {form.fulfillment_mode === 'po' && <span style={{ background: '#0f766e', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>1-Click Procurement Generation</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>1-Click Procurement Gen</div>
                   <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
                     Auto-approves indent and directly generates linked PO with Supplier selection and GST matrix.
                   </div>
                 </div>
 
-                {/* Card 3: Direct DC */}
+                {/* Card 3: Direct Cash Purchase */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'cash' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'cash' ? '2px solid #16a34a' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'cash' ? '#f0fdf4' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'cash' ? '0 2px 8px rgba(22, 163, 74, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#15803d' }}>💵 Cash Purchase</span>
+                    {form.fulfillment_mode === 'cash' && <span style={{ background: '#16a34a', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Spot Procurement &amp; Intake</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Instantly increases store stock, generates official Cash Purchase Voucher and paid Finance bill.
+                  </div>
+                </div>
+
+                {/* Card 4: Immediate Store Issuance */}
+                <div
+                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'issue' }))}
+                  style={{
+                    border: form.fulfillment_mode === 'issue' ? '2px solid #059669' : '1px solid #e2e8f0',
+                    background: form.fulfillment_mode === 'issue' ? '#ecfdf5' : '#ffffff',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: form.fulfillment_mode === 'issue' ? '0 2px 8px rgba(5, 150, 105, 0.15)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#047857' }}>📦 Store Issue (SIV)</span>
+                    {form.fulfillment_mode === 'issue' && <span style={{ background: '#059669', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Immediate In-Stock Issue</div>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                    Directly deducts stock from mill store, writes to stock ledger, and generates official SIV Voucher.
+                  </div>
+                </div>
+
+                {/* Card 5: Direct DC */}
                 <div
                   onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'dc' }))}
                   style={{
@@ -1332,35 +1446,12 @@ export default function Indent() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#b45309' }}>🚛 Delivery Challan (DC)</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#b45309' }}>🚛 Delivery Challan (DC)</span>
                     {form.fulfillment_mode === 'dc' && <span style={{ background: '#d97706', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Outward Gate Pass Dispatch</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Outward Dispatch Gate Pass</div>
                   <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
-                    Generates Outward / Returnable Delivery Challan &amp; Gate Pass for job work, refurbishment or transfer.
-                  </div>
-                </div>
-
-                {/* Card 4: Immediate Store Issuance */}
-                <div
-                  onClick={() => setForm(f => ({ ...f, fulfillment_mode: 'issue' }))}
-                  style={{
-                    border: form.fulfillment_mode === 'issue' ? '2px solid #16a34a' : '1px solid #e2e8f0',
-                    background: form.fulfillment_mode === 'issue' ? '#f0fdf4' : '#ffffff',
-                    borderRadius: 8,
-                    padding: '12px 14px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: form.fulfillment_mode === 'issue' ? '0 2px 8px rgba(22, 163, 74, 0.15)' : 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#15803d' }}>📦 Store Issuance (SIV)</span>
-                    {form.fulfillment_mode === 'issue' && <span style={{ background: '#16a34a', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>SELECTED</span>}
-                  </div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>Immediate In-Stock Issuance</div>
-                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
-                    Directly deducts stock from mill store, writes to stock ledger, and generates official SIV Voucher.
+                    Generates Outward / Returnable Delivery Challan &amp; Gate Pass for job work, repair or transfer.
                   </div>
                 </div>
               </div>
@@ -1410,6 +1501,68 @@ export default function Indent() {
                       onChange={e => setForm(f => ({ ...f, delivery_date: e.target.value }))}
                     />
                   </label>
+                </div>
+              </div>
+            )}
+
+            {/* ── Contextual Configuration: CASH PURCHASE ── */}
+            {form.fulfillment_mode === 'cash' && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: 14, marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>💵</span> Spot Cash Purchase &amp; Local Vendor Details (Direct Stock Intake)
+                </div>
+                <div style={S.grid3}>
+                  <label style={S.lbl}>Supplier / Shop Name *
+                    <input
+                      style={{ ...S.inp, ...(formErrors.vendor_name ? { border: '1px solid #ef4444' } : {}) }}
+                      placeholder="e.g. Local Hardware &amp; Bearing Mart"
+                      value={form.vendor_name}
+                      onChange={e => setForm(f => ({ ...f, vendor_name: e.target.value }))}
+                    />
+                    {formErrors.vendor_name && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.vendor_name}</span>}
+                  </label>
+                  <label style={S.lbl}>Vendor GSTIN (Optional)
+                    <input
+                      style={S.inp}
+                      placeholder="29AAAAA0000A1Z5 (or blank for cash vendor)"
+                      value={form.vendor_gstin}
+                      onChange={e => setForm(f => ({ ...f, vendor_gstin: e.target.value }))}
+                    />
+                  </label>
+                  <label style={S.lbl}>Cash Memo / Receipt No
+                    <input
+                      style={S.inp}
+                      placeholder="e.g. CASH-MEMO-882"
+                      value={form.invoice_number}
+                      onChange={e => setForm(f => ({ ...f, invoice_number: e.target.value }))}
+                    />
+                  </label>
+                </div>
+                <div style={{ ...S.grid3, marginTop: 8 }}>
+                  <label style={S.lbl}>Payment Mode
+                    <select
+                      style={S.sel}
+                      value={form.payment_mode}
+                      onChange={e => setForm(f => ({ ...f, payment_mode: e.target.value }))}
+                    >
+                      <option value="Cash">Cash</option>
+                      <option value="Petty Cash">Petty Cash</option>
+                      <option value="UPI / GPay / PhonePe">UPI / GPay / PhonePe</option>
+                      <option value="Company Debit Card">Company Debit Card</option>
+                      <option value="Bank Transfer (IMPS)">Bank Transfer (IMPS)</option>
+                    </select>
+                  </label>
+                  <label style={S.lbl}>Payment Ref / Voucher No
+                    <input
+                      style={S.inp}
+                      placeholder="e.g. UPI-REF-992384 or PC-VOUCHER-12"
+                      value={form.payment_ref}
+                      onChange={e => setForm(f => ({ ...f, payment_ref: e.target.value }))}
+                    />
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', padding: '14px 10px', background: '#ffffff', borderRadius: 6, border: '1px solid #bbf7d0', fontSize: 11, color: '#166534', fontWeight: 600 }}>
+                    ✓ Materials will be immediately credited to Central Store inventory upon submission.
+                  </div>
                 </div>
               </div>
             )}
@@ -2775,9 +2928,9 @@ export default function Indent() {
                 <button
                   type="submit"
                   style={{ ...S.btnPrimary, background: '#0284c7' }}
-                  disabled={poConverting}
+                  disabled={converting}
                 >
-                  {poConverting ? 'Generating PO...' : '✓ Generate Purchase Order'}
+                  {converting ? 'Generating PO...' : '✓ Generate Purchase Order'}
                 </button>
               </div>
             </form>
@@ -2799,7 +2952,7 @@ export default function Indent() {
             </div>
 
             <div style={{ fontSize: 12, color: '#b45309', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 6, padding: '10px 14px', marginBottom: 16 }}>
-              Dispatching materials from Indent <strong>{dcModal.indentNumber}</strong> via Outward Delivery Challan / Gate Pass. Logistics Multi-Agent will track gate verification.
+              Dispatching materials from Indent <strong>{dcModal.indentNumber || dcModal.num}</strong> via Outward Delivery Challan / Gate Pass. Logistics Multi-Agent will track gate verification.
             </div>
 
             <form onSubmit={handleConvertDcSubmit}>
@@ -2870,43 +3023,111 @@ export default function Indent() {
                 />
               </label>
 
-              <div style={{ marginTop: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 6, textTransform: 'uppercase' }}>
-                  Items in Delivery Challan ({dcModal.items?.length || 0})
-                </div>
-                <div style={{ maxHeight: 150, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 6 }}>
-                  <table style={S.tbl}>
-                    <thead>
-                      <tr>
-                        <th style={S.th}>Item &amp; Code</th>
-                        <th style={S.th}>Position</th>
-                        <th style={S.th}>Dispatch Qty</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(dcModal.items || []).map((it, idx) => (
-                        <tr key={it.id || idx}>
-                          <td style={S.td}>
-                            <strong>{it.materialName}</strong>
-                            <div style={{ fontSize: 10, color: '#64748b' }}>[{it.materialCode}]</div>
-                          </td>
-                          <td style={S.td}>{it.component_position || '—'}</td>
-                          <td style={S.td}><strong>{it.required_qty} {it.uom}</strong></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
                 <button type="button" style={S.btnSecondary} onClick={() => setDcModal(null)}>Cancel</button>
                 <button
                   type="submit"
                   style={{ ...S.btnPrimary, background: '#d97706' }}
-                  disabled={dcConverting}
+                  disabled={converting}
                 >
-                  {dcConverting ? 'Generating DC...' : '✓ Generate Delivery Challan'}
+                  {converting ? 'Generating DC...' : '✓ Generate Delivery Challan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── 1-CLICK CONVERT TO CASH PURCHASE MODAL ─────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {cashModal && (
+        <div style={S.ovl} onClick={() => setCashModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#16a34a', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>💵</span> 1-Click Convert to Direct Cash Purchase (Spot Procurement)
+              </div>
+              <button style={S.close} onClick={() => setCashModal(null)}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 12, color: '#166534', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 6, padding: '10px 14px', marginBottom: 16 }}>
+              Fulfilling Indent <strong>{cashModal.num}</strong> via Direct Spot Cash Procurement. Stock will be atomically added to Store Inventory and an official Cash Purchase Voucher recorded.
+            </div>
+
+            <form onSubmit={handleConvertCashSubmit}>
+              <div style={S.grid2}>
+                <label style={S.lbl}>Supplier / Local Vendor Name *
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. Local Hardware &amp; Bearing Mart"
+                    value={cashModal.vendor_name}
+                    onChange={e => setCashModal(m => ({ ...m, vendor_name: e.target.value }))}
+                    required
+                  />
+                </label>
+
+                <label style={S.lbl}>Vendor GSTIN (Optional)
+                  <input
+                    style={S.inp}
+                    placeholder="29AAAAA0000A1Z5 (or blank for cash vendor)"
+                    value={cashModal.vendor_gstin}
+                    onChange={e => setCashModal(m => ({ ...m, vendor_gstin: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <div style={{ ...S.grid3, marginTop: 12 }}>
+                <label style={S.lbl}>Cash Memo / Receipt No
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. CASH-MEMO-882"
+                    value={cashModal.invoice_number}
+                    onChange={e => setCashModal(m => ({ ...m, invoice_number: e.target.value }))}
+                  />
+                </label>
+
+                <label style={S.lbl}>Payment Mode
+                  <select
+                    style={S.sel}
+                    value={cashModal.payment_mode}
+                    onChange={e => setCashModal(m => ({ ...m, payment_mode: e.target.value }))}
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="Petty Cash">Petty Cash</option>
+                    <option value="UPI / GPay / PhonePe">UPI / GPay / PhonePe</option>
+                    <option value="Company Debit Card">Company Debit Card</option>
+                    <option value="Bank Transfer (IMPS)">Bank Transfer (IMPS)</option>
+                  </select>
+                </label>
+
+                <label style={S.lbl}>Payment Ref / Voucher No
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. UPI-REF-992384"
+                    value={cashModal.payment_ref}
+                    onChange={e => setCashModal(m => ({ ...m, payment_ref: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <label style={{ ...S.lbl, marginTop: 12 }}>Remarks / Voucher Justification
+                <input
+                  style={S.inp}
+                  placeholder="Notes for finance and store auditing..."
+                  value={cashModal.remarks}
+                  onChange={e => setCashModal(m => ({ ...m, remarks: e.target.value }))}
+                />
+              </label>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+                <button type="button" style={S.btnSecondary} onClick={() => setCashModal(null)}>Cancel</button>
+                <button
+                  type="submit"
+                  style={{ ...S.btnPrimary, background: '#16a34a' }}
+                  disabled={converting}
+                >
+                  {converting ? 'Processing Cash Purchase...' : '✓ Generate Cash Purchase Voucher & Intake Stock'}
                 </button>
               </div>
             </form>
