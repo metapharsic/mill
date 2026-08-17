@@ -267,6 +267,44 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
   }
 }));
 
+// ── EXCEL TEMPLATE GENERATOR FOR STORE MANAGERS ─────────────────────────────
+// MUST stay ABOVE `/materials/:id` — Express matches in registration order, so a literal
+// path registered after a `:id` param route is unreachable (the id handler would receive
+// id='excel-template' and blow up casting it to integer).
+router.get('/materials/excel-template', auth, ar(async (req, res) => {
+  const { rows: cats } = await pool.query(`
+    SELECT mc.id, mc.name, mc.code, mc.type, p.name AS parent_name
+    FROM material_categories mc
+    LEFT JOIN material_categories p ON p.id = mc.parent_id
+    ORDER BY p.name NULLS FIRST, mc.name ASC
+  `);
+
+  const wb = xlsx.utils.book_new();
+
+  // Sheet 1: Template
+  const templateData = [
+    ['S.No', 'Material Code', 'Material Name / Full Specification', 'Category / Subcategory', 'Criticality Class (A/B/C)', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price (INR)', 'Status (Active/Inactive)'],
+    [1, 'MV0002', '0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE', 'Mechanical › Valve', 'A', '4802', 'Rack 2, Box 4', 12.001, 5.000, 0.000, 17.001, 100.00, 'Active'],
+    [2, 'MSSS004', '1 1/2" S.S SOCKET', 'Mechanical › SS/MS Pipe Fitting', 'C', '7307 2900', 'Rack 1, Box 10', 9.000, 0.000, 0.000, 9.000, 150.00, 'Active'],
+    [3, 'QC-001', 'LAB DIGITAL VISCOMETER SPINDLE #4', 'Quality Control', 'B', '9027 8090', 'Lab Cabinet 1', 2.000, 1.000, 0.000, 3.000, 4500.00, 'Active']
+  ];
+  const wsTemplate = xlsx.utils.aoa_to_sheet(templateData);
+  xlsx.utils.book_append_sheet(wb, wsTemplate, 'Store_Material_Template');
+
+  // Sheet 2: Categories Reference
+  const catRefData = [
+    ['Category ID', 'Category Name', 'Category Code', 'Parent Category', 'Type'],
+    ...cats.map(c => [c.id, c.name, c.code || '—', c.parent_name || 'Top-Level', c.type || 'Spare Part'])
+  ];
+  const wsCatRef = xlsx.utils.aoa_to_sheet(catRefData);
+  xlsx.utils.book_append_sheet(wb, wsCatRef, 'Categories_Reference');
+
+  const buf = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="MK_Paper_Mill_Store_Template.xlsx"');
+  res.send(buf);
+}));
+
 // GET /api/master/materials/:id — Get comprehensive material product details and stock summary
 router.get('/materials/:id', auth, ar(async (req, res) => {
   const { rows: [mat] } = await pool.query(`
@@ -460,8 +498,10 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
   res.json({ success: true, data: updated });
 }));
 
-// Soft-delete: marks material as inactive instead of hard-deleting (stock history preserved)
-router.delete('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
+// Soft-delete: marks material as inactive instead of hard-deleting (stock history preserved).
+// Level 3 matches every other master-data soft delete in this file (vendors, customers, sections)
+// and matches PUT /materials/:id/restore, which is also requireLevel(3).
+router.delete('/materials/:id', auth, requireLevel(3), ar(async (req, res) => {
   const { rows } = await pool.query('UPDATE materials SET is_active=false, deleted_by=$2 WHERE id=$1 RETURNING id', [req.params.id, req.user?.id || null]);
   if (!rows.length) return res.status(404).json({ success: false, message: 'Material not found' });
   res.json({ success: true });
@@ -523,41 +563,6 @@ router.post('/materials/sync-all-stores', auth, requireLevel(1), ar(async (req, 
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });
   }
-}));
-
-// ── EXCEL TEMPLATE GENERATOR FOR STORE MANAGERS ─────────────────────────────
-router.get('/materials/excel-template', auth, ar(async (req, res) => {
-  const { rows: cats } = await pool.query(`
-    SELECT mc.id, mc.name, mc.code, mc.type, p.name AS parent_name
-    FROM material_categories mc
-    LEFT JOIN material_categories p ON p.id = mc.parent_id
-    ORDER BY p.name NULLS FIRST, mc.name ASC
-  `);
-
-  const wb = xlsx.utils.book_new();
-
-  // Sheet 1: Template
-  const templateData = [
-    ['S.No', 'Material Code', 'Material Name / Full Specification', 'Category / Subcategory', 'Criticality Class (A/B/C)', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price (INR)', 'Status (Active/Inactive)'],
-    [1, 'MV0002', '0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE', 'Mechanical › Valve', 'A', '4802', 'Rack 2, Box 4', 12.001, 5.000, 0.000, 17.001, 100.00, 'Active'],
-    [2, 'MSSS004', '1 1/2" S.S SOCKET', 'Mechanical › SS/MS Pipe Fitting', 'C', '7307 2900', 'Rack 1, Box 10', 9.000, 0.000, 0.000, 9.000, 150.00, 'Active'],
-    [3, 'QC-001', 'LAB DIGITAL VISCOMETER SPINDLE #4', 'Quality Control', 'B', '9027 8090', 'Lab Cabinet 1', 2.000, 1.000, 0.000, 3.000, 4500.00, 'Active']
-  ];
-  const wsTemplate = xlsx.utils.aoa_to_sheet(templateData);
-  xlsx.utils.book_append_sheet(wb, wsTemplate, 'Store_Material_Template');
-
-  // Sheet 2: Categories Reference
-  const catRefData = [
-    ['Category ID', 'Category Name', 'Category Code', 'Parent Category', 'Type'],
-    ...cats.map(c => [c.id, c.name, c.code || '—', c.parent_name || 'Top-Level', c.type || 'Spare Part'])
-  ];
-  const wsCatRef = xlsx.utils.aoa_to_sheet(catRefData);
-  xlsx.utils.book_append_sheet(wb, wsCatRef, 'Categories_Reference');
-
-  const buf = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
-  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename="MK_Paper_Mill_Store_Template.xlsx"');
-  res.send(buf);
 }));
 
 // ── UNIVERSAL STORE EXCEL UPLOAD & PREVIEW/SYNC ENGINE ───────────────────────
@@ -938,10 +943,9 @@ router.delete('/grades/:id', auth, requireLevel(4), ar(async (req, res) => {
   res.json({ success: true });
 }));
 
-router.delete('/materials/:id', auth, requireLevel(3), ar(async (req, res) => {
-  await pool.query('UPDATE materials SET is_active=false, deleted_by=$1 WHERE id=$2', [req.user.id, req.params.id]);
-  res.json({ success: true });
-}));
+// NOTE: DELETE /materials/:id lives with the other material routes above (requireLevel(3),
+// returns 404 when no row matches). A duplicate definition used to sit here — it was dead code,
+// because Express matches in registration order, and it silently documented a different tier.
 
 router.delete('/vendors/:id', auth, requireLevel(3), ar(async (req, res) => {
   await pool.query('UPDATE vendors SET is_active=false, deleted_by=$1 WHERE id=$2', [req.user.id, req.params.id]);

@@ -693,26 +693,52 @@ router.put('/issues/:id/reject', requireAuth, requireLevel(2), ar(async (req, re
 
 // ── INSTALLED ASSETS TERM & ROOT CAUSE QUERIES ─────────────────────────────────
 
-// GET /assets - list installed assets
+// GET /assets - list installed assets & Paper Machine Clothing
 router.get('/assets', requireAuth, ar(async (req, res) => {
-  const { machine_id, status } = req.query;
+  const { machine_id, status, is_clothing } = req.query;
   const conds = []; const params = []; let p = 1;
   if (machine_id) { conds.push(`a.machine_id = $${p++}`); params.push(machine_id); }
   if (status) { conds.push(`a.status = $${p++}`); params.push(status); }
+  if (is_clothing === 'true') {
+    conds.push(`(m.is_serialized = true OR mc.name ILIKE '%cloth%' OR m.name ILIKE '%felt%' OR m.name ILIKE '%wire%' OR m.name ILIKE '%screen%')`);
+  }
   const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
 
   const { rows } = await pool.query(
     `SELECT a.id, a.asset_number as "assetNumber", a.serial_number as "serialNumber",
             a.batch_number as "batchNumber", a.purchase_price as "purchasePrice",
-            a.installed_at as "installedAt", a.status, a.expected_lifespan_days as "expectedLifespanDays",
-            m.name as "materialName", m.code as "materialCode",
-            mach.name as "machineName", pos.name as "positionName",
-            EXTRACT(DAY FROM (NOW() - a.installed_at))::int as "daysInService"
+            a.installed_at as "installedAt", a.retired_at as "retiredAt", a.status,
+            a.expected_lifespan_days as "expectedLifespanDays", a.failure_reason as "failureReason",
+            m.id as "materialId", m.name as "materialName", m.code as "materialCode", m.uom,
+            mc.name as "categoryName",
+            mach.id as "machineId", mach.name as "machineName",
+            pos.id as "positionId", pos.name as "positionName", pos.code as "positionCode",
+            v.name as "vendorName",
+            COALESCE(EXTRACT(DAY FROM (COALESCE(a.retired_at, NOW()) - a.installed_at))::int, 0) as "daysInService",
+            CASE
+              WHEN a.status = 'retired' THEN 'Retired'
+              WHEN a.status = 'In Stock' THEN 'In Stock (Warehouse)'
+              WHEN a.installed_at IS NULL THEN 'Unassigned'
+              WHEN EXTRACT(DAY FROM (NOW() - a.installed_at)) >= a.expected_lifespan_days THEN 'Overdue Replacement'
+              WHEN EXTRACT(DAY FROM (NOW() - a.installed_at)) >= (a.expected_lifespan_days * 0.8) THEN 'Critical (Near End of Life)'
+              ELSE 'Optimal Running Life'
+            END as "lifespanHealthStatus",
+            CASE
+              WHEN a.status = 'In Stock' THEN 100
+              WHEN a.installed_at IS NULL THEN 100
+              ELSE GREATEST(0, LEAST(100, ROUND(((a.expected_lifespan_days - EXTRACT(DAY FROM (COALESCE(a.retired_at, NOW()) - a.installed_at))) / NULLIF(a.expected_lifespan_days, 0)) * 100)))::int
+            END as "healthPct",
+            ROUND((a.purchase_price / NULLIF(COALESCE(EXTRACT(DAY FROM (COALESCE(a.retired_at, NOW()) - a.installed_at)), a.expected_lifespan_days, 1), 0))::numeric, 2) as "costPerDay"
      FROM installed_assets a
      JOIN materials m ON a.material_id = m.id
+     LEFT JOIN material_categories mc ON m.category_id = mc.id
      LEFT JOIN machines mach ON a.machine_id = mach.id
      LEFT JOIN machine_positions pos ON a.position_id = pos.id
-     ${where} ORDER BY a.installed_at DESC`,
+     LEFT JOIN vendors v ON a.vendor_id = v.id
+     ${where} 
+     ORDER BY 
+       CASE WHEN a.status = 'active' THEN 1 WHEN a.status = 'In Stock' THEN 2 ELSE 3 END,
+       COALESCE(a.installed_at, a.created_at) DESC`,
     params
   );
   res.json({ success: true, data: rows });
@@ -1268,7 +1294,8 @@ async function syncPoReceived(client, poRef, materialId, qtyDelta) {
 // POST /api/store/inward — Fast Inward (GRN / Vendor / Return) with Single & Batch Support + PO Sync
 router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
   const { material_id, in_qty, unit_price, inward_type = 'grn', reference_type, reference_id,
-          department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks, items } = req.body;
+          department_id, vendor_name, vendor_id, bin_location, batch_number, quality_status = 'Accepted', remarks, items,
+          gate_pass_id, challan_number, invoice_number, vehicle_number } = req.body;
 
   // Prepare normalized item list (support both single-item and multi-item batch payloads)
   let itemList = [];
@@ -1313,7 +1340,30 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
 
     const refIdNum = resolvedPoId || (/^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null);
     const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : null;
+    const gatePassIdNum = /^\d+$/.test(String(gate_pass_id)) ? parseInt(gate_pass_id) : null;
     const results = [];
+
+    // If inward is a GRN or from PO, create a formal GRN record
+    let createdGrnId = null;
+    let grnNum = null;
+    if (inward_type === 'grn' || reference_type === 'PO' || gatePassIdNum) {
+      const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`grn-${stamp}`]);
+      const { rows: seqRows } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM grn WHERE grn_number LIKE $1`, [`GRN-${stamp}-%`]);
+      grnNum = `GRN-${stamp}-${seqRows[0].seq}`;
+
+      const { rows: [grnHead] } = await client.query(
+        `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
+         VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, 'Received', $9) RETURNING id`,
+        [grnNum, vendorIdNum, resolvedPoId || null, gatePassIdNum || null, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
+      );
+      createdGrnId = grnHead.id;
+
+      // Close the Inward Gate Pass if linked
+      if (gatePassIdNum) {
+        await client.query(`UPDATE gate_passes SET status = 'Closed' WHERE id = $1`, [gatePassIdNum]);
+      }
+    }
 
     for (const it of itemList) {
       const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [it.material_id]);
@@ -1339,7 +1389,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
       `, [newStock, finalBin, price, mat.id]);
 
       const remarkFull = [
-        inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : '[Vendor GRN]',
+        inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : (grnNum ? `[Vendor GRN ${grnNum}]` : '[Vendor GRN]'),
         reference_id ? `Ref: ${reference_id}` : null,
         vendor_name ? `Party: ${vendor_name}` : null,
         itemQC ? `QC: ${itemQC}` : null,
@@ -1357,10 +1407,67 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
           $9, $10, $11, $12, $13
         ) RETURNING *
       `, [
-        mat.id, inward_type === 'return' ? 'return' : 'grn', reference_type || 'GRN', refIdNum,
+        mat.id, inward_type === 'return' ? 'return' : 'grn', createdGrnId ? 'GRN' : (reference_type || 'GRN'), createdGrnId || refIdNum,
         qty, newStock, price, totalVal,
         itemBatch, finalBin || null, remarkFull, req.user.id, vendorIdNum
       ]);
+
+      // If GRN was created, add grn_items
+      if (createdGrnId) {
+        await client.query(
+          `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, bin_location, batch_number, remarks)
+           VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, $10)`,
+          [createdGrnId, mat.id, qty, qty, qty, mat.uom || 'Nos', price, finalBin || null, itemBatch || null, itemRemarks || null]
+        );
+      }
+
+      // Digital Twin & Serialized Assets: Auto-register unique serial numbers for Machine Clothing / Serialized Items
+      const isClothing = mat.is_serialized || (mat.category_id && (await client.query(`SELECT name FROM material_categories WHERE id=$1`, [mat.category_id])).rows[0]?.name?.toLowerCase().includes('clothing'));
+      if (isClothing && qty > 0) {
+        let rawSerials = it.serial_number || it.serial_numbers || itemBatch || '';
+        let snList = [];
+        if (Array.isArray(rawSerials)) {
+          snList = rawSerials.map(s => String(s).trim()).filter(Boolean);
+        } else if (typeof rawSerials === 'string' && rawSerials.trim()) {
+          snList = rawSerials.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+        }
+
+        const countToCreate = Math.floor(qty);
+        while (snList.length < countToCreate) {
+          const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+          const rand = Math.floor(1000 + Math.random() * 9000);
+          snList.push(`${mat.code || 'PMC'}-${stamp}-${rand}`);
+        }
+
+        for (let i = 0; i < countToCreate; i++) {
+          const sn = snList[i];
+          const { rows: dupRows } = await client.query(
+            `SELECT id, asset_number, status FROM installed_assets 
+             WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
+            [sn]
+          );
+          if (dupRows.length > 0) {
+            throw new Error(`Serial number "${sn}" already exists in Mill Asset Registry (Asset #${dupRows[0].asset_number}, Status: ${dupRows[0].status}). All Paper Machine Clothing & Serialized rolls must have unique serial numbers.`);
+          }
+
+          const today = new Date();
+          const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+          await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`ast-${dateStr}`]);
+          const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets WHERE asset_number LIKE $1`, [`AST-${dateStr}-%`]);
+          const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+
+          await client.query(
+            `INSERT INTO installed_assets (
+               asset_number, material_id, serial_number, batch_number, grn_id, vendor_id,
+               purchase_price, status, expected_lifespan_days, created_at
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'In Stock', $8, NOW())`,
+            [
+              assetNumber, mat.id, sn, itemBatch || null, createdGrnId || null, vendorIdNum || null,
+              price, mat.expected_lifespan_days || 90
+            ]
+          );
+        }
+      }
 
       // Sync PO received quantity if applicable
       if (reference_type === 'PO' && reference_id) {
@@ -1531,22 +1638,65 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     ]);
 
     if (mat.is_serialized || machine_id || serial_number) {
-      const today = new Date();
-      const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
-      const { rows: assetSeq } = await client.query(
-        `SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets`
-      );
-      const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
-      await client.query(`
-        INSERT INTO installed_assets (
-          asset_number, material_id, serial_number, batch_number, machine_id, position_id,
-          requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
-      `, [
-        assetNumber, material_id, serial_number || batch_number || `SN-${Date.now()}`,
-        batch_number || null, machine_id || null, position_id || null, req.user.id,
-        req.user.id, req.user.id, price, mat.expected_lifespan_days || 365
-      ]);
+      const selectedSn = serial_number || batch_number || null;
+      
+      // 1. If position_id provided, retire any existing active clothing/asset at that position
+      if (position_id) {
+        await client.query(
+          `UPDATE installed_assets 
+           SET status = 'retired', retired_at = NOW(), failure_reason = 'Replaced by clothing/asset ' || COALESCE($1, 'new issue')
+           WHERE position_id = $2 AND status = 'active'`,
+          [selectedSn, position_id]
+        );
+      }
+
+      // 2. Check if this serialized asset is already registered in 'In Stock' status
+      let existingInStock = null;
+      if (selectedSn) {
+        const { rows: inStockRows } = await client.query(
+          `SELECT id, asset_number FROM installed_assets 
+           WHERE material_id = $1 AND LOWER(TRIM(serial_number)) = LOWER(TRIM($2)) AND status = 'In Stock' 
+           ORDER BY id ASC LIMIT 1`,
+          [material_id, selectedSn]
+        );
+        if (inStockRows.length) existingInStock = inStockRows[0];
+      }
+
+      if (existingInStock) {
+        await client.query(
+          `UPDATE installed_assets
+           SET status = 'active', machine_id = $1, position_id = $2, issued_by = $3, installed_at = NOW(), purchase_price = $4
+           WHERE id = $5`,
+          [machine_id || null, position_id || null, req.user.id, price, existingInStock.id]
+        );
+      } else {
+        const today = new Date();
+        const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
+        const finalSn = selectedSn || `SN-${Date.now()}`;
+        
+        // Ensure uniqueness
+        const { rows: dupCheck } = await client.query(
+          `SELECT id, asset_number FROM installed_assets 
+           WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
+          [finalSn]
+        );
+        if (dupCheck.length > 0) {
+          throw new Error(`Serial number "${finalSn}" is already active in mill registry (Asset #${dupCheck[0].asset_number}). Cannot issue duplicate.`);
+        }
+
+        const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets WHERE asset_number LIKE $1`, [`AST-${dateStr}-%`]);
+        const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+        await client.query(`
+          INSERT INTO installed_assets (
+            asset_number, material_id, serial_number, batch_number, machine_id, position_id,
+            requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
+        `, [
+          assetNumber, material_id, finalSn,
+          batch_number || null, machine_id || null, position_id || null, req.user.id,
+          req.user.id, req.user.id, price, mat.expected_lifespan_days || 90
+        ]);
+      }
     }
 
     await auditLog(client, {
@@ -2309,6 +2459,402 @@ router.get('/reports/movement-analysis', requireAuth, ar(async (req, res) => {
   };
 
   res.json({ success: true, data: { items: rows.rows, summary } });
+}));
+
+// ============================================================================
+// REJECTIONS & RETURN TO VENDOR (RTV) ENDPOINTS
+// ============================================================================
+
+// GET /api/store/rejections — List all material rejections with vendor, PO, and RTV status
+router.get('/rejections', requireAuth, ar(async (req, res) => {
+  const { status, vendorId, materialId } = req.query;
+  const where = ['1=1'];
+  const params = [];
+
+  if (status) {
+    params.push(status);
+    where.push(`mr.status = $${params.length}`);
+  }
+  if (vendorId) {
+    params.push(vendorId);
+    where.push(`mr.vendor_id = $${params.length}`);
+  }
+  if (materialId) {
+    params.push(materialId);
+    where.push(`mr.material_id = $${params.length}`);
+  }
+
+  const { rows } = await pool.query(`
+    SELECT mr.*,
+           m.code AS "materialCode", m.name AS "materialName",
+           v.name AS "vendorName", v.code AS "vendorCode",
+           po.po_number AS "poNumber",
+           g.grn_number AS "grnNumber",
+           qt.test_number AS "testNumber",
+           gp.gp_number AS "outwardGatePassNumber",
+           u.name AS "createdByName"
+    FROM material_rejections mr
+    LEFT JOIN materials m ON mr.material_id = m.id
+    LEFT JOIN vendors v ON mr.vendor_id = v.id
+    LEFT JOIN purchase_orders po ON mr.po_id = po.id
+    LEFT JOIN grn g ON mr.grn_id = g.id
+    LEFT JOIN quality_tests qt ON mr.qc_test_id = qt.id
+    LEFT JOIN gate_passes gp ON mr.outward_gate_pass_id = gp.id
+    LEFT JOIN users u ON mr.created_by = u.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY mr.created_at DESC
+  `, params);
+
+  const { rows: [summary] } = await pool.query(`
+    SELECT
+      COUNT(*) AS total,
+      COUNT(*) FILTER (WHERE status = 'Pending RTV') AS pending,
+      COUNT(*) FILTER (WHERE status = 'Debit Note Raised') AS debit_raised,
+      COUNT(*) FILTER (WHERE status = 'Dispatched Out') AS dispatched,
+      COALESCE(SUM(debit_amount) FILTER (WHERE status IN ('Pending RTV', 'Debit Note Raised')), 0) AS pending_debit_amount
+    FROM material_rejections
+  `);
+
+  res.json({ success: true, data: rows, summary });
+}));
+
+// POST /api/store/rejections/:id/dispatch-rtv — Dispatch rejected goods and generate Outward Gate Pass
+router.post('/rejections/:id/dispatch-rtv', requireAuth, requireStore, ar(async (req, res) => {
+  const { vehicleNumber, driverName, remarks } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [rej] } = await client.query(`
+      SELECT mr.*, v.name AS vendor_name, m.name AS material_name
+      FROM material_rejections mr
+      LEFT JOIN vendors v ON mr.vendor_id = v.id
+      LEFT JOIN materials m ON mr.material_id = m.id
+      WHERE mr.id = $1 FOR UPDATE
+    `, [req.params.id]);
+
+    if (!rej) throw new Error('Rejection record not found');
+    if (rej.status === 'Dispatched Out' || rej.status === 'Closed') {
+      throw new Error(`Rejection is already in '${rej.status}' status`);
+    }
+
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-${stamp}`]);
+    const seq = await client.query('SELECT COUNT(*)+1 AS n FROM gate_passes WHERE date::date = CURRENT_DATE');
+    const num = `GP-${stamp}-${String(seq.rows[0].n).padStart(4,'0')}`;
+
+    const desc = `RTV Dispatch: ${rej.rejected_qty} ${rej.uom} of ${rej.material_name} (Ref: ${rej.rejection_number})`;
+    const { rows: [gp] } = await client.query(`
+      INSERT INTO gate_passes (gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
+        material_description, from_party, to_party, out_time, security_guard_id, remarks,
+        po_id, vendor_id, status)
+      VALUES ($1, 'OUT', 'Truck', $2, $3, 'Return to Vendor (RTV)',
+        $4, 'MK Paper Mill', $5, NOW(), $6, $7,
+        $8, $9, 'Closed') RETURNING id, gp_number
+    `, [num, vehicleNumber || 'Vendor Vehicle', driverName || 'Vendor Driver',
+        desc, rej.vendor_name || 'Vendor', req.user.id, remarks || `RTV ${rej.rejection_number}`,
+        rej.po_id, rej.vendor_id]);
+
+    await client.query(`
+      UPDATE material_rejections
+      SET status = 'Dispatched Out', outward_gate_pass_id = $1
+      WHERE id = $2
+    `, [gp.id, req.params.id]);
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `rtv-${rej.id}`, { event: 'store.rtv.dispatched', id: rej.id, gatePassId: gp.id, gpNumber: gp.gp_number, userId: req.user.id });
+    res.json({ success: true, data: { gatePassId: gp.id, gpNumber: gp.gp_number } });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// ============================================================================
+// INTER-STORE TRANSFERS (STO) ENDPOINTS
+// ============================================================================
+
+// GET /api/store/transfers — List all stock transfer orders
+router.get('/transfers', requireAuth, ar(async (req, res) => {
+  const { status, fromWarehouseId, toWarehouseId } = req.query;
+  const where = ['1=1'];
+  const params = [];
+
+  if (status) { params.push(status); where.push(`st.status = $${params.length}`); }
+  if (fromWarehouseId) { params.push(fromWarehouseId); where.push(`st.from_warehouse_id = $${params.length}`); }
+  if (toWarehouseId) { params.push(toWarehouseId); where.push(`st.to_warehouse_id = $${params.length}`); }
+
+  const { rows } = await pool.query(`
+    SELECT st.*,
+           fw.name AS "fromWarehouseName",
+           tw.name AS "toWarehouseName",
+           ur.name AS "requestedByName",
+           ua.name AS "approvedByName",
+           ud.name AS "dispatchedByName",
+           uc.name AS "receivedByName"
+    FROM store_transfers st
+    LEFT JOIN warehouses fw ON st.from_warehouse_id = fw.id
+    LEFT JOIN warehouses tw ON st.to_warehouse_id = tw.id
+    LEFT JOIN users ur ON st.requested_by = ur.id
+    LEFT JOIN users ua ON st.approved_by = ua.id
+    LEFT JOIN users ud ON st.dispatched_by = ud.id
+    LEFT JOIN users uc ON st.received_by = uc.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY st.created_at DESC
+  `, params);
+
+  // Fetch items for transfers
+  for (const t of rows) {
+    const itemsRes = await pool.query(`
+      SELECT sti.*, m.code AS "materialCode", m.name AS "materialName", m.unit_price AS "unitPrice"
+      FROM store_transfer_items sti
+      LEFT JOIN materials m ON sti.material_id = m.id
+      WHERE sti.transfer_id = $1
+    `, [t.id]);
+    t.items = itemsRes.rows;
+  }
+
+  res.json({ success: true, data: rows });
+}));
+
+// POST /api/store/transfers — Create Inter-Store Transfer Order (STO)
+router.post('/transfers', requireAuth, requireStore, ar(async (req, res) => {
+  const { fromWarehouseId, toWarehouseId, transferDate, remarks, items = [] } = req.body;
+  if (!fromWarehouseId || !toWarehouseId || !items.length) {
+    return res.status(400).json({ success: false, message: 'fromWarehouseId, toWarehouseId, and items required' });
+  }
+  if (fromWarehouseId === toWarehouseId) {
+    return res.status(400).json({ success: false, message: 'Source and Destination warehouses must be different' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`sto-${stamp}`]);
+    const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM store_transfers WHERE created_at::date = CURRENT_DATE`);
+    const stoNum = `STO-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+
+    const { rows: [transfer] } = await client.query(`
+      INSERT INTO store_transfers
+        (transfer_number, from_warehouse_id, to_warehouse_id, transfer_date, status, requested_by, remarks)
+      VALUES ($1, $2, $3, $4, 'Approved', $5, $6)
+      RETURNING *
+    `, [stoNum, fromWarehouseId, toWarehouseId, transferDate || new Date(), req.user.id, remarks || null]);
+
+    for (const item of items) {
+      if (!item.materialId || !item.qty) continue;
+      const { rows: [mat] } = await client.query(`SELECT uom, current_stock FROM materials WHERE id = $1`, [item.materialId]);
+      await client.query(`
+        INSERT INTO store_transfer_items (transfer_id, material_id, qty, uom, batch_number, remarks)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [transfer.id, item.materialId, item.qty, item.uom || mat?.uom || 'Nos', item.batchNumber || null, item.remarks || null]);
+    }
+
+    await client.query('COMMIT');
+    res.json({ success: true, data: transfer });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/transfers/:id/dispatch — Dispatch stock (In Transit)
+router.put('/transfers/:id/dispatch', requireAuth, requireStore, ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [transfer] } = await client.query(`SELECT * FROM store_transfers WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!transfer) throw new Error('Transfer not found');
+    if (transfer.status !== 'Approved' && transfer.status !== 'Requested') {
+      throw new Error(`Cannot dispatch transfer in '${transfer.status}' status`);
+    }
+
+    const { rows: items } = await client.query(`SELECT * FROM store_transfer_items WHERE transfer_id = $1`, [transfer.id]);
+    for (const item of items) {
+      const { rows: [mat] } = await client.query(`SELECT id, current_stock, unit_price FROM materials WHERE id = $1 FOR UPDATE`, [item.material_id]);
+      if (parseFloat(mat.current_stock) < parseFloat(item.qty)) {
+        throw new Error(`Insufficient stock for item ID ${item.material_id}. Available: ${mat.current_stock}`);
+      }
+
+      await client.query(`
+        INSERT INTO stock_ledger (material_id, transaction_type, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
+        VALUES ($1, 'transfer', $2, $3, $4, $5, CURRENT_DATE, 'store_transfer', $6, $7, $8)
+      `, [item.material_id, item.qty, parseFloat(mat.current_stock) - parseFloat(item.qty), mat.unit_price,
+          parseFloat(item.qty) * parseFloat(mat.unit_price), transfer.id,
+          `STO Dispatch: #${transfer.transfer_number}`, req.user.id]);
+    }
+
+    await client.query(`
+      UPDATE store_transfers SET status = 'In Transit', dispatched_by = $1 WHERE id = $2
+    `, [req.user.id, transfer.id]);
+
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/transfers/:id/receive — Receive stock at destination warehouse
+router.put('/transfers/:id/receive', requireAuth, requireStore, ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [transfer] } = await client.query(`SELECT * FROM store_transfers WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!transfer) throw new Error('Transfer not found');
+    if (transfer.status !== 'In Transit') {
+      throw new Error(`Cannot receive transfer in '${transfer.status}' status — must be 'In Transit'`);
+    }
+
+    const { rows: items } = await client.query(`SELECT * FROM store_transfer_items WHERE transfer_id = $1`, [transfer.id]);
+    for (const item of items) {
+      const { rows: [mat] } = await client.query(`SELECT id, current_stock, unit_price FROM materials WHERE id = $1 FOR UPDATE`, [item.material_id]);
+      await client.query(`
+        INSERT INTO stock_ledger (material_id, transaction_type, in_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
+        VALUES ($1, 'transfer', $2, $3, $4, $5, CURRENT_DATE, 'store_transfer', $6, $7, $8)
+      `, [item.material_id, item.qty, parseFloat(mat.current_stock), mat.unit_price,
+          parseFloat(item.qty) * parseFloat(mat.unit_price), transfer.id,
+          `STO Received: #${transfer.transfer_number}`, req.user.id]);
+    }
+
+    await client.query(`
+      UPDATE store_transfers SET status = 'Completed', received_by = $1 WHERE id = $2
+    `, [req.user.id, transfer.id]);
+
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// ============================================================================
+// STORE RETURN VOUCHERS (SRV) ENDPOINTS
+// ============================================================================
+
+// GET /api/store/returns — List all store returns
+router.get('/returns', requireAuth, ar(async (req, res) => {
+  const { status, departmentId } = req.query;
+  const where = ['1=1'];
+  const params = [];
+
+  if (status) { params.push(status); where.push(`sr.status = $${params.length}`); }
+  if (departmentId) { params.push(departmentId); where.push(`sr.department_id = $${params.length}`); }
+
+  const { rows } = await pool.query(`
+    SELECT sr.*,
+           d.name AS "departmentName",
+           ind.indent_number AS "indentNumber",
+           ur.name AS "returnedByName",
+           ui.name AS "inspectedByName"
+    FROM store_returns sr
+    LEFT JOIN departments d ON sr.department_id = d.id
+    LEFT JOIN indents ind ON sr.indent_id = ind.id
+    LEFT JOIN users ur ON sr.returned_by = ur.id
+    LEFT JOIN users ui ON sr.inspected_by = ui.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY sr.created_at DESC
+  `, params);
+
+  for (const r of rows) {
+    const itemsRes = await pool.query(`
+      SELECT sri.*, m.code AS "materialCode", m.name AS "materialName", m.unit_price AS "unitPrice"
+      FROM store_return_items sri
+      LEFT JOIN materials m ON sri.material_id = m.id
+      WHERE sri.return_id = $1
+    `, [r.id]);
+    r.items = itemsRes.rows;
+  }
+
+  res.json({ success: true, data: rows });
+}));
+
+// POST /api/store/returns — Raise Store Return Voucher (SRV)
+router.post('/returns', requireAuth, ar(async (req, res) => {
+  const { departmentId, indentId, returnDate, remarks, items = [] } = req.body;
+  if (!departmentId || !items.length) {
+    return res.status(400).json({ success: false, message: 'departmentId and items required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`srv-${stamp}`]);
+    const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM store_returns WHERE created_at::date = CURRENT_DATE`);
+    const srvNum = `SRV-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+
+    const { rows: [ret] } = await client.query(`
+      INSERT INTO store_returns (return_number, department_id, indent_id, return_date, status, returned_by, remarks)
+      VALUES ($1, $2, $3, $4, 'Submitted', $5, $6) RETURNING *
+    `, [srvNum, departmentId, indentId || null, returnDate || new Date(), req.user.id, remarks || null]);
+
+    for (const item of items) {
+      if (!item.materialId || !item.qty) continue;
+      const { rows: [mat] } = await client.query(`SELECT uom FROM materials WHERE id = $1`, [item.materialId]);
+      await client.query(`
+        INSERT INTO store_return_items (return_id, material_id, qty, uom, condition_grade, action_taken, remarks)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `, [ret.id, item.materialId, item.qty, item.uom || mat?.uom || 'Nos', item.conditionGrade || 'Good', item.actionTaken || 'Restocked to Store', item.remarks || null]);
+    }
+
+    await client.query('COMMIT');
+    res.json({ success: true, data: ret });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/returns/:id/inspect — Store inspection and stock credit for Good condition
+router.put('/returns/:id/inspect', requireAuth, requireStore, ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ret] } = await client.query(`SELECT * FROM store_returns WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!ret) throw new Error('Return voucher not found');
+
+    const { rows: items } = await client.query(`SELECT * FROM store_return_items WHERE return_id = $1`, [ret.id]);
+    for (const item of items) {
+      if (item.condition_grade === 'Good') {
+        await client.query(`UPDATE materials SET current_stock = current_stock + $1 WHERE id = $2`, [item.qty, item.material_id]);
+        const { rows: [bal] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id = $1`, [item.material_id]);
+        await client.query(`
+          INSERT INTO stock_ledger (material_id, transaction_type, in_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
+          VALUES ($1, 'return', $2, $3, $4, $5, CURRENT_DATE, 'store_return', $6, $7, $8)
+        `, [item.material_id, item.qty, bal.current_stock, bal.unit_price, parseFloat(item.qty) * parseFloat(bal.unit_price),
+            ret.id, `SRV Restock: #${ret.return_number}`, req.user.id]);
+      }
+    }
+
+    await client.query(`
+      UPDATE store_returns SET status = 'Restocked', inspected_by = $1 WHERE id = $2
+    `, [req.user.id, ret.id]);
+
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 }));
 
 module.exports = router;

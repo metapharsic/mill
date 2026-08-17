@@ -577,11 +577,14 @@ export default function Purchase() {
     setGrnErr('')
     setGrnForm({
       challan_number:'',vehicle_number:'',invoice_number:'',remarks:'',
-      items:(po.items||[]).map(it=>({
-        material_id:it.material_id, material_name:it.materialName, uom:it.uom,
-        po_qty:it.qty, received_qty:it.qty, accepted_qty:it.qty, rejected_qty:0,
-        unit_price:it.unit_price, gst_pct:it.gst_pct, batch_number:'',
-      }))
+      items:(po.items||[]).map(it=>{
+        const remaining = Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0))
+        return {
+          material_id:it.material_id, material_name:it.materialName, uom:it.uom,
+          po_qty:it.qty, received_qty:remaining, accepted_qty:remaining, rejected_qty:0,
+          unit_price:it.unit_price, gst_pct:it.gst_pct, batch_number:'',
+        }
+      })
     })
   }
 
@@ -636,6 +639,154 @@ export default function Purchase() {
       load()
       setPrintContent(receiptContent)
     }else setGrnErr(r.message||'GRN failed')
+  }
+
+  const printGRNDocument = async (grnRow) => {
+    const r = await API(`/api/purchase/grn/${grnRow.id}`)
+    if (!r.success) return alert(r.message || 'Failed to load GRN details')
+    const g = r.data
+    const total = (g.items || []).reduce((acc, it) => acc + (Number(it.accepted_qty || 0) * Number(it.unit_price || 0)), 0)
+
+    const content = (
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
+              MK PAPER MILL PRIVATE LIMITED
+            </div>
+            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+              Store Department — Goods Receipt Note (Inward Commercial Voucher)
+            </div>
+            <div style={{ fontSize: 11, color: '#475569' }}>
+              Factory: Sy. No. 42/1, Mill Road, Industrial Area, Karnataka - 560001
+            </div>
+            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
+              GSTIN: <code>29AABCM1234F1Z5</code>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ display: 'inline-block', background: '#0f766e', color: '#fff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 14, textTransform: 'uppercase' }}>
+              GOODS RECEIPT NOTE
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
+              GRN #: {g.grnNumber || g.grn_number}
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              Date: <strong>{g.date ? new Date(g.date).toLocaleDateString('en-IN') : '—'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              Status: <strong style={{ color: '#0f766e' }}>{g.status || 'Received'}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* 2-Column Vendor & Order Specifications */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+              SUPPLIER DETAILS
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{g.vendorName}</div>
+            {g.vendorCode && <div style={{ fontSize: 11, color: '#64748b' }}>Vendor Code: <code>{g.vendorCode}</code></div>}
+            <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
+              GSTIN: <strong>{g.vendorGstin || 'Unregistered / Exempt'}</strong>
+            </div>
+          </div>
+
+          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+              LOGISTICS &amp; INVOICE REFERENCES
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              PO Reference: <strong>{g.poNumber || 'Direct Inward'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              Vehicle Number: <strong>{g.vehicleNumber || g.vehicle_number || '—'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>
+              Delivery Challan (DC): <strong>{g.challanNumber || g.challan_number || '—'}</strong>
+            </div>
+            <div style={{ fontSize: 11, color: '#334155' }}>
+              Vendor Invoice #: <strong>{g.invoiceNumber || g.invoice_number || '—'}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Line Items Table */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
+          <thead>
+            <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
+              <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
+              <th style={{ padding: '8px 6px' }}>Material Code &amp; Specification</th>
+              <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>PO Qty</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Received</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Accepted</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Rejected</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Unit Rate</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Accepted Val (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(g.items || []).map((it, i) => {
+              const uPrice = Number(it.unit_price || 0)
+              const accQty = Number(it.accepted_qty || 0)
+              const lineVal = accQty * uPrice
+              return (
+                <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
+                  <td style={{ padding: '8px 6px' }}>
+                    <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName}</div>
+                    <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
+                    {it.batch_number && <div style={{ fontSize: 10, color: '#0f766e' }}>Batch: {it.batch_number}</div>}
+                  </td>
+                  <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right' }}>{parseFloat(it.po_qty || 0).toFixed(2)}</td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600 }}>{parseFloat(it.received_qty || 0).toFixed(2)}</td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{parseFloat(it.accepted_qty || 0).toFixed(2)}</td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: Number(it.rejected_qty) > 0 ? '#dc2626' : '#64748b' }}>
+                    {parseFloat(it.rejected_qty || 0).toFixed(2)}
+                  </td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{uPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>₹{lineVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+
+        {/* Commercial Total */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', marginBottom: 20 }}>
+          <div style={{ fontSize: 11, color: '#475569' }}>
+            <strong>Remarks:</strong> {g.remarks || 'Material physically verified at store dock.'}
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, color: '#64748b' }}>Total Accepted Valuation:</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: '#0f766e' }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+          </div>
+        </div>
+
+        {/* 3 Signatures Block */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, textAlign: 'center', fontSize: 11, color: '#334155', marginTop: 32 }}>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Received By (Store Staff)</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>{g.receivedByName || 'Store Clerk'}</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Quality Inspector / Chemist</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>QA / QC Department</div>
+          </div>
+          <div>
+            <div style={{ height: 36 }}></div>
+            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Store Incharge / Manager</div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>MK Paper Mill Stores</div>
+          </div>
+        </div>
+      </div>
+    )
+    setPrintContent(content)
   }
 
   const setGrnItem=(i,k,v)=>setGrnForm(f=>({...f,items:f.items.map((it,j)=>j===i?{...it,[k]:v}:it)}))
@@ -1050,7 +1201,7 @@ export default function Purchase() {
               <table style={S.table}>
                 <thead>
                   <tr style={S.thead}>
-                    {['GRN Number', 'Date', 'PO Reference', 'Vendor', 'Challan / Invoice', 'Vehicle No', 'Accepted Value', 'Received By', 'Actions'].map(h => (
+                    {['GRN Number', 'Date', 'PO Reference', 'Vendor', 'Challan / Invoice', 'Vehicle No', 'Accepted Value', 'Status', 'Received By', 'Actions'].map(h => (
                       <th key={h} style={S.th}>{h}</th>
                     ))}
                   </tr>
@@ -1058,9 +1209,17 @@ export default function Purchase() {
                 <tbody>
                   {grnList.map(g => (
                     <tr key={g.id} style={S.tr}>
-                      <td style={S.td}><span style={S.code}>{g.grnNumber}</span></td>
+                      <td style={S.td}>
+                        <span
+                          style={{ ...S.code, cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => printGRNDocument(g)}
+                          title="Click to View & Print Goods Receipt Note"
+                        >
+                          {g.grnNumber}
+                        </span>
+                      </td>
                       <td style={S.td}><span style={S.muted}>{g.date?.slice(0, 10)}</span></td>
-                      <td style={S.td}><span style={{ color: '#0369a1', fontWeight: 600 }}>{g.poNumber}</span></td>
+                      <td style={S.td}><span style={{ color: '#0369a1', fontWeight: 600 }}>{g.poNumber || '—'}</span></td>
                       <td style={S.td}><strong>{g.vendorName}</strong></td>
                       <td style={S.td}>
                         <div>{g.invoiceNumber ? `Inv: ${g.invoiceNumber}` : ''}</div>
@@ -1068,21 +1227,35 @@ export default function Purchase() {
                       </td>
                       <td style={S.td}><span style={S.muted}>{g.vehicleNumber || '—'}</span></td>
                       <td style={S.td}><span style={{ color: '#15803d', fontWeight: 700 }}>{fmt(g.totalValue)}</span></td>
+                      <td style={S.td}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 999, background: g.status === 'Approved' ? '#dcfce7' : '#fef9c3', color: g.status === 'Approved' ? '#15803d' : '#854d0e' }}>
+                          {g.status || 'Received'}
+                        </span>
+                      </td>
                       <td style={S.td}><span style={S.muted}>{g.receivedByName || 'Store Clerk'}</span></td>
                       <td style={S.td}>
-                        <button
-                          style={{ ...S.btnIcon, color: '#0369a1', fontWeight: 600, fontSize: 12 }}
-                          onClick={() => openBill({ id: g.poId, poNumber: g.poNumber, vendorName: g.vendorName, grandTotal: g.totalValue })}
-                          title="Book Purchase Bill"
-                        >
-                          🧾 Book Bill
-                        </button>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <button
+                            style={{ ...S.btnIcon, color: '#0f766e', fontWeight: 600, fontSize: 12 }}
+                            onClick={() => printGRNDocument(g)}
+                            title="View & Print Official GRN Note"
+                          >
+                            🖨️ GRN Note
+                          </button>
+                          <button
+                            style={{ ...S.btnIcon, color: '#0369a1', fontWeight: 600, fontSize: 12 }}
+                            onClick={() => openBill({ id: g.poId, poNumber: g.poNumber, vendorName: g.vendorName, grandTotal: g.totalValue })}
+                            title="Book Purchase Bill for Finance"
+                          >
+                            🧾 Bill
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                   {grnList.length === 0 && (
                     <tr>
-                      <td colSpan={9} style={S.empty}>No GRN records found.</td>
+                      <td colSpan={10} style={S.empty}>No GRN records found.</td>
                     </tr>
                   )}
                 </tbody>

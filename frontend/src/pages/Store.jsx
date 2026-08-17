@@ -61,6 +61,38 @@ export default function Store({ onNavigate }) {
   const [lotTraceData, setLotTraceData] = useState([])
   const [lotSearched, setLotSearched] = useState(false)
   const [lotError, setLotError] = useState(false)
+
+  // Rejections / RTV State
+  const [rejectionsList, setRejectionsList] = useState([])
+  const [rejectionsSummary, setRejectionsSummary] = useState({})
+  const [rejectionsLoading, setRejectionsLoading] = useState(false)
+  const [rejectionsStatusFilter, setRejectionsStatusFilter] = useState('')
+  const [rtvDispatchModal, setRtvDispatchModal] = useState(null)
+  const [rtvDispatchForm, setRtvDispatchForm] = useState({ vehicleNumber: '', driverName: '', remarks: '' })
+
+  // STO Transfers State
+  const [transfersList, setTransfersList] = useState([])
+  const [transferModal, setTransferModal] = useState(false)
+  const [transferForm, setTransferForm] = useState({
+    fromWarehouseId: '',
+    toWarehouseId: '',
+    remarks: '',
+    items: [{ materialId: '', qty: '', uom: 'Nos', batchNumber: '', remarks: '' }]
+  })
+  const [warehouses, setWarehouses] = useState([])
+
+  // SRV Returns State
+  const [returnsList, setReturnsList] = useState([])
+  const [returnModal, setReturnModal] = useState(false)
+  const [returnForm, setReturnForm] = useState({
+    departmentId: '',
+    indentId: '',
+    remarks: '',
+    items: [{ materialId: '', qty: '', uom: 'Nos', conditionGrade: 'Good', remarks: '' }]
+  })
+
+  // Open Gate Passes for Inward prefill
+  const [openGatePasses, setOpenGatePasses] = useState([])
   
   // Issue desks state
   const [issues, setIssues] = useState([])
@@ -97,7 +129,8 @@ export default function Store({ onNavigate }) {
     bin_location: '',
     batch_number: '',
     quality_status: 'Accepted',
-    remarks: ''
+    remarks: '',
+    gate_pass_id: ''
   })
   const [inwardVoucher, setInwardVoucher] = useState(null)
   const [vendorPickMode, setVendorPickMode] = useState('list')
@@ -560,14 +593,205 @@ export default function Store({ onNavigate }) {
     }
   }
 
+  const loadOpenGatePasses = async () => {
+    try {
+      const r = await fetch(`${API}/security/open-inward-passes`, { headers: h() }).then(res => res.json())
+      if (r.success) setOpenGatePasses(r.data || [])
+    } catch (e) {}
+  }
+
+  const loadRejections = useCallback(async () => {
+    setRejectionsLoading(true)
+    try {
+      const p = new URLSearchParams()
+      if (rejectionsStatusFilter) p.set('status', rejectionsStatusFilter)
+      const r = await fetch(`${API}/store/rejections?${p}`, { headers: h() }).then(res => res.json())
+      if (r.success) {
+        setRejectionsList(r.data || [])
+        setRejectionsSummary(r.summary || {})
+      }
+    } catch (e) {}
+    finally { setRejectionsLoading(false) }
+  }, [rejectionsStatusFilter])
+
+  const loadTransfers = useCallback(async () => {
+    try {
+      const r = await fetch(`${API}/store/transfers`, { headers: h() }).then(res => res.json())
+      if (r.success) setTransfersList(r.data || [])
+    } catch (e) {}
+  }, [])
+
+  const loadReturns = useCallback(async () => {
+    try {
+      const r = await fetch(`${API}/store/returns`, { headers: h() }).then(res => res.json())
+      if (r.success) setReturnsList(r.data || [])
+    } catch (e) {}
+  }, [])
+
+  const loadWarehouses = async () => {
+    try {
+      const r = await fetch(`${API}/master/warehouses`, { headers: h() }).then(res => res.json())
+      if (r.success) setWarehouses(r.data || [])
+    } catch (e) {}
+  }
+
+  const handleSelectGatePassForInward = (gpId) => {
+    if (!gpId) return
+    const gp = openGatePasses.find(g => String(g.id) === String(gpId))
+    if (gp) {
+      setInwardForm(prev => ({
+        ...prev,
+        gate_pass_id: String(gp.id),
+        vendor_id: gp.vendorId ? String(gp.vendorId) : prev.vendor_id,
+        vendor_name: gp.vendorName || prev.vendor_name,
+        reference_type: gp.poNumber ? 'PO' : 'Gate Pass',
+        reference_id: gp.poNumber || gp.gpNumber,
+        remarks: `Imported from Inward Gate Pass #${gp.gpNumber} (${gp.vehicleNumber || 'Vehicle'})`
+      }))
+      if (gp.poId || gp.poNumber) {
+        handleSelectPOForInward(gp.poNumber || gp.poId)
+      }
+      addToast(`Gate Pass #${gp.gpNumber} loaded into Inward GRN`, 'info')
+    }
+  }
+
+  const handleDispatchRtv = async (e) => {
+    e.preventDefault()
+    if (!rtvDispatchModal) return
+    try {
+      const r = await fetch(`${API}/store/rejections/${rtvDispatchModal.id}/dispatch-rtv`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(rtvDispatchForm)
+      }).then(res => res.json())
+      if (r.success) {
+        addToast(`RTV Gate Pass #${r.data.gpNumber} generated successfully`, 'success')
+        setRtvDispatchModal(null)
+        setRtvDispatchForm({ vehicleNumber: '', driverName: '', remarks: '' })
+        loadRejections()
+      } else {
+        addToast(r.message || 'Failed to dispatch RTV', 'error')
+      }
+    } catch (err) {
+      addToast('Error dispatching RTV: ' + err.message, 'error')
+    }
+  }
+
+  const handleCreateTransfer = async (e) => {
+    e.preventDefault()
+    if (!transferForm.fromWarehouseId || !transferForm.toWarehouseId) {
+      addToast('Please select Source and Destination warehouses', 'warning')
+      return
+    }
+    try {
+      const r = await fetch(`${API}/store/transfers`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(transferForm)
+      }).then(res => res.json())
+      if (r.success) {
+        addToast(`Transfer Order #${r.data.transfer_number} created`, 'success')
+        setTransferModal(false)
+        setTransferForm({
+          fromWarehouseId: '', toWarehouseId: '', remarks: '',
+          items: [{ materialId: '', qty: '', uom: 'Nos', batchNumber: '', remarks: '' }]
+        })
+        loadTransfers()
+      } else {
+        addToast(r.message || 'Failed to create transfer', 'error')
+      }
+    } catch (err) {
+      addToast('Error creating transfer: ' + err.message, 'error')
+    }
+  }
+
+  const handleDispatchTransfer = async (id) => {
+    if (!window.confirm('Dispatch this Transfer Order to In-Transit?')) return
+    const r = await fetch(`${API}/store/transfers/${id}/dispatch`, {
+      method: 'PUT',
+      headers: json(),
+      body: JSON.stringify({})
+    }).then(res => res.json())
+    if (r.success) {
+      addToast('Transfer dispatched to In-Transit', 'info')
+      loadTransfers()
+    } else {
+      addToast(r.message || 'Dispatch failed', 'error')
+    }
+  }
+
+  const handleReceiveTransfer = async (id) => {
+    if (!window.confirm('Confirm receipt of transfer at destination warehouse?')) return
+    const r = await fetch(`${API}/store/transfers/${id}/receive`, {
+      method: 'PUT',
+      headers: json(),
+      body: JSON.stringify({})
+    }).then(res => res.json())
+    if (r.success) {
+      addToast('Transfer completed & stock received', 'success')
+      loadTransfers()
+    } else {
+      addToast(r.message || 'Receive failed', 'error')
+    }
+  }
+
+  const handleCreateReturn = async (e) => {
+    e.preventDefault()
+    if (!returnForm.departmentId) {
+      addToast('Please select department', 'warning')
+      return
+    }
+    try {
+      const r = await fetch(`${API}/store/returns`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(returnForm)
+      }).then(res => res.json())
+      if (r.success) {
+        addToast(`Store Return Voucher #${r.data.return_number} raised`, 'success')
+        setReturnModal(false)
+        setReturnForm({
+          departmentId: '', indentId: '', remarks: '',
+          items: [{ materialId: '', qty: '', uom: 'Nos', conditionGrade: 'Good', remarks: '' }]
+        })
+        loadReturns()
+      } else {
+        addToast(r.message || 'Failed to raise return voucher', 'error')
+      }
+    } catch (err) {
+      addToast('Error raising return: ' + err.message, 'error')
+    }
+  }
+
+  const handleInspectReturn = async (id) => {
+    if (!window.confirm('Inspect and restock items marked Good condition back to store?')) return
+    const r = await fetch(`${API}/store/returns/${id}/inspect`, {
+      method: 'PUT',
+      headers: json(),
+      body: JSON.stringify({})
+    }).then(res => res.json())
+    if (r.success) {
+      addToast('Return inspected & good stock restocked to store', 'success')
+      loadReturns()
+      loadBaseData()
+    } else {
+      addToast(r.message || 'Inspection failed', 'error')
+    }
+  }
+
   useEffect(() => {
     loadBaseData()
+    loadOpenGatePasses()
+    loadWarehouses()
   }, [])
 
   useEffect(() => {
-    if (tab === 'inward') loadInward()
+    if (tab === 'inward') { loadInward(); loadOpenGatePasses() }
     if (tab === 'outward') loadOutward()
-  }, [tab, loadInward, loadOutward])
+    if (tab === 'rejections') loadRejections()
+    if (tab === 'transfers') { loadTransfers(); loadWarehouses() }
+    if (tab === 'returns') loadReturns()
+  }, [tab, loadInward, loadOutward, loadRejections, loadTransfers, loadReturns])
 
   const handleCreateInward = async (e) => {
     e.preventDefault()
@@ -714,6 +938,9 @@ export default function Store({ onNavigate }) {
   const tabs = [
     { id: 'inward', label: '📥 Inward Desk (GRN)' },
     { id: 'outward', label: '📤 Outward Desk (Issues)' },
+    { id: 'rejections', label: '🚫 Rejections & RTV' },
+    { id: 'transfers', label: '🔄 Store Transfers (STO)' },
+    { id: 'returns', label: '↩️ Store Returns (SRV)' },
     { id: 'indents', label: '📋 Indent Requests' },
     isApprover && { id: 'approvals', label: '🛡️ Approvals' },
     { id: 'assets', label: '⚙️ Installed Assets (Digital Twin)' },
@@ -1310,6 +1537,253 @@ export default function Store({ onNavigate }) {
         </div>
       )}
 
+      {/* ── 7. REJECTIONS & RETURN TO VENDOR (RTV) TAB ── */}
+      {tab === 'rejections' && (
+        <div>
+          {/* KPI Summary Cards */}
+          <div style={S.kpiGrid}>
+            <div style={S.kpiCard}>
+              <div style={S.kpiLbl}>Total Material Rejections</div>
+              <div style={{ ...S.kpiVal, color: '#dc2626' }}>{rejectionsSummary.total || 0} Lots</div>
+              <div style={S.kpiSub}>QC Rejected & Quarantined</div>
+            </div>
+            <div style={S.kpiCard}>
+              <div style={S.kpiLbl}>Pending RTV Dispatch</div>
+              <div style={{ ...S.kpiVal, color: '#ea580c' }}>{rejectionsSummary.pending || 0} Lots</div>
+              <div style={S.kpiSub}>Awaiting Vendor Pickup / Truck Exit</div>
+            </div>
+            <div style={S.kpiCard}>
+              <div style={S.kpiLbl}>Pending Debit Amount</div>
+              <div style={{ ...S.kpiVal, color: '#b91c1c' }}>₹{Number(rejectionsSummary.pending_debit_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+              <div style={S.kpiSub}>To be deducted from Vendor AP Bills</div>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div style={S.filterBar}>
+            <select
+              style={{ ...S.input, maxWidth: 220, background: '#fff' }}
+              value={rejectionsStatusFilter}
+              onChange={e => setRejectionsStatusFilter(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="Pending RTV">Pending RTV</option>
+              <option value="Debit Note Raised">Debit Note Raised</option>
+              <option value="Dispatched Out">Dispatched Out</option>
+            </select>
+            <button style={S.btnGhost} onClick={loadRejections}>↻ Refresh Rejections</button>
+          </div>
+
+          {/* Rejections Table */}
+          <div style={S.tableWrap}>
+            <table style={S.table}>
+              <thead>
+                <tr style={S.thead}>
+                  {['Rejection No', 'GRN / PO Ref', 'Material', 'Vendor', 'Rejected Qty', 'Debit Value', 'Reason', 'Action Required', 'Status', 'Outward GP', 'Action'].map(h => (
+                    <th key={h} style={S.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rejectionsLoading ? (
+                  <tr><td colSpan={11} style={S.loading}>Loading rejections...</td></tr>
+                ) : rejectionsList.length === 0 ? (
+                  <tr><td colSpan={11} style={S.empty}>No material rejections recorded. Quality inspection passes are in order.</td></tr>
+                ) : rejectionsList.map(rej => (
+                  <tr key={rej.id} style={S.tr}>
+                    <td style={S.td}><span style={{ ...S.code, color: '#dc2626', fontWeight: 700 }}>{rej.rejection_number}</span></td>
+                    <td style={S.td}>
+                      <div style={{ fontWeight: 600 }}>{rej.grnNumber || '—'}</div>
+                      {rej.poNumber && <div style={S.muted}>PO: {rej.poNumber}</div>}
+                    </td>
+                    <td style={S.td}>
+                      <b>{rej.materialName}</b>
+                      <div style={S.muted}>{rej.materialCode}</div>
+                    </td>
+                    <td style={S.td}>{rej.vendorName || '—'}</td>
+                    <td style={S.td}><span style={{ color: '#dc2626', fontWeight: 700 }}>{rej.rejected_qty} {rej.uom}</span></td>
+                    <td style={S.td}><b>₹{Number(rej.debit_amount || 0).toLocaleString('en-IN')}</b></td>
+                    <td style={{ ...S.td, maxWidth: 220, fontSize: 12 }}>{rej.rejection_reason}</td>
+                    <td style={S.td}><span style={S.badge}>{rej.action_required}</span></td>
+                    <td style={S.td}>
+                      <span style={{
+                        ...S.badge,
+                        background: rej.status === 'Dispatched Out' ? '#dcfce7' : rej.status === 'Debit Note Raised' ? '#e0f2fe' : '#fee2e2',
+                        color: rej.status === 'Dispatched Out' ? '#15803d' : rej.status === 'Debit Note Raised' ? '#0369a1' : '#dc2626'
+                      }}>
+                        {rej.status}
+                      </span>
+                    </td>
+                    <td style={S.td}>
+                      {rej.outwardGatePassNumber ? <span style={{ ...S.code, color: '#16a34a' }}>{rej.outwardGatePassNumber}</span> : '—'}
+                    </td>
+                    <td style={S.td}>
+                      {rej.status !== 'Dispatched Out' && (
+                        <button
+                          style={{ ...S.btnSm, background: '#ea580c', color: '#fff' }}
+                          onClick={() => {
+                            setRtvDispatchForm({ vehicleNumber: '', driverName: '', remarks: `RTV ${rej.rejection_number}` })
+                            setRtvDispatchModal(rej)
+                          }}
+                        >
+                          🚚 Dispatch RTV
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 8. STORE TRANSFERS (STO) TAB ── */}
+      {tab === 'transfers' && (
+        <div>
+          <div style={{ ...S.filterBar, justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: '#1b1b1d' }}>Inter-Store Transfer Orders (STO)</span>
+              <button style={S.btnGhost} onClick={loadTransfers}>↻ Refresh</button>
+            </div>
+            <button style={{ ...S.btn, background: '#0284c7' }} onClick={() => setTransferModal(true)}>
+              + Create Transfer Order (STO)
+            </button>
+          </div>
+
+          <div style={S.tableWrap}>
+            <table style={S.table}>
+              <thead>
+                <tr style={S.thead}>
+                  {['Transfer No', 'From Warehouse', 'To Warehouse', 'Date', 'Items', 'Requested By', 'Status', 'Actions'].map(h => (
+                    <th key={h} style={S.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {transfersList.length === 0 ? (
+                  <tr><td colSpan={8} style={S.empty}>No store transfers found. Click "+ Create Transfer Order" to move stock between warehouses.</td></tr>
+                ) : transfersList.map(st => (
+                  <tr key={st.id} style={S.tr}>
+                    <td style={S.td}><span style={{ ...S.code, color: '#0284c7', fontWeight: 700 }}>{st.transfer_number}</span></td>
+                    <td style={S.td}><b>{st.fromWarehouseName || 'Main Store'}</b></td>
+                    <td style={S.td}><b>{st.toWarehouseName || 'Satellite Store'}</b></td>
+                    <td style={S.td}><span style={S.muted}>{new Date(st.transfer_date).toLocaleDateString('en-IN')}</span></td>
+                    <td style={S.td}>
+                      {st.items?.map((it, i) => (
+                        <div key={i} style={{ fontSize: 12 }}>
+                          {it.materialName}: <b>{it.qty} {it.uom}</b>
+                        </div>
+                      ))}
+                    </td>
+                    <td style={S.td}><span style={S.muted}>{st.requestedByName || 'Staff'}</span></td>
+                    <td style={S.td}>
+                      <span style={{
+                        ...S.badge,
+                        background: st.status === 'Completed' ? '#dcfce7' : st.status === 'In Transit' ? '#fef3c7' : '#e0e7ff',
+                        color: st.status === 'Completed' ? '#15803d' : st.status === 'In Transit' ? '#92400e' : '#1e40af'
+                      }}>
+                        {st.status}
+                      </span>
+                    </td>
+                    <td style={S.td}>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        {(st.status === 'Approved' || st.status === 'Requested') && (
+                          <button style={{ ...S.btnSm, background: '#ea580c', color: '#fff' }} onClick={() => handleDispatchTransfer(st.id)}>
+                            🚀 Dispatch
+                          </button>
+                        )}
+                        {st.status === 'In Transit' && (
+                          <button style={{ ...S.btnSm, background: '#16a34a', color: '#fff' }} onClick={() => handleReceiveTransfer(st.id)}>
+                            📥 Receive Stock
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 9. STORE RETURNS (SRV) TAB ── */}
+      {tab === 'returns' && (
+        <div>
+          <div style={{ ...S.filterBar, justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: '#1b1b1d' }}>Store Return Vouchers (SRV)</span>
+              <button style={S.btnGhost} onClick={loadReturns}>↻ Refresh</button>
+            </div>
+            <button style={{ ...S.btn, background: '#16a34a' }} onClick={() => setReturnModal(true)}>
+              + Raise Store Return Voucher
+            </button>
+          </div>
+
+          <div style={S.tableWrap}>
+            <table style={S.table}>
+              <thead>
+                <tr style={S.thead}>
+                  {['Return No', 'Department', 'Date', 'Returned Material', 'Qty', 'Condition Grade', 'Returned By', 'Status', 'Actions'].map(h => (
+                    <th key={h} style={S.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {returnsList.length === 0 ? (
+                  <tr><td colSpan={9} style={S.empty}>No store return vouchers recorded.</td></tr>
+                ) : returnsList.map(ret => (
+                  <tr key={ret.id} style={S.tr}>
+                    <td style={S.td}><span style={{ ...S.code, color: '#16a34a', fontWeight: 700 }}>{ret.return_number}</span></td>
+                    <td style={S.td}><b>{ret.departmentName || 'Plant Dept'}</b></td>
+                    <td style={S.td}><span style={S.muted}>{new Date(ret.return_date).toLocaleDateString('en-IN')}</span></td>
+                    <td style={S.td}>
+                      {ret.items?.map((it, i) => (
+                        <div key={i} style={{ fontWeight: 600 }}>{it.materialName}</div>
+                      ))}
+                    </td>
+                    <td style={S.td}>
+                      {ret.items?.map((it, i) => (
+                        <div key={i} style={{ color: '#16a34a', fontWeight: 700 }}>+{it.qty} {it.uom}</div>
+                      ))}
+                    </td>
+                    <td style={S.td}>
+                      {ret.items?.map((it, i) => (
+                        <span key={i} style={{
+                          ...S.badge,
+                          background: it.condition_grade === 'Good' ? '#dcfce7' : it.condition_grade === 'Repairable' ? '#fef3c7' : '#fee2e2',
+                          color: it.condition_grade === 'Good' ? '#15803d' : it.condition_grade === 'Repairable' ? '#92400e' : '#dc2626'
+                        }}>
+                          {it.condition_grade || 'Good'}
+                        </span>
+                      ))}
+                    </td>
+                    <td style={S.td}><span style={S.muted}>{ret.returnedByName || 'Staff'}</span></td>
+                    <td style={S.td}>
+                      <span style={{
+                        ...S.badge,
+                        background: ret.status === 'Restocked' ? '#dcfce7' : '#fef9c3',
+                        color: ret.status === 'Restocked' ? '#15803d' : '#854d0e'
+                      }}>
+                        {ret.status}
+                      </span>
+                    </td>
+                    <td style={S.td}>
+                      {ret.status === 'Submitted' && (
+                        <button style={{ ...S.btnSm, background: '#16a34a', color: '#fff' }} onClick={() => handleInspectReturn(ret.id)}>
+                          ✅ Inspect & Restock
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ── MODAL: FAST INWARD (GRN / RETURN) ── */}
       {inwardModal && (
         <div style={S.overlay}>
@@ -1325,7 +1799,7 @@ export default function Store({ onNavigate }) {
                   </span>
                 </div>
                 <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
-                  Direct stock addition with atomic ledger recording & PO synchronization
+                  Direct stock addition with atomic ledger recording & Gate Pass / PO synchronization
                 </div>
               </div>
 
@@ -1333,11 +1807,32 @@ export default function Store({ onNavigate }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600, color: '#166534', display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-                  ⚡ Ledger & PO Agent: Active
+                  ⚡ Gate Pass & PO Agent: Active
                 </div>
                 <button style={S.x} onClick={() => setInwardModal(false)}>✕</button>
               </div>
             </div>
+
+            {/* 1-Click Load from Inward Security Gate Pass */}
+            {openGatePasses.length > 0 && (
+              <div style={{ background: '#eff6ff', padding: 12, borderRadius: 8, border: '1px solid #bfdbfe', marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#1e40af', textTransform: 'uppercase', marginBottom: 4 }}>
+                  🚛 1-Click Import from Security Inward Gate Pass
+                </div>
+                <select
+                  style={{ ...S.select, background: '#fff', borderColor: '#3b82f6', fontWeight: 600 }}
+                  value={inwardForm.gate_pass_id || ''}
+                  onChange={e => handleSelectGatePassForInward(e.target.value)}
+                >
+                  <option value="">-- Select Gate Pass to Auto-Fill Truck, Weighbridge & PO --</option>
+                  {openGatePasses.map(gp => (
+                    <option key={gp.id} value={gp.id}>
+                      {gp.gpNumber} — {gp.vehicleNumber} ({gp.vendorName || gp.materialDescription || 'Material'}) · In: {gp.weightIn ? `${gp.weightIn}T` : 'No Wt'} {gp.poNumber ? `· PO #${gp.poNumber}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Inward Type & Document Reference */}
             <div style={{ background: '#f8fafc', padding: 14, borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 16 }}>
@@ -2288,6 +2783,289 @@ export default function Store({ onNavigate }) {
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
                 <button type="button" style={S.btnGhost} onClick={() => setIssueProcessModal(false)}>Cancel</button>
                 <button type="submit" style={S.btn}>Record Stock Issue</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* RTV Dispatch Outward Gate Pass Modal */}
+      {rtvDispatchModal && (
+        <div style={S.overlay}>
+          <div style={{ ...S.modal, maxWidth: 540 }}>
+            <div style={S.modalHdr}>
+              <div>
+                <b>🚚 Dispatch Return to Vendor (RTV)</b>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  Rejection #{rtvDispatchModal.rejection_number} | Material: {rtvDispatchModal.materialName} ({rtvDispatchModal.rejected_qty} {rtvDispatchModal.uom})
+                </div>
+              </div>
+              <button style={S.x} onClick={() => setRtvDispatchModal(null)}>✕</button>
+            </div>
+            <form onSubmit={handleDispatchRtv} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: '#fee2e2', padding: 10, borderRadius: 8, fontSize: 12, color: '#991b1b' }}>
+                Generating Outward Gate Pass will allow the vendor truck to exit with the rejected goods and close the store quarantine holding.
+              </div>
+              <div>
+                <label style={S.label}>Transport Vehicle Number *</label>
+                <input
+                  style={S.input}
+                  placeholder="e.g. MH 12 AB 9876"
+                  value={rtvDispatchForm.vehicleNumber}
+                  onChange={e => setRtvDispatchForm({ ...rtvDispatchForm, vehicleNumber: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label style={S.label}>Driver Name</label>
+                <input
+                  style={S.input}
+                  placeholder="Driver Name"
+                  value={rtvDispatchForm.driverName}
+                  onChange={e => setRtvDispatchForm({ ...rtvDispatchForm, driverName: e.target.value })}
+                />
+              </div>
+              <div>
+                <label style={S.label}>Dispatch Remarks / E-Way Bill</label>
+                <textarea
+                  style={{ ...S.input, height: 60 }}
+                  placeholder="RTV Dispatch Remarks"
+                  value={rtvDispatchForm.remarks}
+                  onChange={e => setRtvDispatchForm({ ...rtvDispatchForm, remarks: e.target.value })}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="button" style={S.btnGhost} onClick={() => setRtvDispatchModal(null)}>Cancel</button>
+                <button type="submit" style={{ ...S.btn, background: '#ea580c' }}>Generate RTV Outward Gate Pass</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Inter-Store Transfer (STO) Modal */}
+      {transferModal && (
+        <div style={S.overlay}>
+          <div style={{ ...S.modal, maxWidth: 680 }}>
+            <div style={S.modalHdr}>
+              <b>🔄 Create Inter-Store Transfer Order (STO)</b>
+              <button style={S.x} onClick={() => setTransferModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleCreateTransfer} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Source Warehouse (Issuing) *</label>
+                  <select
+                    style={S.select}
+                    value={transferForm.fromWarehouseId}
+                    onChange={e => setTransferForm({ ...transferForm, fromWarehouseId: e.target.value })}
+                    required
+                  >
+                    <option value="">-- Select Source Warehouse --</option>
+                    {warehouses.map(w => (
+                      <option key={w.id} value={w.id}>{w.name || w.code} ({w.type || 'Store'})</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={S.label}>Destination Warehouse (Receiving) *</label>
+                  <select
+                    style={S.select}
+                    value={transferForm.toWarehouseId}
+                    onChange={e => setTransferForm({ ...transferForm, toWarehouseId: e.target.value })}
+                    required
+                  >
+                    <option value="">-- Select Destination Warehouse --</option>
+                    {warehouses.filter(w => String(w.id) !== String(transferForm.fromWarehouseId)).map(w => (
+                      <option key={w.id} value={w.id}>{w.name || w.code} ({w.type || 'Store'})</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#1b1b1d', marginBottom: 6 }}>Transfer Item(s)</div>
+                {transferForm.items.map((it, idx) => (
+                  <div key={idx} style={{ background: '#f8fafc', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <select
+                      style={{ ...S.select, flex: 2 }}
+                      value={it.materialId}
+                      onChange={e => {
+                        const next = [...transferForm.items]
+                        next[idx].materialId = e.target.value
+                        const m = mats.find(x => String(x.id) === String(e.target.value))
+                        if (m) next[idx].uom = m.unit || m.uom || 'Nos'
+                        setTransferForm({ ...transferForm, items: next })
+                      }}
+                      required
+                    >
+                      <option value="">-- Select Material --</option>
+                      {mats.map(m => (
+                        <option key={m.id} value={m.id}>{m.name} ({m.code || 'No Code'}) - Stock: {m.current_stock || 0}</option>
+                      ))}
+                    </select>
+                    <input
+                      style={{ ...S.input, width: 100 }}
+                      type="number"
+                      step="any"
+                      placeholder="Qty"
+                      value={it.qty}
+                      onChange={e => {
+                        const next = [...transferForm.items]
+                        next[idx].qty = e.target.value
+                        setTransferForm({ ...transferForm, items: next })
+                      }}
+                      required
+                    />
+                    <span style={{ fontSize: 12, color: '#64748b', minWidth: 40 }}>{it.uom}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <label style={S.label}>Remarks / Transport Note</label>
+                <textarea
+                  style={{ ...S.input, height: 50 }}
+                  placeholder="Inter-store movement justification"
+                  value={transferForm.remarks}
+                  onChange={e => setTransferForm({ ...transferForm, remarks: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="button" style={S.btnGhost} onClick={() => setTransferModal(false)}>Cancel</button>
+                <button type="submit" style={{ ...S.btn, background: '#0284c7' }}>Create Transfer Order</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Raise Store Return Voucher (SRV) Modal */}
+      {returnModal && (
+        <div style={S.overlay}>
+          <div style={{ ...S.modal, maxWidth: 680 }}>
+            <div style={S.modalHdr}>
+              <b>↩️ Raise Store Return Voucher (SRV)</b>
+              <button style={S.x} onClick={() => setReturnModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleCreateReturn} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Returning Department *</label>
+                  <select
+                    style={S.select}
+                    value={returnForm.departmentId}
+                    onChange={e => setReturnForm({ ...returnForm, departmentId: e.target.value })}
+                    required
+                  >
+                    <option value="">-- Select Department --</option>
+                    {depts.map(d => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={S.label}>Original Indent / Issue Ref (Optional)</label>
+                  <select
+                    style={S.select}
+                    value={returnForm.indentId}
+                    onChange={e => setReturnForm({ ...returnForm, indentId: e.target.value })}
+                  >
+                    <option value="">-- Direct Plant Return --</option>
+                    {issues.slice(0, 30).map(iss => (
+                      <option key={iss.id} value={iss.id}>{iss.issue_number || iss.issueNumber} — {iss.materialName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#1b1b1d', marginBottom: 6 }}>Returned Item Details</div>
+                {returnForm.items.map((it, idx) => (
+                  <div key={idx} style={{ background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <select
+                        style={{ ...S.select, flex: 2 }}
+                        value={it.materialId}
+                        onChange={e => {
+                          const next = [...returnForm.items]
+                          next[idx].materialId = e.target.value
+                          const m = mats.find(x => String(x.id) === String(e.target.value))
+                          if (m) next[idx].uom = m.unit || m.uom || 'Nos'
+                          setReturnForm({ ...returnForm, items: next })
+                        }}
+                        required
+                      >
+                        <option value="">-- Select Material --</option>
+                        {mats.map(m => (
+                          <option key={m.id} value={m.id}>{m.name} ({m.code || 'No Code'})</option>
+                        ))}
+                      </select>
+                      <input
+                        style={{ ...S.input, width: 100 }}
+                        type="number"
+                        step="any"
+                        placeholder="Qty"
+                        value={it.qty}
+                        onChange={e => {
+                          const next = [...returnForm.items]
+                          next[idx].qty = e.target.value
+                          setReturnForm({ ...returnForm, items: next })
+                        }}
+                        required
+                      />
+                      <span style={{ fontSize: 12, color: '#64748b', alignSelf: 'center', minWidth: 40 }}>{it.uom}</span>
+                    </div>
+
+                    <div style={S.grid2}>
+                      <div>
+                        <label style={{ fontSize: 11, color: '#64748b' }}>Condition Grade</label>
+                        <select
+                          style={S.select}
+                          value={it.conditionGrade}
+                          onChange={e => {
+                            const next = [...returnForm.items]
+                            next[idx].conditionGrade = e.target.value
+                            setReturnForm({ ...returnForm, items: next })
+                          }}
+                        >
+                          <option value="Good">Good (Restock immediately to Store)</option>
+                          <option value="Repairable">Repairable (Quarantine / Workshop)</option>
+                          <option value="Scrap">Scrap (Non-reusable)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, color: '#64748b' }}>Item Remarks</label>
+                        <input
+                          style={S.input}
+                          placeholder="e.g. Unused excess from PM2 Maintenance"
+                          value={it.remarks}
+                          onChange={e => {
+                            const next = [...returnForm.items]
+                            next[idx].remarks = e.target.value
+                            setReturnForm({ ...returnForm, items: next })
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <label style={S.label}>Overall Return Reason</label>
+                <textarea
+                  style={{ ...S.input, height: 50 }}
+                  placeholder="Department reason for return"
+                  value={returnForm.remarks}
+                  onChange={e => setReturnForm({ ...returnForm, remarks: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="button" style={S.btnGhost} onClick={() => setReturnModal(false)}>Cancel</button>
+                <button type="submit" style={{ ...S.btn, background: '#16a34a' }}>Submit Return Voucher</button>
               </div>
             </form>
           </div>

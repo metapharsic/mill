@@ -186,6 +186,55 @@ router.put('/schedule/:id/skip', auth, requireLevel(3), ar(async (req, res) => {
   finally { client.release(); }
 }));
 
+// COST PER MACHINE/SECTION — real spend, computed from indent_items linked to a
+// maintenance_log via indent_items.maintenance_log_id (migration_maintenance_spares_link.sql),
+// since maintenance_logs.cost is always NULL in live data (nothing ever wrote it back from Store).
+router.get('/cost-by-machine', auth, ar(async (req, res) => {
+  const { machine_id, from, to } = req.query;
+  const conds = [];
+  const params = [];
+  let p = 1;
+  if (machine_id) { conds.push(`ml.machine_id=$${p++}`); params.push(machine_id); }
+  if (from && to) { conds.push(`ml.date BETWEEN $${p++} AND $${p++}`); params.push(from, to); }
+  const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+  const { rows } = await pool.query(
+    `SELECT ml.machine_id, m.name AS "machineName", m.code AS "machineCode",
+            ps.id AS "sectionId", ps.name AS "sectionName",
+            COUNT(DISTINCT ml.id) AS "jobCount",
+            COALESCE(SUM(ii.line_value), 0) AS "sparesCost",
+            COALESCE(SUM(ml.cost), 0) AS "loggedCost",
+            COALESCE(SUM(ii.line_value), 0) + COALESCE(SUM(ml.cost), 0) AS "totalCost"
+     FROM maintenance_logs ml
+     LEFT JOIN machines m ON m.id = ml.machine_id
+     LEFT JOIN section_equipment se ON se.machine_id = ml.machine_id
+     LEFT JOIN plant_sections ps ON ps.id = se.section_id
+     LEFT JOIN indent_items ii ON ii.maintenance_log_id = ml.id
+     ${where}
+     GROUP BY ml.machine_id, m.name, m.code, ps.id, ps.name
+     ORDER BY "totalCost" DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// COST FOR A SINGLE MAINTENANCE LOG — spares actually consumed for this job via linked indent_items
+router.get('/logs/:id/cost', auth, ar(async (req, res) => {
+  const { rows: [log] } = await pool.query(`SELECT id, machine_id, cost FROM maintenance_logs WHERE id=$1`, [req.params.id]);
+  if (!log) return res.status(404).json({ success: false, message: 'Log not found' });
+  const { rows: items } = await pool.query(
+    `SELECT ii.id, ii.indent_id, i.indent_number AS "indentNumber", ii.material_id,
+            m.name AS "materialName", ii.required_qty, ii.issued_qty, ii.unit_price, ii.line_value
+     FROM indent_items ii
+     JOIN indents i ON i.id = ii.indent_id
+     LEFT JOIN materials m ON m.id = ii.material_id
+     WHERE ii.maintenance_log_id = $1
+     ORDER BY ii.id`,
+    [req.params.id]
+  );
+  const sparesCost = items.reduce((sum, it) => sum + parseFloat(it.line_value || 0), 0);
+  res.json({ success: true, data: { logId: log.id, machineId: log.machine_id, loggedCost: parseFloat(log.cost || 0), sparesCost, totalCost: sparesCost + parseFloat(log.cost || 0), items } });
+}));
+
 // LOGS LIST
 router.get('/logs', auth, ar(async (req, res) => {
   const { machine_id, maintenance_type, page=1, limit=20 } = req.query;

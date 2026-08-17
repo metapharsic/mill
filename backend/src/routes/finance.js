@@ -142,12 +142,17 @@ router.get('/bills', auth, requireLevel(2), ar(async (req, res) => {
      ${where}`, params
   );
 
+  // NOTE: must join purchase_orders/grn here too — the shared `where` clause references
+  // po.po_number / g.grn_number when `search` is set, and without these joins the query
+  // 500s with "missing FROM-clause entry for table po" (only reproduces when searching).
   const { rows: [sumRow] } = await pool.query(
     `SELECT COALESCE(SUM(vb.total_amount),0) as "totalBillAmount",
             COALESCE(SUM(vb.paid_amount),0) as "totalPaidAmount",
             COALESCE(SUM(vb.balance_amount),0) as "totalBalanceAmount"
      FROM vendor_bills vb
      LEFT JOIN vendors v ON v.id = vb.vendor_id
+     LEFT JOIN purchase_orders po ON po.id = vb.po_id
+     LEFT JOIN grn g ON g.id = vb.grn_id
      ${where}`, params
   );
 
@@ -482,6 +487,107 @@ router.get('/grn-bills', auth, requireLevel(2), ar(async (req, res) => {
 
   const totalValue = rows.reduce((s, r) => s + parseFloat(r.grnTotalValue || 0), 0);
   res.json({ success: true, data: rows, summary: { totalCount: rows.length, totalValue } });
+}));
+
+// ============================================================================
+// DEBIT NOTES & RTV ADJUSTMENTS
+// ============================================================================
+
+// GET /api/finance/debit-notes — List all debit notes generated from QC material rejections
+router.get('/debit-notes', auth, requireLevel(2), ar(async (req, res) => {
+  const { status, vendor_id } = req.query;
+  const where = ['1=1'];
+  const params = [];
+
+  if (status) {
+    params.push(status);
+    where.push(`mr.status = $${params.length}`);
+  }
+  if (vendor_id) {
+    params.push(vendor_id);
+    where.push(`mr.vendor_id = $${params.length}`);
+  }
+
+  const { rows } = await pool.query(`
+    SELECT mr.id,
+           mr.rejection_number AS "rejectionNumber",
+           mr.rejected_qty AS "rejectedQty",
+           mr.uom,
+           mr.unit_price AS "unitPrice",
+           mr.debit_amount AS "debitAmount",
+           mr.rejection_reason AS "rejectionReason",
+           mr.status,
+           mr.created_at AS "createdAt",
+           v.id AS "vendorId",
+           v.name AS "vendorName",
+           v.code AS "vendorCode",
+           v.gstin AS "vendorGstin",
+           m.id AS "materialId",
+           m.name AS "materialName",
+           m.code AS "materialCode",
+           po.po_number AS "poNumber",
+           g.grn_number AS "grnNumber"
+    FROM material_rejections mr
+    LEFT JOIN vendors v ON mr.vendor_id = v.id
+    LEFT JOIN materials m ON mr.material_id = m.id
+    LEFT JOIN purchase_orders po ON mr.po_id = po.id
+    LEFT JOIN grn g ON mr.grn_id = g.id
+    WHERE ${where.join(' AND ')}
+    ORDER BY mr.created_at DESC
+  `, params);
+
+  const totalDebit = rows.reduce((s, r) => s + parseFloat(r.debitAmount || 0), 0);
+  res.json({ success: true, data: rows, totalDebit });
+}));
+
+// POST /api/finance/debit-notes/:id/apply — Apply Debit Note to offset a Vendor Bill
+router.post('/debit-notes/:id/apply', auth, requireLevel(3), ar(async (req, res) => {
+  const { billId } = req.body;
+  if (!billId) return res.status(400).json({ success: false, message: 'Vendor Bill ID required' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [rej] } = await client.query(
+      `SELECT * FROM material_rejections WHERE id = $1 FOR UPDATE`,
+      [req.params.id]
+    );
+    if (!rej) throw new Error('Debit Note / Rejection not found');
+
+    const { rows: [bill] } = await client.query(
+      `SELECT * FROM vendor_bills WHERE id = $1 FOR UPDATE`,
+      [billId]
+    );
+    if (!bill) throw new Error('Vendor Bill not found');
+
+    const debitAmt = parseFloat(rej.debit_amount || 0);
+    const billBal = parseFloat(bill.balance_amount || 0);
+    const newBal = Math.max(0, billBal - debitAmt);
+
+    await client.query(
+      `UPDATE vendor_bills 
+       SET balance_amount = $1, 
+           remarks = COALESCE(remarks, '') || ' | Offset by Debit Note #' || $2
+       WHERE id = $3`,
+      [newBal, rej.rejection_number, billId]
+    );
+
+    await client.query(
+      `UPDATE material_rejections 
+       SET status = 'Debit Note Raised' 
+       WHERE id = $1`,
+      [req.params.id]
+    );
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Debit Note of ₹${debitAmt} applied against Bill ${bill.bill_number}` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 }));
 
 module.exports = router;

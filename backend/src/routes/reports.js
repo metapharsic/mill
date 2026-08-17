@@ -230,7 +230,7 @@ async function compileEOD(targetDate) {
              m.code AS mat_code, m.name AS mat_name, m.uom,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
-               WHERE ind.id = sl.reference_id AND sl.reference_type = 'INDENT' LIMIT 1
+               WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
@@ -246,7 +246,7 @@ async function compileEOD(targetDate) {
              m.code AS mat_code, m.name AS mat_name, m.uom, m.unit_price,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
-               WHERE ind.id = sl.reference_id AND sl.reference_type = 'INDENT' LIMIT 1
+               WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
@@ -709,7 +709,7 @@ router.get('/stores/item-ledger/:id', auth, requireLevel(2), ar(async (req, res)
     FROM stock_ledger sl
     LEFT JOIN vendors v ON sl.vendor_id = v.id
     LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
-    LEFT JOIN indents ind ON sl.reference_type = 'INDENT' AND sl.reference_id = ind.id
+    LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND sl.reference_id = ind.id
     LEFT JOIN departments si_dept ON si.department_id = si_dept.id
     LEFT JOIN departments ind_dept ON ind.department_id = ind_dept.id
     LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND sl.reference_id = po.id
@@ -778,7 +778,7 @@ router.get('/stores/consumption-by-item', auth, requireLevel(2), ar(async (req, 
       JOIN material_categories mc ON m.category_id = mc.id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
       LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
-      LEFT JOIN indents ind ON sl.reference_type = 'INDENT' AND sl.reference_id = ind.id
+      LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND sl.reference_id = ind.id
       LEFT JOIN departments si_dept ON si.department_id = si_dept.id
       LEFT JOIN departments ind_dept ON ind.department_id = ind_dept.id
       WHERE ${where}
@@ -797,7 +797,7 @@ router.get('/stores/consumption-by-item', auth, requireLevel(2), ar(async (req, 
       JOIN material_categories mc ON m.category_id = mc.id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
       LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
-      LEFT JOIN indents ind ON sl.reference_type = 'INDENT' AND sl.reference_id = ind.id
+      LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND sl.reference_id = ind.id
       LEFT JOIN departments si_dept ON si.department_id = si_dept.id
       LEFT JOIN departments ind_dept ON ind.department_id = ind_dept.id
       WHERE ${where}
@@ -1206,7 +1206,7 @@ router.get('/maintenance', auth, requireLevel(2), ar(async (req, res) => {
             COUNT(d.id) as breakdown_count,
             COALESCE(SUM(d.duration_min),0) as total_downtime_min,
             CASE WHEN COUNT(d.id) > 0 THEN COALESCE(SUM(d.duration_min),0) / COUNT(d.id) ELSE 0 END as mttr_min,
-            CASE WHEN COUNT(d.id) > 0 THEN (EXTRACT(EPOCH FROM ($2::date - $1::date))*24*60 / COUNT(d.id)) ELSE 0 END as mtbf_min
+            CASE WHEN COUNT(d.id) > 0 THEN (($2::date - $1::date) * 24 * 60 / COUNT(d.id)) ELSE 0 END as mtbf_min
      FROM machines m
      LEFT JOIN downtime_entries d ON m.id = d.machine_id AND d.start_time >= $1::date AND d.start_time <= $2::date + interval '1 day'
      GROUP BY m.id, m.name, m.code

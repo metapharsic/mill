@@ -45,7 +45,7 @@ router.get('/summary', auth, ar(async (req, res) => {
      FROM utility_readings WHERE date=$1`, [d]
   );
   const { rows: prodRows } = await pool.query(
-    `SELECT COALESCE(SUM(net_weight_kg),0) as "prodKg" FROM reels WHERE status != 'Rejected' AND DATE(end_time)=$1`, [d]
+    `SELECT COALESCE(SUM(weight_kg),0) as "prodKg" FROM reels WHERE status != 'Rejected' AND DATE(end_time)=$1`, [d]
   );
 
   const data = rows[0];

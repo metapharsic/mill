@@ -40,10 +40,22 @@ router.post('/', requireAuth, requireLevel(2), ar(async (req, res) => {
 
 router.put('/:id', requireAuth, requireLevel(2), ar(async (req, res) => {
   const { scrapType, quantityKg, description, disposalMethod, buyerName, saleAmount, status, remarks } = req.body
-  await pool.query(`
-    UPDATE scrap_records SET scrap_type=$1,quantity_kg=$2,description=$3,disposal_method=$4,
-    buyer_name=$5,sale_amount=$6,status=$7,remarks=$8 WHERE id=$9
-  `, [scrapType, quantityKg, description, disposalMethod, buyerName, saleAmount||0, status, remarks, req.params.id])
+  // Partial update: the edit form does not post `status` at all, so a raw assignment
+  // nulled the status column on every edit. COALESCE keeps unsent fields untouched.
+  const { rowCount } = await pool.query(`
+    UPDATE scrap_records SET
+      scrap_type=COALESCE($1,scrap_type),
+      quantity_kg=COALESCE($2,quantity_kg),
+      description=COALESCE($3,description),
+      disposal_method=COALESCE($4,disposal_method),
+      buyer_name=COALESCE($5,buyer_name),
+      sale_amount=COALESCE($6,sale_amount),
+      status=COALESCE($7,status),
+      remarks=COALESCE($8,remarks)
+    WHERE id=$9
+  `, [scrapType ?? null, quantityKg ?? null, description ?? null, disposalMethod ?? null,
+      buyerName ?? null, saleAmount ?? null, status ?? null, remarks ?? null, req.params.id])
+  if (!rowCount) return res.status(404).json({ success: false, message: 'Scrap record not found' })
   res.json({ success: true })
 }))
 

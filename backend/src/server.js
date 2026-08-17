@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const pool = require('./db/pool');
 const { logBackendError, logDbError, logFrontendError } = require('./logger');
 
 process.on('uncaughtException', (err) => { console.error('[UNCAUGHT]', err); logBackendError('uncaughtException', err); });
@@ -145,7 +146,6 @@ setInterval(computeSectionKPISnapshot, 3_600_000).unref();
 setTimeout(computeSectionKPISnapshot, 5000).unref(); // run once 5s after boot
 
 // ─── NOTIFICATIONS TABLE (auto-create if not exists) ────────────────────────
-const pool = require('./db/pool');
 pool.query(`
   CREATE TABLE IF NOT EXISTS notifications (
     id         SERIAL PRIMARY KEY,

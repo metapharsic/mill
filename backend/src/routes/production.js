@@ -690,12 +690,10 @@ router.get('/chemical-consumption', auth, asyncRoute(async (req, res) => {
     where.push(`cc.date = $${p++}`);
     params.push(date);
   }
-  if (!canSeeAllSections(req)) {
-    where.push(
-      `(cc.machine_id IS NULL OR cc.machine_id IN (SELECT se.machine_id FROM section_equipment se JOIN plant_sections ps ON ps.id = se.section_id WHERE ps.department_id = $${p++}))`
-    );
-    params.push(req.user.department_id);
-  }
+  // NOTE: chemical_consumption has no machine_id column, so consumption rows cannot be
+  // attributed to a section/department. The previous department filter referenced
+  // cc.machine_id and threw 42703, making this endpoint a hard 500 for every user below
+  // role_level 4. Consumption is a mill-wide figure until the column exists.
   if (where.length) query += ` WHERE ` + where.join(' AND ');
   query += ` ORDER BY cc.date DESC, cc.shift_type`;
   const { rows } = await pool.query(query, params);
@@ -715,10 +713,13 @@ router.post('/chemical-consumption', auth, requireLevel(1), asyncRoute(async (re
   const unitCost = unit_cost || 0;
   const totalCost = Number(qty_consumed) * Number(unitCost);
 
+  // machine_id is accepted (and ownership-checked above) but NOT persisted: the
+  // chemical_consumption table has no machine_id column. Including it in the INSERT made
+  // every POST to this endpoint fail with 42703.
   const { rows } = await pool.query(
-    `INSERT INTO chemical_consumption (date, shift_type, chemical_id, qty_consumed, unit_cost, total_cost, recorded_by, machine_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-    [date, shift_type, chemical_id, qty_consumed, unitCost, totalCost, req.user.id, machine_id || null]
+    `INSERT INTO chemical_consumption (date, shift_type, chemical_id, qty_consumed, unit_cost, total_cost, recorded_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [date, shift_type, chemical_id, qty_consumed, unitCost, totalCost, req.user.id]
   );
   res.status(201).json({ success: true, data: rows[0] });
 }));

@@ -46,15 +46,19 @@ const DEPT_GATE = {
   scrap:           ['Scrap Management', 'Commercial', 'Administration'],
 }
 
-export function filterNav(navItems, user) {
-  if (!user) return []
+// Keys deliberately hidden from the sidebar but still reachable by direct URL.
+// NOTE: this is a *navigation* rule only — it must never be used for page
+// authorization, or the page becomes unreachable entirely.
+const NAV_HIDDEN = new Set(['chemicals'])
+
+// Can this user open this page (by URL or by nav click)?
+// Nav visibility is a separate, stricter question — see filterNav below.
+export function canAccess(key, user) {
+  if (!user) return false
   const lvl = user.role_level || 1
   const dept = user.department || ''
 
-  return navItems.filter(({ key }) => {
-    // 1. Hide chemicals sidebar completely as per requirement
-    if (key === 'chemicals') return false
-
+  {
     // 2. Admin sees all
     if (lvl >= 5) return true
 
@@ -87,5 +91,11 @@ export function filterNav(navItems, user) {
     if (rule === undefined) return false
     if (rule === true) return true
     return rule.includes(dept)
-  })
+  }
+}
+
+// Sidebar rendering: everything the user may access, minus deliberately hidden keys.
+export function filterNav(navItems, user) {
+  if (!user) return []
+  return navItems.filter(({ key }) => !NAV_HIDDEN.has(key) && canAccess(key, user))
 }

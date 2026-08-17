@@ -143,6 +143,10 @@ export default function Production() {
 
   // UI state
   const [loading, setLoading] = useState(true)
+  const [msg, setMsg] = useState({ text: '', ok: true })
+  const [busy, setBusy] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
+  const [closeShiftTarget, setCloseShiftTarget] = useState(null)
 
   const toast = (text, ok = true) => {
     setMsg({ text, ok })

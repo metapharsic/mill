@@ -41,6 +41,7 @@ graphify-out/
 # ─── Database Dumps & Backups ─────────────────────────────────
 # db/backups/ (tracked for repository backup)
 db/backup_*.sql
+*.zip
 
 # ─── Auto-Generated Status Files ───────────────────────────────
 CHECKPOINT.md

@@ -2,6 +2,9 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const pool = require('../db/pool');
 const { auth, requireLevel } = require('../middleware/auth');
+// Express 4 does not forward rejected promises from async handlers — without this wrapper a DB
+// error leaves the request hanging forever (client spins, no response). Same pattern as inventory.js.
+const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // GET /api/users
 router.get('/', auth, requireLevel(3), async (req, res) => {
@@ -72,16 +75,16 @@ router.put('/:id', auth, requireLevel(5), async (req, res) => {
 });
 
 // GET /api/users/roles
-router.get('/roles', auth, async (req, res) => {
+router.get('/roles', auth, ar(async (req, res) => {
   const { rows } = await pool.query('SELECT * FROM roles ORDER BY level');
   res.json({ success: true, data: rows });
-});
+}));
 
 // GET /api/users/departments
-router.get('/departments', auth, async (req, res) => {
+router.get('/departments', auth, ar(async (req, res) => {
   const { rows } = await pool.query('SELECT * FROM departments ORDER BY name');
   res.json({ success: true, data: rows });
-});
+}));
 
 // POST /api/users/:id/reset-password
 router.post('/:id/reset-password', auth, requireLevel(5), async (req, res) => {
@@ -97,6 +100,12 @@ router.post('/:id/reset-password', auth, requireLevel(5), async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
+});
+
+router.use((err, req, res, next) => {
+  if (err.code === '23505') return res.status(409).json({ success: false, message: 'Record already exists (duplicate)' });
+  console.error(err);
+  res.status(500).json({ success: false, message: 'Server error' });
 });
 
 module.exports = router;

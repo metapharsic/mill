@@ -16,10 +16,19 @@ const seqNum = async (client) => {
 
 // Section-ownership: quality_tests -> (Reel) reference_id -> reels.machine_id ->
 // section_equipment.machine_id -> plant_sections.department_id. L4+ (Plant Head) sees/acts on all.
+// NOTE: one machine maps to MANY section_equipment rows (PM1 alone has 12), so a plain
+// join here fans a single test out into one row per equipment row — duplicating the list
+// and multiplying COUNT(*). LATERAL ... LIMIT 1 collapses it to at most one owning dept,
+// which matches getTestDeptId()'s own LIMIT 1 semantics.
 const DEPT_JOIN = `
      LEFT JOIN reels rl ON rl.id=qt.reference_id AND qt.reference_type='Reel'
-     LEFT JOIN section_equipment se ON se.machine_id=rl.machine_id
-     LEFT JOIN plant_sections ps ON ps.id=se.section_id`;
+     LEFT JOIN LATERAL (
+       SELECT ps2.department_id
+       FROM section_equipment se
+       JOIN plant_sections ps2 ON ps2.id=se.section_id
+       WHERE se.machine_id = rl.machine_id
+       LIMIT 1
+     ) ps ON true`;
 
 // Returns the owning department_id for a test (via its Reel/machine/section), or null if unresolvable.
 async function getTestDeptId(client, id) {
@@ -295,7 +304,166 @@ router.put('/tests/:id', auth, requireLevel(2), ar(async (req, res) => {
      brightness_pct||null,thickness_micron||null,width_mm||null,weight_kg||null,
      tensile_strength||null,tear_strength||null,remarks||null,req.params.id]
   );
-  res.json({ success:!!rows.length, data:rows[0] });
+  if (!rows.length) return res.json({ success: false, message: 'Test not found' });
+  res.json({ success: true, data: rows[0] });
+}));
+
+// POST /api/quality/grn-inspect — Complete Quality Inspection Usage Decision for Inward GRN
+router.post('/grn-inspect', auth, requireLevel(2), ar(async (req, res) => {
+  const { grnId, overallResult = 'Pass', remarks, items = [] } = req.body;
+  if (!grnId) return res.status(400).json({ success: false, message: 'grnId is required' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Lock GRN
+    const { rows: [grn] } = await client.query(
+      `SELECT g.*, po.po_number, v.id AS vendor_id, v.name AS vendor_name
+       FROM grn g
+       LEFT JOIN purchase_orders po ON g.po_id = po.id
+       LEFT JOIN vendors v ON g.vendor_id = v.id
+       WHERE g.id = $1 FOR UPDATE`,
+      [grnId]
+    );
+    if (!grn) throw new Error('GRN record not found');
+
+    // 2. Create Quality Test Record
+    const testNum = await seqNum(client);
+    const { rows: [qt] } = await client.query(
+      `INSERT INTO quality_tests
+         (test_number, test_type, reference_type, reference_id, tested_by, result, remarks)
+       VALUES ($1, 'Incoming', 'GRN', $2, $3, $4, $5) RETURNING *`,
+      [testNum, grnId, req.user.id, overallResult, remarks || `GRN Incoming Inspection: ${grn.grn_number}`]
+    );
+
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const rejectionsCreated = [];
+
+    // 3. Process each inspected item
+    for (const item of items) {
+      const { grnItemId, materialId, acceptedQty = 0, rejectedQty = 0, rejectionReason, actionRequired = 'Return to Vendor' } = item;
+      const accQty = parseFloat(acceptedQty) || 0;
+      const rejQty = parseFloat(rejectedQty) || 0;
+
+      // Update grn_items
+      if (grnItemId) {
+        await client.query(
+          `UPDATE grn_items 
+           SET accepted_qty = $1, rejected_qty = $2, remarks = COALESCE($3, remarks)
+           WHERE id = $4`,
+          [accQty, rejQty, rejectionReason || null, grnItemId]
+        );
+      }
+
+      // Fetch material details
+      const { rows: [mat] } = await client.query(
+        `SELECT id, name, uom, current_stock, unit_price FROM materials WHERE id = $1 FOR UPDATE`,
+        [materialId]
+      );
+      if (!mat) continue;
+
+      const unitPrice = parseFloat(mat.unit_price || 0);
+
+      // A. Credit Accepted Stock
+      if (accQty > 0) {
+        await client.query(
+          `UPDATE materials SET current_stock = current_stock + $1 WHERE id = $2`,
+          [accQty, materialId]
+        );
+
+        const { rows: [balRow] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1`, [materialId]);
+        const newBal = parseFloat(balRow.current_stock);
+
+        await client.query(
+          `INSERT INTO stock_ledger 
+             (material_id, transaction_type, in_qty, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by, vendor_id)
+           VALUES ($1, 'grn', $2, 0, $3, $4, $5, CURRENT_DATE, 'grn', $6, $7, $8, $9)`,
+          [materialId, accQty, newBal, unitPrice, accQty * unitPrice, grnId,
+           `QC Accepted | GRN #${grn.grn_number} | PO #${grn.po_number || 'Direct'}`, req.user.id, grn.vendor_id]
+        );
+
+        // Update PO items received qty if PO exists
+        if (grn.po_id) {
+          await client.query(
+            `UPDATE po_items SET received_qty = COALESCE(received_qty, 0) + $1 
+             WHERE po_id = $2 AND material_id = $3`,
+            [accQty, grn.po_id, materialId]
+          );
+        }
+      }
+
+      // B. Create Rejection Note for Rejected Stock
+      if (rejQty > 0) {
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`rej-${stamp}`]);
+        const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM material_rejections WHERE created_at::date = CURRENT_DATE`);
+        const rejNum = `REJ-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+        const debitAmt = rejQty * unitPrice;
+
+        const { rows: [rej] } = await client.query(
+          `INSERT INTO material_rejections
+             (rejection_number, grn_id, po_id, vendor_id, material_id, qc_test_id,
+              rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, created_by)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending RTV', $13)
+           RETURNING *`,
+          [rejNum, grnId, grn.po_id || null, grn.vendor_id || null, materialId, qt.id,
+           rejQty, mat.uom || 'Nos', unitPrice, debitAmt,
+           rejectionReason || 'Quality parameters failed', actionRequired, req.user.id]
+        );
+
+        rejectionsCreated.push(rej);
+
+        // Notify Finance of Debit Note requirement
+        // users has no role_level column — the level lives on roles.level. Referencing
+        // role_level directly threw 42703 and aborted the whole grn-inspect transaction
+        // for every GRN that had any rejected qty.
+        await client.query(
+          `INSERT INTO notifications (user_id, title, message, is_read, created_at)
+           SELECT u.id, 'Debit Note Required: ' || $1, 'Material rejection of ₹' || $2 || ' against vendor ' || $3, false, NOW()
+           FROM users u JOIN roles r ON r.id = u.role_id
+           WHERE u.is_active = true
+             AND (r.level >= 4
+                  OR (r.level >= 3 AND u.department_id = (SELECT id FROM departments WHERE name ILIKE '%Finance%' LIMIT 1)))`,
+          [rejNum, debitAmt.toFixed(2), grn.vendor_name || 'Vendor']
+        );
+      }
+    }
+
+    // 4. Update GRN status
+    const finalStatus = overallResult === 'Pass' ? 'Approved' : (overallResult === 'Partial' ? 'Partial' : 'Rejected');
+    await client.query(`UPDATE grn SET status = $1 WHERE id = $2`, [finalStatus, grnId]);
+
+    // 5. Update PO status if linked
+    if (grn.po_id) {
+      const { rows: poCheck } = await client.query(
+        `SELECT SUM(qty) as total_ordered, SUM(COALESCE(received_qty,0)) as total_received 
+         FROM po_items WHERE po_id = $1`,
+        [grn.po_id]
+      );
+      if (poCheck.length && parseFloat(poCheck[0].total_received) >= parseFloat(poCheck[0].total_ordered)) {
+        await client.query(`UPDATE purchase_orders SET status = 'Received' WHERE id = $1`, [grn.po_id]);
+      } else if (poCheck.length && parseFloat(poCheck[0].total_received) > 0) {
+        await client.query(`UPDATE purchase_orders SET status = 'Partial' WHERE id = $1`, [grn.po_id]);
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({
+      success: true,
+      data: {
+        qualityTestId: qt.id,
+        testNumber: qt.test_number,
+        grnStatus: finalStatus,
+        rejections: rejectionsCreated
+      }
+    });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 }));
 
 module.exports = router;

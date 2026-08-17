@@ -94,6 +94,12 @@ export default function Materials() {
   const [quickSaving, setQuickSaving] = useState(false)
   const [quickErr, setQuickErr] = useState('')
 
+  // KPI totals must reflect the *entire* filtered set, not just the current
+  // 30-row page — summing `materials` directly here undercounts badly on any
+  // multi-page result (previously showed e.g. "3 below reorder" instead of 263
+  // on the analogous inventory bug; same shape of bug applies to these sums).
+  const [kpiTotals, setKpiTotals] = useState({ opening: 0, received: 0, issued: 0, valuation: 0, loaded: false })
+
   const LIMIT = 30
 
   useEffect(() => {
@@ -119,6 +125,30 @@ export default function Materials() {
   }, [page, filterActive, filterCat, filterCrit, search])
 
   useEffect(() => { load() }, [load])
+
+  // Fetch the same filtered set unpaginated (bounded to a large-but-finite limit)
+  // purely to compute accurate KPI totals across all matching materials.
+  useEffect(() => {
+    let cancelled = false
+    const params = new URLSearchParams({ page: 1, limit: 100000 })
+    if (filterActive) params.set('is_active', filterActive)
+    if (filterCat) params.set('category_id', filterCat)
+    if (filterCrit) params.set('criticality_class', filterCrit)
+    if (search) params.set('search', search)
+    API(`/api/master/materials?${params}`).then(r => {
+      if (cancelled || !r.success) return
+      const rows = r.data || []
+      const opening = rows.reduce((acc, m) => {
+        const rec = Number(m.received || 0), iss = Number(m.issued || 0), cur = Number(m.current_stock || 0)
+        return acc + (cur - rec + iss)
+      }, 0)
+      const received = rows.reduce((acc, m) => acc + Number(m.received || 0), 0)
+      const issued = rows.reduce((acc, m) => acc + Number(m.issued || 0), 0)
+      const valuation = rows.reduce((acc, m) => acc + (Number(m.current_stock || 0) * Number(m.unit_price || 0)), 0)
+      setKpiTotals({ opening, received, issued, valuation, loaded: true })
+    })
+    return () => { cancelled = true }
+  }, [filterActive, filterCat, filterCrit, search])
 
   useEffect(() => {
     if (filterCat && !quickForm.category_id) {
@@ -441,13 +471,15 @@ export default function Materials() {
 
       {/* ── Summary KPI Stats Cards ── */}
       {(() => {
-        const totalOpening = materials.reduce((acc, m) => {
+        // Use the unpaginated kpiTotals (whole filtered set) once loaded; fall back
+        // to summing the current page only for the brief instant before it arrives.
+        const totalOpening = kpiTotals.loaded ? kpiTotals.opening : materials.reduce((acc, m) => {
           const rec = Number(m.received || 0), iss = Number(m.issued || 0), cur = Number(m.current_stock || 0)
           return acc + (cur - rec + iss)
         }, 0)
-        const totalReceived = materials.reduce((acc, m) => acc + Number(m.received || 0), 0)
-        const totalIssued = materials.reduce((acc, m) => acc + Number(m.issued || 0), 0)
-        const totalValuation = materials.reduce((acc, m) => acc + (Number(m.current_stock || 0) * Number(m.unit_price || 0)), 0)
+        const totalReceived = kpiTotals.loaded ? kpiTotals.received : materials.reduce((acc, m) => acc + Number(m.received || 0), 0)
+        const totalIssued = kpiTotals.loaded ? kpiTotals.issued : materials.reduce((acc, m) => acc + Number(m.issued || 0), 0)
+        const totalValuation = kpiTotals.loaded ? kpiTotals.valuation : materials.reduce((acc, m) => acc + (Number(m.current_stock || 0) * Number(m.unit_price || 0)), 0)
 
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 16 }}>

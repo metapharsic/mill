@@ -296,6 +296,7 @@ router.post('/grn', auth, requireLevel(2), asyncRoute(async (req, res) => {
       date,
       vendorId,
       poId,
+      gatePassId,
       vehicleNumber,
       challanNumber,
       invoiceNumber,
@@ -332,13 +333,17 @@ router.post('/grn', auth, requireLevel(2), asyncRoute(async (req, res) => {
 
     const grnNumber = await buildSequenceNumber(client, 'GRN');
     const grnResult = await client.query(
-      `INSERT INTO grn (grn_number, date, vendor_id, po_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING id, grn_number as "grnNumber"`,
-      [grnNumber, date, vendorId, poId || null, vehicleNumber || null, challanNumber || null, invoiceNumber || null, req.user.id, 'Received', remarks || null]
+      [grnNumber, date, vendorId, poId || null, gatePassId || null, vehicleNumber || null, challanNumber || null, invoiceNumber || null, req.user.id, 'Received', remarks || null]
     );
 
     const grnId = grnResult.rows[0].id;
+
+    if (gatePassId) {
+      await client.query(`UPDATE gate_passes SET status = 'Closed' WHERE id = $1`, [gatePassId]);
+    }
 
     for (const item of items) {
       if (!item.materialId || !item.receivedQty) continue;
@@ -365,6 +370,23 @@ router.post('/grn', auth, requireLevel(2), asyncRoute(async (req, res) => {
           item.remarks || null,
         ]
       );
+
+      // If rejected quantity exists, generate a material_rejection entry
+      if (rejectedQty > 0) {
+        const d = new Date();
+        const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`rej-${stamp}`]);
+        const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM material_rejections WHERE created_at::date = CURRENT_DATE`);
+        const rejNum = `REJ-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+        const debitAmt = rejectedQty * unitPrice;
+
+        await client.query(
+          `INSERT INTO material_rejections
+             (rejection_number, grn_id, po_id, vendor_id, material_id, rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, created_by)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'Return to Vendor', 'Pending RTV', $11)`,
+          [rejNum, grnId, poId || null, vendorId, item.materialId, rejectedQty, item.uom || 'Nos', unitPrice, debitAmt, item.remarks || 'Rejected during Inward GRN Intake', req.user.id]
+        );
+      }
 
       const materialRes = await client.query(
         `SELECT current_stock as "currentStock", unit_price as "unitPrice" FROM materials WHERE id = $1`,
@@ -407,6 +429,61 @@ router.post('/grn', auth, requireLevel(2), asyncRoute(async (req, res) => {
           isHigh,
         ]
       );
+
+      // Digital Twin & Unique Serialization: Auto-register unique serial numbers for Machine Clothing
+      const { rows: [matFull] } = await client.query(
+        `SELECT m.id, m.name, m.code, m.is_serialized, m.expected_lifespan_days, mc.name as category_name
+         FROM materials m
+         LEFT JOIN material_categories mc ON m.category_id = mc.id
+         WHERE m.id = $1`,
+        [item.materialId]
+      );
+      const isClothing = matFull?.is_serialized || (matFull?.category_name && matFull.category_name.toLowerCase().includes('clothing'));
+      if (isClothing && acceptedQty > 0) {
+        let rawSerials = item.serialNumber || item.serialNumbers || item.batchNumber || '';
+        let snList = [];
+        if (Array.isArray(rawSerials)) {
+          snList = rawSerials.map(s => String(s).trim()).filter(Boolean);
+        } else if (typeof rawSerials === 'string' && rawSerials.trim()) {
+          snList = rawSerials.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+        }
+
+        const countToCreate = Math.floor(acceptedQty);
+        while (snList.length < countToCreate) {
+          const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+          const rand = Math.floor(1000 + Math.random() * 9000);
+          snList.push(`${matFull?.code || 'PMC'}-${stamp}-${rand}`);
+        }
+
+        for (let i = 0; i < countToCreate; i++) {
+          const sn = snList[i];
+          const { rows: dupRows } = await client.query(
+            `SELECT id, asset_number, status FROM installed_assets 
+             WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
+            [sn]
+          );
+          if (dupRows.length > 0) {
+            throw new Error(`Serial number "${sn}" already exists in Mill Asset Registry (Asset #${dupRows[0].asset_number}, Status: ${dupRows[0].status}). All Paper Machine Clothing & Serialized rolls must have unique serial numbers.`);
+          }
+
+          const today = new Date();
+          const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+          await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`ast-${dateStr}`]);
+          const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets WHERE asset_number LIKE $1`, [`AST-${dateStr}-%`]);
+          const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+
+          await client.query(
+            `INSERT INTO installed_assets (
+               asset_number, material_id, serial_number, batch_number, grn_id, vendor_id,
+               purchase_price, status, expected_lifespan_days, created_at
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'In Stock', $8, NOW())`,
+            [
+              assetNumber, matFull.id, sn, item.batchNumber || null, grnId, vendorId || null,
+              nextUnitPrice, matFull.expected_lifespan_days || 90
+            ]
+          );
+        }
+      }
     }
 
     if (poId) {

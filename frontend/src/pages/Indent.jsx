@@ -961,6 +961,28 @@ export default function Indent() {
                               </button>
                               <button style={S.btnSm('#1e293b')} onClick={() => openDetail(r.id)}>View</button>
 
+                              {/* Approvals — GAP-5 FIX: L2 at level 3, L3 added for level 4 */}
+                              {r.status === 'Submitted' && (user?.role_level >= 3) && (
+                                <button style={S.btnSm('#0891b2')} onClick={() => action(r.id, 'approve/l1')} title="L1 Approve — Store Head">✓ L1 Approve</button>
+                              )}
+                              {r.status === 'L1 Approved' && (user?.role_level >= 3) && (
+                                <button style={S.btnSm('#7c3aed')} onClick={() => action(r.id, 'approve/l2')} title="L2 Approve — Store Manager">✓ L2 Approve</button>
+                              )}
+                              {['L1 Approved', 'L2 Approved'].includes(r.status) && (user?.role_level >= 4) && (
+                                <button style={S.btnSm('#065f46')} onClick={() => action(r.id, 'approve/l3')} title="L3 Approve — Plant Head / MD (Final)">✓ L3 MD Approve</button>
+                              )}
+                              {['Submitted', 'L1 Approved', 'L2 Approved'].includes(r.status) && (user?.role_level >= 3) && (
+                                <button
+                                  style={{ ...S.btnSm('#dc2626'), padding: '4px 8px' }}
+                                  onClick={async () => {
+                                    const reason = window.prompt('Enter rejection reason:')
+                                    if (!reason) return
+                                    await action(r.id, 'reject', { remarks: reason })
+                                  }}
+                                  title="Reject this indent and notify requester"
+                                >✗ Reject</button>
+                              )}
+
                               {/* Edit available for unissued/uncancelled indents */}
                               {r.status !== 'Issued' && r.status !== 'Closed' && r.status !== 'Cancelled' && (
                                 <button style={S.btnSm('#2563eb')} onClick={() => openEdit(r.id)} title="Edit Indent Items & Details">
@@ -974,15 +996,6 @@ export default function Indent() {
                                   📦 Issue
                                 </button>
                               )}
-
-                              {/* Approvals */}
-                              {r.status === 'Submitted' && (user?.role_level >= 3) && (
-                                <button style={S.btnSm('#0891b2')} onClick={() => action(r.id, 'approve/l1')}>✓ L1</button>
-                              )}
-                              {r.status === 'L1 Approved' && (user?.role_level >= 4) && (
-                                <button style={S.btnSm('#7c3aed')} onClick={() => action(r.id, 'approve/l2')}>✓ L2</button>
-                              )}
-
                               {/* Create PO from Approved Indent */}
                               {['Approved', 'L2 Approved'].includes(r.status) && (
                                 <button

@@ -222,20 +222,22 @@ router.post('/:code/alarms', requireAuth, requireLevel(2), ar(async (req, res) =
       const machineId = equip[0]?.machine_id;
 
       if (machineId) {
+        // maintenance_logs actor column is performed_by (there is no created_by).
         const { rows: mlog } = await client.query(
           `INSERT INTO maintenance_logs
-             (machine_id, maintenance_type, date, description, status, created_by)
-           VALUES ($1,'Breakdown',NOW(),$2,'Open',$3) RETURNING id`,
+             (machine_id, maintenance_type, date, description, status, performed_by)
+           VALUES ($1,'Breakdown',CURRENT_DATE,$2,'Open',$3) RETURNING id`,
           [machineId, description, req.user.id]
         );
+        // downtime_entries actor column is reported_by (there is no created_by).
         await client.query(
-          `INSERT INTO downtime_entries (machine_id, start_time, category, reason, created_by)
+          `INSERT INTO downtime_entries (machine_id, start_time, category, reason, reported_by)
            VALUES ($1,NOW(),'Breakdown',$2,$3)`,
           [machineId, description, req.user.id]
         );
         await client.query(
           'UPDATE section_alarms SET maintenance_log_id=$1 WHERE id=$2',
-          [mlog.rows[0].id, alarmId]
+          [mlog[0].id, alarmId]
         );
       }
     }

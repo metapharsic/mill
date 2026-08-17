@@ -1,11 +1,14 @@
 const pool = require('../db/pool');
 const { auth: requireAuth, requireLevel, requireStore } = require('./auth');
 
-const ar = fn => (req, res, next) =>
-  Promise.resolve(fn(req, res, next)).catch(err => {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
-  });
+// IMPORTANT: forward to next(err) — do NOT respond here. Several routers that import this ar()
+// (master.js, store.js) define their own `router.use((err,req,res,next) => ...)` error middleware
+// at the bottom of the file to translate specific DB errors (e.g. Postgres 23505 unique-violation
+// -> a friendly 409 "Duplicate record"/"Record already exists"). Responding directly from ar()
+// swallows the error before it ever reaches that middleware, making it permanently dead code and
+// downgrading every conflict to a generic 500. This matches the `.catch(next)` convention already
+// used by the local `ar`/`asyncRoute` helpers in purchase.js, finance.js, and inventory.js.
+const ar = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // Write one row to audit_log. Pass transaction client when inside BEGIN/COMMIT.
 async function audit(clientOrNull, { userId, module, action, entityId, oldVal, newVal, ip }) {

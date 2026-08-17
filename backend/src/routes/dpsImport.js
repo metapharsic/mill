@@ -87,8 +87,13 @@ function normalizeKeys(obj) {
   return norm;
 }
 
+// Same async wrapper the other route files use. Without it, anything that throws before
+// the try/catch below (the machines lookup, pool.connect(), sheet_to_json) rejects with
+// no response at all — on Express 4 that leaves the browser hanging forever.
+const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+
 // ─── POST /api/production/dpr/import — Import DPS spreadsheet ────────────────
-router.post('/import', auth, requireLevel(2), upload.single('file'), async (req, res) => {
+router.post('/import', auth, requireLevel(2), upload.single('file'), ar(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No spreadsheet file uploaded' });
   }
@@ -272,6 +277,6 @@ router.post('/import', auth, requireLevel(2), upload.single('file'), async (req,
   } finally {
     client.release();
   }
-});
+}));
 
 module.exports = router;

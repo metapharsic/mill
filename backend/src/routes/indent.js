@@ -234,9 +234,9 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
       totalVal += lVal;
 
       await client.query(
-        `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal]
+        `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        [id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
       );
     }
 
@@ -315,9 +315,9 @@ router.put('/:id', auth, ar(async (req, res) => {
         totalVal += lVal;
 
         await client.query(
-          `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-          [req.params.id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal]
+          `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+          [req.params.id, it.material_id, qty, it.uom || mat[0]?.uom || 'NOS', it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
         );
       }
       await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, req.params.id]);
@@ -331,7 +331,7 @@ router.put('/:id', auth, ar(async (req, res) => {
 
 // APPEND ITEM TO EXISTING INDENT
 router.post('/:id/items', auth, ar(async (req, res) => {
-  const { material_id, required_qty, uom, purpose, component_position, reason_code } = req.body;
+  const { material_id, required_qty, uom, purpose, component_position, reason_code, maintenance_log_id } = req.body;
   if (!material_id || !required_qty || Number(required_qty) <= 0) {
     return res.status(400).json({ success: false, message: 'Material and valid required_qty are required' });
   }
@@ -352,9 +352,9 @@ router.post('/:id/items', auth, ar(async (req, res) => {
     const lVal = qty * price;
 
     const { rows: [inserted] } = await client.query(
-      `INSERT INTO indent_items (indent_id, material_id, required_qty, uom, purpose, current_stock, component_position, reason_code, unit_price, line_value)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [req.params.id, material_id, qty, finalUom, purpose||'', mat[0]?.current_stock||0, component_position||null, reason_code||'Routine Replacement', price, lVal]
+      `INSERT INTO indent_items (indent_id, material_id, required_qty, uom, purpose, current_stock, component_position, reason_code, unit_price, line_value, maintenance_log_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [req.params.id, material_id, qty, finalUom, purpose||'', mat[0]?.current_stock||0, component_position||null, reason_code||'Routine Replacement', price, lVal, maintenance_log_id ? parseInt(maintenance_log_id) : null]
     );
 
     // Recompute total value
@@ -521,9 +521,9 @@ router.put('/:id/approve/l1', auth, requireLevel(3), ar(async (req, res) => {
   res.json({ success: !!rows.length, data: rows[0], message: rows.length ? undefined : 'Indent must be Submitted' });
 }));
 
-// APPROVE L2 — Admin (level 5) or Plant Head (level 4)
-// L1 Approved → Approved (ready to issue).
-router.put('/:id/approve/l2', auth, requireLevel(4), ar(async (req, res) => {
+// APPROVE L2 — Store Manager (level 3+) or Admin/PlantHead (level 4+)
+// L1 Approved → Approved (ready to issue). GAP-2 FIX: was requireLevel(4), now requireLevel(3).
+router.put('/:id/approve/l2', auth, requireLevel(3), ar(async (req, res) => {
   const client0 = await pool.connect();
   let tier;
   try { tier = await getIndentTier(client0, req.params.id); } finally { client0.release(); }
@@ -635,11 +635,15 @@ const issueHandler = ar(async (req, res) => {
       await client.query(`UPDATE materials SET current_stock=current_stock-$1 WHERE id=$2`, [issQty, item.material_id]);
       const { rows: [mat] } = await client.query(`SELECT current_stock,unit_price,is_serialized,expected_lifespan_days FROM materials WHERE id=$1`, [item.material_id]);
 
-      // stock_ledger
-      await client.query(`INSERT INTO stock_ledger(material_id,transaction_type,out_qty,balance,unit_price,value,date,reference_type,remarks,created_by)
-        VALUES($1,'issue',$2,$3,$4,$5,CURRENT_DATE,'indent',$6,$7)`,
+      // stock_ledger — reference_id MUST be the indent id: reports.js's department-consumption
+      // and material-ledger queries join `indents ind ON sl.reference_type='indent' AND
+      // sl.reference_id=ind.id` to resolve the issuing department. Without it those joins can
+      // never match (found live: 9 of 10 'indent'/'issue' ledger rows had reference_id NULL),
+      // silently collapsing every department's consumption into "General Mill Operations".
+      await client.query(`INSERT INTO stock_ledger(material_id,transaction_type,out_qty,balance,unit_price,value,date,reference_type,reference_id,remarks,created_by)
+        VALUES($1,'issue',$2,$3,$4,$5,CURRENT_DATE,'indent',$6,$7,$8)`,
         [item.material_id, issQty, mat.current_stock, mat.unit_price, issQty * parseFloat(mat.unit_price || 0),
-         `Indent ${ind.indent_number}`, req.user.id]);
+         ind.id, `Indent ${ind.indent_number}`, req.user.id]);
 
       await client.query(`UPDATE indent_items SET issued_qty=$1,batch_no=$2,unit_price=$3,line_value=$4,ack_status='pending' WHERE id=$5`,
         [issQty, it.batch_no || null, mat.unit_price, issQty * parseFloat(mat.unit_price || 0), item.id]);

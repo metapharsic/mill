@@ -151,14 +151,13 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
          VALUES ($1, 'PO Created', $2, 'PO Created', $3, $4)`,
         [indent_id, ind?.status || null, req.user.id, `PO ${num} Created`]
       );
-      const { rows: storeInd } = await client.query(`SELECT 1 FROM store_indents WHERE id = $1`, [indent_id]);
-      if (storeInd.length) {
-        await client.query(
-          `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
-           VALUES ($1,'PO Created',$2,'PO Created',$3,$4,$5,$6)`,
-          [indent_id, ind?.status||null, req.user.id, req.user.name, req.user.role, `PO ${num} Created`]
-        );
-      }
+      // GAP-4 FIX: Always write store_indent_log for ALL indent types (removed incorrect store_indents table guard)
+      await client.query(
+        `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+         VALUES ($1,'PO Created',$2,'PO Created',$3,$4,$5,$6)
+         ON CONFLICT DO NOTHING`,
+        [indent_id, ind?.status||null, req.user.id, req.user.name||'System', req.user.role||'Procurement', `PO ${num} Created`]
+      );
     }
     await client.query('COMMIT');
     res.json({ success:true, data:rows[0] });
@@ -400,7 +399,8 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
 // GENERATE GRN FROM PO (With QC Inspection & Atomic Stock Increment)
 router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
   const poId = req.params.id;
-  const { vehicle_number, challan_number, invoice_number, remarks, items: customItems } = req.body;
+  const { vehicle_number, challan_number, invoice_number, remarks, items: customItems, gate_pass_id, gatePassId } = req.body;
+  const targetGatePassId = gate_pass_id || gatePassId || null;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -417,11 +417,15 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
 
     // Create Header
     const { rows: [head] } = await client.query(
-      `INSERT INTO grn (grn_number, date, vendor_id, po_id, vehicle_number, challan_number, invoice_number, status, received_by, remarks)
-       VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, 'Received', $7, $8) RETURNING *`,
-      [grnNum, po.vendor_id, poId, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
+      `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, status, received_by, remarks)
+       VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, 'Received', $8, $9) RETURNING *`,
+      [grnNum, po.vendor_id, poId, targetGatePassId, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
     );
     const grnId = head.id;
+
+    if (targetGatePassId) {
+      await client.query(`UPDATE gate_passes SET status = 'Closed' WHERE id = $1`, [targetGatePassId]);
+    }
 
     // Get unfulfilled PO items
     const { rows: poItems } = await client.query(
@@ -437,7 +441,7 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
       const userIt = Array.isArray(customItems) ? customItems.find(x => String(x.material_id) === String(poIt.material_id) || String(x.po_item_id) === String(poIt.id)) : null;
       const recQty = userIt ? Number(userIt.received_qty ?? remaining) : remaining;
       const accQty = userIt ? Number(userIt.accepted_qty ?? recQty) : recQty;
-      const rejQty = userIt ? Number(userIt.rejected_qty ?? (recQty - accQty)) : 0;
+      const rejQty = userIt ? Number(userIt.rejected_qty ?? (recQty - accQty)) : (recQty - accQty);
       const uPrice = userIt ? Number(userIt.unit_price ?? poIt.unit_price) : Number(poIt.unit_price || 0);
       const binLoc = userIt ? (userIt.bin_location || null) : null;
       const lineRemarks = userIt ? (userIt.remarks || null) : null;
@@ -455,6 +459,21 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
         [recQty, poIt.id]
       );
 
+      // If rejection exists, record in material_rejections
+      if (rejQty > 0) {
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`rej-${stamp}`]);
+        const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM material_rejections WHERE created_at::date = CURRENT_DATE`);
+        const rejNum = `REJ-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+        const debitAmt = rejQty * uPrice;
+
+        await client.query(
+          `INSERT INTO material_rejections
+             (rejection_number, grn_id, po_id, vendor_id, material_id, rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, created_by)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'Return to Vendor', 'Pending RTV', $11)`,
+          [rejNum, grnId, poId, po.vendor_id, poIt.material_id, rejQty, poIt.uom || 'Nos', uPrice, debitAmt, lineRemarks || 'Rejected during PO Receipt', req.user.id]
+        );
+      }
+
       // Atomic stock increment for ACCEPTED quantity
       if (accQty > 0) {
         const { rows: [mat] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id=$1 FOR UPDATE`, [poIt.material_id]);
@@ -468,9 +487,64 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
         // Insert into stock_ledger
         await client.query(
           `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by, vendor_id)
-           VALUES ($1, CURRENT_DATE, 'GRN', 'PO', $2, $3, 0, $4, $5, $6, $7, $8, $9)`,
+           VALUES ($1, CURRENT_DATE, 'grn', 'PO', $2, $3, 0, $4, $5, $6, $7, $8, $9)`,
           [poIt.material_id, poId, accQty, newStock, uPrice, accQty * uPrice, `Inward GRN ${grnNum} against PO ${po.po_number}`, req.user.id, po.vendor_id]
         );
+
+        // Digital Twin & Unique Serialization: Auto-register unique serial numbers for Machine Clothing
+        const { rows: [matFull] } = await client.query(
+          `SELECT m.id, m.name, m.code, m.is_serialized, m.expected_lifespan_days, mc.name as category_name
+           FROM materials m
+           LEFT JOIN material_categories mc ON m.category_id = mc.id
+           WHERE m.id = $1`,
+          [poIt.material_id]
+        );
+        const isClothing = matFull?.is_serialized || (matFull?.category_name && matFull.category_name.toLowerCase().includes('clothing'));
+        if (isClothing && accQty > 0) {
+          let rawSerials = userIt ? (userIt.serial_number || userIt.serial_numbers || userIt.batch_number) : null;
+          let snList = [];
+          if (Array.isArray(rawSerials)) {
+            snList = rawSerials.map(s => String(s).trim()).filter(Boolean);
+          } else if (typeof rawSerials === 'string' && rawSerials.trim()) {
+            snList = rawSerials.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+          }
+
+          const countToCreate = Math.floor(accQty);
+          while (snList.length < countToCreate) {
+            const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            snList.push(`${matFull?.code || 'PMC'}-${stamp}-${rand}`);
+          }
+
+          for (let i = 0; i < countToCreate; i++) {
+            const sn = snList[i];
+            const { rows: dupRows } = await client.query(
+              `SELECT id, asset_number, status FROM installed_assets 
+               WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
+              [sn]
+            );
+            if (dupRows.length > 0) {
+              throw new Error(`Serial number "${sn}" already exists in Mill Asset Registry (Asset #${dupRows[0].asset_number}, Status: ${dupRows[0].status}). All Paper Machine Clothing & Serialized rolls must have unique serial numbers.`);
+            }
+
+            const today = new Date();
+            const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+            await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`ast-${dateStr}`]);
+            const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets WHERE asset_number LIKE $1`, [`AST-${dateStr}-%`]);
+            const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
+
+            await client.query(
+              `INSERT INTO installed_assets (
+                 asset_number, material_id, serial_number, batch_number, grn_id, vendor_id,
+                 purchase_price, status, expected_lifespan_days, created_at
+               ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'In Stock', $8, NOW())`,
+              [
+                assetNumber, matFull.id, sn, userIt?.batch_number || null, grnId, po.vendor_id || null,
+                uPrice, matFull.expected_lifespan_days || 90
+              ]
+            );
+          }
+        }
       }
 
       totalItems++;
@@ -645,10 +719,23 @@ router.get('/p2p-pipeline', auth, ar(async (req, res) => {
     LEFT JOIN indents ind ON ind.id = po.indent_id
     LEFT JOIN users indUser ON indUser.id = ind.raised_by
     LEFT JOIN departments dept ON dept.id = ind.department_id
-    LEFT JOIN grn g ON g.po_id = po.id
+    -- GAP-1 FIX: Use LATERAL to pick the latest GRN per PO (prevents row duplication when multiple GRNs exist)
+    LEFT JOIN LATERAL (
+      SELECT * FROM grn WHERE po_id = po.id ORDER BY created_at DESC LIMIT 1
+    ) g ON TRUE
     LEFT JOIN users gUser ON gUser.id = g.received_by
-    LEFT JOIN vendor_bills vb ON vb.po_id = po.id OR vb.grn_id = g.id
-    LEFT JOIN vendor_payments vp ON vp.bill_id = vb.id OR vp.po_id = po.id
+    -- Use LATERAL for vendor_bills: pick latest bill linked to this PO or its GRN (avoids OR-join fanout)
+    LEFT JOIN LATERAL (
+      SELECT * FROM vendor_bills
+      WHERE po_id = po.id OR grn_id = g.id
+      ORDER BY created_at DESC LIMIT 1
+    ) vb ON TRUE
+    -- GAP-1 FIX: LATERAL for payments — prevents N-row duplication when multiple partial payments exist
+    LEFT JOIN LATERAL (
+      SELECT * FROM vendor_payments
+      WHERE bill_id = vb.id OR po_id = po.id
+      ORDER BY payment_date DESC LIMIT 1
+    ) vp ON TRUE
     ${where}
     ORDER BY po.created_at DESC
     LIMIT $${p}

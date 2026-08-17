@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bell, BellOff, Lock, LogOut, Menu } from 'lucide-react'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import { filterNav } from './data/permissions'
+import { canAccess } from './data/permissions'
 import ForceChangePassword from './pages/ForceChangePassword'
 import Login from './pages/Login'
 import Sidebar from './components/Sidebar'
@@ -40,14 +40,22 @@ import Admin from './pages/Admin'
 import AllSections from './pages/AllSections'
 import PlantSection from './pages/PlantSection'
 import ChemicalStore from './pages/ChemicalStore'
-import StoreDeptReports from './pages/StoreDeptReports'
 import StoreDashboard from './pages/StoreDashboard'
+
+// Plant-section keys — must stay in sync with the 'Plant Sections' group in Sidebar.jsx.
+// They are routed as /sections/<code> and rendered by AllSections / PlantSection.
+const SECTION_KEYS = ['sections-all','sections-pulp','sections-centri','sections-wire','sections-vacuum',
+  'sections-press','sections-unirun','sections-predryer','sections-sizepress','sections-sizekitchen',
+  'sections-postdryer','sections-calender','sections-pope','sections-rewinder','sections-starchkitchen',
+  'sections-steamcond','sections-etp','sections-boiler','sections-lab','sections-cranes',
+  'sections-compressors','sections-store']
 
 const NAV_KEYS = ['dashboard','production','daily-report','quality','maintenance','utility','grades','machines',
   'rawmaterial','inventory','materials','chemicals','store','store-dashboard','indent','scrap',
   'purchase','customers','vendors','sales','dispatch','finance',
   'packing','fgwarehouse','hr','security','laboratory','ehs',
-  'reports','phases','masterdata','admin','users']
+  'reports','phases','masterdata','admin','users',
+  ...SECTION_KEYS]
 
 function AccessDenied({ onNavigate }) {
   return (
@@ -88,10 +96,6 @@ const PAGE_COMPONENTS = {
   phases: Phases,
   masterdata: MasterData,
   inventory: Inventory,
-  shifts: Production,
-  downtime: Production,
-  grn: Inventory,
-  stockledger: Inventory,
   indent: Indent,
   purchase: Purchase,
   quality: Quality,
@@ -105,7 +109,6 @@ const PAGE_COMPONENTS = {
   rawmaterial: RawMaterial,
   store: Store,
   'store-dashboard': StoreDashboard,
-  'store-reports': Reports,
   scrap: Scrap,
   packing: Packing,
   fgwarehouse: FGWarehouse,
@@ -120,7 +123,7 @@ const PAGE_TITLES = {
   dashboard:'Dashboard', production:'Production', 'daily-report':'Daily Report', quality:'Quality', maintenance:'Maintenance',
   utility:'Utility', grades:'Grades', machines:'Machines', rawmaterial:'Raw Material Store',
   inventory:'Inventory', materials:'Materials', chemicals:'Chemical Store', store:'Store Management',
-  'store-dashboard':'Store Dashboard', 'store-reports':'Reports & Analytics',
+  'store-dashboard':'Store Dashboard',
   indent:'Indent / PIIMAS', scrap:'Scrap Management', purchase:'Purchase', customers:'Customers',
   vendors:'Vendors', sales:'Sales', dispatch:'Dispatch', finance:'Finance', packing:'Packing',
   fgwarehouse:'FG Warehouse', hr:'HR & Payroll', security:'Security', laboratory:'Laboratory',
@@ -161,8 +164,11 @@ function AppShell() {
     active = rawPath.substring(1)
   }
 
+  // Page authorization — deliberately uses canAccess, NOT filterNav: filterNav also
+  // strips keys that are merely hidden from the sidebar (e.g. 'chemicals'), which
+  // would make those pages unreachable by URL as well.
   const allowedKeys = new Set(
-    user ? filterNav(NAV_KEYS.map(k => ({ key: k })), user).map(n => n.key) : []
+    user ? NAV_KEYS.filter(k => canAccess(k, user)) : []
   )
 
   useEffect(() => {
@@ -253,12 +259,12 @@ function AppShell() {
   if (user.must_change_password) return <ForceChangePassword />
 
   const renderPage = () => {
+    if (active !== 'dashboard' && !allowedKeys.has(active)) return <AccessDenied onNavigate={handleNavigate} />
     if (active === 'sections-all') return <AllSections />
     if (active.startsWith('sections-')) {
       const code = active.replace('sections-', '').toUpperCase()
       return <PlantSection sectionCode={code} />
     }
-    if (active !== 'dashboard' && !allowedKeys.has(active)) return <AccessDenied onNavigate={handleNavigate} />
     const PageComponent = PAGE_COMPONENTS[active]
     if (PageComponent) return <PageComponent onNavigate={handleNavigate} />
     if (MODULES.includes(active)) return <Placeholder module={active} onNavigate={handleNavigate} />
