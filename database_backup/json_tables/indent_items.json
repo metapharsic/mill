@@ -133,5 +133,32 @@
     "photo_url": null,
     "ack_status": "pending",
     "maintenance_log_id": null
+  },
+  {
+    "id": 38,
+    "indent_id": 38,
+    "material_id": 2299,
+    "required_qty": "2.000",
+    "approved_qty": null,
+    "uom": "Nos",
+    "purpose": "",
+    "current_stock": "1.000",
+    "component_position": null,
+    "section_id": null,
+    "machine_id": null,
+    "unit_price": "507516.00",
+    "line_value": "1015032.00",
+    "issued_qty": "0.000",
+    "batch_no": null,
+    "reason_code": "Routine Replacement",
+    "ack_by": null,
+    "ack_at": null,
+    "fitment_date": null,
+    "observations": null,
+    "kpi_before": null,
+    "kpi_after": null,
+    "photo_url": null,
+    "ack_status": "pending",
+    "maintenance_log_id": null
   }
 ]

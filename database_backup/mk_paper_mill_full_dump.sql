@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 7u7kcR1PCvVtw81f0pPlsBZAEcoX1b1s4dIOP6a6TvGE90IYgyrQu9U4VtNaJkw
+\restrict EzOggepPFJQZG3Fnp9TAeeIvzC537ssmXtx65InDVl8k9ZxToscL2dbFnSF0Ey8
 
 -- Dumped from database version 18.2
 -- Dumped by pg_dump version 18.2
@@ -467,6 +467,98 @@ ALTER SEQUENCE public.boiler_performance_logs_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE public.boiler_performance_logs_id_seq OWNED BY public.boiler_performance_logs.id;
+
+
+--
+-- Name: cash_purchase_items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cash_purchase_items (
+    id integer NOT NULL,
+    cash_purchase_id integer,
+    material_id integer,
+    qty numeric(12,3) NOT NULL,
+    uom character varying(20),
+    unit_price numeric(12,2) NOT NULL,
+    gst_pct numeric(5,2) DEFAULT 18,
+    line_taxable numeric(15,2) NOT NULL,
+    line_total numeric(15,2) NOT NULL
+);
+
+
+ALTER TABLE public.cash_purchase_items OWNER TO postgres;
+
+--
+-- Name: cash_purchase_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.cash_purchase_items_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.cash_purchase_items_id_seq OWNER TO postgres;
+
+--
+-- Name: cash_purchase_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.cash_purchase_items_id_seq OWNED BY public.cash_purchase_items.id;
+
+
+--
+-- Name: cash_purchases; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cash_purchases (
+    id integer NOT NULL,
+    voucher_number character varying(50) NOT NULL,
+    date date NOT NULL,
+    indent_id integer,
+    vendor_name character varying(150) NOT NULL,
+    vendor_gstin character varying(20),
+    invoice_number character varying(100),
+    invoice_date date,
+    payment_mode character varying(50) DEFAULT 'Cash'::character varying,
+    payment_ref character varying(100),
+    taxable_amount numeric(15,2) DEFAULT 0,
+    cgst_amount numeric(12,2) DEFAULT 0,
+    sgst_amount numeric(12,2) DEFAULT 0,
+    igst_amount numeric(12,2) DEFAULT 0,
+    total_tax numeric(12,2) DEFAULT 0,
+    total_amount numeric(15,2) NOT NULL,
+    remarks text,
+    created_by integer,
+    created_at timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.cash_purchases OWNER TO postgres;
+
+--
+-- Name: cash_purchases_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.cash_purchases_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.cash_purchases_id_seq OWNER TO postgres;
+
+--
+-- Name: cash_purchases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.cash_purchases_id_seq OWNED BY public.cash_purchases.id;
 
 
 --
@@ -4913,6 +5005,20 @@ ALTER TABLE ONLY public.boiler_performance_logs ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: cash_purchase_items id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchase_items ALTER COLUMN id SET DEFAULT nextval('public.cash_purchase_items_id_seq'::regclass);
+
+
+--
+-- Name: cash_purchases id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchases ALTER COLUMN id SET DEFAULT nextval('public.cash_purchases_id_seq'::regclass);
+
+
+--
 -- Name: chemical_consumption id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5784,6 +5890,22 @@ COPY public.boiler_performance_logs (id, log_time, steam_flow_kgh, steam_pressur
 
 
 --
+-- Data for Name: cash_purchase_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.cash_purchase_items (id, cash_purchase_id, material_id, qty, uom, unit_price, gst_pct, line_taxable, line_total) FROM stdin;
+\.
+
+
+--
+-- Data for Name: cash_purchases; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.cash_purchases (id, voucher_number, date, indent_id, vendor_name, vendor_gstin, invoice_number, invoice_date, payment_mode, payment_ref, taxable_amount, cgst_amount, sgst_amount, igst_amount, total_tax, total_amount, remarks, created_by, created_at) FROM stdin;
+\.
+
+
+--
 -- Data for Name: chemical_consumption; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6447,6 +6569,7 @@ COPY public.indent_items (id, indent_id, material_id, required_qty, approved_qty
 28	27	4454	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-639817	\N	\N	\N	\N	\N	\N	\N	\N	pending	\N
 33	33	4455	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-635458	\N	\N	\N	\N	\N	\N	\N	\N	pending	\N
 36	36	3059	1.000	\N	Nos	CHANGING LINE	0.000	Vaccume Line 	\N	\N	0.00	0.00	1.000	\N	Upgrade/MOC	\N	\N	\N	\N	\N	\N	\N	pending	\N
+38	38	2299	2.000	\N	Nos		1.000	\N	\N	\N	507516.00	1015032.00	0.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending	\N
 \.
 
 
@@ -6460,6 +6583,7 @@ COPY public.indents (id, indent_number, date, department_id, required_date, prio
 14	IND-20260813-0002	2026-08-13	1	2026-08-13	Normal	Closed	6	\N	\N	\N	\N	\N	\N	\N	2026-08-13 22:14:44.54647	\N	\N	0.00	6	2026-08-13 22:15:07.470584+05:30	2026-08-14 00:13:10.479441+05:30	f	\N	\N	\N
 36	IND-20260815-0001	2026-08-15	8	2026-08-14	Normal	Closed	6	\N	\N	\N	\N	\N	\N	vaccume line	2026-08-15 15:07:41.096594	\N	\N	0.00	6	2026-08-15 15:10:37.056553+05:30	2026-08-15 15:11:07.548563+05:30	f	\N	\N	\N
 27	IND-20260813-0014	2026-08-14	10	2026-08-13	High	Issued	10	1	2026-08-14 01:54:00.130268	\N	\N	\N	\N	Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]	2026-08-14 01:54:00.115492	\N	\N	216000.00	6	2026-08-14 01:54:00.145124+05:30	\N	f	\N	\N	\N
+38	IND-20260817-0001	2026-08-17	1	2026-08-17	Normal	Submitted	6	\N	\N	\N	\N	\N	\N	\N	2026-08-17 10:59:51.407621	2	\N	1015032.00	\N	\N	\N	f	\N	\N	\N
 \.
 
 
@@ -13776,6 +13900,20 @@ SELECT pg_catalog.setval('public.boiler_performance_logs_id_seq', 3, true);
 
 
 --
+-- Name: cash_purchase_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.cash_purchase_items_id_seq', 1, false);
+
+
+--
+-- Name: cash_purchases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.cash_purchases_id_seq', 1, false);
+
+
+--
 -- Name: chemical_consumption_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14010,14 +14148,14 @@ SELECT pg_catalog.setval('public.indent_comments_id_seq', 1, false);
 -- Name: indent_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indent_items_id_seq', 37, true);
+SELECT pg_catalog.setval('public.indent_items_id_seq', 38, true);
 
 
 --
 -- Name: indents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indents_id_seq', 37, true);
+SELECT pg_catalog.setval('public.indents_id_seq', 38, true);
 
 
 --
@@ -14527,6 +14665,30 @@ ALTER TABLE ONLY public.boiler_performance_logs
 
 ALTER TABLE ONLY public.boiler_performance_logs
     ADD CONSTRAINT boiler_performance_logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cash_purchase_items cash_purchase_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchase_items
+    ADD CONSTRAINT cash_purchase_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cash_purchases cash_purchases_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchases
+    ADD CONSTRAINT cash_purchases_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cash_purchases cash_purchases_voucher_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchases
+    ADD CONSTRAINT cash_purchases_voucher_number_key UNIQUE (voucher_number);
 
 
 --
@@ -15826,6 +15988,13 @@ CREATE INDEX idx_audit_log_user ON public.audit_log USING btree (user_id);
 
 
 --
+-- Name: idx_cash_purchases_indent_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_cash_purchases_indent_id ON public.cash_purchases USING btree (indent_id);
+
+
+--
 -- Name: idx_dpr_chem_report; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16378,6 +16547,14 @@ ALTER TABLE ONLY public.audit_log
 
 ALTER TABLE ONLY public.boiler_performance_logs
     ADD CONSTRAINT boiler_performance_logs_logged_by_fkey FOREIGN KEY (logged_by) REFERENCES public.users(id);
+
+
+--
+-- Name: cash_purchase_items cash_purchase_items_cash_purchase_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cash_purchase_items
+    ADD CONSTRAINT cash_purchase_items_cash_purchase_id_fkey FOREIGN KEY (cash_purchase_id) REFERENCES public.cash_purchases(id) ON DELETE CASCADE;
 
 
 --
@@ -18152,5 +18329,5 @@ ALTER TABLE ONLY public.vendors
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 7u7kcR1PCvVtw81f0pPlsBZAEcoX1b1s4dIOP6a6TvGE90IYgyrQu9U4VtNaJkw
+\unrestrict EzOggepPFJQZG3Fnp9TAeeIvzC537ssmXtx65InDVl8k9ZxToscL2dbFnSF0Ey8
 

@@ -1,7 +1,7 @@
 {
-  "exportedAt": "2026-08-17T05:25:14.048Z",
+  "exportedAt": "2026-08-17T05:39:42.771Z",
   "database": "mk_paper_mill",
-  "totalTables": 106,
+  "totalTables": 108,
   "tables": {
     "adjustment_requests": {
       "rowCount": 0,
@@ -42,6 +42,14 @@
     "boiler_performance_logs": {
       "rowCount": 1,
       "file": "boiler_performance_logs.json"
+    },
+    "cash_purchase_items": {
+      "rowCount": 0,
+      "file": "cash_purchase_items.json"
+    },
+    "cash_purchases": {
+      "rowCount": 0,
+      "file": "cash_purchases.json"
     },
     "chemical_consumption": {
       "rowCount": 0,
@@ -176,11 +184,11 @@
       "file": "indent_comments.json"
     },
     "indent_items": {
-      "rowCount": 5,
+      "rowCount": 6,
       "file": "indent_items.json"
     },
     "indents": {
-      "rowCount": 5,
+      "rowCount": 6,
       "file": "indents.json"
     },
     "inspection_round_scans": {

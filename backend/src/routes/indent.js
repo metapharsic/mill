@@ -73,10 +73,25 @@ router.get('/', auth, ar(async (req, res) => {
      LEFT JOIN users cu ON cu.id=i.cancelled_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
-     LEFT JOIN purchase_orders po ON po.indent_id=i.id
-     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
-     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
-     LEFT JOIN cash_purchases cp ON cp.indent_id = i.id
+     LEFT JOIN LATERAL (
+       SELECT po.id, po.po_number, po.status, po.grand_total, v.name as "vendor_name"
+       FROM purchase_orders po
+       LEFT JOIN vendors v ON v.id = po.vendor_id
+       WHERE po.indent_id = i.id
+       ORDER BY po.id DESC LIMIT 1
+     ) po ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT gp.id, gp.gp_number, gp.status, gp.pass_type
+       FROM gate_passes gp
+       WHERE gp.remarks ILIKE '%' || i.indent_number || '%' OR (po.id IS NOT NULL AND gp.po_id = po.id)
+       ORDER BY gp.id DESC LIMIT 1
+     ) gp ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT cp.id, cp.voucher_number, cp.total_amount, cp.vendor_name
+       FROM cash_purchases cp
+       WHERE cp.indent_id = i.id
+       ORDER BY cp.id DESC LIMIT 1
+     ) cp ON TRUE
      ${where} ORDER BY i.created_at DESC LIMIT $${p} OFFSET $${p+1}`,
     [...params, parseInt(limit), offset]
   );
@@ -86,9 +101,6 @@ router.get('/', auth, ar(async (req, res) => {
      LEFT JOIN users u ON u.id=i.raised_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
-     LEFT JOIN purchase_orders po ON po.indent_id=i.id
-     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
-     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
      ${where}`, params
   );
   res.json({ success:true, data:rows, total:parseInt(cnt[0].count) });

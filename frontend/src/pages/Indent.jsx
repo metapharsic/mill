@@ -225,14 +225,13 @@ export default function Indent() {
     setLoading(true)
     const p = new URLSearchParams({ page, limit: LIMIT })
     if (fStatus) p.set('status', fStatus)
-    if (fDept) p.set('dept', fDept)
-    else if (user?.role_level === 3 && user?.dept_code !== 'STORE') p.set('dept', user.department_id)
+    if (fDept && fDept !== 'undefined') p.set('dept', fDept)
     if (searchTerm) p.set('search', searchTerm)
 
     const r = await API(`/indent?${p}`)
     if (r.success) { setRows(r.data); setTotal(r.total) }
     setLoading(false)
-  }, [page, fStatus, fDept, searchTerm, user])
+  }, [page, fStatus, fDept, searchTerm])
 
   useEffect(() => { load() }, [load])
   useEffect(() => {
