@@ -76,8 +76,8 @@ const REASON_COLORS = {
 }
 
 const ALL_TABS = [
+  { key: 'raise',       label: '✨ Request / Raise Indent',   who: u => (u.role_level || 1) >= 1 },
   { key: 'list',        label: '📋 All Indents & Vouchers',   who: () => true },
-  { key: 'raise',       label: '✨ Raise / Edit Indent',      who: u => (u.role_level || 1) >= 1 },
   { key: 'issue',       label: '📦 Store Issuance Desk',      who: u => u.dept_code === 'STORE' || ['Store Management', 'Store'].includes(u.department) || (u.role_level || 1) >= 3 },
   { key: 'acknowledge', label: '🤝 Fitment Acks',            who: u => (u.role_level || 1) >= 1 },
   { key: 'analytics',   label: '📊 Indent Analytics',         who: u => (u.role_level || 1) >= 2 },
@@ -119,7 +119,7 @@ function numberToWords(num) {
 export default function Indent() {
   const { user } = useAuth()
   const visibleTabs = ALL_TABS.filter(t => t.who(user || {}))
-  const [tabKey, setTabKey] = useState('list')
+  const [tabKey, setTabKey] = useState('raise')
   const printRef = useRef(null)
 
   const [rows, setRows] = useState([])
@@ -129,6 +129,7 @@ export default function Indent() {
   const [fDept, setFDept] = useState('')
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
+  const [raiseSearch, setRaiseSearch] = useState('')
   const [matSearch, setMatSearch] = useState({})
   const [matDropOpen, setMatDropOpen] = useState({})
   const [depts, setDepts] = useState([])
@@ -240,6 +241,17 @@ export default function Indent() {
     API('/sections').then(r => { if (r.success) setSections(r.data) })
     API('/master/machines').then(r => { if (r.success) setMachines(r.data) })
     API('/master/vendors').then(r => { if (r.success) setVendors(r.data) })
+
+    // Check URL params for direct tab / detail routing
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')
+    if (tabParam && ['raise', 'list', 'issue', 'acknowledge', 'analytics', 'calendar'].includes(tabParam)) {
+      setTabKey(tabParam)
+    }
+    const indId = params.get('indent_id') || params.get('indentId') || params.get('id')
+    if (indId) {
+      openDetail(indId)
+    }
   }, [])
 
 
@@ -961,9 +973,15 @@ export default function Indent() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }} onClick={() => setTabKey('raise')}>
-            ＋ Raise New Indent
-          </button>
+          {tabKey !== 'raise' ? (
+            <button style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }} onClick={() => setTabKey('raise')}>
+              ＋ Raise / Request Indent
+            </button>
+          ) : (
+            <button style={{ ...S.btnSecondary, background: '#1e293b', color: '#fff', fontWeight: 700 }} onClick={() => setTabKey('list')}>
+              📋 All Indents Register
+            </button>
+          )}
           <button style={S.btnSecondary} onClick={exportToCSV} title="Export Indents with Full Specifications to CSV">
             📥 Export CSV
           </button>
@@ -1967,14 +1985,20 @@ export default function Indent() {
                   Live tracking of all indents raised across departments with instant PO / DC / Cash conversion and voucher printing.
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  style={{ ...S.inp, width: 220, fontSize: 12, padding: '6px 10px' }}
+                  placeholder="🔍 Quick filter indents..."
+                  value={raiseSearch}
+                  onChange={e => setRaiseSearch(e.target.value)}
+                />
                 <button
                   type="button"
                   style={{ ...S.btnSm('#0f766e'), padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 4 }}
                   onClick={load}
                   title="Reload Indents"
                 >
-                  ↻ Refresh Indents
+                  ↻ Refresh
                 </button>
                 <button
                   type="button"
@@ -1997,7 +2021,10 @@ export default function Indent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.slice(0, 10).map((r) => {
+                  {rows
+                    .filter(r => !raiseSearch || (r.indentNumber||'').toLowerCase().includes(raiseSearch.toLowerCase()) || (r.deptName||'').toLowerCase().includes(raiseSearch.toLowerCase()) || (r.raisedByName||'').toLowerCase().includes(raiseSearch.toLowerCase()) || (r.reasonCode||'').toLowerCase().includes(raiseSearch.toLowerCase()) || (r.machineName||'').toLowerCase().includes(raiseSearch.toLowerCase()))
+                    .slice(0, 25)
+                    .map((r) => {
                     const rc = REASON_COLORS[r.reasonCode] || { bg: '#f1f5f9', color: '#475569', border: '#cbd5e1', icon: '📝' }
                     return (
                       <tr key={r.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
