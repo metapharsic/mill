@@ -314,25 +314,9 @@
     "department_id": 4,
     "shift": null,
     "is_active": true,
-    "last_login": "2026-08-15T05:39:03.686Z",
+    "last_login": "2026-08-15T09:42:34.008Z",
     "created_at": "2026-06-29T04:18:42.952Z",
     "updated_at": "2026-06-29T04:18:42.952Z",
-    "must_change_password": false
-  },
-  {
-    "id": 1,
-    "employee_code": "EMP001",
-    "name": "Admin",
-    "email": "admin@mkpapermill.com",
-    "mobile": "9999999999",
-    "password_hash": "$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq",
-    "role_id": 5,
-    "department_id": 16,
-    "shift": null,
-    "is_active": true,
-    "last_login": "2026-08-15T11:45:59.506Z",
-    "created_at": "2026-06-26T12:43:01.372Z",
-    "updated_at": "2026-06-26T12:43:01.372Z",
     "must_change_password": false
   },
   {
@@ -346,9 +330,25 @@
     "department_id": 16,
     "shift": null,
     "is_active": true,
-    "last_login": "2026-08-15T08:10:48.250Z",
+    "last_login": "2026-08-16T16:02:13.363Z",
     "created_at": "2026-06-29T04:18:42.952Z",
     "updated_at": "2026-07-10T14:10:06.471Z",
+    "must_change_password": false
+  },
+  {
+    "id": 1,
+    "employee_code": "EMP001",
+    "name": "Admin",
+    "email": "admin@mkpapermill.com",
+    "mobile": "9999999999",
+    "password_hash": "$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq",
+    "role_id": 5,
+    "department_id": 16,
+    "shift": null,
+    "is_active": true,
+    "last_login": "2026-08-16T18:45:16.536Z",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "updated_at": "2026-06-26T12:43:01.372Z",
     "must_change_password": false
   },
   {
@@ -362,7 +362,7 @@
     "department_id": 4,
     "shift": null,
     "is_active": true,
-    "last_login": "2026-08-15T11:52:01.082Z",
+    "last_login": "2026-08-17T05:17:33.138Z",
     "created_at": "2026-06-29T04:18:42.952Z",
     "updated_at": "2026-06-29T04:18:42.952Z",
     "must_change_password": false

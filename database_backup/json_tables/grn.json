@@ -11,7 +11,8 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:23:12.694Z"
+    "created_at": "2026-08-13T20:23:12.694Z",
+    "gate_pass_id": null
   },
   {
     "id": 4,
@@ -25,7 +26,8 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:23:25.319Z"
+    "created_at": "2026-08-13T20:23:25.319Z",
+    "gate_pass_id": null
   },
   {
     "id": 5,
@@ -39,7 +41,8 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:23:33.935Z"
+    "created_at": "2026-08-13T20:23:33.935Z",
+    "gate_pass_id": null
   },
   {
     "id": 6,
@@ -53,7 +56,8 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:23:40.866Z"
+    "created_at": "2026-08-13T20:23:40.866Z",
+    "gate_pass_id": null
   },
   {
     "id": 7,
@@ -67,7 +71,8 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:24:00.067Z"
+    "created_at": "2026-08-13T20:24:00.067Z",
+    "gate_pass_id": null
   },
   {
     "id": 8,
@@ -81,48 +86,157 @@
     "received_by": 6,
     "status": "Received",
     "remarks": null,
-    "created_at": "2026-08-13T20:40:35.847Z"
-  },
-  {
-    "id": 9,
-    "grn_number": "GRN-P2P-1786794967620",
-    "date": "2026-08-14T18:30:00.000Z",
-    "vendor_id": 2,
-    "po_id": 24,
-    "vehicle_number": "KA-01-MM-9999",
-    "challan_number": "CH-88899",
-    "invoice_number": "INV-VEND-2026-001",
-    "received_by": 21,
-    "status": "Received",
-    "remarks": "Quality inspection passed at Gate 1",
-    "created_at": "2026-08-15T11:56:07.621Z"
+    "created_at": "2026-08-13T20:40:35.847Z",
+    "gate_pass_id": null
   },
   {
     "id": 10,
-    "grn_number": "GRN-P2P-1786795104118",
-    "date": "2026-08-14T18:30:00.000Z",
+    "grn_number": "GRN-TEST-721532",
+    "date": "2026-08-15T18:30:00.000Z",
     "vendor_id": 2,
     "po_id": 25,
-    "vehicle_number": "KA-01-MM-9999",
-    "challan_number": "CH-88899",
-    "invoice_number": "INV-VEND-2026-001",
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
     "received_by": 21,
-    "status": "Received",
-    "remarks": "Quality inspection passed at Gate 1",
-    "created_at": "2026-08-15T11:58:24.119Z"
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T12:52:01.532Z",
+    "gate_pass_id": 3
   },
   {
     "id": 11,
-    "grn_number": "GRN-P2P-1786795797464",
-    "date": "2026-08-14T18:30:00.000Z",
+    "grn_number": "GRN-TEST-766685",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 26,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T12:52:46.686Z",
+    "gate_pass_id": 4
+  },
+  {
+    "id": 12,
+    "grn_number": "GRN-TEST-945827",
+    "date": "2026-08-15T18:30:00.000Z",
     "vendor_id": 2,
     "po_id": 27,
-    "vehicle_number": "KA-01-MM-9999",
-    "challan_number": "CH-88899",
-    "invoice_number": "INV-VEND-2026-001",
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
     "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T12:55:45.827Z",
+    "gate_pass_id": 5
+  },
+  {
+    "id": 13,
+    "grn_number": "GRN-TEST-048405",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 28,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T12:57:28.406Z",
+    "gate_pass_id": 6
+  },
+  {
+    "id": 14,
+    "grn_number": "GRN-TEST-903999",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 29,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T13:11:44.000Z",
+    "gate_pass_id": 8
+  },
+  {
+    "id": 15,
+    "grn_number": "GRN-TEST-302145",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 30,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T13:18:22.145Z",
+    "gate_pass_id": 10
+  },
+  {
+    "id": 16,
+    "grn_number": "GRN-TEST-638381",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 31,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T13:40:38.382Z",
+    "gate_pass_id": 12
+  },
+  {
+    "id": 17,
+    "grn_number": "GRN-CLOTH-9613",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": null,
+    "vehicle_number": null,
+    "challan_number": null,
+    "invoice_number": null,
+    "received_by": null,
     "status": "Received",
-    "remarks": "Quality inspection passed at Gate 1",
-    "created_at": "2026-08-15T12:09:57.464Z"
+    "remarks": "Test Clothing Inward",
+    "created_at": "2026-08-16T14:07:19.616Z",
+    "gate_pass_id": null
+  },
+  {
+    "id": 18,
+    "grn_number": "GRN-CLOTH-3505",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": null,
+    "vehicle_number": null,
+    "challan_number": null,
+    "invoice_number": null,
+    "received_by": null,
+    "status": "Received",
+    "remarks": "Test Clothing Inward",
+    "created_at": "2026-08-16T14:10:03.508Z",
+    "gate_pass_id": null
+  },
+  {
+    "id": 19,
+    "grn_number": "GRN-TEST-599654",
+    "date": "2026-08-15T18:30:00.000Z",
+    "vendor_id": 2,
+    "po_id": 32,
+    "vehicle_number": null,
+    "challan_number": "DC-9988",
+    "invoice_number": "INV-5544",
+    "received_by": 21,
+    "status": "QC Pending",
+    "remarks": null,
+    "created_at": "2026-08-16T14:13:19.655Z",
+    "gate_pass_id": 14
   }
 ]

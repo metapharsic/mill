@@ -90,100 +90,12 @@
   {
     "id": 21,
     "po_id": 22,
-    "material_id": 2129,
-    "qty": "1.000",
+    "material_id": 2131,
+    "qty": "3.000",
     "received_qty": "0.000",
     "uom": "Nos",
     "unit_price": "1200.00",
     "gst_pct": "18.00",
-    "total": "1200.00"
-  },
-  {
-    "id": 22,
-    "po_id": 23,
-    "material_id": 2142,
-    "qty": "10.000",
-    "received_qty": "0.000",
-    "uom": "Nos",
-    "unit_price": "312.00",
-    "gst_pct": "18.00",
-    "total": "3120.00"
-  },
-  {
-    "id": 23,
-    "po_id": 24,
-    "material_id": 3488,
-    "qty": "10.000",
-    "received_qty": "10.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
-  },
-  {
-    "id": 24,
-    "po_id": 24,
-    "material_id": 3496,
-    "qty": "5.000",
-    "received_qty": "5.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
-  },
-  {
-    "id": 25,
-    "po_id": 25,
-    "material_id": 3488,
-    "qty": "10.000",
-    "received_qty": "10.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
-  },
-  {
-    "id": 26,
-    "po_id": 25,
-    "material_id": 3496,
-    "qty": "5.000",
-    "received_qty": "5.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
-  },
-  {
-    "id": 27,
-    "po_id": 26,
-    "material_id": 2853,
-    "qty": "1.000",
-    "received_qty": "0.000",
-    "uom": "NOS",
-    "unit_price": "150.00",
-    "gst_pct": "18.00",
-    "total": "150.00"
-  },
-  {
-    "id": 28,
-    "po_id": 27,
-    "material_id": 3488,
-    "qty": "10.000",
-    "received_qty": "10.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
-  },
-  {
-    "id": 29,
-    "po_id": 27,
-    "material_id": 3496,
-    "qty": "5.000",
-    "received_qty": "5.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "gst_pct": "18.00",
-    "total": "2950.00"
+    "total": "3600.00"
   }
 ]

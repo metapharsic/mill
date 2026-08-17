@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "transfer_id": 1,
+    "material_id": 3367,
+    "qty": "50.000",
+    "uom": "Kg",
+    "batch_number": null,
+    "remarks": null
+  },
+  {
+    "id": 2,
+    "transfer_id": 2,
+    "material_id": 3368,
+    "qty": "50.000",
+    "uom": "Kg",
+    "batch_number": null,
+    "remarks": null
+  },
+  {
+    "id": 3,
+    "transfer_id": 3,
+    "material_id": 3369,
+    "qty": "50.000",
+    "uom": "Kg",
+    "batch_number": null,
+    "remarks": null
+  },
+  {
+    "id": 4,
+    "transfer_id": 4,
+    "material_id": 3370,
+    "qty": "50.000",
+    "uom": "Kg",
+    "batch_number": null,
+    "remarks": null
+  }
+]

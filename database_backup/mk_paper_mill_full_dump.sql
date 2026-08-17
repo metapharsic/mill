@@ -2,12 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict fO7A20Gx7RVk2myi9vBIBOyd3EPnXFxpwczDgENXaDHB4x6CcSL2aptQ9bTQZfm
+\restrict 7u7kcR1PCvVtw81f0pPlsBZAEcoX1b1s4dIOP6a6TvGE90IYgyrQu9U4VtNaJkw
 
--- Dumped from database version 18.4
--- Dumped by pg_dump version 18.4
-
--- Started on 2026-08-15 17:45:54
+-- Dumped from database version 18.2
+-- Dumped by pg_dump version 18.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,7 +20,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 419 (class 1255 OID 24587)
 -- Name: seed_clearance_items(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -50,7 +47,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 220 (class 1259 OID 24588)
 -- Name: adjustment_requests; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -73,7 +69,6 @@ CREATE TABLE public.adjustment_requests (
 ALTER TABLE public.adjustment_requests OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 24602)
 -- Name: adjustment_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -89,8 +84,6 @@ CREATE SEQUENCE public.adjustment_requests_id_seq
 ALTER SEQUENCE public.adjustment_requests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6692 (class 0 OID 0)
--- Dependencies: 221
 -- Name: adjustment_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -98,7 +91,6 @@ ALTER SEQUENCE public.adjustment_requests_id_seq OWNED BY public.adjustment_requ
 
 
 --
--- TOC entry 222 (class 1259 OID 24603)
 -- Name: appraisal_competencies; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -117,7 +109,6 @@ CREATE TABLE public.appraisal_competencies (
 ALTER TABLE public.appraisal_competencies OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 24613)
 -- Name: appraisal_competencies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -133,8 +124,6 @@ CREATE SEQUENCE public.appraisal_competencies_id_seq
 ALTER SEQUENCE public.appraisal_competencies_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6693 (class 0 OID 0)
--- Dependencies: 223
 -- Name: appraisal_competencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -142,7 +131,6 @@ ALTER SEQUENCE public.appraisal_competencies_id_seq OWNED BY public.appraisal_co
 
 
 --
--- TOC entry 224 (class 1259 OID 24614)
 -- Name: appraisal_cycles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -167,7 +155,6 @@ CREATE TABLE public.appraisal_cycles (
 ALTER TABLE public.appraisal_cycles OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 24627)
 -- Name: appraisal_cycles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -183,8 +170,6 @@ CREATE SEQUENCE public.appraisal_cycles_id_seq
 ALTER SEQUENCE public.appraisal_cycles_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6694 (class 0 OID 0)
--- Dependencies: 225
 -- Name: appraisal_cycles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -192,7 +177,6 @@ ALTER SEQUENCE public.appraisal_cycles_id_seq OWNED BY public.appraisal_cycles.i
 
 
 --
--- TOC entry 226 (class 1259 OID 24628)
 -- Name: appraisal_goals; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -216,7 +200,6 @@ CREATE TABLE public.appraisal_goals (
 ALTER TABLE public.appraisal_goals OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 24639)
 -- Name: appraisal_goals_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -232,8 +215,6 @@ CREATE SEQUENCE public.appraisal_goals_id_seq
 ALTER SEQUENCE public.appraisal_goals_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6695 (class 0 OID 0)
--- Dependencies: 227
 -- Name: appraisal_goals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -241,7 +222,6 @@ ALTER SEQUENCE public.appraisal_goals_id_seq OWNED BY public.appraisal_goals.id;
 
 
 --
--- TOC entry 228 (class 1259 OID 24640)
 -- Name: approval_matrix; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -259,7 +239,6 @@ CREATE TABLE public.approval_matrix (
 ALTER TABLE public.approval_matrix OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 24651)
 -- Name: approval_matrix_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -275,8 +254,6 @@ CREATE SEQUENCE public.approval_matrix_id_seq
 ALTER SEQUENCE public.approval_matrix_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6696 (class 0 OID 0)
--- Dependencies: 229
 -- Name: approval_matrix_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -284,7 +261,6 @@ ALTER SEQUENCE public.approval_matrix_id_seq OWNED BY public.approval_matrix.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 24652)
 -- Name: asset_events; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -301,7 +277,6 @@ CREATE TABLE public.asset_events (
 ALTER TABLE public.asset_events OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 24660)
 -- Name: asset_events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -317,8 +292,6 @@ CREATE SEQUENCE public.asset_events_id_seq
 ALTER SEQUENCE public.asset_events_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6697 (class 0 OID 0)
--- Dependencies: 231
 -- Name: asset_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -326,7 +299,6 @@ ALTER SEQUENCE public.asset_events_id_seq OWNED BY public.asset_events.id;
 
 
 --
--- TOC entry 232 (class 1259 OID 24661)
 -- Name: attendance; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -347,7 +319,6 @@ CREATE TABLE public.attendance (
 ALTER TABLE public.attendance OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 24670)
 -- Name: attendance_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -363,8 +334,6 @@ CREATE SEQUENCE public.attendance_id_seq
 ALTER SEQUENCE public.attendance_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6698 (class 0 OID 0)
--- Dependencies: 233
 -- Name: attendance_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -372,7 +341,6 @@ ALTER SEQUENCE public.attendance_id_seq OWNED BY public.attendance.id;
 
 
 --
--- TOC entry 234 (class 1259 OID 24671)
 -- Name: attendance_regularization; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -396,7 +364,6 @@ CREATE TABLE public.attendance_regularization (
 ALTER TABLE public.attendance_regularization OWNER TO postgres;
 
 --
--- TOC entry 235 (class 1259 OID 24684)
 -- Name: attendance_regularization_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -412,8 +379,6 @@ CREATE SEQUENCE public.attendance_regularization_id_seq
 ALTER SEQUENCE public.attendance_regularization_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6699 (class 0 OID 0)
--- Dependencies: 235
 -- Name: attendance_regularization_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -421,7 +386,6 @@ ALTER SEQUENCE public.attendance_regularization_id_seq OWNED BY public.attendanc
 
 
 --
--- TOC entry 236 (class 1259 OID 24685)
 -- Name: audit_log; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -441,7 +405,6 @@ CREATE TABLE public.audit_log (
 ALTER TABLE public.audit_log OWNER TO postgres;
 
 --
--- TOC entry 237 (class 1259 OID 24693)
 -- Name: audit_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -457,8 +420,6 @@ CREATE SEQUENCE public.audit_log_id_seq
 ALTER SEQUENCE public.audit_log_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6700 (class 0 OID 0)
--- Dependencies: 237
 -- Name: audit_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -466,7 +427,6 @@ ALTER SEQUENCE public.audit_log_id_seq OWNED BY public.audit_log.id;
 
 
 --
--- TOC entry 238 (class 1259 OID 24694)
 -- Name: boiler_performance_logs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -488,7 +448,6 @@ CREATE TABLE public.boiler_performance_logs (
 ALTER TABLE public.boiler_performance_logs OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 24705)
 -- Name: boiler_performance_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -504,8 +463,6 @@ CREATE SEQUENCE public.boiler_performance_logs_id_seq
 ALTER SEQUENCE public.boiler_performance_logs_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6701 (class 0 OID 0)
--- Dependencies: 239
 -- Name: boiler_performance_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -513,7 +470,6 @@ ALTER SEQUENCE public.boiler_performance_logs_id_seq OWNED BY public.boiler_perf
 
 
 --
--- TOC entry 240 (class 1259 OID 24706)
 -- Name: chemical_consumption; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -533,7 +489,6 @@ CREATE TABLE public.chemical_consumption (
 ALTER TABLE public.chemical_consumption OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 24719)
 -- Name: chemical_consumption_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -549,8 +504,6 @@ CREATE SEQUENCE public.chemical_consumption_id_seq
 ALTER SEQUENCE public.chemical_consumption_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6702 (class 0 OID 0)
--- Dependencies: 241
 -- Name: chemical_consumption_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -558,7 +511,6 @@ ALTER SEQUENCE public.chemical_consumption_id_seq OWNED BY public.chemical_consu
 
 
 --
--- TOC entry 242 (class 1259 OID 24720)
 -- Name: chemical_limit_alerts; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -576,7 +528,6 @@ CREATE TABLE public.chemical_limit_alerts (
 ALTER TABLE public.chemical_limit_alerts OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1259 OID 24727)
 -- Name: chemical_limit_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -592,8 +543,6 @@ CREATE SEQUENCE public.chemical_limit_alerts_id_seq
 ALTER SEQUENCE public.chemical_limit_alerts_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6703 (class 0 OID 0)
--- Dependencies: 243
 -- Name: chemical_limit_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -601,7 +550,6 @@ ALTER SEQUENCE public.chemical_limit_alerts_id_seq OWNED BY public.chemical_limi
 
 
 --
--- TOC entry 244 (class 1259 OID 24728)
 -- Name: clearance_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -623,7 +571,6 @@ CREATE TABLE public.clearance_items (
 ALTER TABLE public.clearance_items OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1259 OID 24739)
 -- Name: clearance_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -639,8 +586,6 @@ CREATE SEQUENCE public.clearance_items_id_seq
 ALTER SEQUENCE public.clearance_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6704 (class 0 OID 0)
--- Dependencies: 245
 -- Name: clearance_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -648,7 +593,6 @@ ALTER SEQUENCE public.clearance_items_id_seq OWNED BY public.clearance_items.id;
 
 
 --
--- TOC entry 246 (class 1259 OID 24740)
 -- Name: customers; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -676,7 +620,6 @@ CREATE TABLE public.customers (
 ALTER TABLE public.customers OWNER TO postgres;
 
 --
--- TOC entry 247 (class 1259 OID 24751)
 -- Name: customers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -692,8 +635,6 @@ CREATE SEQUENCE public.customers_id_seq
 ALTER SEQUENCE public.customers_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6705 (class 0 OID 0)
--- Dependencies: 247
 -- Name: customers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -701,7 +642,6 @@ ALTER SEQUENCE public.customers_id_seq OWNED BY public.customers.id;
 
 
 --
--- TOC entry 248 (class 1259 OID 24752)
 -- Name: daily_production_reports; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -751,7 +691,6 @@ CREATE TABLE public.daily_production_reports (
 ALTER TABLE public.daily_production_reports OWNER TO postgres;
 
 --
--- TOC entry 249 (class 1259 OID 24787)
 -- Name: daily_production_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -767,8 +706,6 @@ CREATE SEQUENCE public.daily_production_reports_id_seq
 ALTER SEQUENCE public.daily_production_reports_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6706 (class 0 OID 0)
--- Dependencies: 249
 -- Name: daily_production_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -776,7 +713,6 @@ ALTER SEQUENCE public.daily_production_reports_id_seq OWNED BY public.daily_prod
 
 
 --
--- TOC entry 250 (class 1259 OID 24788)
 -- Name: departments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -792,7 +728,6 @@ CREATE TABLE public.departments (
 ALTER TABLE public.departments OWNER TO postgres;
 
 --
--- TOC entry 251 (class 1259 OID 24795)
 -- Name: departments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -808,8 +743,6 @@ CREATE SEQUENCE public.departments_id_seq
 ALTER SEQUENCE public.departments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6707 (class 0 OID 0)
--- Dependencies: 251
 -- Name: departments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -817,7 +750,6 @@ ALTER SEQUENCE public.departments_id_seq OWNED BY public.departments.id;
 
 
 --
--- TOC entry 252 (class 1259 OID 24796)
 -- Name: dispatch_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -832,7 +764,6 @@ CREATE TABLE public.dispatch_items (
 ALTER TABLE public.dispatch_items OWNER TO postgres;
 
 --
--- TOC entry 253 (class 1259 OID 24800)
 -- Name: dispatch_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -848,8 +779,6 @@ CREATE SEQUENCE public.dispatch_items_id_seq
 ALTER SEQUENCE public.dispatch_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6708 (class 0 OID 0)
--- Dependencies: 253
 -- Name: dispatch_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -857,7 +786,6 @@ ALTER SEQUENCE public.dispatch_items_id_seq OWNED BY public.dispatch_items.id;
 
 
 --
--- TOC entry 254 (class 1259 OID 24801)
 -- Name: dispatch_orders; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -886,7 +814,6 @@ CREATE TABLE public.dispatch_orders (
 ALTER TABLE public.dispatch_orders OWNER TO postgres;
 
 --
--- TOC entry 255 (class 1259 OID 24810)
 -- Name: dispatch_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -902,8 +829,6 @@ CREATE SEQUENCE public.dispatch_orders_id_seq
 ALTER SEQUENCE public.dispatch_orders_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6709 (class 0 OID 0)
--- Dependencies: 255
 -- Name: dispatch_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -911,7 +836,6 @@ ALTER SEQUENCE public.dispatch_orders_id_seq OWNED BY public.dispatch_orders.id;
 
 
 --
--- TOC entry 256 (class 1259 OID 24811)
 -- Name: downtime_entries; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -935,7 +859,6 @@ CREATE TABLE public.downtime_entries (
 ALTER TABLE public.downtime_entries OWNER TO postgres;
 
 --
--- TOC entry 257 (class 1259 OID 24819)
 -- Name: downtime_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -951,8 +874,6 @@ CREATE SEQUENCE public.downtime_entries_id_seq
 ALTER SEQUENCE public.downtime_entries_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6710 (class 0 OID 0)
--- Dependencies: 257
 -- Name: downtime_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -960,7 +881,6 @@ ALTER SEQUENCE public.downtime_entries_id_seq OWNED BY public.downtime_entries.i
 
 
 --
--- TOC entry 258 (class 1259 OID 24820)
 -- Name: downtime_reason_codes; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -981,7 +901,6 @@ CREATE TABLE public.downtime_reason_codes (
 ALTER TABLE public.downtime_reason_codes OWNER TO postgres;
 
 --
--- TOC entry 259 (class 1259 OID 24830)
 -- Name: downtime_reason_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -997,8 +916,6 @@ CREATE SEQUENCE public.downtime_reason_codes_id_seq
 ALTER SEQUENCE public.downtime_reason_codes_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6711 (class 0 OID 0)
--- Dependencies: 259
 -- Name: downtime_reason_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1006,7 +923,6 @@ ALTER SEQUENCE public.downtime_reason_codes_id_seq OWNED BY public.downtime_reas
 
 
 --
--- TOC entry 260 (class 1259 OID 24831)
 -- Name: dpr_chemical_lines; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1023,7 +939,6 @@ CREATE TABLE public.dpr_chemical_lines (
 ALTER TABLE public.dpr_chemical_lines OWNER TO postgres;
 
 --
--- TOC entry 261 (class 1259 OID 24839)
 -- Name: dpr_chemical_lines_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1039,8 +954,6 @@ CREATE SEQUENCE public.dpr_chemical_lines_id_seq
 ALTER SEQUENCE public.dpr_chemical_lines_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6712 (class 0 OID 0)
--- Dependencies: 261
 -- Name: dpr_chemical_lines_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1048,7 +961,6 @@ ALTER SEQUENCE public.dpr_chemical_lines_id_seq OWNED BY public.dpr_chemical_lin
 
 
 --
--- TOC entry 262 (class 1259 OID 24840)
 -- Name: dpr_downtime_lines; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1066,7 +978,6 @@ CREATE TABLE public.dpr_downtime_lines (
 ALTER TABLE public.dpr_downtime_lines OWNER TO postgres;
 
 --
--- TOC entry 263 (class 1259 OID 24849)
 -- Name: dpr_downtime_lines_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1082,8 +993,6 @@ CREATE SEQUENCE public.dpr_downtime_lines_id_seq
 ALTER SEQUENCE public.dpr_downtime_lines_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6713 (class 0 OID 0)
--- Dependencies: 263
 -- Name: dpr_downtime_lines_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1091,7 +1000,6 @@ ALTER SEQUENCE public.dpr_downtime_lines_id_seq OWNED BY public.dpr_downtime_lin
 
 
 --
--- TOC entry 264 (class 1259 OID 24850)
 -- Name: dpr_grade_standards; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1117,7 +1025,6 @@ CREATE TABLE public.dpr_grade_standards (
 ALTER TABLE public.dpr_grade_standards OWNER TO postgres;
 
 --
--- TOC entry 265 (class 1259 OID 24868)
 -- Name: dpr_grade_standards_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1133,8 +1040,6 @@ CREATE SEQUENCE public.dpr_grade_standards_id_seq
 ALTER SEQUENCE public.dpr_grade_standards_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6714 (class 0 OID 0)
--- Dependencies: 265
 -- Name: dpr_grade_standards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1142,7 +1047,6 @@ ALTER SEQUENCE public.dpr_grade_standards_id_seq OWNED BY public.dpr_grade_stand
 
 
 --
--- TOC entry 266 (class 1259 OID 24869)
 -- Name: dpr_gsm_breakup; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1160,7 +1064,6 @@ CREATE TABLE public.dpr_gsm_breakup (
 ALTER TABLE public.dpr_gsm_breakup OWNER TO postgres;
 
 --
--- TOC entry 267 (class 1259 OID 24878)
 -- Name: dpr_gsm_breakup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1176,8 +1079,6 @@ CREATE SEQUENCE public.dpr_gsm_breakup_id_seq
 ALTER SEQUENCE public.dpr_gsm_breakup_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6715 (class 0 OID 0)
--- Dependencies: 267
 -- Name: dpr_gsm_breakup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1185,7 +1086,6 @@ ALTER SEQUENCE public.dpr_gsm_breakup_id_seq OWNED BY public.dpr_gsm_breakup.id;
 
 
 --
--- TOC entry 268 (class 1259 OID 24879)
 -- Name: ehs_incidents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1212,7 +1112,6 @@ CREATE TABLE public.ehs_incidents (
 ALTER TABLE public.ehs_incidents OWNER TO postgres;
 
 --
--- TOC entry 269 (class 1259 OID 24890)
 -- Name: ehs_incidents_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1228,8 +1127,6 @@ CREATE SEQUENCE public.ehs_incidents_id_seq
 ALTER SEQUENCE public.ehs_incidents_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6716 (class 0 OID 0)
--- Dependencies: 269
 -- Name: ehs_incidents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1237,7 +1134,6 @@ ALTER SEQUENCE public.ehs_incidents_id_seq OWNED BY public.ehs_incidents.id;
 
 
 --
--- TOC entry 270 (class 1259 OID 24891)
 -- Name: employee_documents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1260,7 +1156,6 @@ CREATE TABLE public.employee_documents (
 ALTER TABLE public.employee_documents OWNER TO postgres;
 
 --
--- TOC entry 271 (class 1259 OID 24903)
 -- Name: employee_documents_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1276,8 +1171,6 @@ CREATE SEQUENCE public.employee_documents_id_seq
 ALTER SEQUENCE public.employee_documents_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6717 (class 0 OID 0)
--- Dependencies: 271
 -- Name: employee_documents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1285,7 +1178,6 @@ ALTER SEQUENCE public.employee_documents_id_seq OWNED BY public.employee_documen
 
 
 --
--- TOC entry 272 (class 1259 OID 24904)
 -- Name: employee_leave_balances; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1307,7 +1199,6 @@ CREATE TABLE public.employee_leave_balances (
 ALTER TABLE public.employee_leave_balances OWNER TO postgres;
 
 --
--- TOC entry 273 (class 1259 OID 24918)
 -- Name: employee_leave_balances_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1323,8 +1214,6 @@ CREATE SEQUENCE public.employee_leave_balances_id_seq
 ALTER SEQUENCE public.employee_leave_balances_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6718 (class 0 OID 0)
--- Dependencies: 273
 -- Name: employee_leave_balances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1332,7 +1221,6 @@ ALTER SEQUENCE public.employee_leave_balances_id_seq OWNED BY public.employee_le
 
 
 --
--- TOC entry 274 (class 1259 OID 24919)
 -- Name: employee_leave_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1356,7 +1244,6 @@ CREATE TABLE public.employee_leave_types (
 ALTER TABLE public.employee_leave_types OWNER TO postgres;
 
 --
--- TOC entry 275 (class 1259 OID 24935)
 -- Name: employee_leave_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1372,8 +1259,6 @@ CREATE SEQUENCE public.employee_leave_types_id_seq
 ALTER SEQUENCE public.employee_leave_types_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6719 (class 0 OID 0)
--- Dependencies: 275
 -- Name: employee_leave_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1381,7 +1266,6 @@ ALTER SEQUENCE public.employee_leave_types_id_seq OWNED BY public.employee_leave
 
 
 --
--- TOC entry 276 (class 1259 OID 24936)
 -- Name: employee_loans; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1403,7 +1287,6 @@ CREATE TABLE public.employee_loans (
 ALTER TABLE public.employee_loans OWNER TO postgres;
 
 --
--- TOC entry 277 (class 1259 OID 24953)
 -- Name: employee_loans_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1419,8 +1302,6 @@ CREATE SEQUENCE public.employee_loans_id_seq
 ALTER SEQUENCE public.employee_loans_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6720 (class 0 OID 0)
--- Dependencies: 277
 -- Name: employee_loans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1428,7 +1309,6 @@ ALTER SEQUENCE public.employee_loans_id_seq OWNED BY public.employee_loans.id;
 
 
 --
--- TOC entry 278 (class 1259 OID 24954)
 -- Name: employee_salary_assignments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1446,7 +1326,6 @@ CREATE TABLE public.employee_salary_assignments (
 ALTER TABLE public.employee_salary_assignments OWNER TO postgres;
 
 --
--- TOC entry 279 (class 1259 OID 24962)
 -- Name: employee_salary_assignments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1462,8 +1341,6 @@ CREATE SEQUENCE public.employee_salary_assignments_id_seq
 ALTER SEQUENCE public.employee_salary_assignments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6721 (class 0 OID 0)
--- Dependencies: 279
 -- Name: employee_salary_assignments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1471,7 +1348,6 @@ ALTER SEQUENCE public.employee_salary_assignments_id_seq OWNED BY public.employe
 
 
 --
--- TOC entry 280 (class 1259 OID 24963)
 -- Name: employees; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1526,7 +1402,6 @@ CREATE TABLE public.employees (
 ALTER TABLE public.employees OWNER TO postgres;
 
 --
--- TOC entry 281 (class 1259 OID 24977)
 -- Name: employees_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1542,8 +1417,6 @@ CREATE SEQUENCE public.employees_id_seq
 ALTER SEQUENCE public.employees_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6722 (class 0 OID 0)
--- Dependencies: 281
 -- Name: employees_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1551,7 +1424,6 @@ ALTER SEQUENCE public.employees_id_seq OWNED BY public.employees.id;
 
 
 --
--- TOC entry 282 (class 1259 OID 24978)
 -- Name: eod_reports; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1570,7 +1442,6 @@ CREATE TABLE public.eod_reports (
 ALTER TABLE public.eod_reports OWNER TO postgres;
 
 --
--- TOC entry 283 (class 1259 OID 24988)
 -- Name: eod_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1586,8 +1457,6 @@ CREATE SEQUENCE public.eod_reports_id_seq
 ALTER SEQUENCE public.eod_reports_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6723 (class 0 OID 0)
--- Dependencies: 283
 -- Name: eod_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1595,7 +1464,6 @@ ALTER SEQUENCE public.eod_reports_id_seq OWNED BY public.eod_reports.id;
 
 
 --
--- TOC entry 284 (class 1259 OID 24989)
 -- Name: equipment; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1617,7 +1485,6 @@ CREATE TABLE public.equipment (
 ALTER TABLE public.equipment OWNER TO postgres;
 
 --
--- TOC entry 285 (class 1259 OID 24998)
 -- Name: equipment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1633,8 +1500,6 @@ CREATE SEQUENCE public.equipment_id_seq
 ALTER SEQUENCE public.equipment_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6724 (class 0 OID 0)
--- Dependencies: 285
 -- Name: equipment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1642,7 +1507,6 @@ ALTER SEQUENCE public.equipment_id_seq OWNED BY public.equipment.id;
 
 
 --
--- TOC entry 286 (class 1259 OID 24999)
 -- Name: equipment_inspection; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1674,7 +1538,6 @@ CREATE TABLE public.equipment_inspection (
 ALTER TABLE public.equipment_inspection OWNER TO postgres;
 
 --
--- TOC entry 287 (class 1259 OID 25013)
 -- Name: equipment_inspection_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1690,8 +1553,6 @@ CREATE SEQUENCE public.equipment_inspection_id_seq
 ALTER SEQUENCE public.equipment_inspection_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6725 (class 0 OID 0)
--- Dependencies: 287
 -- Name: equipment_inspection_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1699,7 +1560,6 @@ ALTER SEQUENCE public.equipment_inspection_id_seq OWNED BY public.equipment_insp
 
 
 --
--- TOC entry 288 (class 1259 OID 25014)
 -- Name: etp_readings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1722,7 +1582,6 @@ CREATE TABLE public.etp_readings (
 ALTER TABLE public.etp_readings OWNER TO postgres;
 
 --
--- TOC entry 289 (class 1259 OID 25024)
 -- Name: etp_readings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1738,8 +1597,6 @@ CREATE SEQUENCE public.etp_readings_id_seq
 ALTER SEQUENCE public.etp_readings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6726 (class 0 OID 0)
--- Dependencies: 289
 -- Name: etp_readings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1747,7 +1604,6 @@ ALTER SEQUENCE public.etp_readings_id_seq OWNED BY public.etp_readings.id;
 
 
 --
--- TOC entry 290 (class 1259 OID 25025)
 -- Name: furnish_mix_log; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1773,7 +1629,6 @@ CREATE TABLE public.furnish_mix_log (
 ALTER TABLE public.furnish_mix_log OWNER TO postgres;
 
 --
--- TOC entry 291 (class 1259 OID 25036)
 -- Name: furnish_mix_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1789,8 +1644,6 @@ CREATE SEQUENCE public.furnish_mix_log_id_seq
 ALTER SEQUENCE public.furnish_mix_log_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6727 (class 0 OID 0)
--- Dependencies: 291
 -- Name: furnish_mix_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1798,7 +1651,6 @@ ALTER SEQUENCE public.furnish_mix_log_id_seq OWNED BY public.furnish_mix_log.id;
 
 
 --
--- TOC entry 292 (class 1259 OID 25037)
 -- Name: gate_passes; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1822,14 +1674,17 @@ CREATE TABLE public.gate_passes (
     security_guard_id integer,
     status character varying(20) DEFAULT 'Open'::character varying,
     remarks text,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    po_id integer,
+    vendor_id integer,
+    challan_number character varying(50),
+    invoice_number character varying(50)
 );
 
 
 ALTER TABLE public.gate_passes OWNER TO postgres;
 
 --
--- TOC entry 293 (class 1259 OID 25048)
 -- Name: gate_passes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1845,8 +1700,6 @@ CREATE SEQUENCE public.gate_passes_id_seq
 ALTER SEQUENCE public.gate_passes_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6728 (class 0 OID 0)
--- Dependencies: 293
 -- Name: gate_passes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1854,7 +1707,6 @@ ALTER SEQUENCE public.gate_passes_id_seq OWNED BY public.gate_passes.id;
 
 
 --
--- TOC entry 294 (class 1259 OID 25049)
 -- Name: grades; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1873,7 +1725,6 @@ CREATE TABLE public.grades (
 ALTER TABLE public.grades OWNER TO postgres;
 
 --
--- TOC entry 295 (class 1259 OID 25057)
 -- Name: grades_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1889,8 +1740,6 @@ CREATE SEQUENCE public.grades_id_seq
 ALTER SEQUENCE public.grades_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6729 (class 0 OID 0)
--- Dependencies: 295
 -- Name: grades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1898,7 +1747,6 @@ ALTER SEQUENCE public.grades_id_seq OWNED BY public.grades.id;
 
 
 --
--- TOC entry 296 (class 1259 OID 25058)
 -- Name: grn; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1915,6 +1763,7 @@ CREATE TABLE public.grn (
     status character varying(20) DEFAULT 'Draft'::character varying,
     remarks text,
     created_at timestamp without time zone DEFAULT now(),
+    gate_pass_id integer,
     CONSTRAINT grn_status_check CHECK (((status)::text = ANY (ARRAY[('Draft'::character varying)::text, ('Received'::character varying)::text, ('QC Pending'::character varying)::text, ('QC Done'::character varying)::text, ('Approved'::character varying)::text, ('Rejected'::character varying)::text])))
 );
 
@@ -1922,7 +1771,6 @@ CREATE TABLE public.grn (
 ALTER TABLE public.grn OWNER TO postgres;
 
 --
--- TOC entry 297 (class 1259 OID 25069)
 -- Name: grn_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1938,8 +1786,6 @@ CREATE SEQUENCE public.grn_id_seq
 ALTER SEQUENCE public.grn_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6730 (class 0 OID 0)
--- Dependencies: 297
 -- Name: grn_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1947,7 +1793,6 @@ ALTER SEQUENCE public.grn_id_seq OWNED BY public.grn.id;
 
 
 --
--- TOC entry 298 (class 1259 OID 25070)
 -- Name: grn_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1965,14 +1810,14 @@ CREATE TABLE public.grn_items (
     mfg_date date,
     expiry_date date,
     bin_location character varying(30),
-    remarks text
+    remarks text,
+    rejection_reason text
 );
 
 
 ALTER TABLE public.grn_items OWNER TO postgres;
 
 --
--- TOC entry 299 (class 1259 OID 25077)
 -- Name: grn_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1988,8 +1833,6 @@ CREATE SEQUENCE public.grn_items_id_seq
 ALTER SEQUENCE public.grn_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6731 (class 0 OID 0)
--- Dependencies: 299
 -- Name: grn_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1997,7 +1840,6 @@ ALTER SEQUENCE public.grn_items_id_seq OWNED BY public.grn_items.id;
 
 
 --
--- TOC entry 300 (class 1259 OID 25078)
 -- Name: holidays; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2015,7 +1857,6 @@ CREATE TABLE public.holidays (
 ALTER TABLE public.holidays OWNER TO postgres;
 
 --
--- TOC entry 301 (class 1259 OID 25089)
 -- Name: holidays_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2031,8 +1872,6 @@ CREATE SEQUENCE public.holidays_id_seq
 ALTER SEQUENCE public.holidays_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6732 (class 0 OID 0)
--- Dependencies: 301
 -- Name: holidays_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2040,7 +1879,6 @@ ALTER SEQUENCE public.holidays_id_seq OWNED BY public.holidays.id;
 
 
 --
--- TOC entry 302 (class 1259 OID 25090)
 -- Name: indent_audit_log; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2059,7 +1897,6 @@ CREATE TABLE public.indent_audit_log (
 ALTER TABLE public.indent_audit_log OWNER TO postgres;
 
 --
--- TOC entry 303 (class 1259 OID 25099)
 -- Name: indent_audit_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2075,8 +1912,6 @@ CREATE SEQUENCE public.indent_audit_log_id_seq
 ALTER SEQUENCE public.indent_audit_log_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6733 (class 0 OID 0)
--- Dependencies: 303
 -- Name: indent_audit_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2084,7 +1919,6 @@ ALTER SEQUENCE public.indent_audit_log_id_seq OWNED BY public.indent_audit_log.i
 
 
 --
--- TOC entry 304 (class 1259 OID 25100)
 -- Name: indent_comments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2100,7 +1934,6 @@ CREATE TABLE public.indent_comments (
 ALTER TABLE public.indent_comments OWNER TO postgres;
 
 --
--- TOC entry 305 (class 1259 OID 25108)
 -- Name: indent_comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2116,8 +1949,6 @@ CREATE SEQUENCE public.indent_comments_id_seq
 ALTER SEQUENCE public.indent_comments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6734 (class 0 OID 0)
--- Dependencies: 305
 -- Name: indent_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2125,7 +1956,6 @@ ALTER SEQUENCE public.indent_comments_id_seq OWNED BY public.indent_comments.id;
 
 
 --
--- TOC entry 306 (class 1259 OID 25109)
 -- Name: indent_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2153,14 +1983,14 @@ CREATE TABLE public.indent_items (
     kpi_before character varying(100),
     kpi_after character varying(100),
     photo_url character varying(500),
-    ack_status character varying(20) DEFAULT 'pending'::character varying
+    ack_status character varying(20) DEFAULT 'pending'::character varying,
+    maintenance_log_id integer
 );
 
 
 ALTER TABLE public.indent_items OWNER TO postgres;
 
 --
--- TOC entry 307 (class 1259 OID 25119)
 -- Name: indent_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2176,8 +2006,6 @@ CREATE SEQUENCE public.indent_items_id_seq
 ALTER SEQUENCE public.indent_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6735 (class 0 OID 0)
--- Dependencies: 307
 -- Name: indent_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2185,7 +2013,6 @@ ALTER SEQUENCE public.indent_items_id_seq OWNED BY public.indent_items.id;
 
 
 --
--- TOC entry 308 (class 1259 OID 25120)
 -- Name: indents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2215,7 +2042,7 @@ CREATE TABLE public.indents (
     escalated boolean DEFAULT false,
     cancellation_reason text,
     cancelled_by integer,
-    cancelled_at timestamp without time zone,
+    cancelled_at timestamp with time zone,
     CONSTRAINT indents_priority_check CHECK (((priority)::text = ANY (ARRAY[('Low'::character varying)::text, ('Normal'::character varying)::text, ('High'::character varying)::text, ('Urgent'::character varying)::text]))),
     CONSTRAINT indents_status_check CHECK (((status)::text = ANY (ARRAY[('Draft'::character varying)::text, ('Submitted'::character varying)::text, ('L1 Approved'::character varying)::text, ('L2 Approved'::character varying)::text, ('L3 Approved'::character varying)::text, ('Approved'::character varying)::text, ('PO Created'::character varying)::text, ('Partially Issued'::character varying)::text, ('Issued'::character varying)::text, ('Closed'::character varying)::text, ('Rejected'::character varying)::text, ('Cancelled'::character varying)::text])))
 );
@@ -2224,7 +2051,6 @@ CREATE TABLE public.indents (
 ALTER TABLE public.indents OWNER TO postgres;
 
 --
--- TOC entry 309 (class 1259 OID 25135)
 -- Name: indents_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2240,8 +2066,6 @@ CREATE SEQUENCE public.indents_id_seq
 ALTER SEQUENCE public.indents_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6736 (class 0 OID 0)
--- Dependencies: 309
 -- Name: indents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2249,7 +2073,6 @@ ALTER SEQUENCE public.indents_id_seq OWNED BY public.indents.id;
 
 
 --
--- TOC entry 310 (class 1259 OID 25136)
 -- Name: inspection_round_scans; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2268,7 +2091,6 @@ CREATE TABLE public.inspection_round_scans (
 ALTER TABLE public.inspection_round_scans OWNER TO postgres;
 
 --
--- TOC entry 311 (class 1259 OID 25147)
 -- Name: inspection_round_scans_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2284,8 +2106,6 @@ CREATE SEQUENCE public.inspection_round_scans_id_seq
 ALTER SEQUENCE public.inspection_round_scans_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6737 (class 0 OID 0)
--- Dependencies: 311
 -- Name: inspection_round_scans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2293,7 +2113,6 @@ ALTER SEQUENCE public.inspection_round_scans_id_seq OWNED BY public.inspection_r
 
 
 --
--- TOC entry 312 (class 1259 OID 25148)
 -- Name: installed_assets; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2315,14 +2134,19 @@ CREATE TABLE public.installed_assets (
     status character varying(20) DEFAULT 'In Service'::character varying,
     retired_at timestamp without time zone,
     failure_reason text,
-    expected_lifespan_days integer DEFAULT 365
+    expected_lifespan_days integer DEFAULT 365,
+    running_hours numeric DEFAULT 0,
+    tonnage_produced numeric DEFAULT 0,
+    cost_per_ton numeric DEFAULT 0,
+    vendor_id integer,
+    grn_id integer,
+    created_at timestamp without time zone DEFAULT now()
 );
 
 
 ALTER TABLE public.installed_assets OWNER TO postgres;
 
 --
--- TOC entry 313 (class 1259 OID 25158)
 -- Name: installed_assets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2338,8 +2162,6 @@ CREATE SEQUENCE public.installed_assets_id_seq
 ALTER SEQUENCE public.installed_assets_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6738 (class 0 OID 0)
--- Dependencies: 313
 -- Name: installed_assets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2347,7 +2169,6 @@ ALTER SEQUENCE public.installed_assets_id_seq OWNED BY public.installed_assets.i
 
 
 --
--- TOC entry 314 (class 1259 OID 25159)
 -- Name: lab_samples; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2379,7 +2200,6 @@ CREATE TABLE public.lab_samples (
 ALTER TABLE public.lab_samples OWNER TO postgres;
 
 --
--- TOC entry 315 (class 1259 OID 25169)
 -- Name: lab_samples_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2395,8 +2215,6 @@ CREATE SEQUENCE public.lab_samples_id_seq
 ALTER SEQUENCE public.lab_samples_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6739 (class 0 OID 0)
--- Dependencies: 315
 -- Name: lab_samples_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2404,7 +2222,6 @@ ALTER SEQUENCE public.lab_samples_id_seq OWNED BY public.lab_samples.id;
 
 
 --
--- TOC entry 316 (class 1259 OID 25170)
 -- Name: leave_applications; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2433,7 +2250,6 @@ CREATE TABLE public.leave_applications (
 ALTER TABLE public.leave_applications OWNER TO postgres;
 
 --
--- TOC entry 317 (class 1259 OID 25186)
 -- Name: leave_applications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2449,8 +2265,6 @@ CREATE SEQUENCE public.leave_applications_id_seq
 ALTER SEQUENCE public.leave_applications_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6740 (class 0 OID 0)
--- Dependencies: 317
 -- Name: leave_applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2458,7 +2272,6 @@ ALTER SEQUENCE public.leave_applications_id_seq OWNED BY public.leave_applicatio
 
 
 --
--- TOC entry 318 (class 1259 OID 25187)
 -- Name: machine_events; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2489,7 +2302,6 @@ CREATE TABLE public.machine_events (
 ALTER TABLE public.machine_events OWNER TO postgres;
 
 --
--- TOC entry 319 (class 1259 OID 25202)
 -- Name: machine_events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2504,8 +2316,6 @@ CREATE SEQUENCE public.machine_events_id_seq
 ALTER SEQUENCE public.machine_events_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6741 (class 0 OID 0)
--- Dependencies: 319
 -- Name: machine_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2513,7 +2323,6 @@ ALTER SEQUENCE public.machine_events_id_seq OWNED BY public.machine_events.id;
 
 
 --
--- TOC entry 320 (class 1259 OID 25203)
 -- Name: machine_positions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2530,7 +2339,6 @@ CREATE TABLE public.machine_positions (
 ALTER TABLE public.machine_positions OWNER TO postgres;
 
 --
--- TOC entry 321 (class 1259 OID 25211)
 -- Name: machine_positions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2546,8 +2354,6 @@ CREATE SEQUENCE public.machine_positions_id_seq
 ALTER SEQUENCE public.machine_positions_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6742 (class 0 OID 0)
--- Dependencies: 321
 -- Name: machine_positions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2555,7 +2361,6 @@ ALTER SEQUENCE public.machine_positions_id_seq OWNED BY public.machine_positions
 
 
 --
--- TOC entry 219 (class 1259 OID 20368)
 -- Name: machines; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2576,7 +2381,6 @@ CREATE TABLE public.machines (
 ALTER TABLE public.machines OWNER TO postgres;
 
 --
--- TOC entry 322 (class 1259 OID 25212)
 -- Name: machines_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2592,8 +2396,6 @@ CREATE SEQUENCE public.machines_id_seq
 ALTER SEQUENCE public.machines_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6743 (class 0 OID 0)
--- Dependencies: 322
 -- Name: machines_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2601,7 +2403,6 @@ ALTER SEQUENCE public.machines_id_seq OWNED BY public.machines.id;
 
 
 --
--- TOC entry 323 (class 1259 OID 25213)
 -- Name: maintenance_logs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2627,7 +2428,6 @@ CREATE TABLE public.maintenance_logs (
 ALTER TABLE public.maintenance_logs OWNER TO postgres;
 
 --
--- TOC entry 324 (class 1259 OID 25223)
 -- Name: maintenance_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2643,8 +2443,6 @@ CREATE SEQUENCE public.maintenance_logs_id_seq
 ALTER SEQUENCE public.maintenance_logs_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6744 (class 0 OID 0)
--- Dependencies: 324
 -- Name: maintenance_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2652,7 +2450,6 @@ ALTER SEQUENCE public.maintenance_logs_id_seq OWNED BY public.maintenance_logs.i
 
 
 --
--- TOC entry 325 (class 1259 OID 25224)
 -- Name: maintenance_schedule; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2678,7 +2475,6 @@ CREATE TABLE public.maintenance_schedule (
 ALTER TABLE public.maintenance_schedule OWNER TO postgres;
 
 --
--- TOC entry 326 (class 1259 OID 25236)
 -- Name: maintenance_schedule_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2694,8 +2490,6 @@ CREATE SEQUENCE public.maintenance_schedule_id_seq
 ALTER SEQUENCE public.maintenance_schedule_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6745 (class 0 OID 0)
--- Dependencies: 326
 -- Name: maintenance_schedule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2703,7 +2497,6 @@ ALTER SEQUENCE public.maintenance_schedule_id_seq OWNED BY public.maintenance_sc
 
 
 --
--- TOC entry 327 (class 1259 OID 25237)
 -- Name: material_categories; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2719,7 +2512,6 @@ CREATE TABLE public.material_categories (
 ALTER TABLE public.material_categories OWNER TO postgres;
 
 --
--- TOC entry 328 (class 1259 OID 25242)
 -- Name: material_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2735,8 +2527,6 @@ CREATE SEQUENCE public.material_categories_id_seq
 ALTER SEQUENCE public.material_categories_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6746 (class 0 OID 0)
--- Dependencies: 328
 -- Name: material_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2744,7 +2534,58 @@ ALTER SEQUENCE public.material_categories_id_seq OWNED BY public.material_catego
 
 
 --
--- TOC entry 329 (class 1259 OID 25243)
+-- Name: material_rejections; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.material_rejections (
+    id integer NOT NULL,
+    rejection_number character varying(50) NOT NULL,
+    grn_id integer,
+    po_id integer,
+    vendor_id integer,
+    material_id integer,
+    qc_test_id integer,
+    rejected_qty numeric(12,3) NOT NULL,
+    uom character varying(20) NOT NULL,
+    unit_price numeric(12,2) DEFAULT 0,
+    debit_amount numeric(15,2) DEFAULT 0,
+    rejection_reason text NOT NULL,
+    action_required character varying(50) DEFAULT 'Return to Vendor'::character varying,
+    status character varying(30) DEFAULT 'Pending RTV'::character varying,
+    outward_gate_pass_id integer,
+    created_by integer,
+    created_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT material_rejections_action_required_check CHECK (((action_required)::text = ANY ((ARRAY['Return to Vendor'::character varying, 'Scrap On Site'::character varying, 'Supplier Rework'::character varying, 'Replacement Pending'::character varying])::text[]))),
+    CONSTRAINT material_rejections_rejected_qty_check CHECK ((rejected_qty > (0)::numeric)),
+    CONSTRAINT material_rejections_status_check CHECK (((status)::text = ANY ((ARRAY['Pending RTV'::character varying, 'Debit Note Raised'::character varying, 'Gate Pass Created'::character varying, 'Dispatched Out'::character varying, 'Closed'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.material_rejections OWNER TO postgres;
+
+--
+-- Name: material_rejections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.material_rejections_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.material_rejections_id_seq OWNER TO postgres;
+
+--
+-- Name: material_rejections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.material_rejections_id_seq OWNED BY public.material_rejections.id;
+
+
+--
 -- Name: materials; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2780,7 +2621,6 @@ CREATE TABLE public.materials (
 ALTER TABLE public.materials OWNER TO postgres;
 
 --
--- TOC entry 330 (class 1259 OID 25263)
 -- Name: materials_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2796,8 +2636,6 @@ CREATE SEQUENCE public.materials_id_seq
 ALTER SEQUENCE public.materials_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6747 (class 0 OID 0)
--- Dependencies: 330
 -- Name: materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2805,7 +2643,6 @@ ALTER SEQUENCE public.materials_id_seq OWNED BY public.materials.id;
 
 
 --
--- TOC entry 331 (class 1259 OID 25264)
 -- Name: motor_electrical_specs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2827,7 +2664,6 @@ CREATE TABLE public.motor_electrical_specs (
 ALTER TABLE public.motor_electrical_specs OWNER TO postgres;
 
 --
--- TOC entry 332 (class 1259 OID 25271)
 -- Name: motor_electrical_specs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2843,8 +2679,6 @@ CREATE SEQUENCE public.motor_electrical_specs_id_seq
 ALTER SEQUENCE public.motor_electrical_specs_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6748 (class 0 OID 0)
--- Dependencies: 332
 -- Name: motor_electrical_specs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2852,7 +2686,6 @@ ALTER SEQUENCE public.motor_electrical_specs_id_seq OWNED BY public.motor_electr
 
 
 --
--- TOC entry 333 (class 1259 OID 25272)
 -- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2872,7 +2705,6 @@ CREATE TABLE public.notifications (
 ALTER TABLE public.notifications OWNER TO postgres;
 
 --
--- TOC entry 334 (class 1259 OID 25283)
 -- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2888,8 +2720,6 @@ CREATE SEQUENCE public.notifications_id_seq
 ALTER SEQUENCE public.notifications_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6749 (class 0 OID 0)
--- Dependencies: 334
 -- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2897,7 +2727,6 @@ ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 
 
 --
--- TOC entry 335 (class 1259 OID 25284)
 -- Name: onboarding_checklist; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2918,7 +2747,6 @@ CREATE TABLE public.onboarding_checklist (
 ALTER TABLE public.onboarding_checklist OWNER TO postgres;
 
 --
--- TOC entry 336 (class 1259 OID 25295)
 -- Name: onboarding_checklist_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2934,8 +2762,6 @@ CREATE SEQUENCE public.onboarding_checklist_id_seq
 ALTER SEQUENCE public.onboarding_checklist_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6750 (class 0 OID 0)
--- Dependencies: 336
 -- Name: onboarding_checklist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2943,7 +2769,6 @@ ALTER SEQUENCE public.onboarding_checklist_id_seq OWNED BY public.onboarding_che
 
 
 --
--- TOC entry 337 (class 1259 OID 25296)
 -- Name: onboarding_tasks_master; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2961,7 +2786,6 @@ CREATE TABLE public.onboarding_tasks_master (
 ALTER TABLE public.onboarding_tasks_master OWNER TO postgres;
 
 --
--- TOC entry 338 (class 1259 OID 25305)
 -- Name: onboarding_tasks_master_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -2977,8 +2801,6 @@ CREATE SEQUENCE public.onboarding_tasks_master_id_seq
 ALTER SEQUENCE public.onboarding_tasks_master_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6751 (class 0 OID 0)
--- Dependencies: 338
 -- Name: onboarding_tasks_master_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -2986,7 +2808,6 @@ ALTER SEQUENCE public.onboarding_tasks_master_id_seq OWNED BY public.onboarding_
 
 
 --
--- TOC entry 339 (class 1259 OID 25306)
 -- Name: packing_records; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3009,7 +2830,6 @@ CREATE TABLE public.packing_records (
 ALTER TABLE public.packing_records OWNER TO postgres;
 
 --
--- TOC entry 340 (class 1259 OID 25316)
 -- Name: packing_records_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3025,8 +2845,6 @@ CREATE SEQUENCE public.packing_records_id_seq
 ALTER SEQUENCE public.packing_records_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6752 (class 0 OID 0)
--- Dependencies: 340
 -- Name: packing_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3034,7 +2852,6 @@ ALTER SEQUENCE public.packing_records_id_seq OWNED BY public.packing_records.id;
 
 
 --
--- TOC entry 341 (class 1259 OID 25317)
 -- Name: payments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3060,7 +2877,6 @@ CREATE TABLE public.payments (
 ALTER TABLE public.payments OWNER TO postgres;
 
 --
--- TOC entry 342 (class 1259 OID 25332)
 -- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3076,8 +2892,6 @@ CREATE SEQUENCE public.payments_id_seq
 ALTER SEQUENCE public.payments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6753 (class 0 OID 0)
--- Dependencies: 342
 -- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3085,7 +2899,6 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
--- TOC entry 343 (class 1259 OID 25333)
 -- Name: payroll_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3129,7 +2942,6 @@ CREATE TABLE public.payroll_details (
 ALTER TABLE public.payroll_details OWNER TO postgres;
 
 --
--- TOC entry 344 (class 1259 OID 25365)
 -- Name: payroll_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3145,8 +2957,6 @@ CREATE SEQUENCE public.payroll_details_id_seq
 ALTER SEQUENCE public.payroll_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6754 (class 0 OID 0)
--- Dependencies: 344
 -- Name: payroll_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3154,7 +2964,6 @@ ALTER SEQUENCE public.payroll_details_id_seq OWNED BY public.payroll_details.id;
 
 
 --
--- TOC entry 345 (class 1259 OID 25366)
 -- Name: payroll_runs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3180,7 +2989,6 @@ CREATE TABLE public.payroll_runs (
 ALTER TABLE public.payroll_runs OWNER TO postgres;
 
 --
--- TOC entry 346 (class 1259 OID 25376)
 -- Name: payroll_runs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3196,8 +3004,6 @@ CREATE SEQUENCE public.payroll_runs_id_seq
 ALTER SEQUENCE public.payroll_runs_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6755 (class 0 OID 0)
--- Dependencies: 346
 -- Name: payroll_runs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3205,7 +3011,6 @@ ALTER SEQUENCE public.payroll_runs_id_seq OWNED BY public.payroll_runs.id;
 
 
 --
--- TOC entry 347 (class 1259 OID 25377)
 -- Name: payrolls; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3228,7 +3033,6 @@ CREATE TABLE public.payrolls (
 ALTER TABLE public.payrolls OWNER TO postgres;
 
 --
--- TOC entry 348 (class 1259 OID 25389)
 -- Name: payrolls_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3244,8 +3048,6 @@ CREATE SEQUENCE public.payrolls_id_seq
 ALTER SEQUENCE public.payrolls_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6756 (class 0 OID 0)
--- Dependencies: 348
 -- Name: payrolls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3253,7 +3055,6 @@ ALTER SEQUENCE public.payrolls_id_seq OWNED BY public.payrolls.id;
 
 
 --
--- TOC entry 349 (class 1259 OID 25390)
 -- Name: plant_sections; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3273,7 +3074,6 @@ CREATE TABLE public.plant_sections (
 ALTER TABLE public.plant_sections OWNER TO postgres;
 
 --
--- TOC entry 350 (class 1259 OID 25401)
 -- Name: plant_sections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3289,8 +3089,6 @@ CREATE SEQUENCE public.plant_sections_id_seq
 ALTER SEQUENCE public.plant_sections_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6757 (class 0 OID 0)
--- Dependencies: 350
 -- Name: plant_sections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3298,7 +3096,6 @@ ALTER SEQUENCE public.plant_sections_id_seq OWNED BY public.plant_sections.id;
 
 
 --
--- TOC entry 351 (class 1259 OID 25402)
 -- Name: po_items; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3318,7 +3115,6 @@ CREATE TABLE public.po_items (
 ALTER TABLE public.po_items OWNER TO postgres;
 
 --
--- TOC entry 352 (class 1259 OID 25407)
 -- Name: po_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3334,8 +3130,6 @@ CREATE SEQUENCE public.po_items_id_seq
 ALTER SEQUENCE public.po_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6758 (class 0 OID 0)
--- Dependencies: 352
 -- Name: po_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3343,7 +3137,6 @@ ALTER SEQUENCE public.po_items_id_seq OWNED BY public.po_items.id;
 
 
 --
--- TOC entry 353 (class 1259 OID 25408)
 -- Name: production_summary; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3370,7 +3163,6 @@ CREATE TABLE public.production_summary (
 ALTER TABLE public.production_summary OWNER TO postgres;
 
 --
--- TOC entry 354 (class 1259 OID 25422)
 -- Name: production_summary_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3386,8 +3178,6 @@ CREATE SEQUENCE public.production_summary_id_seq
 ALTER SEQUENCE public.production_summary_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6759 (class 0 OID 0)
--- Dependencies: 354
 -- Name: production_summary_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3395,7 +3185,6 @@ ALTER SEQUENCE public.production_summary_id_seq OWNED BY public.production_summa
 
 
 --
--- TOC entry 355 (class 1259 OID 25423)
 -- Name: purchase_orders; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3422,7 +3211,6 @@ CREATE TABLE public.purchase_orders (
 ALTER TABLE public.purchase_orders OWNER TO postgres;
 
 --
--- TOC entry 356 (class 1259 OID 25434)
 -- Name: purchase_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3438,8 +3226,6 @@ CREATE SEQUENCE public.purchase_orders_id_seq
 ALTER SEQUENCE public.purchase_orders_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6760 (class 0 OID 0)
--- Dependencies: 356
 -- Name: purchase_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3447,7 +3233,6 @@ ALTER SEQUENCE public.purchase_orders_id_seq OWNED BY public.purchase_orders.id;
 
 
 --
--- TOC entry 357 (class 1259 OID 25435)
 -- Name: quality_lab_tests; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3477,7 +3262,6 @@ CREATE TABLE public.quality_lab_tests (
 ALTER TABLE public.quality_lab_tests OWNER TO postgres;
 
 --
--- TOC entry 358 (class 1259 OID 25444)
 -- Name: quality_lab_tests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3492,8 +3276,6 @@ CREATE SEQUENCE public.quality_lab_tests_id_seq
 ALTER SEQUENCE public.quality_lab_tests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6761 (class 0 OID 0)
--- Dependencies: 358
 -- Name: quality_lab_tests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3501,7 +3283,6 @@ ALTER SEQUENCE public.quality_lab_tests_id_seq OWNED BY public.quality_lab_tests
 
 
 --
--- TOC entry 359 (class 1259 OID 25445)
 -- Name: quality_tests; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3534,7 +3315,6 @@ CREATE TABLE public.quality_tests (
 ALTER TABLE public.quality_tests OWNER TO postgres;
 
 --
--- TOC entry 360 (class 1259 OID 25457)
 -- Name: quality_tests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3550,8 +3330,6 @@ CREATE SEQUENCE public.quality_tests_id_seq
 ALTER SEQUENCE public.quality_tests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6762 (class 0 OID 0)
--- Dependencies: 360
 -- Name: quality_tests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3559,7 +3337,6 @@ ALTER SEQUENCE public.quality_tests_id_seq OWNED BY public.quality_tests.id;
 
 
 --
--- TOC entry 361 (class 1259 OID 25458)
 -- Name: reels; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3605,7 +3382,6 @@ CREATE TABLE public.reels (
 ALTER TABLE public.reels OWNER TO postgres;
 
 --
--- TOC entry 362 (class 1259 OID 25473)
 -- Name: reels_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3621,8 +3397,6 @@ CREATE SEQUENCE public.reels_id_seq
 ALTER SEQUENCE public.reels_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6763 (class 0 OID 0)
--- Dependencies: 362
 -- Name: reels_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3630,7 +3404,6 @@ ALTER SEQUENCE public.reels_id_seq OWNED BY public.reels.id;
 
 
 --
--- TOC entry 363 (class 1259 OID 25474)
 -- Name: roles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3646,7 +3419,6 @@ CREATE TABLE public.roles (
 ALTER TABLE public.roles OWNER TO postgres;
 
 --
--- TOC entry 364 (class 1259 OID 25484)
 -- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3662,8 +3434,6 @@ CREATE SEQUENCE public.roles_id_seq
 ALTER SEQUENCE public.roles_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6764 (class 0 OID 0)
--- Dependencies: 364
 -- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3671,7 +3441,6 @@ ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
 
 
 --
--- TOC entry 365 (class 1259 OID 25485)
 -- Name: salary_structures; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3694,7 +3463,6 @@ CREATE TABLE public.salary_structures (
 ALTER TABLE public.salary_structures OWNER TO postgres;
 
 --
--- TOC entry 366 (class 1259 OID 25499)
 -- Name: salary_structures_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3710,8 +3478,6 @@ CREATE SEQUENCE public.salary_structures_id_seq
 ALTER SEQUENCE public.salary_structures_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6765 (class 0 OID 0)
--- Dependencies: 366
 -- Name: salary_structures_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3719,7 +3485,6 @@ ALTER SEQUENCE public.salary_structures_id_seq OWNED BY public.salary_structures
 
 
 --
--- TOC entry 367 (class 1259 OID 25500)
 -- Name: sales_orders; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3747,7 +3512,6 @@ CREATE TABLE public.sales_orders (
 ALTER TABLE public.sales_orders OWNER TO postgres;
 
 --
--- TOC entry 368 (class 1259 OID 25512)
 -- Name: sales_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3763,8 +3527,6 @@ CREATE SEQUENCE public.sales_orders_id_seq
 ALTER SEQUENCE public.sales_orders_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6766 (class 0 OID 0)
--- Dependencies: 368
 -- Name: sales_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3772,7 +3534,6 @@ ALTER SEQUENCE public.sales_orders_id_seq OWNED BY public.sales_orders.id;
 
 
 --
--- TOC entry 369 (class 1259 OID 25513)
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3785,7 +3546,6 @@ CREATE TABLE public.schema_migrations (
 ALTER TABLE public.schema_migrations OWNER TO postgres;
 
 --
--- TOC entry 370 (class 1259 OID 25520)
 -- Name: scrap_records; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3810,7 +3570,6 @@ CREATE TABLE public.scrap_records (
 ALTER TABLE public.scrap_records OWNER TO postgres;
 
 --
--- TOC entry 371 (class 1259 OID 25532)
 -- Name: scrap_records_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3826,8 +3585,6 @@ CREATE SEQUENCE public.scrap_records_id_seq
 ALTER SEQUENCE public.scrap_records_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6767 (class 0 OID 0)
--- Dependencies: 371
 -- Name: scrap_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3835,7 +3592,6 @@ ALTER SEQUENCE public.scrap_records_id_seq OWNED BY public.scrap_records.id;
 
 
 --
--- TOC entry 372 (class 1259 OID 25533)
 -- Name: section_alarms; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3861,7 +3617,6 @@ CREATE TABLE public.section_alarms (
 ALTER TABLE public.section_alarms OWNER TO postgres;
 
 --
--- TOC entry 373 (class 1259 OID 25545)
 -- Name: section_alarms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3877,8 +3632,6 @@ CREATE SEQUENCE public.section_alarms_id_seq
 ALTER SEQUENCE public.section_alarms_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6768 (class 0 OID 0)
--- Dependencies: 373
 -- Name: section_alarms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3886,7 +3639,6 @@ ALTER SEQUENCE public.section_alarms_id_seq OWNED BY public.section_alarms.id;
 
 
 --
--- TOC entry 374 (class 1259 OID 25546)
 -- Name: section_energy_allocations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3904,7 +3656,6 @@ CREATE TABLE public.section_energy_allocations (
 ALTER TABLE public.section_energy_allocations OWNER TO postgres;
 
 --
--- TOC entry 375 (class 1259 OID 25555)
 -- Name: section_energy_allocations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3920,8 +3671,6 @@ CREATE SEQUENCE public.section_energy_allocations_id_seq
 ALTER SEQUENCE public.section_energy_allocations_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6769 (class 0 OID 0)
--- Dependencies: 375
 -- Name: section_energy_allocations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3929,7 +3678,6 @@ ALTER SEQUENCE public.section_energy_allocations_id_seq OWNED BY public.section_
 
 
 --
--- TOC entry 376 (class 1259 OID 25556)
 -- Name: section_equipment; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -3959,7 +3707,6 @@ CREATE TABLE public.section_equipment (
 ALTER TABLE public.section_equipment OWNER TO postgres;
 
 --
--- TOC entry 377 (class 1259 OID 25567)
 -- Name: section_equipment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -3975,8 +3722,6 @@ CREATE SEQUENCE public.section_equipment_id_seq
 ALTER SEQUENCE public.section_equipment_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6770 (class 0 OID 0)
--- Dependencies: 377
 -- Name: section_equipment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -3984,7 +3729,6 @@ ALTER SEQUENCE public.section_equipment_id_seq OWNED BY public.section_equipment
 
 
 --
--- TOC entry 378 (class 1259 OID 25568)
 -- Name: section_kpi_snapshots; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4000,7 +3744,6 @@ CREATE TABLE public.section_kpi_snapshots (
 ALTER TABLE public.section_kpi_snapshots OWNER TO postgres;
 
 --
--- TOC entry 379 (class 1259 OID 25578)
 -- Name: section_kpi_snapshots_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4016,8 +3759,6 @@ CREATE SEQUENCE public.section_kpi_snapshots_id_seq
 ALTER SEQUENCE public.section_kpi_snapshots_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6771 (class 0 OID 0)
--- Dependencies: 379
 -- Name: section_kpi_snapshots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4025,7 +3766,6 @@ ALTER SEQUENCE public.section_kpi_snapshots_id_seq OWNED BY public.section_kpi_s
 
 
 --
--- TOC entry 380 (class 1259 OID 25579)
 -- Name: section_process_readings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4049,7 +3789,6 @@ CREATE TABLE public.section_process_readings (
 ALTER TABLE public.section_process_readings OWNER TO postgres;
 
 --
--- TOC entry 381 (class 1259 OID 25590)
 -- Name: section_process_readings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4064,8 +3803,6 @@ CREATE SEQUENCE public.section_process_readings_id_seq
 ALTER SEQUENCE public.section_process_readings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6772 (class 0 OID 0)
--- Dependencies: 381
 -- Name: section_process_readings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4073,7 +3810,6 @@ ALTER SEQUENCE public.section_process_readings_id_seq OWNED BY public.section_pr
 
 
 --
--- TOC entry 382 (class 1259 OID 25591)
 -- Name: section_sops; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4095,7 +3831,6 @@ CREATE TABLE public.section_sops (
 ALTER TABLE public.section_sops OWNER TO postgres;
 
 --
--- TOC entry 383 (class 1259 OID 25605)
 -- Name: section_sops_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4111,8 +3846,6 @@ CREATE SEQUENCE public.section_sops_id_seq
 ALTER SEQUENCE public.section_sops_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6773 (class 0 OID 0)
--- Dependencies: 383
 -- Name: section_sops_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4120,7 +3853,6 @@ ALTER SEQUENCE public.section_sops_id_seq OWNED BY public.section_sops.id;
 
 
 --
--- TOC entry 384 (class 1259 OID 25606)
 -- Name: sections; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4137,7 +3869,6 @@ CREATE TABLE public.sections (
 ALTER TABLE public.sections OWNER TO postgres;
 
 --
--- TOC entry 385 (class 1259 OID 25613)
 -- Name: sections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4153,8 +3884,6 @@ CREATE SEQUENCE public.sections_id_seq
 ALTER SEQUENCE public.sections_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6774 (class 0 OID 0)
--- Dependencies: 385
 -- Name: sections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4162,7 +3891,6 @@ ALTER SEQUENCE public.sections_id_seq OWNED BY public.sections.id;
 
 
 --
--- TOC entry 386 (class 1259 OID 25614)
 -- Name: separation_records; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4197,7 +3925,6 @@ CREATE TABLE public.separation_records (
 ALTER TABLE public.separation_records OWNER TO postgres;
 
 --
--- TOC entry 387 (class 1259 OID 25628)
 -- Name: separation_records_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4213,8 +3940,6 @@ CREATE SEQUENCE public.separation_records_id_seq
 ALTER SEQUENCE public.separation_records_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6775 (class 0 OID 0)
--- Dependencies: 387
 -- Name: separation_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4222,7 +3947,6 @@ ALTER SEQUENCE public.separation_records_id_seq OWNED BY public.separation_recor
 
 
 --
--- TOC entry 388 (class 1259 OID 25629)
 -- Name: sessions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4237,7 +3961,6 @@ CREATE TABLE public.sessions (
 ALTER TABLE public.sessions OWNER TO postgres;
 
 --
--- TOC entry 389 (class 1259 OID 25635)
 -- Name: shift_reports; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4257,7 +3980,6 @@ CREATE TABLE public.shift_reports (
 ALTER TABLE public.shift_reports OWNER TO postgres;
 
 --
--- TOC entry 390 (class 1259 OID 25648)
 -- Name: shift_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4273,8 +3995,6 @@ CREATE SEQUENCE public.shift_reports_id_seq
 ALTER SEQUENCE public.shift_reports_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6776 (class 0 OID 0)
--- Dependencies: 390
 -- Name: shift_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4282,7 +4002,6 @@ ALTER SEQUENCE public.shift_reports_id_seq OWNED BY public.shift_reports.id;
 
 
 --
--- TOC entry 391 (class 1259 OID 25649)
 -- Name: shifts; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4305,7 +4024,6 @@ CREATE TABLE public.shifts (
 ALTER TABLE public.shifts OWNER TO postgres;
 
 --
--- TOC entry 392 (class 1259 OID 25662)
 -- Name: shifts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4321,8 +4039,6 @@ CREATE SEQUENCE public.shifts_id_seq
 ALTER SEQUENCE public.shifts_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6777 (class 0 OID 0)
--- Dependencies: 392
 -- Name: shifts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4330,7 +4046,6 @@ ALTER SEQUENCE public.shifts_id_seq OWNED BY public.shifts.id;
 
 
 --
--- TOC entry 393 (class 1259 OID 25663)
 -- Name: stock_ledger; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4361,7 +4076,6 @@ CREATE TABLE public.stock_ledger (
 ALTER TABLE public.stock_ledger OWNER TO postgres;
 
 --
--- TOC entry 394 (class 1259 OID 25677)
 -- Name: stock_ledger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4377,8 +4091,6 @@ CREATE SEQUENCE public.stock_ledger_id_seq
 ALTER SEQUENCE public.stock_ledger_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6778 (class 0 OID 0)
--- Dependencies: 394
 -- Name: stock_ledger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4386,7 +4098,6 @@ ALTER SEQUENCE public.stock_ledger_id_seq OWNED BY public.stock_ledger.id;
 
 
 --
--- TOC entry 395 (class 1259 OID 25678)
 -- Name: store_indent_log; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4408,7 +4119,6 @@ CREATE TABLE public.store_indent_log (
 ALTER TABLE public.store_indent_log OWNER TO postgres;
 
 --
--- TOC entry 396 (class 1259 OID 25685)
 -- Name: store_indent_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4424,8 +4134,6 @@ CREATE SEQUENCE public.store_indent_log_id_seq
 ALTER SEQUENCE public.store_indent_log_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6779 (class 0 OID 0)
--- Dependencies: 396
 -- Name: store_indent_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4433,7 +4141,6 @@ ALTER SEQUENCE public.store_indent_log_id_seq OWNED BY public.store_indent_log.i
 
 
 --
--- TOC entry 397 (class 1259 OID 25686)
 -- Name: store_indents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4465,7 +4172,6 @@ CREATE TABLE public.store_indents (
 ALTER TABLE public.store_indents OWNER TO postgres;
 
 --
--- TOC entry 398 (class 1259 OID 25699)
 -- Name: store_indents_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4481,8 +4187,6 @@ CREATE SEQUENCE public.store_indents_id_seq
 ALTER SEQUENCE public.store_indents_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6780 (class 0 OID 0)
--- Dependencies: 398
 -- Name: store_indents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4490,7 +4194,6 @@ ALTER SEQUENCE public.store_indents_id_seq OWNED BY public.store_indents.id;
 
 
 --
--- TOC entry 399 (class 1259 OID 25700)
 -- Name: store_issues; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4526,7 +4229,6 @@ CREATE TABLE public.store_issues (
 ALTER TABLE public.store_issues OWNER TO postgres;
 
 --
--- TOC entry 400 (class 1259 OID 25715)
 -- Name: store_issues_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4542,8 +4244,6 @@ CREATE SEQUENCE public.store_issues_id_seq
 ALTER SEQUENCE public.store_issues_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6781 (class 0 OID 0)
--- Dependencies: 400
 -- Name: store_issues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4551,7 +4251,176 @@ ALTER SEQUENCE public.store_issues_id_seq OWNED BY public.store_issues.id;
 
 
 --
--- TOC entry 401 (class 1259 OID 25716)
+-- Name: store_return_items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.store_return_items (
+    id integer NOT NULL,
+    return_id integer,
+    material_id integer,
+    qty numeric(12,3) NOT NULL,
+    uom character varying(20) NOT NULL,
+    condition_grade character varying(30) DEFAULT 'Good'::character varying,
+    action_taken character varying(50) DEFAULT 'Restocked to Store'::character varying,
+    remarks text,
+    CONSTRAINT store_return_items_condition_grade_check CHECK (((condition_grade)::text = ANY ((ARRAY['Good'::character varying, 'Repairable'::character varying, 'Scrap'::character varying])::text[]))),
+    CONSTRAINT store_return_items_qty_check CHECK ((qty > (0)::numeric))
+);
+
+
+ALTER TABLE public.store_return_items OWNER TO postgres;
+
+--
+-- Name: store_return_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.store_return_items_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_return_items_id_seq OWNER TO postgres;
+
+--
+-- Name: store_return_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.store_return_items_id_seq OWNED BY public.store_return_items.id;
+
+
+--
+-- Name: store_returns; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.store_returns (
+    id integer NOT NULL,
+    return_number character varying(50) NOT NULL,
+    department_id integer,
+    indent_id integer,
+    return_date date DEFAULT CURRENT_DATE NOT NULL,
+    status character varying(30) DEFAULT 'Submitted'::character varying,
+    returned_by integer,
+    inspected_by integer,
+    remarks text,
+    created_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT store_returns_status_check CHECK (((status)::text = ANY ((ARRAY['Submitted'::character varying, 'Inspected'::character varying, 'Restocked'::character varying, 'Rejected'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.store_returns OWNER TO postgres;
+
+--
+-- Name: store_returns_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.store_returns_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_returns_id_seq OWNER TO postgres;
+
+--
+-- Name: store_returns_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.store_returns_id_seq OWNED BY public.store_returns.id;
+
+
+--
+-- Name: store_transfer_items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.store_transfer_items (
+    id integer NOT NULL,
+    transfer_id integer,
+    material_id integer,
+    qty numeric(12,3) NOT NULL,
+    uom character varying(20) NOT NULL,
+    batch_number character varying(50),
+    remarks text,
+    CONSTRAINT store_transfer_items_qty_check CHECK ((qty > (0)::numeric))
+);
+
+
+ALTER TABLE public.store_transfer_items OWNER TO postgres;
+
+--
+-- Name: store_transfer_items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.store_transfer_items_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_transfer_items_id_seq OWNER TO postgres;
+
+--
+-- Name: store_transfer_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.store_transfer_items_id_seq OWNED BY public.store_transfer_items.id;
+
+
+--
+-- Name: store_transfers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.store_transfers (
+    id integer NOT NULL,
+    transfer_number character varying(50) NOT NULL,
+    from_warehouse_id integer,
+    to_warehouse_id integer,
+    transfer_date date DEFAULT CURRENT_DATE NOT NULL,
+    status character varying(30) DEFAULT 'Requested'::character varying,
+    requested_by integer,
+    approved_by integer,
+    dispatched_by integer,
+    received_by integer,
+    remarks text,
+    created_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT store_transfers_status_check CHECK (((status)::text = ANY ((ARRAY['Requested'::character varying, 'Approved'::character varying, 'In Transit'::character varying, 'Completed'::character varying, 'Cancelled'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.store_transfers OWNER TO postgres;
+
+--
+-- Name: store_transfers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.store_transfers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_transfers_id_seq OWNER TO postgres;
+
+--
+-- Name: store_transfers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.store_transfers_id_seq OWNED BY public.store_transfers.id;
+
+
+--
 -- Name: system_settings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4569,7 +4438,6 @@ CREATE TABLE public.system_settings (
 ALTER TABLE public.system_settings OWNER TO postgres;
 
 --
--- TOC entry 402 (class 1259 OID 25724)
 -- Name: system_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4585,8 +4453,6 @@ CREATE SEQUENCE public.system_settings_id_seq
 ALTER SEQUENCE public.system_settings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6782 (class 0 OID 0)
--- Dependencies: 402
 -- Name: system_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4594,7 +4460,6 @@ ALTER SEQUENCE public.system_settings_id_seq OWNED BY public.system_settings.id;
 
 
 --
--- TOC entry 403 (class 1259 OID 25725)
 -- Name: training_attendance; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4616,7 +4481,6 @@ CREATE TABLE public.training_attendance (
 ALTER TABLE public.training_attendance OWNER TO postgres;
 
 --
--- TOC entry 404 (class 1259 OID 25736)
 -- Name: training_attendance_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4632,8 +4496,6 @@ CREATE SEQUENCE public.training_attendance_id_seq
 ALTER SEQUENCE public.training_attendance_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6783 (class 0 OID 0)
--- Dependencies: 404
 -- Name: training_attendance_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4641,7 +4503,6 @@ ALTER SEQUENCE public.training_attendance_id_seq OWNED BY public.training_attend
 
 
 --
--- TOC entry 405 (class 1259 OID 25737)
 -- Name: training_programs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4668,7 +4529,6 @@ CREATE TABLE public.training_programs (
 ALTER TABLE public.training_programs OWNER TO postgres;
 
 --
--- TOC entry 406 (class 1259 OID 25749)
 -- Name: training_programs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4684,8 +4544,6 @@ CREATE SEQUENCE public.training_programs_id_seq
 ALTER SEQUENCE public.training_programs_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6784 (class 0 OID 0)
--- Dependencies: 406
 -- Name: training_programs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4693,7 +4551,6 @@ ALTER SEQUENCE public.training_programs_id_seq OWNED BY public.training_programs
 
 
 --
--- TOC entry 407 (class 1259 OID 25750)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4718,7 +4575,6 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 408 (class 1259 OID 25762)
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4734,8 +4590,6 @@ CREATE SEQUENCE public.users_id_seq
 ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6785 (class 0 OID 0)
--- Dependencies: 408
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4743,7 +4597,6 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- TOC entry 409 (class 1259 OID 25763)
 -- Name: utility_readings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4771,7 +4624,6 @@ CREATE TABLE public.utility_readings (
 ALTER TABLE public.utility_readings OWNER TO postgres;
 
 --
--- TOC entry 410 (class 1259 OID 25770)
 -- Name: utility_readings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4787,8 +4639,6 @@ CREATE SEQUENCE public.utility_readings_id_seq
 ALTER SEQUENCE public.utility_readings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6786 (class 0 OID 0)
--- Dependencies: 410
 -- Name: utility_readings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4796,41 +4646,40 @@ ALTER SEQUENCE public.utility_readings_id_seq OWNED BY public.utility_readings.i
 
 
 --
--- TOC entry 416 (class 1259 OID 27270)
 -- Name: vendor_bills; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.vendor_bills (
     id integer NOT NULL,
-    bill_number character varying(64) NOT NULL,
-    vendor_id integer NOT NULL,
+    bill_number character varying(50) NOT NULL,
+    vendor_id integer,
     po_id integer,
     grn_id integer,
-    vendor_invoice_number character varying(128) NOT NULL,
-    invoice_date date NOT NULL,
-    due_date date,
-    taxable_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    cgst_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    sgst_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    igst_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    total_tax numeric(15,2) DEFAULT 0 NOT NULL,
+    vendor_invoice_number character varying(50),
+    invoice_date date DEFAULT CURRENT_DATE NOT NULL,
+    due_date date DEFAULT (CURRENT_DATE + 30) NOT NULL,
+    taxable_amount numeric(15,2) DEFAULT 0,
+    cgst_amount numeric(15,2) DEFAULT 0,
+    sgst_amount numeric(15,2) DEFAULT 0,
+    igst_amount numeric(15,2) DEFAULT 0,
+    total_tax numeric(15,2) DEFAULT 0,
     roundoff numeric(10,2) DEFAULT 0,
-    total_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    paid_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    balance_amount numeric(15,2) DEFAULT 0 NOT NULL,
-    status character varying(32) DEFAULT 'Pending Approval'::character varying NOT NULL,
+    total_amount numeric(15,2) NOT NULL,
+    paid_amount numeric(15,2) DEFAULT 0,
+    balance_amount numeric(15,2) NOT NULL,
+    status character varying(30) DEFAULT 'Pending Approval'::character varying,
     remarks text,
     created_by integer,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
     approved_by integer,
-    approved_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now()
+    approved_at timestamp without time zone
 );
 
 
 ALTER TABLE public.vendor_bills OWNER TO postgres;
 
 --
--- TOC entry 415 (class 1259 OID 27269)
 -- Name: vendor_bills_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4846,8 +4695,6 @@ CREATE SEQUENCE public.vendor_bills_id_seq
 ALTER SEQUENCE public.vendor_bills_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6787 (class 0 OID 0)
--- Dependencies: 415
 -- Name: vendor_bills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4855,7 +4702,6 @@ ALTER SEQUENCE public.vendor_bills_id_seq OWNED BY public.vendor_bills.id;
 
 
 --
--- TOC entry 418 (class 1259 OID 27331)
 -- Name: vendor_payments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4882,7 +4728,6 @@ CREATE TABLE public.vendor_payments (
 ALTER TABLE public.vendor_payments OWNER TO postgres;
 
 --
--- TOC entry 417 (class 1259 OID 27330)
 -- Name: vendor_payments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4898,8 +4743,6 @@ CREATE SEQUENCE public.vendor_payments_id_seq
 ALTER SEQUENCE public.vendor_payments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6788 (class 0 OID 0)
--- Dependencies: 417
 -- Name: vendor_payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4907,7 +4750,6 @@ ALTER SEQUENCE public.vendor_payments_id_seq OWNED BY public.vendor_payments.id;
 
 
 --
--- TOC entry 411 (class 1259 OID 25771)
 -- Name: vendors; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4929,14 +4771,19 @@ CREATE TABLE public.vendors (
     rating numeric(3,1) DEFAULT 0,
     is_active boolean DEFAULT true,
     created_at timestamp without time zone DEFAULT now(),
-    deleted_by integer
+    deleted_by integer,
+    bank_name character varying(150),
+    account_number character varying(50),
+    ifsc_code character varying(20),
+    branch_name character varying(150),
+    account_holder_name character varying(150),
+    account_type character varying(20) DEFAULT 'Current'::character varying
 );
 
 
 ALTER TABLE public.vendors OWNER TO postgres;
 
 --
--- TOC entry 412 (class 1259 OID 25782)
 -- Name: vendors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4952,8 +4799,6 @@ CREATE SEQUENCE public.vendors_id_seq
 ALTER SEQUENCE public.vendors_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6789 (class 0 OID 0)
--- Dependencies: 412
 -- Name: vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -4961,7 +4806,6 @@ ALTER SEQUENCE public.vendors_id_seq OWNED BY public.vendors.id;
 
 
 --
--- TOC entry 413 (class 1259 OID 25783)
 -- Name: warehouses; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4977,7 +4821,6 @@ CREATE TABLE public.warehouses (
 ALTER TABLE public.warehouses OWNER TO postgres;
 
 --
--- TOC entry 414 (class 1259 OID 25790)
 -- Name: warehouses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -4993,8 +4836,6 @@ CREATE SEQUENCE public.warehouses_id_seq
 ALTER SEQUENCE public.warehouses_id_seq OWNER TO postgres;
 
 --
--- TOC entry 6790 (class 0 OID 0)
--- Dependencies: 414
 -- Name: warehouses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -5002,7 +4843,6 @@ ALTER SEQUENCE public.warehouses_id_seq OWNED BY public.warehouses.id;
 
 
 --
--- TOC entry 5259 (class 2604 OID 25791)
 -- Name: adjustment_requests id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5010,7 +4850,6 @@ ALTER TABLE ONLY public.adjustment_requests ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 5262 (class 2604 OID 25792)
 -- Name: appraisal_competencies id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5018,7 +4857,6 @@ ALTER TABLE ONLY public.appraisal_competencies ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 5264 (class 2604 OID 25793)
 -- Name: appraisal_cycles id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5026,7 +4864,6 @@ ALTER TABLE ONLY public.appraisal_cycles ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5268 (class 2604 OID 25794)
 -- Name: appraisal_goals id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5034,7 +4871,6 @@ ALTER TABLE ONLY public.appraisal_goals ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5271 (class 2604 OID 25795)
 -- Name: approval_matrix id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5042,7 +4878,6 @@ ALTER TABLE ONLY public.approval_matrix ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5273 (class 2604 OID 25796)
 -- Name: asset_events id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5050,7 +4885,6 @@ ALTER TABLE ONLY public.asset_events ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5275 (class 2604 OID 25797)
 -- Name: attendance id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5058,7 +4892,6 @@ ALTER TABLE ONLY public.attendance ALTER COLUMN id SET DEFAULT nextval('public.a
 
 
 --
--- TOC entry 5277 (class 2604 OID 25798)
 -- Name: attendance_regularization id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5066,7 +4899,6 @@ ALTER TABLE ONLY public.attendance_regularization ALTER COLUMN id SET DEFAULT ne
 
 
 --
--- TOC entry 5281 (class 2604 OID 25799)
 -- Name: audit_log id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5074,7 +4906,6 @@ ALTER TABLE ONLY public.audit_log ALTER COLUMN id SET DEFAULT nextval('public.au
 
 
 --
--- TOC entry 5283 (class 2604 OID 25800)
 -- Name: boiler_performance_logs id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5082,7 +4913,6 @@ ALTER TABLE ONLY public.boiler_performance_logs ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 5286 (class 2604 OID 25801)
 -- Name: chemical_consumption id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5090,7 +4920,6 @@ ALTER TABLE ONLY public.chemical_consumption ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 5291 (class 2604 OID 25802)
 -- Name: chemical_limit_alerts id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5098,7 +4927,6 @@ ALTER TABLE ONLY public.chemical_limit_alerts ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- TOC entry 5294 (class 2604 OID 25803)
 -- Name: clearance_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5106,7 +4934,6 @@ ALTER TABLE ONLY public.clearance_items ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5297 (class 2604 OID 25804)
 -- Name: customers id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5114,7 +4941,6 @@ ALTER TABLE ONLY public.customers ALTER COLUMN id SET DEFAULT nextval('public.cu
 
 
 --
--- TOC entry 5302 (class 2604 OID 25805)
 -- Name: daily_production_reports id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5122,7 +4948,6 @@ ALTER TABLE ONLY public.daily_production_reports ALTER COLUMN id SET DEFAULT nex
 
 
 --
--- TOC entry 5330 (class 2604 OID 25806)
 -- Name: departments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5130,7 +4955,6 @@ ALTER TABLE ONLY public.departments ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 5332 (class 2604 OID 25807)
 -- Name: dispatch_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5138,7 +4962,6 @@ ALTER TABLE ONLY public.dispatch_items ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 5333 (class 2604 OID 25808)
 -- Name: dispatch_orders id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5146,7 +4969,6 @@ ALTER TABLE ONLY public.dispatch_orders ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5336 (class 2604 OID 25809)
 -- Name: downtime_entries id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5154,7 +4976,6 @@ ALTER TABLE ONLY public.downtime_entries ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5338 (class 2604 OID 25810)
 -- Name: downtime_reason_codes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5162,7 +4983,6 @@ ALTER TABLE ONLY public.downtime_reason_codes ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- TOC entry 5342 (class 2604 OID 25811)
 -- Name: dpr_chemical_lines id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5170,7 +4990,6 @@ ALTER TABLE ONLY public.dpr_chemical_lines ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5345 (class 2604 OID 25812)
 -- Name: dpr_downtime_lines id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5178,7 +4997,6 @@ ALTER TABLE ONLY public.dpr_downtime_lines ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5348 (class 2604 OID 25813)
 -- Name: dpr_grade_standards id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5186,7 +5004,6 @@ ALTER TABLE ONLY public.dpr_grade_standards ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 5362 (class 2604 OID 25814)
 -- Name: dpr_gsm_breakup id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5194,7 +5011,6 @@ ALTER TABLE ONLY public.dpr_gsm_breakup ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5366 (class 2604 OID 25815)
 -- Name: ehs_incidents id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5202,7 +5018,6 @@ ALTER TABLE ONLY public.ehs_incidents ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5370 (class 2604 OID 25816)
 -- Name: employee_documents id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5210,7 +5025,6 @@ ALTER TABLE ONLY public.employee_documents ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5373 (class 2604 OID 25817)
 -- Name: employee_leave_balances id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5218,7 +5032,6 @@ ALTER TABLE ONLY public.employee_leave_balances ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 5381 (class 2604 OID 25818)
 -- Name: employee_leave_types id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5226,7 +5039,6 @@ ALTER TABLE ONLY public.employee_leave_types ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 5390 (class 2604 OID 25819)
 -- Name: employee_loans id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5234,7 +5046,6 @@ ALTER TABLE ONLY public.employee_loans ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 5395 (class 2604 OID 25820)
 -- Name: employee_salary_assignments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5242,7 +5053,6 @@ ALTER TABLE ONLY public.employee_salary_assignments ALTER COLUMN id SET DEFAULT 
 
 
 --
--- TOC entry 5397 (class 2604 OID 25821)
 -- Name: employees id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5250,7 +5060,6 @@ ALTER TABLE ONLY public.employees ALTER COLUMN id SET DEFAULT nextval('public.em
 
 
 --
--- TOC entry 5405 (class 2604 OID 25822)
 -- Name: eod_reports id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5258,7 +5067,6 @@ ALTER TABLE ONLY public.eod_reports ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 5408 (class 2604 OID 25823)
 -- Name: equipment id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5266,7 +5074,6 @@ ALTER TABLE ONLY public.equipment ALTER COLUMN id SET DEFAULT nextval('public.eq
 
 
 --
--- TOC entry 5411 (class 2604 OID 25824)
 -- Name: equipment_inspection id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5274,7 +5081,6 @@ ALTER TABLE ONLY public.equipment_inspection ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 5415 (class 2604 OID 25825)
 -- Name: etp_readings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5282,7 +5088,6 @@ ALTER TABLE ONLY public.etp_readings ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5418 (class 2604 OID 25826)
 -- Name: furnish_mix_log id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5290,7 +5095,6 @@ ALTER TABLE ONLY public.furnish_mix_log ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5423 (class 2604 OID 25827)
 -- Name: gate_passes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5298,7 +5102,6 @@ ALTER TABLE ONLY public.gate_passes ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 5427 (class 2604 OID 25828)
 -- Name: grades id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5306,7 +5109,6 @@ ALTER TABLE ONLY public.grades ALTER COLUMN id SET DEFAULT nextval('public.grade
 
 
 --
--- TOC entry 5429 (class 2604 OID 25829)
 -- Name: grn id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5314,7 +5116,6 @@ ALTER TABLE ONLY public.grn ALTER COLUMN id SET DEFAULT nextval('public.grn_id_s
 
 
 --
--- TOC entry 5432 (class 2604 OID 25830)
 -- Name: grn_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5322,7 +5123,6 @@ ALTER TABLE ONLY public.grn_items ALTER COLUMN id SET DEFAULT nextval('public.gr
 
 
 --
--- TOC entry 5434 (class 2604 OID 25831)
 -- Name: holidays id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5330,7 +5130,6 @@ ALTER TABLE ONLY public.holidays ALTER COLUMN id SET DEFAULT nextval('public.hol
 
 
 --
--- TOC entry 5438 (class 2604 OID 25832)
 -- Name: indent_audit_log id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5338,7 +5137,6 @@ ALTER TABLE ONLY public.indent_audit_log ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5440 (class 2604 OID 25833)
 -- Name: indent_comments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5346,7 +5144,6 @@ ALTER TABLE ONLY public.indent_comments ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5442 (class 2604 OID 25834)
 -- Name: indent_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5354,7 +5151,6 @@ ALTER TABLE ONLY public.indent_items ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5447 (class 2604 OID 25835)
 -- Name: indents id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5362,7 +5158,6 @@ ALTER TABLE ONLY public.indents ALTER COLUMN id SET DEFAULT nextval('public.inde
 
 
 --
--- TOC entry 5453 (class 2604 OID 25836)
 -- Name: inspection_round_scans id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5370,7 +5165,6 @@ ALTER TABLE ONLY public.inspection_round_scans ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 5456 (class 2604 OID 25837)
 -- Name: installed_assets id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5378,7 +5172,6 @@ ALTER TABLE ONLY public.installed_assets ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5461 (class 2604 OID 25838)
 -- Name: lab_samples id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5386,7 +5179,6 @@ ALTER TABLE ONLY public.lab_samples ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 5465 (class 2604 OID 25839)
 -- Name: leave_applications id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5394,7 +5186,6 @@ ALTER TABLE ONLY public.leave_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5470 (class 2604 OID 25840)
 -- Name: machine_events id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5402,7 +5193,6 @@ ALTER TABLE ONLY public.machine_events ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 5475 (class 2604 OID 25841)
 -- Name: machine_positions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5410,7 +5200,6 @@ ALTER TABLE ONLY public.machine_positions ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 5254 (class 2604 OID 25842)
 -- Name: machines id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5418,7 +5207,6 @@ ALTER TABLE ONLY public.machines ALTER COLUMN id SET DEFAULT nextval('public.mac
 
 
 --
--- TOC entry 5478 (class 2604 OID 25843)
 -- Name: maintenance_logs id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5426,7 +5214,6 @@ ALTER TABLE ONLY public.maintenance_logs ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5482 (class 2604 OID 25844)
 -- Name: maintenance_schedule id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5434,7 +5221,6 @@ ALTER TABLE ONLY public.maintenance_schedule ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 5486 (class 2604 OID 25845)
 -- Name: material_categories id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5442,7 +5228,13 @@ ALTER TABLE ONLY public.material_categories ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 5487 (class 2604 OID 25846)
+-- Name: material_rejections id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections ALTER COLUMN id SET DEFAULT nextval('public.material_rejections_id_seq'::regclass);
+
+
+--
 -- Name: materials id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5450,7 +5242,6 @@ ALTER TABLE ONLY public.materials ALTER COLUMN id SET DEFAULT nextval('public.ma
 
 
 --
--- TOC entry 5498 (class 2604 OID 25847)
 -- Name: motor_electrical_specs id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5458,7 +5249,6 @@ ALTER TABLE ONLY public.motor_electrical_specs ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 5500 (class 2604 OID 25848)
 -- Name: notifications id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5466,7 +5256,6 @@ ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5504 (class 2604 OID 25849)
 -- Name: onboarding_checklist id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5474,7 +5263,6 @@ ALTER TABLE ONLY public.onboarding_checklist ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 5507 (class 2604 OID 25850)
 -- Name: onboarding_tasks_master id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5482,7 +5270,6 @@ ALTER TABLE ONLY public.onboarding_tasks_master ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 5512 (class 2604 OID 25851)
 -- Name: packing_records id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5490,7 +5277,6 @@ ALTER TABLE ONLY public.packing_records ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5516 (class 2604 OID 25852)
 -- Name: payments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5498,7 +5284,6 @@ ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.pay
 
 
 --
--- TOC entry 5520 (class 2604 OID 25853)
 -- Name: payroll_details id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5506,7 +5291,6 @@ ALTER TABLE ONLY public.payroll_details ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5546 (class 2604 OID 25854)
 -- Name: payroll_runs id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5514,7 +5298,6 @@ ALTER TABLE ONLY public.payroll_runs ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5549 (class 2604 OID 25855)
 -- Name: payrolls id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5522,7 +5305,6 @@ ALTER TABLE ONLY public.payrolls ALTER COLUMN id SET DEFAULT nextval('public.pay
 
 
 --
--- TOC entry 5555 (class 2604 OID 25856)
 -- Name: plant_sections id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5530,7 +5312,6 @@ ALTER TABLE ONLY public.plant_sections ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 5559 (class 2604 OID 25857)
 -- Name: po_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5538,7 +5319,6 @@ ALTER TABLE ONLY public.po_items ALTER COLUMN id SET DEFAULT nextval('public.po_
 
 
 --
--- TOC entry 5561 (class 2604 OID 25858)
 -- Name: production_summary id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5546,7 +5326,6 @@ ALTER TABLE ONLY public.production_summary ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5570 (class 2604 OID 25859)
 -- Name: purchase_orders id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5554,7 +5333,6 @@ ALTER TABLE ONLY public.purchase_orders ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5573 (class 2604 OID 25860)
 -- Name: quality_lab_tests id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5562,7 +5340,6 @@ ALTER TABLE ONLY public.quality_lab_tests ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 5576 (class 2604 OID 25861)
 -- Name: quality_tests id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5570,7 +5347,6 @@ ALTER TABLE ONLY public.quality_tests ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5580 (class 2604 OID 25862)
 -- Name: reels id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5578,7 +5354,6 @@ ALTER TABLE ONLY public.reels ALTER COLUMN id SET DEFAULT nextval('public.reels_
 
 
 --
--- TOC entry 5587 (class 2604 OID 25863)
 -- Name: roles id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5586,7 +5361,6 @@ ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.roles_
 
 
 --
--- TOC entry 5590 (class 2604 OID 25864)
 -- Name: salary_structures id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5594,7 +5368,6 @@ ALTER TABLE ONLY public.salary_structures ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 5599 (class 2604 OID 25865)
 -- Name: sales_orders id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5602,7 +5375,6 @@ ALTER TABLE ONLY public.sales_orders ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5604 (class 2604 OID 25866)
 -- Name: scrap_records id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5610,7 +5382,6 @@ ALTER TABLE ONLY public.scrap_records ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5609 (class 2604 OID 25867)
 -- Name: section_alarms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5618,7 +5389,6 @@ ALTER TABLE ONLY public.section_alarms ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 5612 (class 2604 OID 25868)
 -- Name: section_energy_allocations id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5626,7 +5396,6 @@ ALTER TABLE ONLY public.section_energy_allocations ALTER COLUMN id SET DEFAULT n
 
 
 --
--- TOC entry 5617 (class 2604 OID 25869)
 -- Name: section_equipment id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5634,7 +5403,6 @@ ALTER TABLE ONLY public.section_equipment ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 5621 (class 2604 OID 25870)
 -- Name: section_kpi_snapshots id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5642,7 +5410,6 @@ ALTER TABLE ONLY public.section_kpi_snapshots ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- TOC entry 5624 (class 2604 OID 25871)
 -- Name: section_process_readings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5650,7 +5417,6 @@ ALTER TABLE ONLY public.section_process_readings ALTER COLUMN id SET DEFAULT nex
 
 
 --
--- TOC entry 5628 (class 2604 OID 25872)
 -- Name: section_sops id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5658,7 +5424,6 @@ ALTER TABLE ONLY public.section_sops ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5633 (class 2604 OID 25873)
 -- Name: sections id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5666,7 +5431,6 @@ ALTER TABLE ONLY public.sections ALTER COLUMN id SET DEFAULT nextval('public.sec
 
 
 --
--- TOC entry 5636 (class 2604 OID 25874)
 -- Name: separation_records id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5674,7 +5438,6 @@ ALTER TABLE ONLY public.separation_records ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 5642 (class 2604 OID 25875)
 -- Name: shift_reports id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5682,7 +5445,6 @@ ALTER TABLE ONLY public.shift_reports ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5645 (class 2604 OID 25876)
 -- Name: shifts id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5690,7 +5452,6 @@ ALTER TABLE ONLY public.shifts ALTER COLUMN id SET DEFAULT nextval('public.shift
 
 
 --
--- TOC entry 5648 (class 2604 OID 25877)
 -- Name: stock_ledger id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5698,7 +5459,6 @@ ALTER TABLE ONLY public.stock_ledger ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5653 (class 2604 OID 25878)
 -- Name: store_indent_log id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5706,7 +5466,6 @@ ALTER TABLE ONLY public.store_indent_log ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5655 (class 2604 OID 25879)
 -- Name: store_indents id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5714,7 +5473,6 @@ ALTER TABLE ONLY public.store_indents ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5661 (class 2604 OID 25880)
 -- Name: store_issues id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5722,7 +5480,34 @@ ALTER TABLE ONLY public.store_issues ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5669 (class 2604 OID 25881)
+-- Name: store_return_items id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_return_items ALTER COLUMN id SET DEFAULT nextval('public.store_return_items_id_seq'::regclass);
+
+
+--
+-- Name: store_returns id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns ALTER COLUMN id SET DEFAULT nextval('public.store_returns_id_seq'::regclass);
+
+
+--
+-- Name: store_transfer_items id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfer_items ALTER COLUMN id SET DEFAULT nextval('public.store_transfer_items_id_seq'::regclass);
+
+
+--
+-- Name: store_transfers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers ALTER COLUMN id SET DEFAULT nextval('public.store_transfers_id_seq'::regclass);
+
+
+--
 -- Name: system_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5730,7 +5515,6 @@ ALTER TABLE ONLY public.system_settings ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5671 (class 2604 OID 25882)
 -- Name: training_attendance id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5738,7 +5522,6 @@ ALTER TABLE ONLY public.training_attendance ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 5674 (class 2604 OID 25883)
 -- Name: training_programs id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5746,7 +5529,6 @@ ALTER TABLE ONLY public.training_programs ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 5678 (class 2604 OID 25884)
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5754,7 +5536,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- TOC entry 5683 (class 2604 OID 25885)
 -- Name: utility_readings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5762,7 +5543,6 @@ ALTER TABLE ONLY public.utility_readings ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 5693 (class 2604 OID 27273)
 -- Name: vendor_bills id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5770,7 +5550,6 @@ ALTER TABLE ONLY public.vendor_bills ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 5705 (class 2604 OID 27334)
 -- Name: vendor_payments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5778,7 +5557,6 @@ ALTER TABLE ONLY public.vendor_payments ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 5685 (class 2604 OID 25886)
 -- Name: vendors id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5786,7 +5564,6 @@ ALTER TABLE ONLY public.vendors ALTER COLUMN id SET DEFAULT nextval('public.vend
 
 
 --
--- TOC entry 5690 (class 2604 OID 25887)
 -- Name: warehouses id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5794,8 +5571,6 @@ ALTER TABLE ONLY public.warehouses ALTER COLUMN id SET DEFAULT nextval('public.w
 
 
 --
--- TOC entry 6488 (class 0 OID 24588)
--- Dependencies: 220
 -- Data for Name: adjustment_requests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5804,8 +5579,6 @@ COPY public.adjustment_requests (id, material_id, qty, reason, bin_location, bat
 
 
 --
--- TOC entry 6490 (class 0 OID 24603)
--- Dependencies: 222
 -- Data for Name: appraisal_competencies; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5814,8 +5587,6 @@ COPY public.appraisal_competencies (id, cycle_id, employee_id, competency, self_
 
 
 --
--- TOC entry 6492 (class 0 OID 24614)
--- Dependencies: 224
 -- Data for Name: appraisal_cycles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5824,8 +5595,6 @@ COPY public.appraisal_cycles (id, name, year, cycle_type, start_date, end_date, 
 
 
 --
--- TOC entry 6494 (class 0 OID 24628)
--- Dependencies: 226
 -- Data for Name: appraisal_goals; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5834,8 +5603,6 @@ COPY public.appraisal_goals (id, cycle_id, employee_id, goal_title, description,
 
 
 --
--- TOC entry 6496 (class 0 OID 24640)
--- Dependencies: 228
 -- Data for Name: approval_matrix; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5847,8 +5614,6 @@ COPY public.approval_matrix (id, tier, label, min_value, max_value, required_lev
 
 
 --
--- TOC entry 6498 (class 0 OID 24652)
--- Dependencies: 230
 -- Data for Name: asset_events; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5857,8 +5622,6 @@ COPY public.asset_events (id, asset_id, event_type, event_date, recorded_by, rem
 
 
 --
--- TOC entry 6500 (class 0 OID 24661)
--- Dependencies: 232
 -- Data for Name: attendance; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5867,8 +5630,6 @@ COPY public.attendance (id, employee_id, date, shift_type, in_time, out_time, ho
 
 
 --
--- TOC entry 6502 (class 0 OID 24671)
--- Dependencies: 234
 -- Data for Name: attendance_regularization; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5877,8 +5638,6 @@ COPY public.attendance_regularization (id, employee_id, attendance_date, in_time
 
 
 --
--- TOC entry 6504 (class 0 OID 24685)
--- Dependencies: 236
 -- Data for Name: audit_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6002,53 +5761,20 @@ COPY public.audit_log (id, user_id, action, module, record_id, old_data, new_dat
 117	6	DELETE /vendors/15	master	15	\N	{}	::1	2026-08-14 02:23:16.338767
 118	6	DELETE /vendors/17	master	17	\N	{}	::1	2026-08-14 02:23:19.405908
 119	6	DELETE /vendors/16	master	16	\N	{}	::1	2026-08-14 02:23:23.139258
-120	6	PUT /materials/2706	master	2706	\N	{"uom": "KG", "code": "MV0002", "name": "0.5\\" PISTON VALVES/ BELLOW SEAL GLOBE VALVE", "issued": 1, "balance": 17.001, "hsn_code": "4802", "received": 5, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 100, "category_id": 46, "bin_location": "Rack 2, Box 4", "oem_supplier": "e.g. SKF India / Schaeffler", "current_stock": 17.001, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "e.g. Pulp Mill Section", "last_audit_cycle": "e.g. Cycle-1 Verified", "criticality_class": "", "calibration_protocol": "e.g. Vibration spectral sweep validations", "procurement_strategy": "e.g. OEM Direct Procurement", "expected_lifespan_days": 365}	::1	2026-08-14 11:17:14.230291
-121	6	PUT /materials/2706	master	2706	\N	{"uom": "KG", "code": "MV0002", "name": "0.5\\" PISTON VALVES/ BELLOW SEAL GLOBE VALVE", "issued": 1, "balance": 17, "hsn_code": "4802", "received": 5, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 100, "category_id": 46, "bin_location": "Rack 2, Box 4", "oem_supplier": "e.g. SKF India / Schaeffler", "current_stock": 17, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "e.g. Pulp Mill Section", "last_audit_cycle": "e.g. Cycle-1 Verified", "criticality_class": "", "calibration_protocol": "e.g. Vibration spectral sweep validations", "procurement_strategy": "e.g. OEM Direct Procurement", "expected_lifespan_days": 365}	::1	2026-08-14 11:18:00.022272
-122	6	store.inward.delete	store	2716	{"in_qty": 1.5, "curStock": 12.5, "material_id": 4455}	{"newStock": 11}	::1	2026-08-14 15:38:37.950605
-123	6	store.inward.delete	store	2712	{"in_qty": 1.5, "curStock": 12.5, "material_id": 4454}	{"newStock": 11}	::1	2026-08-14 15:39:24.057052
-124	6	store.inward.delete	store	2697	{"in_qty": 10, "curStock": 145.5, "material_id": 4439}	{"newStock": 135.5}	::1	2026-08-14 15:39:44.347709
-125	6	store.inward.delete	store	905	{"in_qty": 3, "curStock": 3, "material_id": 2708}	{"newStock": 0}	::1	2026-08-14 15:40:08.513161
-126	6	store.inward.delete	store	904	{"in_qty": 2, "curStock": 3, "material_id": 2707}	{"newStock": 1}	::1	2026-08-14 15:40:32.291693
-127	6	store.inward.delete	store	903	{"in_qty": 5, "curStock": 17, "material_id": 2706}	{"newStock": 12}	::1	2026-08-14 15:44:01.453121
-128	6	store.inward.update	store	894	{"in_qty": 28, "unit_price": 100}	{"in_qty": 1, "newStock": 2, "unit_price": 2800}	::1	2026-08-14 15:45:58.115995
-129	6	PUT /materials/3461	master	3461	\N	{"uom": "NOS", "code": "GECR005", "name": "LIFT SLING WIRE ROPE 3 TON (10MM X 28MTR)", "issued": 0, "balance": 1, "opening": 0, "hsn_code": "", "received": 1, "is_active": true, "max_stock": 0, "min_stock": 2, "unit_price": 2800, "category_id": 35, "bin_location": "", "oem_supplier": "", "current_stock": 1, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 15:50:20.202558
-130	6	POST /materials/sync-all-stores	master	\N	\N	{}	::1	2026-08-14 16:27:44.682542
-131	6	PUT /materials/2262	master	2262	\N	{"uom": "Nos", "code": "BE0135", "name": "NU2217 -E-XL-M1-QP", "issued": 0, "balance": 0, "opening": 0, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 39, "bin_location": "", "oem_supplier": "", "current_stock": 0, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "PRESSER SCREEN MCN TOP & BOTTOM ", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 16:45:05.15647
-132	6	PUT /materials/2225	master	2225	\N	{"uom": "Nos", "code": "BE0098", "name": "29418 -E1-XL-C3", "issued": 0, "balance": 0, "opening": 0, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 39, "bin_location": "", "oem_supplier": "", "current_stock": 0, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "PRESSER SCREEN MAN TOP & BOTTOM ", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 16:46:23.792521
-133	6	DELETE /materials/4448	master	4448	\N	{}	::1	2026-08-14 17:56:12.71093
-134	6	DELETE /materials/4449	master	4449	\N	{}	::1	2026-08-14 17:56:21.907789
-135	6	DELETE /materials/4450	master	4450	\N	{}	::1	2026-08-14 17:56:32.67509
-136	6	DELETE /materials/4451	master	4451	\N	{}	::1	2026-08-14 17:56:45.595734
-137	6	DELETE /materials/4452	master	4452	\N	{}	::1	2026-08-14 17:56:52.028442
-138	6	DELETE /materials/4453	master	4453	\N	{}	::1	2026-08-14 17:56:59.397816
-139	6	DELETE /materials/4455	master	4455	\N	{}	::1	2026-08-14 17:57:06.172422
-140	6	DELETE /materials/4454	master	4454	\N	{}	::1	2026-08-14 17:57:13.550146
-141	6	PUT /materials/2163	master	2163	\N	{"uom": "Nos", "code": "BE0036", "name": "6308-zz", "issued": 0, "balance": 6, "opening": 6, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 39, "bin_location": "", "oem_supplier": "", "current_stock": 6, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:04:16.850304
-142	6	PUT /materials/2163	master	2163	\N	{"uom": "Nos", "code": "BE0036", "name": "6308-zz", "issued": 3, "balance": 3, "opening": 6, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 39, "bin_location": "", "oem_supplier": "", "current_stock": 3, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:06:47.394033
-143	6	PUT /materials/3327	master	3327	\N	{"uom": "Nos", "code": "ELEG0081", "name": "INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK", "issued": 0, "balance": 14, "opening": 14, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 59, "bin_location": "", "oem_supplier": "", "current_stock": 14, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:15:52.770655
-144	6	PUT /materials/3327	master	3327	\N	{"uom": "Nos", "code": "ELEG0081", "name": "INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK", "issued": 7, "balance": 7, "opening": 14, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 59, "bin_location": "", "oem_supplier": "", "current_stock": 7, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:16:06.945831
-145	6	PUT /materials/3230	master	3230	\N	{"uom": "Nos", "code": "EMC0008", "name": "MCB 6AMPS -3 P", "issued": 2, "balance": 1, "opening": 3, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 58, "bin_location": "", "oem_supplier": "", "current_stock": 1, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:22:37.969078
-146	6	PUT /materials/3185	master	3185	\N	{"uom": "Nos", "code": "ECT0024", "name": "ABB -45 AMPS 230V /50 HZ/ 240V /60HZ CONTACTOR", "issued": 1, "balance": 1, "opening": 2, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 56, "bin_location": "", "oem_supplier": "", "current_stock": 1, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-14 18:42:06.226402
-147	23	PUT /materials/2956	master	2956	\N	{"uom": "Nos", "code": "GMSB0001", "name": "1/2\\"X2\\" MS BOLT & NUT, WASHER", "issued": 0, "balance": 508, "opening": 500, "hsn_code": "7318-1500", "received": 8, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 55, "bin_location": "", "oem_supplier": "", "current_stock": 508, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 12:28:17.316827
-148	23	PUT /materials/2957	master	2957	\N	{"uom": "Nos", "code": "GMSB0002", "name": "1/2\\"X4\\" MS BOLT & NUT, WASHER", "issued": 4, "balance": 41, "opening": 45, "hsn_code": "7318-1500", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 55, "bin_location": "", "oem_supplier": "", "current_stock": 41, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 12:29:20.594368
-149	23	PUT /materials/2956	master	2956	\N	{"uom": "Nos", "code": "GMSB0001", "name": "1/2\\"X2\\" MS BOLT & NUT, WASHER", "issued": 8, "balance": 500, "opening": 508, "hsn_code": "7318-1500", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 55, "bin_location": "", "oem_supplier": "", "current_stock": 500, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 12:29:37.902853
-150	6	PUT /materials/3263	master	3263	\N	{"uom": "Nos", "code": "ELEG0017", "name": "100 WATS FLOOD LIGHT", "issued": 2, "balance": 1, "opening": 3, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "unit_price": 0, "category_id": 59, "bin_location": "", "oem_supplier": "", "current_stock": 1, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 14:31:00.64247
-151	6	PUT /materials/4660	master	4660	\N	{"uom": "NOS", "code": "LAB001", "name": "FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125", "issued": 0, "balance": 7, "gst_pct": 18, "opening": 2, "hsn_code": "4823-2000", "received": 5, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 63, "bin_location": "", "oem_supplier": "", "current_stock": 7, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "Quality Control Laboratory", "last_audit_cycle": "", "criticality_class": "B", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:05:53.834102
-152	6	PUT /materials/4660	master	4660	\N	{"uom": "NOS", "code": "LAB001", "name": "FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125", "issued": 2, "balance": 5, "gst_pct": 18, "opening": 7, "hsn_code": "4823-2000", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 63, "bin_location": "", "oem_supplier": "", "current_stock": 5, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "Quality Control Laboratory", "last_audit_cycle": "", "criticality_class": "B", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:06:01.208409
-153	6	PUT /materials/2303	master	2303	\N	{"uom": "NOS", "code": "URG001", "name": "1 ST UNIRUN GROUP VOITH  41 X 3.5 (12595227)", "issued": 2, "balance": 0, "gst_pct": 18, "opening": 2, "hsn_code": "5911-9010", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 273543.22, "category_id": 29, "bin_location": "Rack 2, Box 4", "oem_supplier": "", "current_stock": 0, "is_serialized": true, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "A", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:07:30.11314
-154	6	PUT /materials/2303	master	2303	\N	{"uom": "NOS", "code": "URG001", "name": "1 ST UNIRUN GROUP VOITH  41 X 3.5 (12595227)", "issued": 2, "balance": 1, "gst_pct": 18, "opening": 1, "hsn_code": "5911-9010", "received": 2, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 273543.22, "category_id": 29, "bin_location": "Rack 2, Box 4", "oem_supplier": "", "current_stock": 1, "is_serialized": true, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "A", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:07:46.030268
-155	6	PUT /materials/4660	master	4660	\N	{"uom": "NOS", "code": "LAB001", "name": "FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125", "issued": 0, "balance": 7, "gst_pct": 18, "opening": 5, "hsn_code": "4823-2000", "received": 2, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 63, "bin_location": "", "oem_supplier": "", "current_stock": 7, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "Quality Control Laboratory", "last_audit_cycle": "", "criticality_class": "B", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:23:00.848271
-156	6	PUT /materials/4660	master	4660	\N	{"uom": "NOS", "code": "LAB001", "name": "FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125", "issued": 0, "balance": 9, "gst_pct": 18, "opening": 7, "hsn_code": "4823-2000", "received": 2, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 63, "bin_location": "", "oem_supplier": "", "current_stock": 9, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "Quality Control Laboratory", "last_audit_cycle": "", "criticality_class": "B", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:23:16.305512
-157	6	PUT /materials/4660	master	4660	\N	{"uom": "NOS", "code": "LAB001", "name": "FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125", "issued": 2, "balance": 7, "gst_pct": 18, "opening": 9, "hsn_code": "4823-2000", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 63, "bin_location": "", "oem_supplier": "", "current_stock": 7, "is_serialized": false, "reorder_level": 2, "reorder_buffer": 0, "section_context": "Quality Control Laboratory", "last_audit_cycle": "", "criticality_class": "B", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:24:18.074701
-158	6	PUT /materials/2054	master	2054	\N	{"uom": "NOS", "code": "OS0001", "name": "10-22-7 OIL SEAL", "issued": 2, "balance": 21, "gst_pct": 18, "opening": 15, "hsn_code": "4016 9330", "received": 8, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 275.5, "category_id": 40, "bin_location": "Rack 9, Box 99", "oem_supplier": "", "current_stock": 21, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "A", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 15:50:24.302213
-159	6	PUT /materials/2141	master	2141	\N	{"uom": "NOS", "code": "BE0014", "name": "6203-C-HRS 2Z", "issued": 2, "balance": 8, "gst_pct": 18, "opening": 10, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 1, "unit_price": 0, "category_id": 39, "bin_location": "", "oem_supplier": "", "current_stock": 8, "is_serialized": false, "reorder_level": 1, "reorder_buffer": 0, "section_context": "", "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "expected_lifespan_days": 365}	::1	2026-08-15 16:11:25.790833
-160	6	store.inward	store	2963	\N	{"qty": 1, "price": 150, "newStock": 41, "inward_type": "grn", "material_id": "2853", "reference_id": "PO-20260815-0001"}	::1	2026-08-15 17:34:00.070928
+120	6	DELETE /materials/4448	master	4448	\N	{}	::1	2026-08-14 12:17:23.769799
+121	6	DELETE /materials/4449	master	4449	\N	{}	::1	2026-08-14 12:17:29.059397
+122	6	DELETE /materials/4450	master	4450	\N	{}	::1	2026-08-14 12:17:33.643253
+123	6	DELETE /materials/4451	master	4451	\N	{}	::1	2026-08-14 12:17:40.70926
+124	6	DELETE /materials/4452	master	4452	\N	{}	::1	2026-08-14 12:17:44.916205
+125	6	DELETE /materials/4453	master	4453	\N	{}	::1	2026-08-14 12:17:48.592137
+126	6	DELETE /materials/4455	master	4455	\N	{}	::1	2026-08-14 12:17:54.393407
+127	6	DELETE /materials/4454	master	4454	\N	{}	::1	2026-08-14 12:18:00.051519
+128	1	VENDOR_BILL_APPROVED	Finance	5	\N	{"id": 5, "po_id": 16, "grn_id": null, "status": "Approved", "remarks": "Chain-1 verification test bill", "due_date": "2026-09-15T18:30:00.000Z", "roundoff": "0.00", "total_tax": "97200.00", "vendor_id": 12, "created_at": "2026-08-16T18:40:27.986Z", "created_by": 8, "updated_at": "2026-08-16T18:40:27.986Z", "approved_at": "2026-08-16T18:44:41.773Z", "approved_by": 1, "bill_number": "BILL-20260816-0001", "cgst_amount": "48600.00", "igst_amount": "0.00", "paid_amount": "0.00", "sgst_amount": "48600.00", "invoice_date": "2026-08-16T18:30:00.000Z", "total_amount": "637200.00", "balance_amount": "637200.00", "taxable_amount": "540000.00", "vendor_invoice_number": "CHAINTEST-INV-01"}	::ffff:127.0.0.1	2026-08-17 00:14:41.7798
+129	17	VENDOR_PAYMENT_DISBURSED	Finance	1	\N	{"id": 1, "po_id": 16, "amount": "637200.00", "status": "Paid", "bill_id": 5, "remarks": "Chain-1 full settlement test", "bank_name": "HDFC", "vendor_id": 12, "created_at": "2026-08-16T18:44:51.530Z", "recorded_by": 17, "confirmed_at": null, "confirmed_by": null, "payment_date": "2026-08-16T18:30:00.000Z", "payment_mode": "NEFT", "payment_number": "VPY-20260816-0001", "reference_number": "CHAINTEST-NEFT-1"}	::ffff:127.0.0.1	2026-08-17 00:14:51.530893
 \.
 
 
 --
--- TOC entry 6506 (class 0 OID 24694)
--- Dependencies: 238
 -- Data for Name: boiler_performance_logs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6058,8 +5784,6 @@ COPY public.boiler_performance_logs (id, log_time, steam_flow_kgh, steam_pressur
 
 
 --
--- TOC entry 6508 (class 0 OID 24706)
--- Dependencies: 240
 -- Data for Name: chemical_consumption; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6068,8 +5792,6 @@ COPY public.chemical_consumption (id, date, shift_type, chemical_id, qty_consume
 
 
 --
--- TOC entry 6510 (class 0 OID 24720)
--- Dependencies: 242
 -- Data for Name: chemical_limit_alerts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6078,8 +5800,6 @@ COPY public.chemical_limit_alerts (id, alert_date, chemical_id, actual_ratio, st
 
 
 --
--- TOC entry 6512 (class 0 OID 24728)
--- Dependencies: 244
 -- Data for Name: clearance_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6088,8 +5808,6 @@ COPY public.clearance_items (id, separation_id, department_id, dept_name, item_d
 
 
 --
--- TOC entry 6514 (class 0 OID 24740)
--- Dependencies: 246
 -- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6100,8 +5818,6 @@ COPY public.customers (id, code, name, gstin, pan, address, city, state, pincode
 
 
 --
--- TOC entry 6516 (class 0 OID 24752)
--- Dependencies: 248
 -- Data for Name: daily_production_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6118,8 +5834,6 @@ COPY public.daily_production_reports (id, report_date, machine_id, pmc_productio
 
 
 --
--- TOC entry 6518 (class 0 OID 24788)
--- Dependencies: 250
 -- Data for Name: departments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6148,8 +5862,6 @@ COPY public.departments (id, name, code, created_at, category) FROM stdin;
 
 
 --
--- TOC entry 6520 (class 0 OID 24796)
--- Dependencies: 252
 -- Data for Name: dispatch_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6158,8 +5870,6 @@ COPY public.dispatch_items (id, dispatch_id, reel_id, weight_kg) FROM stdin;
 
 
 --
--- TOC entry 6522 (class 0 OID 24801)
--- Dependencies: 254
 -- Data for Name: dispatch_orders; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6168,8 +5878,6 @@ COPY public.dispatch_orders (id, do_number, date, so_id, customer_id, vehicle_nu
 
 
 --
--- TOC entry 6524 (class 0 OID 24811)
--- Dependencies: 256
 -- Data for Name: downtime_entries; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6182,8 +5890,6 @@ COPY public.downtime_entries (id, shift_id, machine_id, reel_id, start_time, end
 
 
 --
--- TOC entry 6526 (class 0 OID 24820)
--- Dependencies: 258
 -- Data for Name: downtime_reason_codes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6202,8 +5908,6 @@ COPY public.downtime_reason_codes (id, reason_code, category, subcategory, compo
 
 
 --
--- TOC entry 6528 (class 0 OID 24831)
--- Dependencies: 260
 -- Data for Name: dpr_chemical_lines; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6212,8 +5916,6 @@ COPY public.dpr_chemical_lines (id, report_id, chemical_name, chemical_id, qty_k
 
 
 --
--- TOC entry 6530 (class 0 OID 24840)
--- Dependencies: 262
 -- Data for Name: dpr_downtime_lines; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6225,8 +5927,6 @@ COPY public.dpr_downtime_lines (id, report_id, shift, minutes, reason, sort_orde
 
 
 --
--- TOC entry 6532 (class 0 OID 24850)
--- Dependencies: 264
 -- Data for Name: dpr_grade_standards; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6241,8 +5941,6 @@ COPY public.dpr_grade_standards (id, grade_code, starch_kg_per_ton, pac_kg_per_t
 
 
 --
--- TOC entry 6534 (class 0 OID 24869)
--- Dependencies: 266
 -- Data for Name: dpr_gsm_breakup; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6276,8 +5974,6 @@ COPY public.dpr_gsm_breakup (id, report_id, gsm, bf, sets, production_mt, sort_o
 
 
 --
--- TOC entry 6536 (class 0 OID 24879)
--- Dependencies: 268
 -- Data for Name: ehs_incidents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6287,8 +5983,6 @@ COPY public.ehs_incidents (id, incident_number, date, incident_time, incident_ty
 
 
 --
--- TOC entry 6538 (class 0 OID 24891)
--- Dependencies: 270
 -- Data for Name: employee_documents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6297,8 +5991,6 @@ COPY public.employee_documents (id, employee_id, doc_type, doc_name, file_url, f
 
 
 --
--- TOC entry 6540 (class 0 OID 24904)
--- Dependencies: 272
 -- Data for Name: employee_leave_balances; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6312,8 +6004,6 @@ COPY public.employee_leave_balances (id, employee_id, leave_type_id, year, openi
 
 
 --
--- TOC entry 6542 (class 0 OID 24919)
--- Dependencies: 274
 -- Data for Name: employee_leave_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6330,8 +6020,6 @@ COPY public.employee_leave_types (id, code, name, annual_quota, carry_forward, m
 
 
 --
--- TOC entry 6544 (class 0 OID 24936)
--- Dependencies: 276
 -- Data for Name: employee_loans; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6340,8 +6028,6 @@ COPY public.employee_loans (id, employee_id, loan_type, amount, disbursed_date, 
 
 
 --
--- TOC entry 6546 (class 0 OID 24954)
--- Dependencies: 278
 -- Data for Name: employee_salary_assignments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6350,8 +6036,6 @@ COPY public.employee_salary_assignments (id, employee_id, salary_structure_id, e
 
 
 --
--- TOC entry 6548 (class 0 OID 24963)
--- Dependencies: 280
 -- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6361,8 +6045,6 @@ COPY public.employees (id, user_id, employee_code, name, department_id, designat
 
 
 --
--- TOC entry 6550 (class 0 OID 24978)
--- Dependencies: 282
 -- Data for Name: eod_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6372,8 +6054,6 @@ COPY public.eod_reports (id, report_date, summary_json, status, sent_by, sent_at
 
 
 --
--- TOC entry 6552 (class 0 OID 24989)
--- Dependencies: 284
 -- Data for Name: equipment; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6578,8 +6258,6 @@ COPY public.equipment (id, name, code, type, section_id, hp, amps, is_active, cr
 
 
 --
--- TOC entry 6554 (class 0 OID 24999)
--- Dependencies: 286
 -- Data for Name: equipment_inspection; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6617,8 +6295,6 @@ COPY public.equipment_inspection (id, equipment_id, inspector_id, status, check_
 
 
 --
--- TOC entry 6556 (class 0 OID 25014)
--- Dependencies: 288
 -- Data for Name: etp_readings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6627,8 +6303,6 @@ COPY public.etp_readings (id, date, reading_time, ph, cod, bod, tss, tds, flow_r
 
 
 --
--- TOC entry 6558 (class 0 OID 25025)
--- Dependencies: 290
 -- Data for Name: furnish_mix_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6641,18 +6315,29 @@ COPY public.furnish_mix_log (id, batch_number, report_date, machine_id, shift_ty
 
 
 --
--- TOC entry 6560 (class 0 OID 25037)
--- Dependencies: 292
 -- Data for Name: gate_passes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.gate_passes (id, gp_number, date, pass_type, vehicle_type, vehicle_number, driver_name, purpose, material_description, from_party, to_party, in_time, out_time, weight_in, weight_out, net_weight, security_guard_id, status, remarks, created_at) FROM stdin;
+COPY public.gate_passes (id, gp_number, date, pass_type, vehicle_type, vehicle_number, driver_name, purpose, material_description, from_party, to_party, in_time, out_time, weight_in, weight_out, net_weight, security_guard_id, status, remarks, created_at, po_id, vendor_id, challan_number, invoice_number) FROM stdin;
+1	GP-IN-656632	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:20:56.633068	23	2	DC-9988	INV-5544
+2	GP-IN-689844	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:21:29.845015	24	2	DC-9988	INV-5544
+3	GP-IN-721527	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:22:01.528354	25	2	DC-9988	INV-5544
+4	GP-IN-766680	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:22:46.681299	26	2	DC-9988	INV-5544
+5	GP-IN-945822	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:25:45.822921	27	2	DC-9988	INV-5544
+6	GP-IN-048400	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:27:28.401303	28	2	DC-9988	INV-5544
+7	GP-OUT-RTV-048436	2026-08-16	OUT	Truck	MH 14 AB 7788	Suresh Kumar	Return to Vendor (RTV)	Rejected Alum (300 Kg)	MK Paper Mill	Global Scrap Co	\N	\N	\N	\N	\N	\N	Closed	\N	2026-08-16 18:27:28.43695	\N	\N	\N	\N
+8	GP-IN-903995	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:41:43.996669	29	2	DC-9988	INV-5544
+9	GP-OUT-RTV-904015	2026-08-16	OUT	Truck	MH 14 AB 7788	Suresh Kumar	Return to Vendor (RTV)	Rejected Alum (300 Kg)	MK Paper Mill	Global Scrap Co	\N	\N	\N	\N	\N	\N	Closed	\N	2026-08-16 18:41:44.016443	\N	\N	\N	\N
+10	GP-IN-302139	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 18:48:22.139802	30	2	DC-9988	INV-5544
+11	GP-OUT-RTV-302166	2026-08-16	OUT	Truck	MH 14 AB 7788	Suresh Kumar	Return to Vendor (RTV)	Rejected Alum (300 Kg)	MK Paper Mill	Global Scrap Co	\N	\N	\N	\N	\N	\N	Closed	\N	2026-08-16 18:48:22.166737	\N	\N	\N	\N
+12	GP-IN-638376	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 19:10:38.376647	31	2	DC-9988	INV-5544
+13	GP-OUT-RTV-638421	2026-08-16	OUT	Truck	MH 14 AB 7788	Suresh Kumar	Return to Vendor (RTV)	Rejected Alum (300 Kg)	MK Paper Mill	Global Scrap Co	\N	\N	\N	\N	\N	\N	Closed	\N	2026-08-16 19:10:38.421706	\N	\N	\N	\N
+14	GP-IN-599646	2026-08-16	IN	Truck	MH 14 AB 7788	Suresh Kumar	Raw Material Delivery	Alum Chemical 1000 Kg	Global Scrap Co	MK Paper Mill	\N	\N	24.500	\N	\N	\N	Open	\N	2026-08-16 19:43:19.647541	32	2	DC-9988	INV-5544
+15	GP-OUT-RTV-599684	2026-08-16	OUT	Truck	MH 14 AB 7788	Suresh Kumar	Return to Vendor (RTV)	Rejected Alum (300 Kg)	MK Paper Mill	Global Scrap Co	\N	\N	\N	\N	\N	\N	Closed	\N	2026-08-16 19:43:19.684685	\N	\N	\N	\N
 \.
 
 
 --
--- TOC entry 6562 (class 0 OID 25049)
--- Dependencies: 294
 -- Data for Name: grades; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6666,49 +6351,44 @@ COPY public.grades (id, name, code, gsm_min, gsm_max, description, is_active, de
 
 
 --
--- TOC entry 6564 (class 0 OID 25058)
--- Dependencies: 296
 -- Data for Name: grn; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.grn (id, grn_number, date, vendor_id, po_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks, created_at) FROM stdin;
-3	GRN-20260813-1	2026-08-14	12	16	\N	\N	\N	6	Received	\N	2026-08-14 01:53:12.694951
-4	GRN-20260813-2	2026-08-14	13	17	\N	\N	\N	6	Received	\N	2026-08-14 01:53:25.319764
-5	GRN-20260813-3	2026-08-14	14	18	\N	\N	\N	6	Received	\N	2026-08-14 01:53:33.935166
-6	GRN-20260813-4	2026-08-14	15	19	\N	\N	\N	6	Received	\N	2026-08-14 01:53:40.866548
-7	GRN-20260813-5	2026-08-14	16	20	\N	\N	\N	6	Received	\N	2026-08-14 01:54:00.067303
-8	GRN-20260813-6	2026-08-14	17	21	\N	\N	\N	6	Received	\N	2026-08-14 02:10:35.847788
-9	GRN-P2P-1786794967620	2026-08-15	2	24	KA-01-MM-9999	CH-88899	INV-VEND-2026-001	21	Received	Quality inspection passed at Gate 1	2026-08-15 17:26:07.621113
-10	GRN-P2P-1786795104118	2026-08-15	2	25	KA-01-MM-9999	CH-88899	INV-VEND-2026-001	21	Received	Quality inspection passed at Gate 1	2026-08-15 17:28:24.119034
-11	GRN-P2P-1786795797464	2026-08-15	2	27	KA-01-MM-9999	CH-88899	INV-VEND-2026-001	21	Received	Quality inspection passed at Gate 1	2026-08-15 17:39:57.464506
+COPY public.grn (id, grn_number, date, vendor_id, po_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks, created_at, gate_pass_id) FROM stdin;
+3	GRN-20260813-1	2026-08-14	12	16	\N	\N	\N	6	Received	\N	2026-08-14 01:53:12.694951	\N
+4	GRN-20260813-2	2026-08-14	13	17	\N	\N	\N	6	Received	\N	2026-08-14 01:53:25.319764	\N
+5	GRN-20260813-3	2026-08-14	14	18	\N	\N	\N	6	Received	\N	2026-08-14 01:53:33.935166	\N
+6	GRN-20260813-4	2026-08-14	15	19	\N	\N	\N	6	Received	\N	2026-08-14 01:53:40.866548	\N
+7	GRN-20260813-5	2026-08-14	16	20	\N	\N	\N	6	Received	\N	2026-08-14 01:54:00.067303	\N
+8	GRN-20260813-6	2026-08-14	17	21	\N	\N	\N	6	Received	\N	2026-08-14 02:10:35.847788	\N
+10	GRN-TEST-721532	2026-08-16	2	25	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:22:01.532958	3
+11	GRN-TEST-766685	2026-08-16	2	26	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:22:46.686529	4
+12	GRN-TEST-945827	2026-08-16	2	27	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:25:45.82772	5
+13	GRN-TEST-048405	2026-08-16	2	28	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:27:28.406417	6
+14	GRN-TEST-903999	2026-08-16	2	29	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:41:44.000231	8
+15	GRN-TEST-302145	2026-08-16	2	30	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 18:48:22.145791	10
+16	GRN-TEST-638381	2026-08-16	2	31	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 19:10:38.382272	12
+17	GRN-CLOTH-9613	2026-08-16	2	\N	\N	\N	\N	\N	Received	Test Clothing Inward	2026-08-16 19:37:19.616544	\N
+18	GRN-CLOTH-3505	2026-08-16	2	\N	\N	\N	\N	\N	Received	Test Clothing Inward	2026-08-16 19:40:03.508364	\N
+19	GRN-TEST-599654	2026-08-16	2	32	\N	DC-9988	INV-5544	21	QC Pending	\N	2026-08-16 19:43:19.655463	14
 \.
 
 
 --
--- TOC entry 6566 (class 0 OID 25070)
--- Dependencies: 298
 -- Data for Name: grn_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.grn_items (id, grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, batch_number, mfg_date, expiry_date, bin_location, remarks) FROM stdin;
-3	3	4450	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-4	4	4451	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-5	5	4452	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-6	6	4453	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-7	7	4454	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-8	8	4455	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N
-9	9	3488	10.000	10.000	10.000	0.000	NOS	250.00	\N	\N	\N	Rack 3, Box 2	\N
-10	9	3496	5.000	5.000	4.000	1.000	NOS	500.00	\N	\N	\N	Rack 1, Box 5	1 unit rejected due to gasket defect
-11	10	3488	10.000	10.000	10.000	0.000	NOS	250.00	\N	\N	\N	Rack 3, Box 2	\N
-12	10	3496	5.000	5.000	4.000	1.000	NOS	500.00	\N	\N	\N	Rack 1, Box 5	1 unit rejected due to gasket defect
-13	11	3488	10.000	10.000	10.000	0.000	NOS	250.00	\N	\N	\N	Rack 3, Box 2	\N
-14	11	3496	5.000	5.000	4.000	1.000	NOS	500.00	\N	\N	\N	Rack 1, Box 5	1 unit rejected due to gasket defect
+COPY public.grn_items (id, grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, batch_number, mfg_date, expiry_date, bin_location, remarks, rejection_reason) FROM stdin;
+3	3	4450	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
+4	4	4451	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
+5	5	4452	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
+6	6	4453	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
+7	7	4454	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
+8	8	4455	10.000	10.000	10.000	0.000	\N	54000.00	\N	\N	\N	\N	\N	\N
 \.
 
 
 --
--- TOC entry 6568 (class 0 OID 25078)
--- Dependencies: 300
 -- Data for Name: holidays; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6736,8 +6416,6 @@ COPY public.holidays (id, holiday_date, name, holiday_type, year, is_active, cre
 
 
 --
--- TOC entry 6570 (class 0 OID 25090)
--- Dependencies: 302
 -- Data for Name: indent_audit_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6747,21 +6425,11 @@ COPY public.indent_audit_log (id, indent_id, action, old_status, new_status, use
 7	14	issue	Submitted	Issued	6	\N	2026-08-13 22:15:07.470584+05:30
 13	27	issue	L1 Approved	Issued	6	Issued to Pulp Mill Floor	2026-08-14 01:54:00.145124+05:30
 15	33	issue	L1 Approved	Issued	6	Issued to Pulp Mill Floor	2026-08-14 02:10:35.911769+05:30
-16	36	issue	Submitted	Partially Issued	6	\N	2026-08-14 11:55:55.901806+05:30
-17	36	close	Issued	Closed	6	\N	2026-08-14 11:57:21.520438+05:30
-18	39	issue	Submitted	Issued	6	\N	2026-08-15 16:07:48.548237+05:30
-19	42	issue	Submitted	Issued	6	\N	2026-08-15 16:10:46.668536+05:30
-20	44	issue	Submitted	Issued	6	\N	2026-08-15 16:43:24.699948+05:30
-21	38	issue	Submitted	Issued	6	\N	2026-08-15 16:43:50.770831+05:30
-22	46	issue	Submitted	Issued	6	\N	2026-08-15 16:46:11.262088+05:30
-23	44	close	Closed	Closed	6	\N	2026-08-15 16:47:20.07296+05:30
-30	46	close	Closed	Closed	6	\N	2026-08-15 17:15:03.083626+05:30
+16	36	issue	Submitted	Issued	6	\N	2026-08-15 15:10:37.056553+05:30
 \.
 
 
 --
--- TOC entry 6572 (class 0 OID 25100)
--- Dependencies: 304
 -- Data for Name: indent_comments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6770,28 +6438,19 @@ COPY public.indent_comments (id, issue_id, user_id, message, created_at) FROM st
 
 
 --
--- TOC entry 6574 (class 0 OID 25109)
--- Dependencies: 306
 -- Data for Name: indent_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.indent_items (id, indent_id, material_id, required_qty, approved_qty, uom, purpose, current_stock, component_position, section_id, machine_id, unit_price, line_value, issued_qty, batch_no, reason_code, ack_by, ack_at, fitment_date, observations, kpi_before, kpi_after, photo_url, ack_status) FROM stdin;
-7	8	2074	1.000	\N	Nos		10.000	front	\N	\N	0.00	0.00	1.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending
-15	14	3343	1.000	\N	Nos		0.000	\N	\N	\N	0.00	0.00	1.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending
-28	27	4454	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-639817	\N	\N	\N	\N	\N	\N	\N	\N	pending
-33	33	4455	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-635458	\N	\N	\N	\N	\N	\N	\N	\N	pending
-36	36	3339	1.000	\N	Nos	ADHAN QC	0.000	\N	\N	\N	0.00	0.00	0.000	\N	Routine Replacement	6	2026-08-14 11:57:21.520438+05:30	2026-08-13	ANJANEYULU	\N	\N	\N	done
-43	39	3488	2.000	\N	NOS	Pulp washer drive seal replacement	15.000	Drive End	\N	\N	0.00	0.00	2.000	\N	Emergency Failure	\N	\N	\N	\N	\N	\N	\N	pending
-44	42	2141	2.000	\N	NOS		6.000	\N	\N	\N	0.00	0.00	2.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending
-46	44	4658	2.000	\N	NOS	NA	22.000	Floor Cleaning	\N	\N	0.00	0.00	2.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending
-39	38	3488	2.000	\N	NOS	Pulp washer drive seal replacement	15.000	Drive End	\N	\N	0.00	0.00	2.000	\N	Emergency Failure	\N	\N	\N	\N	\N	\N	\N	pending
-49	46	4658	2.000	\N	NOS	NA	20.000	Floor cleaning	\N	\N	0.00	0.00	2.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending
+COPY public.indent_items (id, indent_id, material_id, required_qty, approved_qty, uom, purpose, current_stock, component_position, section_id, machine_id, unit_price, line_value, issued_qty, batch_no, reason_code, ack_by, ack_at, fitment_date, observations, kpi_before, kpi_after, photo_url, ack_status, maintenance_log_id) FROM stdin;
+7	8	2074	1.000	\N	Nos		10.000	front	\N	\N	0.00	0.00	1.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending	\N
+15	14	3343	1.000	\N	Nos		0.000	\N	\N	\N	0.00	0.00	1.000	\N	Routine Replacement	\N	\N	\N	\N	\N	\N	\N	pending	\N
+28	27	4454	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-639817	\N	\N	\N	\N	\N	\N	\N	\N	pending	\N
+33	33	4455	4.000	\N	MT	Pulper feeding	15.000	\N	\N	\N	54000.00	216000.00	4.000	LOT-PULP-635458	\N	\N	\N	\N	\N	\N	\N	\N	pending	\N
+36	36	3059	1.000	\N	Nos	CHANGING LINE	0.000	Vaccume Line 	\N	\N	0.00	0.00	1.000	\N	Upgrade/MOC	\N	\N	\N	\N	\N	\N	\N	pending	\N
 \.
 
 
 --
--- TOC entry 6576 (class 0 OID 25120)
--- Dependencies: 308
 -- Data for Name: indents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6799,19 +6458,12 @@ COPY public.indents (id, indent_number, date, department_id, required_date, prio
 33	IND-20260813-0017	2026-08-14	10	2026-08-13	High	Closed	10	1	2026-08-14 02:10:35.898352	\N	\N	\N	\N	Issued to Pulp Mill Floor	2026-08-14 02:10:35.886036	\N	\N	216000.00	6	2026-08-14 02:10:35.911769+05:30	2026-08-14 02:22:40.768232+05:30	f	\N	\N	\N
 8	IND-20260813-0001	2026-08-13	8	2026-08-13	Urgent	Closed	6	\N	\N	\N	\N	\N	\N	\N	2026-08-13 15:37:06.991085	\N	\N	0.00	6	2026-08-13 17:01:32.356616+05:30	2026-08-13 18:11:27.92091+05:30	f	\N	\N	\N
 14	IND-20260813-0002	2026-08-13	1	2026-08-13	Normal	Closed	6	\N	\N	\N	\N	\N	\N	\N	2026-08-13 22:14:44.54647	\N	\N	0.00	6	2026-08-13 22:15:07.470584+05:30	2026-08-14 00:13:10.479441+05:30	f	\N	\N	\N
-27	IND-20260813-0014	2026-08-14	10	2026-08-13	High	Issued	10	1	2026-08-14 01:54:00.130268	\N	\N	\N	\N	Issued to Pulp Mill Floor	2026-08-14 01:54:00.115492	\N	\N	216000.00	6	2026-08-14 01:54:00.145124+05:30	\N	f	\N	\N	\N
-36	IND-20260814-0001	2026-08-14	14	2026-08-13	Normal	Closed	6	\N	\N	\N	\N	\N	\N	Record writing	2026-08-14 11:55:39.196336	\N	\N	0.00	6	2026-08-14 11:55:55.901806+05:30	2026-08-14 11:57:21.520438+05:30	f	\N	\N	\N
-39	IND-VERIF-1786790098624	2026-08-15	1	2026-08-16	Normal	Issued	21	\N	\N	\N	\N	\N	\N	Department Breakdown Repair	2026-08-15 16:04:58.625212	18	\N	0.00	6	2026-08-15 16:07:48.548237+05:30	\N	f	\N	\N	\N
-42	IND-20260815-0001	2026-08-15	8	2026-08-15	Normal	Issued	6	\N	\N	\N	\N	\N	\N	\N	2026-08-15 16:10:04.831407	5	\N	0.00	6	2026-08-15 16:10:46.668536+05:30	\N	f	\N	\N	\N
-46	IND-20260815-0003	2026-08-15	4	2026-08-15	Normal	Closed	6	\N	\N	\N	\N	\N	\N	House keeping.	2026-08-15 16:46:03.366686	85	27	0.00	6	2026-08-15 16:46:11.262088+05:30	2026-08-15 17:15:03.077224+05:30	f	\N	\N	\N
-38	IND-VERIF-1786790080639	2026-08-15	1	2026-08-17	Normal	Issued	21	\N	\N	\N	\N	\N	\N	Department Breakdown Repair	2026-08-15 16:04:40.640045	18	\N	0.00	6	2026-08-15 16:43:50.770831+05:30	\N	f	\N	\N	\N
-44	IND-20260815-0002	2026-08-15	9	2026-08-15	Normal	Closed	6	\N	\N	\N	\N	\N	\N	House Keeping, sweeping.	2026-08-15 16:35:00.623759	85	27	0.00	6	2026-08-15 16:43:24.699948+05:30	2026-08-15 16:47:20.068937+05:30	f	\N	\N	\N
+36	IND-20260815-0001	2026-08-15	8	2026-08-14	Normal	Closed	6	\N	\N	\N	\N	\N	\N	vaccume line	2026-08-15 15:07:41.096594	\N	\N	0.00	6	2026-08-15 15:10:37.056553+05:30	2026-08-15 15:11:07.548563+05:30	f	\N	\N	\N
+27	IND-20260813-0014	2026-08-14	10	2026-08-13	High	Issued	10	1	2026-08-14 01:54:00.130268	\N	\N	\N	\N	Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]	2026-08-14 01:54:00.115492	\N	\N	216000.00	6	2026-08-14 01:54:00.145124+05:30	\N	f	\N	\N	\N
 \.
 
 
 --
--- TOC entry 6578 (class 0 OID 25136)
--- Dependencies: 310
 -- Data for Name: inspection_round_scans; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6821,23 +6473,20 @@ COPY public.inspection_round_scans (id, section_id, shift, check_date, file_url,
 
 
 --
--- TOC entry 6580 (class 0 OID 25148)
--- Dependencies: 312
 -- Data for Name: installed_assets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.installed_assets (id, asset_number, material_id, serial_number, batch_number, machine_id, position_id, indent_id, grn_item_id, requested_by, approved_by, issued_by, purchase_price, installed_at, status, retired_at, failure_reason, expected_lifespan_days) FROM stdin;
-2	AST-20260701-0001	2303	VOITH-SN-12595227	LOT-2026-VTH-01	1	5	\N	\N	1	1	1	0.00	2026-06-30 23:28:10.635023	active	\N	\N	365
-3	AST-20260615-0002	2305	VOITH-PF-12759027	LOT-2026-VTH-02	1	4	\N	\N	1	1	1	261152.62	2026-06-14 23:28:10.635023	active	\N	\N	180
-4	AST-20260510-0003	2654	SKF-626-99418	LOT-2026-SKF-88	1	6	\N	\N	1	1	1	0.00	2026-05-10 23:28:10.635023	active	\N	\N	730
-6	AST-20260813-0004	4454	SN-PULP-639817	LOT-PULP-639817	\N	\N	27	\N	10	1	6	54000.00	2026-08-14 01:54:00.145124	active	\N	\N	365
-7	AST-20260813-0005	4455	SN-PULP-635458	LOT-PULP-635458	\N	\N	33	\N	10	1	6	54000.00	2026-08-14 02:10:35.911769	active	\N	\N	365
+COPY public.installed_assets (id, asset_number, material_id, serial_number, batch_number, machine_id, position_id, indent_id, grn_item_id, requested_by, approved_by, issued_by, purchase_price, installed_at, status, retired_at, failure_reason, expected_lifespan_days, running_hours, tonnage_produced, cost_per_ton, vendor_id, grn_id, created_at) FROM stdin;
+2	AST-20260701-0001	2303	VOITH-SN-12595227	LOT-2026-VTH-01	1	5	\N	\N	1	1	1	0.00	2026-06-30 23:28:10.635023	active	\N	\N	365	0	0	0	\N	\N	2026-08-16 19:37:53.850182
+4	AST-20260510-0003	2654	SKF-626-99418	LOT-2026-SKF-88	1	6	\N	\N	1	1	1	0.00	2026-05-10 23:28:10.635023	active	\N	\N	730	0	0	0	\N	\N	2026-08-16 19:37:53.850182
+6	AST-20260813-0004	4454	SN-PULP-639817	LOT-PULP-639817	\N	\N	27	\N	10	1	6	54000.00	2026-08-14 01:54:00.145124	active	\N	\N	365	0	0	0	\N	\N	2026-08-16 19:37:53.850182
+7	AST-20260813-0005	4455	SN-PULP-635458	LOT-PULP-635458	\N	\N	33	\N	10	1	6	54000.00	2026-08-14 02:10:35.911769	active	\N	\N	365	0	0	0	\N	\N	2026-08-16 19:37:53.850182
+3	AST-20260615-0002	2305	VOITH-PF-12759027	LOT-2026-VTH-02	1	4	\N	\N	1	1	1	261152.62	2026-06-14 23:28:10.635023	retired	2026-08-16 19:40:03.623429	Replaced with felt VOITH-TEST-FELT-1786889403503	180	0	0	0	\N	\N	2026-08-16 19:37:53.850182
+8	AST-20260816-9999	2298	VOITH-TEST-FELT-1786889403503	\N	1	4	\N	\N	\N	\N	\N	235171.00	2026-08-16 19:40:03.63393	active	\N	\N	90	0	0	0	2	18	2026-08-16 19:40:03.521333
 \.
 
 
 --
--- TOC entry 6582 (class 0 OID 25159)
--- Dependencies: 314
 -- Data for Name: lab_samples; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6846,8 +6495,6 @@ COPY public.lab_samples (id, sample_number, date, sample_type, source_ref, colle
 
 
 --
--- TOC entry 6584 (class 0 OID 25170)
--- Dependencies: 316
 -- Data for Name: leave_applications; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6857,8 +6504,6 @@ COPY public.leave_applications (id, employee_id, leave_type_id, from_date, to_da
 
 
 --
--- TOC entry 6586 (class 0 OID 25187)
--- Dependencies: 318
 -- Data for Name: machine_events; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6870,8 +6515,6 @@ COPY public.machine_events (id, section_id, equipment_id, event_type, severity, 
 
 
 --
--- TOC entry 6588 (class 0 OID 25203)
--- Dependencies: 320
 -- Data for Name: machine_positions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6885,12 +6528,15 @@ COPY public.machine_positions (id, machine_id, name, code, is_active, created_at
 7	1	Calender Stack / Top Chilled Roll Bearing	PM1-CAL-TPROLL	t	2026-08-13 23:28:10.635023
 8	2	Paper Machine 2 / Wire Forming Table	PM2-WIRE-TBL	t	2026-08-13 23:28:10.635023
 9	3	Rewinder 1 / Slitter Arbor Drive Bearing	RW1-SLIT-DE	t	2026-08-13 23:28:10.635023
+10	1	PM1 Forming Section / Top Wire Position (20.25x3.65m)	PM1-WIRE-TOP	t	2026-08-16 19:32:46.389323
+11	1	PM1 Forming Section / Bottom Wire Position (44.95x3.65m)	PM1-WIRE-BTM	t	2026-08-16 19:32:46.389323
+12	1	PM1 1st Press Section / Top Felt Position (15.1x3.5m)	PM1-PRSS1-TOPFLT	t	2026-08-16 19:32:46.389323
+13	1	PM1 Dryer Section / Group #1 Screen Position (29x3.5m)	PM1-DRY-GRP1	t	2026-08-16 19:32:46.389323
+14	1	PM1 Dryer Section / Group #2 Screen Position (32x3.5m)	PM1-DRY-GRP2	t	2026-08-16 19:32:46.389323
 \.
 
 
 --
--- TOC entry 6487 (class 0 OID 20368)
--- Dependencies: 219
 -- Data for Name: machines; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6925,8 +6571,6 @@ COPY public.machines (id, name, code, type, capacity_tpd, is_active, created_at,
 
 
 --
--- TOC entry 6591 (class 0 OID 25213)
--- Dependencies: 323
 -- Data for Name: maintenance_logs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6936,8 +6580,6 @@ COPY public.maintenance_logs (id, schedule_id, machine_id, date, maintenance_typ
 
 
 --
--- TOC entry 6593 (class 0 OID 25224)
--- Dependencies: 325
 -- Data for Name: maintenance_schedule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6946,8 +6588,6 @@ COPY public.maintenance_schedule (id, machine_id, maintenance_type, title, frequ
 
 
 --
--- TOC entry 6595 (class 0 OID 25237)
--- Dependencies: 327
 -- Data for Name: material_categories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6987,63 +6627,162 @@ COPY public.material_categories (id, name, code, type, parent_id) FROM stdin;
 61	Waste Paper	WASTE	Raw Material	\N
 62	Wood Pulp	PULP	Raw Material	\N
 28	Chemical	CHEM	Raw Material	\N
-63	Quality Control	QC	Consumable	\N
 \.
 
 
 --
--- TOC entry 6597 (class 0 OID 25243)
--- Dependencies: 329
+-- Data for Name: material_rejections; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.material_rejections (id, rejection_number, grn_id, po_id, vendor_id, material_id, qc_test_id, rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, outward_gate_pass_id, created_by, created_at) FROM stdin;
+2	REJ-TEST-048421	13	28	2	3366	6	300.000	Kg	45.00	15930.00	High moisture content > 14%	Return to Vendor	Dispatched Out	7	\N	2026-08-16 18:27:28.422259
+3	REJ-TEST-904010	14	29	2	3367	7	300.000	Kg	45.00	15930.00	High moisture content > 14%	Return to Vendor	Debit Note Raised	9	\N	2026-08-16 18:41:44.011081
+4	REJ-TEST-302159	15	30	2	3368	8	300.000	Kg	45.00	15930.00	High moisture content > 14%	Return to Vendor	Debit Note Raised	11	\N	2026-08-16 18:48:22.159916
+5	REJ-TEST-638413	16	31	2	3369	9	300.000	Kg	45.00	15930.00	High moisture content > 14%	Return to Vendor	Debit Note Raised	13	\N	2026-08-16 19:10:38.41442
+6	REJ-TEST-599674	19	32	2	3370	10	300.000	Kg	45.00	15930.00	High moisture content > 14%	Return to Vendor	Debit Note Raised	15	\N	2026-08-16 19:43:19.675285
+\.
+
+
+--
 -- Data for Name: materials; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.materials (id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active, created_at, is_serialized, expected_lifespan_days, section_context, criticality_class, procurement_strategy, oem_supplier, last_audit_cycle, calibration_protocol, reorder_buffer, deleted_by, bin_location) FROM stdin;
-3488	GER0017	HOSE CLAMP 1/2" GI	35	NOS	\N	2.000	2.000	0.000	41.000	0.00	t	2026-08-13 17:13:50.539585	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3496	GER0022	HOSE CLAMP 2.5" GI	35	NOS	\N	2.000	2.000	0.000	34.000	0.00	t	2026-08-13 17:13:50.554049	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2941	GECR003	LIFT SLING BELT 3TON X 5 MTR	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2950	GBFP001	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 80X250 mm	35	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3489	GER0018	HOSE CLAMP 1/2"SS	35	NOS	\N	2.000	2.000	0.000	2.000	0.00	t	2026-08-13 17:13:50.54264	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3493	GER0019	HOSE CLAMP 2" GI	35	NOS	\N	2.000	2.000	0.000	4.000	0.00	t	2026-08-13 17:13:50.549461	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3494	GER0020	HOSE CLAMP 2" SS	35	NOS	\N	2.000	2.000	0.000	3.000	0.00	t	2026-08-13 17:13:50.551008	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3495	GER0021	HOSE CLAMP 2.5" SS	35	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-08-13 17:13:50.552578	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3497	GER0023	HOSE CLAMP 3" SS	35	NOS	\N	2.000	2.000	0.000	20.000	0.00	t	2026-08-13 17:13:50.555618	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3498	GER0024	HOSE CLAMP 4" SS	35	NOS	\N	2.000	2.000	0.000	20.000	0.00	t	2026-08-13 17:13:50.557098	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3499	GER0025	HOSE CLAMP 5" GI	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.558611	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3500	GER0026	HOSE CLAMP 6" GI	35	NOS	\N	2.000	2.000	0.000	7.000	0.00	t	2026-08-13 17:13:50.560047	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3501	GER0027	HOSE CLAMP 6" SS	35	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-08-13 17:13:50.56153	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3502	GER0028	HOSE CLAMP 7" SS	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.563284	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3503	GER0029	HOSE CLAMP 7" GI	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.56539	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3504	GER0030	HOSE CLAMP 8" GI	35	NOS	\N	2.000	2.000	0.000	3.000	0.00	t	2026-08-13 17:13:50.567272	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3371	COM0008	OIL FILTER CPB-7	53	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3372	COM0009	ELEMENT CPB-7	53	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3373	PULL0001	TLP 200X3C/2517 FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3374	PULL0002	TLP 200X4C/3020 FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3375	PULL0003	TLP 375X7C/4040 FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3376	PULL0004	TLP 375X5C/3535 FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3377	PULL0005	TLP 425X5C/4040 FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3378	PULL0006	TLP 900X4C/ FENNER	54	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3505	GER0031	HOSE CLAMP 8" SS	35	NOS	\N	2.000	2.000	0.000	21.000	0.00	t	2026-08-13 17:13:50.569773	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3506	GER0032	HAND GLOVES (CLOTH) SET	35	NOS	\N	2.000	2.000	0.000	13.000	0.00	t	2026-08-13 17:13:50.571594	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3507	GER0033	HAND GLOVES (GREY) SET	35	NOS	\N	2.000	2.000	0.000	5.000	0.00	t	2026-08-13 17:13:50.573179	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3508	GER0034	HAND HALF GLOVES (CLOTH) SET	35	NOS	\N	2.000	2.000	0.000	4.000	0.00	t	2026-08-13 17:13:50.574694	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3509	GER0035	WELDING HAND HALF (LETHER) SET	35	NOS	\N	2.000	2.000	0.000	28.000	0.00	t	2026-08-13 17:13:50.576277	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3510	GER0036	3 Mtr MEASURING TAPE	35	NOS	\N	2.000	2.000	0.000	7.000	0.00	t	2026-08-13 17:13:50.578271	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3511	GER0037	50 Mtr MEASURING TAPE	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.57999	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3512	GER0038	PHENYLE 1 LT BOTTLE	35	NOS	\N	2.000	2.000	0.000	6.000	0.00	t	2026-08-13 17:13:50.581565	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3514	GER0040	ADHESIVE TAPE (BROWN)	35	NOS	\N	2.000	2.000	0.000	0.000	0.00	t	2026-08-13 17:13:50.584654	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3515	GER0041	PET STRAP BDL 12MM	35	NOS	\N	2.000	2.000	0.000	0.000	0.00	t	2026-08-13 17:13:50.585653	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 3516	GER0042	WHITE STRAP BDL  12 MM	35	NOS	\N	2.000	2.000	0.000	0.000	0.00	t	2026-08-13 17:13:50.586515	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3517	GER0043	S.S CLOTH -10 PLAIN,1.320 X 1320 ( LENGTH *WIDTH) MESH	35	NOS	\N	2.000	2.000	0.000	2.000	0.00	t	2026-08-13 17:13:50.587636	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3518	GER0044	S.S CLOTH -40 PLAIN,1.320 X 1320 ( LENGTH *WIDTH) MESH	35	NOS	\N	2.000	2.000	0.000	2.000	0.00	t	2026-08-13 17:13:50.58867	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2912	PUTU001	Polyurethane Tubes 4 x 2.5 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3330	STA001	REGISTRES 100 PAGE	33	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2128	BE0001	2213-K-TVH-C3	39	NOS	\N	1.000	1.000	0.000	1.000	13.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack M-1, Bin 12
-2939	GECR001	LIFT SLING BELT 3TON X 3 MTR	35	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2130	BE0003	3309	31	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2299	BW0001	BOTTOM WIRE (44.953 X 3.65)- (1.5 LAYER),W&F -60216	29	NOS	5911-2000	1.000	1.000	0.000	1.000	507516.00	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2300	PF0001	PRESS FELTS (14.1 X 3.5 M) 1650 GSM V3 (81.43 KGS) ,12579028	29	NOS	5911-9010	1.000	1.000	0.000	1.000	243858.71	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2301	DS0001	DRYER SCREEN (29 X 3.5 M) -SHALIMAR-18164	29	NOS	5911-2000	1.000	1.000	0.000	1.000	158847.00	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2302	DS0002	DRYER SCREEN (32 X 3.5 M) SHALIMAR-18163 ,18165	29	NOS	5911-2000	1.000	1.000	0.000	2.000	175280.00	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2303	URG001	1 ST UNIRUN GROUP VOITH  41 X 3.5 (12595227)	29	NOS	5911-9010	1.000	1.000	0.000	1.000	273543.22	t	2026-07-15 18:39:14.282141	t	365	\N	A	\N	\N	\N	\N	0.00	\N	Rack 2, Box 4
-2304	PF0003	NEW PRESS FELTS TOP ( 15.1 X 3.5 M) 1450 , WT: 79.28 (12559803, 9026)	29	NOS	5911-9010	1.000	1.000	0.000	2.000	230430.49	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2305	PF0004	NEW PRESS FELTS BOTTOM( 15.1 X 3.5 M) 1650 ,voith 12507946, (89.55) 12759027	29	NOS	5911-9010	1.000	1.000	0.000	2.000	261152.62	t	2026-07-15 18:39:14.282141	t	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2134	BE0007	6004-2z	39	NOS	6004-2z	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3517	GER0043	S.S CLOTH -10 PLAIN,1.320 X 1320 ( LENGTH *WIDTH)	35	NOS	\N	2.000	2.000	0.000	0.000	0.00	t	2026-08-13 17:13:50.587636	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3518	GER0044	S.S CLOTH -40 PLAN,1.320 X 1320 ( LENGTH *WIDTH)	35	NOS	\N	2.000	2.000	0.000	0.000	0.00	t	2026-08-13 17:13:50.58867	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3461	GECR005	LIFT SLING WIRE ROPE 3 TON (10MM X 28MTR)	35	NOS	\N	2.000	2.000	0.000	29.000	100.00	t	2026-08-13 17:13:50.491878	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3496	GER0022	HOSE CLAMP 2.5" GI	35	NOS	\N	2.000	2.000	0.000	22.000	0.00	t	2026-08-13 17:13:50.554049	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3497	GER0023	HOSE CLAMP 3" SS	35	NOS	\N	2.000	2.000	0.000	20.000	0.00	t	2026-08-13 17:13:50.555618	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2939	GECR001	LIFT SLING BELT 3TON X 3 MTR	35	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2941	GECR003	LIFT SLING BELT 3TON X 5 MTR	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3488	GER0017	HOSE CLAMP 1/2" GI	35	NOS	\N	2.000	2.000	0.000	15.000	0.00	t	2026-08-13 17:13:50.539585	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3489	GER0018	HOSE CLAMP 1/2"SS	35	NOS	\N	2.000	2.000	0.000	2.000	0.00	t	2026-08-13 17:13:50.54264	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3498	GER0024	HOSE CLAMP 4" SS	35	NOS	\N	2.000	2.000	0.000	20.000	0.00	t	2026-08-13 17:13:50.557098	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3493	GER0019	HOSE CLAMP 2" GI	35	NOS	\N	2.000	2.000	0.000	4.000	0.00	t	2026-08-13 17:13:50.549461	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3494	GER0020	HOSE CLAMP 2" SS	35	NOS	\N	2.000	2.000	0.000	3.000	0.00	t	2026-08-13 17:13:50.551008	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3499	GER0025	HOSE CLAMP 5" GI	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.558611	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3510	GER0036	3 Mtr MEASURING TAPE	35	NOS	\N	2.000	2.000	0.000	7.000	0.00	t	2026-08-13 17:13:50.578271	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3500	GER0026	HOSE CLAMP 6" GI	35	NOS	\N	2.000	2.000	0.000	7.000	0.00	t	2026-08-13 17:13:50.560047	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3501	GER0027	HOSE CLAMP 6" SS	35	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-08-13 17:13:50.56153	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3502	GER0028	HOSE CLAMP 7" SS	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.563284	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3503	GER0029	HOSE CLAMP 7" GI	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.56539	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3504	GER0030	HOSE CLAMP 8" GI	35	NOS	\N	2.000	2.000	0.000	3.000	0.00	t	2026-08-13 17:13:50.567272	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3511	GER0037	50 Mtr MEASURING TAPE	35	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-08-13 17:13:50.57999	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3512	GER0038	PHENYLE 1 LT BOTTLE	35	NOS	\N	2.000	2.000	0.000	6.000	0.00	t	2026-08-13 17:13:50.581565	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2912	PUTU001	Polyurethane Tubes 4 x 2.5 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3379	MNO006	NOZZLE IN CERAMIC (BIG THREADED) L 80MM X CL 60MM X HOLE 14MM	51	Nos	8441	0.000	0.000	0.000	20.000	1250.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3495	GER0021	HOSE CLAMP 2.5" SS	35	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-08-13 17:13:50.552578	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3513	GER0039	SELF ADHESIVE TAPE (36 X 50) EACH BOX-48	35	NOS	\N	2.000	2.000	0.000	376.000	0.00	t	2026-08-13 17:13:50.583185	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2164	BE0037	6309-zz / L140	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2342	MPS0016	CPC 100/320	42	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2349	MPS0023	GUN METAL(OD50XID75XLE210 MM)/S.S 316 (ID63XID70XLE130 MM)	42	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2129	BE0002	3309B-TVH-C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2971	GMSB0016	12mmX75mm MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	250.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2950	GBFP001	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 80X250 mm	35	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3330	STA001	REGISTRES 100 PAGE	33	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2191	BE0064	22220 E1-XL-K	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2128	BE0001	2213-K-TVH-C3	39	Nos	\N	1.000	1.000	0.000	1.000	13.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack M-1, Bin 12
+2131	BE0004	3307 -BD-XL	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2132	BE0005	6001-c-2hrs /2z/C3	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2133	BE0006	6003 -2z	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2136	BE0009	6009-2RSR/LLU/ZZ	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2137	BE0010	6011-2rs	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2139	BE0012	6201-2Z	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3365	COM0002	AIR FILTER CPB-40	53	Nos	\N	0.000	0.000	0.000	700.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3366	COM0003	VALVE REGULATOR CPB-40	53	Nos	\N	0.000	0.000	0.000	700.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3367	COM0004	ASSEMBLE CPB-60	53	Nos	\N	0.000	0.000	0.000	680.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3368	COM0005	SOLENOID VALVE CPB-60	53	Nos	\N	0.000	0.000	0.000	680.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3369	COM0006	AIR FILTER CPB-7	53	Nos	\N	0.000	0.000	0.000	680.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3370	COM0007	OIL SEPRATOR CPB-7	53	Nos	\N	0.000	0.000	0.000	680.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3380	BE0174	UJ CROSS (49 X 155) 4018	39	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3382	BE0176	UJ CROSS (72 X 185)	39	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3383	BE0177	UJ CROSS (74 X 244)	39	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3384	BE0178	UJ CROSS (57 X 152) 4113A OLD	39	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3385	MV0044	200NB STOP VALVE PISTON TYPE	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3386	GHTBN0005	3/8" X 2" HT BOLT & NUT, SPRING WASHER	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3387	GSSAB0010	5/16" X 25 MM SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3388	GSSBN0024	10 X 40 MM SS BOLT & LOCK NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3389	GSSBN0025	12 X 65 MM SS BOLT & LOCK NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 4045	FLTDGD001	FLT GD 30UNO CEV-5 (KKK005009D3.0TCVT4500 SINGSOLSJV435)	35	NOS	8427-2000	0.000	0.000	0.000	1.000	1665000.00	t	2026-08-13 17:43:39.494756	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2796	MGU0014	Vaccum Gauge 0 to 760 mm Hg 1/2" Bspt Dial 6"	48	Nos	9026-2000	0.000	0.000	0.000	2.000	1700.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3381	BE0175	UJ CROSS (47 X 134)	39	Nos	\N	0.000	0.000	0.000	4.000	1750.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 4046	RETURN	10 K POTENTIOAL METER	35	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-13 17:45:08.541072	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2298	TW0001	TOP WIRE (20.250 X 3.65 M) SHALIMAR -48497, W&F -	29	NOS	5911-2000	1.000	1.000	0.000	1.000	235171.00	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2143	BE0016	6204-zz /6204- 2RS	39	NOS	\N	1.000	1.000	0.000	6.000	195.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2143	BE0016	6204-zz /6204- 2RS	39	Nos	\N	1.000	1.000	0.000	6.000	195.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2306	TF0001	TYRE F-45	41	Nos	4012-9010	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2307	TF0002	TYRE F-70	41	Nos	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2308	TF0003	TYRE F-90	41	Nos	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2309	TF0004	TYRE F-160	41	Nos	4012-9010	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2310	TP0001	TYRE PH-126	41	Nos	4012-9010	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2311	TP0002	TYRE PH-140	41	Nos	4012-9010	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2312	TP0003	TYRE PH-160	41	Nos	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2313	TP0004	TYRE PH-178	41	Nos	4012-9010	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2314	TP0005	TYRE PH-190	41	Nos	4012-9010	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2315	TP0006	TYRE PH-250	41	Nos	4012-9010	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2316	TCF0001	TYRE COUPLING F-70	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2317	TCP0002	TYRE COUPLING PH-106	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2318	TCP0003	TYRE COUPLING PH-140	41	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2319	TCP0004	TYRE COUPLING PH-160	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2320	TCP0005	TYRE COUPLING PH-178	41	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2321	TCP0006	TYRE COUPLING PH-190	41	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2322	TCP0007	TYRE COUPLING PH-250	41	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2323	CPB0001	FBC-6A4 (OD-254, 10 HPLES)	41	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2324	CPB0002	FBC-5L (6 HOLES)	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2325	CPB0003	FGC2-0.5L GARE COUPALING PART(OD-185, 6 HOLES)	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2329	MPS0003	SEPRATOR SLEEVE 25X32X75 MM	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2130	BE0003	3309	31	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2664	MVB0008	GREEN & BLACK SPC-PT 4750	43	Nos	4010-3999	0.000	0.000	0.000	8.000	4954.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2658	MVB0002	V-BELT GREEN SPB -PT 3150	43	Nos	4010-3999	0.000	0.000	0.000	6.000	1927.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2706	MV0002	0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE	46	KG	4802	0.000	0.000	0.000	17.001	100.00	t	2026-08-09 11:48:09.915991	f	365	e.g. Pulp Mill Section	\N	e.g. OEM Direct Procurement	e.g. SKF India / Schaeffler	e.g. Cycle-1 Verified	e.g. Vibration spectral sweep validations	0.00	\N	Rack 2, Box 4
+2656	BE0173	627 BEARING	39	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2134	BE0007	6004-2z	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2326	CPB0004	FGC1-0.5L GEAR COUPALING PART(OD-170, 6 HOLES)	41	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2327	MPS0001	SWP 80/260	42	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2328	MPS0002	MEGA A 40	42	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2330	MPS0004	OD-38 mm -108 LENGTH	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2331	MPS0005	CPC 65/260	42	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2332	MPS0006	CPC 150/320	42	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2657	MVB0001	V-BELT SPB 1850	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2659	MVB0003	V-BELT BLACK SP 3300	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2660	MVB0004	V- BELT GREEN SPC-PT 3750 /BLACK SPC 3750	43	Nos	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2661	MVB0005	V-BELTBLACK SPB 4250 /GREEN SPB-PT 4250	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2662	MVB0006	V-BELTBLACK SPC 4300	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2663	MVB0007	GREEN SPC -PT 4500	43	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2665	MVB0009	GREEN SPC 5300	43	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2666	MVB0010	GREEN SPC -PT 6000 /BLACK SPC-PT 6000	43	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2667	MVB0011	BLACK SPC 8500/ GREEN SPC -8500	43	Nos	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2668	MVB0012	BLACK XPA 1120	43	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2669	MVB0013	BLACK XPA 1450	43	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2670	MVB0014	BLACK B 47	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2671	MVB0015	BLACK C48	43	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2672	MVB0016	BLACK A 49	43	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2673	MVB0017	BLACK B50	43	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2674	MVB0018	BLACK B 58	43	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2675	MVB0019	BLACK B 62	43	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2676	MVB0020	BLACK C 73	43	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2677	MVB0021	GREEN SPA -PT 1220	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2678	MVB0022	BLACK SPB 1600	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2679	MVB0023	BLACK C 107/C 2774	43	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2680	MVB0024	BLACK B 68	43	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2681	MVB0025	BLACK C 114/C2952	43	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2682	MVB0026	BLACK C 103	43	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2683	MVB0027	BLACK C 104	43	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2705	MV0001	1.5 " GLOBE VALVE	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
 4440	RM-NDL-02	NDLKC (New Double Lined Kraft Cuttings)	61	MT	\N	0.000	20.000	0.000	92.000	22000.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	RM-YARD-B
 4441	RM-IUOCC-03	Imported US OCC #12 (High Yield)	61	MT	\N	0.000	15.000	0.000	68.400	24500.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	RM-YARD-A
 4442	RM-SWL-04	SWL (Sorted White Ledger / Record Paper)	61	MT	\N	0.000	10.000	0.000	38.200	28000.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	RM-SHED-C
@@ -7052,1084 +6791,962 @@ COPY public.materials (id, code, name, category_id, uom, hsn_code, reorder_level
 4445	RM-BHKP-01	Imported BHKP (Bleached Hardwood Kraft Pulp)	62	MT	\N	0.000	5.000	0.000	26.000	62000.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	PULP-STORE-1
 4446	RM-BSKP-02	Imported BSKP (Bleached Softwood Kraft Long Fiber)	62	MT	\N	0.000	5.000	0.000	19.500	74000.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	PULP-STORE-1
 4447	RM-UKP-03	Unbleached Kraft Pulp (UKP)	62	MT	\N	0.000	4.000	0.000	14.000	58000.00	t	2026-08-14 01:11:28.016628	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	PULP-STORE-2
-2661	MVB0005	V-BELTBLACK SPB 4250 /GREEN SPB-PT 4250	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3189	ECT0028	LC1DWKM7C -62 KVAR CONTACTORS -CAPACITOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3221	ERE0024	L & T (SWITCHGEAR) 3355 THERMAL OVERLOAD RELAY (30AMPS-40AMPS)	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3224	EMC0002	L&t 160 AMPS SIZE 00	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3227	EMC0005	L& T SWITCHGEAR 400 AMPS (415 V -100 KA) SIZE -2	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3268	ELEG0022	SIEMENS ELECTORNIC TIMER (3RP15131AP308K) 3-60S	59	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3286	ELEG0040	PROCERSS INDICATOR PIC101A-VI230	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3311	ELEG0065	COPPER FLAT LUGS 50 SQMM	59	NOS	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3392	ELEG0084	TERMINAL PLATE TAMCO T1-9007 (5 HP)	59	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-13 16:35:06.907613	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3393	ELEG0085	ELE HAND HALF (RUBBER) SET	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.912731	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3394	ELEG0086	20 W LED BULB	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.915702	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3395	ELEG0087	10 K POTENTIOAL METER	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.917694	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3397	EVFD002	POWER CARD 6SL3246-0BA22 -1PA0 ( CU 2505-2DP)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.923591	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3398	EVFD003	POWER CARD 6SL3246-0BA22 -1FA0 ( CU 2505-2PN )	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.926498	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3399	EVFD004	INTERFACE MODULE 6ES7155-6AA02-0BN0 ( IM155 --8PN ST )	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.929514	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3400	EVFD005	SIEMENS -SIMATIC DIGITAL INPUT MODULE (8 DI DC 24V ET 200S )(6ES7131-4BF00-0AA0)	60	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-13 16:35:06.931614	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3401	EVFD006	SIEMENS -SIMATIC DIGITAL INPUT MODULE (DI 16 X 24VDC ST,ET 200SP) (6ES7131-6BH01-0BA0)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:06.934218	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3402	EVFD007	SIEMENS -SIMATIC DIGITAL OUTPUT MODULE (8 D0 DC 24V /0.5 A ET 200S )(6ES7132-4BF00-0AA0)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.937421	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3403	EVFD008	SIEMENS -SIMATIC DIGITAL OUTPUT MODULE (D0 16 X 24V DC /0.5 A ET 200SP) (6ES7132-6BH01-0BA0)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.940192	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3404	EVFD009	SIEMENS ANALOG INPUT MODULE ET 200SP AI 4 X U 2WIRE ST ET200 SP	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.942709	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3406	EVFD011	SIEMENS SIMATIC ANALOG OUTPUT MODULE (AQ4 X U/I ST ET 200SP) (6ES7135 -6HD00-0BA1)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.946735	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3407	EVFD012	SIEMENS POWER MODULE PM-E DC24 VST (6ES7138-4CA01-0AA0)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:06.949581	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3408	EVFD013	SIEMENS SIMATIC BUS CONNECTOR PROFIBUS DP (6ES7972 0BA42-0XA0)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:06.952841	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3411	EVFD016	SIEMENS SITOP PSU 100L POWER SUPPLY DC24V/5A ,AC120/230V/2,1/1,15A/50-60 HZ (6EP133 -1LB00YSU/HD130538)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.961757	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3412	EVFD017	SIEMENS (6ES79564-8LE03-0AA0) 12MB SIMATIC MEMORY CARD	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.963365	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3413	EVFD018	SIEMENS BASIC OPEARATOR PANEL (6SL3255-0AA00-4CA1-BOP-2)-DISPLAY	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.966565	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3414	EVFD019	SIEMENS BASIC OPEARATOR PANEL (6SL3055-0AA00-4BA0-BOP-20)-DISPLAY	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.969893	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2847	DB0001	DOCTOR BLADE 1.2X75X3600 MM RSE -BRONZE	45	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2848	DB0002	DOCTOR BLADE 6.0X75X4000 MM PLASTIC GREEN	45	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2947	GEGR005	GLAND ROPE 16MM (KGS)	35	NOS	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2948	GEGR006	GLAND ROPE 18MM (KGS)	35	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2949	GEGR007	GLAND ROPE 20MM (KGS)	35	NOS	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2952	GBFP003	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 50X400 mm	35	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2953	GBFP004	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 65X400 mm	35	NOS	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2954	GBFP005	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 80X420 mm	35	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2869	PCK0001	50mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2870	PCK0002	80mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2871	PCK0003	100mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2872	PCK0004	125mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2873	PCK0005	150mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2874	PCK0006	200mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2875	PCK0007	250mm CYLINDER KITS	36	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2876	PCK0008	SPARE PENUMATICS AIR MAX SEAL KIT (200MM -214MM) SHAFT SIZE :38MM	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2877	PUE0009	10X1/2" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2878	PUM0005	10X1/2" PU MALE CONNECTOR	36	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2879	PUM0009	10X1/2" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2880	PUM0001	10X1/4" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	41.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2881	PUE0006	10X1/8" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2882	PUM0013	10X1/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2883	PUC0002	10X10 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2884	PUT0002	10X10X10 PU T CONNECTOR	36	NOS	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2885	PUC0003	10X12 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2886	PUM0011	10X3/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2887	PUM0014	12X1/2" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2888	PUC0006	12X12 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2889	PUT0004	12X12X12 PU T CONNECTOR	36	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2890	PUM0012	4X3/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	13.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2891	PUE0001	6X1/2" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2892	PUM0002	6X1/2" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2893	PUE0007	6X1/4" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2894	PUM0003	6X1/4" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2895	PUE0003	6X1/8" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2896	PUE0008	6X3/8" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	34.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2897	PUM0004	6X3/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	71.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2898	PUC0007	6X6 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2899	PUT0003	6X6X6 PU T CONNECTOR	36	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2900	PUC0004	6X8 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2901	PUM0008	8X1/2" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2902	PUE0005	8X1/4" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2903	PUM0006	8X1/4" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	210.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2904	PUE0004	8X1/8" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	66.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2905	PUM0010	8X1/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	80.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2906	PUC0008	8X10 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	46.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2907	PUC0005	8X12 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	47.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2908	PUE0002	8X3/8" PU ELBOW CONNECTOR	36	NOS	\N	0.000	0.000	0.000	65.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2909	PUM0007	8X3/8" PU MAIL CONNECTOR	36	NOS	\N	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2910	PUC0001	8X8 PU COUPLER	36	NOS	\N	0.000	0.000	0.000	167.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2866	MNO003	3/64 GAS CUTTER NOZZLE	51	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3415	EVFD020	8 MM DRIVE SENSOR CABLE	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.973277	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3416	EVFD021	SIEMENS CENTRAL PROCESSING UNIT (CPU1510SP-1-PN) SINMATIC ET 200SP	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.974969	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3417	EVFD022	SIEMENS BASE UNITS 6ES7 193 -6BP00-0BA0 ,PRODUCT NO: 4200918239 ,ET -200SP	60	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-13 16:35:06.976841	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2946	GEGR004	GLAND ROPE 12MM (KGS)	35	NOS	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2943	GEGR001	GLAND ROPE 6MM (KGS)	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2944	GEGR002	GLAND ROPE 8MM (KGS)	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2911	PUT0001	8X8X8 PU T CONNECTOR	36	NOS	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2913	PUTU002	Polyurethane Tubes 4 x 2 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2914	PUTU003	Polyurethane Tubes 6 x 4 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2915	PUTU004	Polyurethane Tubes 8 x 5 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2916	PUTU005	Polyurethane Tubes 10 x 6.5 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2917	PUTU006	Polyurethane Tubes 8 x 6 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	69.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2918	PUTU007	Polyurethane Tubes 10 x 8 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2919	PUTU008	Polyurethane Tubes 12 x 10 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2920	PUTU009	Polyurethane Tubes 12 x 8 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2921	PUTU010	Polyurethane Tubes 14 x 11 mm 100 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2922	PUTU011	Polyurethane Tubes 16 x 12 mm 50 mts	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2923	PFRL001	3 /8" FR+L (JHFRCLM-14B) AIRMAX	36	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2924	PFRL002	1/2 "FR+L (JHFRCLM-15) AIRMAX	36	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2925	PREG001	3/8" REGULATOR (MO NO:R14624)	36	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2926	PREG002	1/2" REGULATOR ( R15634) AIRMAX	36	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2928	PCV0001	1/4" COMPACT VALVE  (DS265SC61-W)-JANATICS	36	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2929	PDV0001	1/4" DISC ROTARY VALVE	36	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2930	PDV0002	1/2" DISC ROTARY VALVE	36	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2931	PRV0001	1/2" ROTARY VALVE	36	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2932	PCV0002	1/4" COMPACT VALVE  (DS255ER61)-JANATICS	36	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2933	PSM001	PNEUMATIC PP & PET STRAPPING MACHINE MODEL: XQD-19	36	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2934	PSM002	PNEUMATIC PP & PET STRAPPING MACHINE MODEL: AQD-19	36	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2935	PSH001	PNEUMATIC SHAFT 100 X 50 MM	36	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2936	PBR001	PNEUMATIC BAREL 100 X 50 MM	36	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2937	PCY001	PNEUMATIC CYLINDER 100 X 850 MM	36	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2938	PCY002	AIR MAX DUBLE ACTING CYLENDER SIZE 80X1050MM	36	NOS	8420-9100	0.000	0.000	0.000	10.000	10260.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3162	ECT0001	3TF30-10-0AP0-(230V/50HZ,276/60) (9A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3418	EVFD023	SIEMENS BASE UNITS 6ES7 193 -6BP00-0DA0 ,ET -200SP	60	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-13 16:35:06.979265	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3419	EVFD024	SIMATIC BUS CONNECTORS ,RJ 45 CONNECTORS (6GK1901-1BB10-2AB0)	60	NOS	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-13 16:35:06.982006	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3420	EVFD025	SIEMENS SERVER MODULE 6ES7193-6PA00-0AA0 SINMATIC ET ,POI NO: 4200936678	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.985559	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3421	EVFD026	SIMATIC INTERFACE MODULE IM151-1 STANDARD (6ES7151 1CA00-0AB0)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.987581	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3422	EVFD027	SIEMENS SINAMICS CONTROL UNIT CUA31 Ta 0 to 55 C 24VDC 0.6A (6SL3040-0PA01-0AA0) -OLD	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.989277	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3423	EVFD028	DRIVE CLIQ CABLE (6SL30604AF100AA0) 1 CABLE-3 MTRS	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.991025	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3424	EVFD029	SINAMICS CONTROL UNIT CU 230-2 DP ,(6SL3040-1MA00-0AA0) TA 0 TO 55 CENTRIGRADE SUPPLY 24VDC 6.5 A ,DIGITAL OUTPUT 24VDC 0.5 A	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.992733	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3425	EVFD030	6ES7512-1DM03-0AB0	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.995204	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3426	EVFD031	6ES7954-8LC040 -0AA0- MEMORY CARD	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.997039	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3427	EVFD032	6AV21232GB030AX0-KTP700 HMI SIEMENS Basic panel	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.998804	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3428	EVFD033	6ES72141AG400XB0 -CPU 1214C -SIEMENS CPU MODULE	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.000539	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3429	EVFD034	6ES72344HE320XB0 -SB 1234 4 AI/2 AO -SIEMENS ANALOG IP/OP	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.004488	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3430	EVFD035	6XV18300EH10 -PROFIBUS CABLE SIEMENS 100 MTR	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.006956	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3431	EVFD036	6XV18402AH10 -PROFINET CABLE SIEMENS 100 MTR	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.008879	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3433	EVFD038	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE315UL0- PM240-2 , 55kW -Siemens (G120 POWER MODULE PM240-2 55kW (CT)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.0121	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3434	EVFD039	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE245UL0- PM240-2 , 18.5kW -Siemens (G120 POWER MODULE PM240-2 18.5kW	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.013767	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3435	EVFD040	6SL3054 -0FC31-1BA0 -SIEMENS PLC (FlASH CARD)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.015634	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3436	EVFD041	6SL30550AA004BA0 -BASIC OPERATOR PANEL SIEMENS (BOP-20)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.017422	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3437	EVFD042	6SL30550AA005CA2- SMC30 -SIEMENS (SENCER MODULE)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.01931	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3438	EVFD043	6SL32440BB121FA0 -CU240 E-2 PN CONTROL UNIT ( CU240E-2)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.021996	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3439	EVFD044	6ES75455DA000AB0 -200SP CM DPU CPU MODULE SIEMENS (CM PROFIBUS DP) COMMUNICATION MODULE	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.023488	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2942	GECR004	CRANE REMOTE	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3023	GER0002	1" WIRE BRUSH	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3024	GER0003	ANABOND RTV SILICON RED 80GR	35	NOS	2710	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3025	GER0004	ANABOND RTV SILICON RED 25GR	35	NOS	2710	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3026	GER0005	GREAS GUN PESTOL TYPE	35	NOS	\N	0.000	0.000	0.000	2.000	1900.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3029	GER0008	FEVIQUICK PKTS	35	NOS	\N	0.000	0.000	0.000	166.000	4.76	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3030	GER0009	HOLE SAW DRILL BIT (1902) 6PC SET	35	NOS	\N	0.000	0.000	0.000	1.000	240.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3031	GER0010	2" TUBE CLEANING BRUSH (ROUND)	35	NOS	\N	0.000	0.000	0.000	72.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3032	GER0011	5 Mtr MEASURING TAPE	35	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3033	GER0012	RUST RELEASE SPRAY (480ML)	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3034	GER0013	1/2" PVC TAP'S	35	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3035	GER0014	1/2" TEFLON TAPE	35	NOS	\N	0.000	0.000	0.000	33.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3036	GER0015	1" TEFLON TAPE	35	NOS	\N	0.000	0.000	0.000	56.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3028	GER0007	HOSE CLAMPS 3/4" GI	35	NOS	\N	0.000	0.000	0.000	66.000	18.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3037	GER0016	HOSE CLAMP 1" SS	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3027	GER0006	HOSE CLAMPS 1" GI	35	NOS	\N	0.000	0.000	0.000	50.000	20.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3121	CHSBC013	SE-BOND 102(CRACKING AGENT)	28	KG	3809 9200	0.000	0.000	0.000	0.000	170.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3122	CHPML010	PROMASK 192	28	KG	3824 9022	0.000	0.000	0.000	129.200	320.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3123	CHPSL011	PROSOLVE 126	28	KG	3824 9022	0.000	0.000	0.000	174.562	230.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3124	CHPDL009	PROSOLVE ADVANCE	28	KG	3824 9022	0.000	0.000	0.000	2087.600	230.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3129	CHPHB017	PH BOOSTER [3230] (L)	28	KG	3824 9900	0.000	0.000	0.000	344.500	87.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2107	OS0058	107-135.5-10 OIL SEAL	40	NOS	4016 9330	4.000	4.000	0.000	18.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-4448	MAT-PULP-505444	Bleached Hardwood Kraft Pulp Grade A-505444	28	MT	\N	4.000	2.000	0.000	5.000	55000.00	f	2026-08-14 01:51:45.613925	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-3453	EVFD058	SIMENS DRIVE CLIQ CABLE (6SL30604AF100AA0)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.05249	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-4449	MAT-PULP-512468	Bleached Hardwood Kraft Pulp Grade A-512468	28	MT	\N	4.000	2.000	0.000	5.000	55000.00	f	2026-08-14 01:51:52.558438	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-4450	MAT-PULP-592261	Bleached Hardwood Kraft Pulp Grade A-592261	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:12.540204	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-4452	MAT-PULP-613802	Bleached Hardwood Kraft Pulp Grade A-613802	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:33.847651	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-3170	ECT0009	LC1D12M7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3409	EVFD014	SIEMENS ELECTRICAL SWITCH MODULE LTX LAN PORTS RJ45 (10/100 M BITS ,CLASS IP 20 -PROTOCOL (6GK5005-0BA001AB2)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.956356	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3410	EVFD015	SIEMENS SITOP PSU 100L POWER SUPPLY DC 24V /10A (50HZ-60HZ)( AC-120/230V /4,1/2,0A 50-60HZ) (6EP1334-1LB00 YSU /K2100830)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.959371	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3441	EVFD046	6SL 3210 PE 325 UL0 -PM 240--2 ,110 KW ,VFD -SIEMENS ,G120 POWER MODULE 110 KW (CT) VARIABLE FREQUENCY DRIVE	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.026749	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3442	EVFD047	FR-D740-036-E16 1.5 KW/2 HP. ,,SI NO: (C5504J082,C5504J094),MAKE MITUSBISHI	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.027888	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3443	EVFD048	SWITCH MODE POWER SUPPLY ART NO: 85135(MURR ELEKTRONIK)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.029016	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3444	EVFD049	PROGRAM MMABLE CONTROLLER S.NO 22YO53696 (MITSUBISHI MODEL :- FX5U-32MT/ES)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.030822	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3445	EVFD050	CONTROL UNITE ADAPTER CUA32 (6SL3040 OPA01)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:07.033132	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3446	EVFD051	FERQUENCY CONVERTER EQUIMENT/CONTROL UNIT (CU320-2PN TA 0 TO 55C SUPPLY 24 VDL 6.5A DIGITAL OUTPUTS 24VDC, 0.5 A) MODEL:-65L304-IMA01-OAA0	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.035787	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3447	EVFD052	SIEMENS CIRCUIT BREAKER 1.6 (3RV6011-1AA10)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:07.038467	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3448	EVFD053	SIEMENS SIGNALLING SWITCH (3RV 2921-1M)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:07.040637	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3449	EVFD054	SIEMENS CONTACTOR (3RT2016-1 PU1-8K) 9A,400, 4KW (A5E51557269017)	60	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-13 16:35:07.042864	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3450	EVFD055	SIEMENS SIMATIES (57-1200) 6ES7 214-1HG40-ORBO CPU 1214C DC/DC/RLY	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.044984	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3451	EVFD056	SINAMICS CONTROL UNIT CU 240E-2 6SL3244-OBB12-13A1	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.047043	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3452	EVFD057	SWITCH MODE POWER SUPPLY ART NO: 58812 (MURR ELEKTRONIK)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:07.049919	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3022	GER0001	2" WIRE BRUSH	35	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3013	GSSBN0021	3/8" X 1 1/4 SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3014	GSSBN0022	5/16" X 1 1/4 SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3113	CHSFS002	SURFACE SIZE (700C)	28	KG	4811	0.000	0.000	0.000	3643.000	98.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3114	CHENL004	ENZYME (L)	28	KG	3507 9062	0.000	0.000	0.000	16.840	625.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3115	CHSRA005	RETENTION AID (2024)	28	KG	3906 9090	0.000	0.000	0.000	808.700	350.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3116	CHDEL007	DEFOAMER (SE 100)	28	KG	3402 9099	0.000	0.000	0.000	485.000	215.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3117	CHCOA004	COAGULANT (CL 200)	28	KG	3824	0.000	0.000	0.000	2666.000	151.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3118	CHSKR006	KROFTA (303)	28	KG	3906 9090	0.000	0.000	0.000	737.000	255.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3120	CHGYD008	GOLDEN YELLOW DYE	28	KG	4804 3900	0.000	0.000	0.000	3450.000	172.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3125	CHBPS014	BLEACHING POWDER (S)	28	KG	2828 1010	0.000	0.000	0.000	50.000	38.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3130	CHASL018	ANTI SCALEN [3220] (L)	28	KG	3824 9900	0.000	0.000	0.000	600.000	92.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3131	CHOXL019	OXYGEN SCAVANGER [3210] (L)	28	KG	3824 9022	0.000	0.000	0.000	400.000	85.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3127	CHHCA016	HCL [BOILER]	28	KG	2806 1000	0.000	0.000	0.000	540.000	10.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3132	CHROL020	RO ANTI SCALEN [3291 (L)	28	KG	3824 9022	0.000	0.000	0.000	122.000	240.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3133	CHCSF021	CAUSTIC SODA FLAKES	28	KG	2815 1110	0.000	0.000	0.000	250.000	45.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3134	CHDEL022	DESCALING [3250] (L)	28	KG	3824	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-4451	MAT-PULP-605170	Bleached Hardwood Kraft Pulp Grade A-605170	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:25.225077	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-4453	MAT-PULP-620717	Bleached Hardwood Kraft Pulp Grade A-620717	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:40.760237	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-3186	ECT0025	LC1DPKM7 -30 KVAR CONTACTORS -CAPACITOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3163	ECT0002	3TF32-00-0AP0-(230V/50HZ,276/60) (16A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3164	ECT0003	3TF35-00-0AP0-(230V/50HZ) (38 A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3165	ECT0004	LC1E2510B5 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3166	ECT0005	LC1E2510B7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3167	ECT0006	LC1E 3810M5/B5 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3168	ECT0007	LC1E3810M7 /B7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3169	ECT0008	LC1E40M7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3172	ECT0011	LC1D25M7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3173	ECT0012	LC1D32M7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3174	ECT0013	LC1D40AM7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3175	ECT0014	LC1D65AM7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3176	ECT0015	LC1D80AM7 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3177	ECT0016	MNX12 240 Vac POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3178	ECT0017	MNX18 240 Vac POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3179	ECT0018	MNX25 -240 Vac POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3180	ECT0019	MNX 32-110V POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3181	ECT0020	MNX 32-240V POWER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3182	ECT0021	MNX 40-110V (L&T)(SWITCHGEAR) CONTACTOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3183	ECT0022	MNX40-240V (L&T)(SWITCHGEAR) CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3184	ECT0023	ABB  25AMPS -230V/60 HZ CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3185	ECT0024	ABB -45 AMPS 230V /50 HZ/ 240V /60HZ CONTACTOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3187	ECT0026	LC1DMKM7 -25 KVAR CONTACTORS -CAPACITOR	56	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3188	ECT0027	LC1DLKM7-20 KVAR CONTACTORS -CAPACITOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3191	ECT0030	3 kVAr X 440 V  POWER CAPACITOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3192	ECT0031	20 KVR CAPACITOR (L&T) 440V -RACK	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3193	ECT0032	LC1D1157 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3194	ECT0033	LC1D1400 SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3195	ECT0034	LA5D150830 SCHNEIDER CONTACTOR KIT (LC1D150)	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3196	ECT0035	LA5FF431 SCHNEIDER CONTACTOR KIT (LC1F150,LC1F115)	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3197	ECT0036	LAF400803 SCHNEIDER CONTACTOR KIT (LC1F400)	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3198	ERE0001	SCHNEIDER RELAY LRD 07 (1.6 AMPS -2.5 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3199	ERE0002	SCHNEIDER RELAY LRD 10 (4 AMPS -6 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3200	ERE0003	SCHNEIDER RELAY LRD 16 (9 AMPS -13AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3201	ERE0004	SCHNEIDER RELAY LRD 21 (12 AMPS -18AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3202	ERE0005	SCHNEIDER RELAY LRD 22 (16AMPS -24 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3203	ERE0006	SCHNEIDER RELAY LRD 32 (23AMPS-32 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3112	CHPAS003	POLY ALUMINIUM CHLORIDE ( SOLID)	28	KG	2827 3200	0.000	0.000	0.000	30459.000	43.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3231	EMC0009	MCB 10AMPS-1 P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3264	ELEG0018	LED TUBE LIGHTS	59	NOS	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3171	ECT0010	LC1D18M7SCHNEIDER CONTACTOR	56	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3204	ERE0007	SCHNEIDER RELAY LRD 35 (30AMPS-38 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3205	ERE0008	SCHNEIDER RELAY LRE35 (30AMPS-38 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3206	ERE0009	SCHNEIDER RELAY LRE353 (23AMPS-32 AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3207	ERE0010	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (2- 3.3 AMPS)	57	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3208	ERE0011	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (3- 5 AMPS)	57	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3209	ERE0012	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (9- 15 AMPS)	57	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3210	ERE0013	ABB THERMAL OVERLOAD RELAY (10 -14 AMPS)	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3211	ERE0014	MK1 STARTER THERMAL OVERLOAD RELAY (1.5 -2.5 AMPS)	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3212	ERE0015	MK1 STARTER THERMAL OVERLOAD RELAY (4- 6.5 AMPS)	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3213	ERE0016	MK1 STARTER THERMAL OVERLOAD RELAY (6-10 AMPS)	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3214	ERE0017	MK1 STARTER THERMAL OVERLOAD RELAY (9-14 AMPS)	57	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3215	ERE0018	LR 9F 5369 ELECTROIC OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3216	ERE0019	LR 9F7375 ELECTROIC OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3218	ERE0021	SIEMENS REAL (20AMPS-25AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3219	ERE0022	SIEMENS REAL (2.8AMPS-4AMPS) THERMAL OVERLOAD RELAY	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3220	ERE0023	L & T (SWITCHGEAR) 353 THERMAL OVERLOAD RELAY (23AMPS-32AMPS)	57	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3222	ERE0025	MINILEC  BP-VOLTAGE SENSING PHASE FAILURE RELAY 380-440V AC(S1 VMR7)	57	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3223	EMC0001	EATON 80 AMPS FUSE (690 V-200KA )-SIZE -1	58	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3226	EMC0004	200 AMPS HRC FUSE (SIZE-0)	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3228	EMC0006	MCB 6AMPS-1 P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3229	EMC0007	MCB 6AMPS -2 P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3230	EMC0008	MCB 6AMPS -3 P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3232	EMC0010	MCB 10AMPS-3 P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3233	EMC0011	MCB 16 AMPS -1P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3234	EMC0012	MCB 16 AMPS -3P	58	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3235	EMC0013	MCB 25 AMPS -3P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3236	EMC0014	MCB 32AMPS-3P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3237	EMC0015	MCB 32AMPS-4P	58	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3238	EMC0016	MCB 40 AMPS -3P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3239	EMC0017	MCB 63AMPS -3P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3240	EMC0018	MCB 63 AMPS -4 P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3241	EMC0019	LV510307 MCCB 100 A -3P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3242	EMC0020	LV516303 MCCB 160 A 3P	58	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3243	EMC0021	LV525303 MCCB 250A 3P /SWITCH GEAR 25 KA	58	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3244	EMC0022	LV563307 300A -3P MCCB	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3245	EMC0023	MCB 32 AMPS 2P	58	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3246	EMC0024	MCB 25 AMPS 2P	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3247	ELEG0001	MOTOR STATR 9-14 AMP AMPER	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3248	ELEG0002	SIEMENS 3TY7 460-OYA CONTACTOR KIT	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3249	ELEG0003	REWIDER POTENTIO METER 10K	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3250	ELEG0004	PRESOR SWITCH 10A	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3251	ELEG0005	SMPS 24 V 10A	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3252	ELEG0006	MK1 STATOR COIL	59	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3253	ELEG0007	L&T MK1 STATOR RELAY KIT	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3254	ELEG0008	SIEMENS NET CONETER	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3255	ELEG0009	ADD ON BLOK	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3256	ELEG0010	L&T ADD ON BLOK 2NO2NC	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3257	ELEG0011	SIEMENS ADD ON BLOK 2NO2NC	59	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3258	ELEG0012	L&T COMPRSER TERMINAL	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3259	ELEG0013	PID CONTROLLER TN: 00442008 (JUMO MAKE)	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3261	ELEG0015	SIREN 150-MFTER1, 90-120CB	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3262	ELEG0016	REPON/SIBASS FAN- 24 V	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3263	ELEG0017	100 WATS FLOOD LIGHT	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3265	ELEG0019	LX1FJ220 COIL SCHNEIDER	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3266	ELEG0020	12SDTO STATER DELTA TIMER 3S-120S	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3267	ELEG0021	120DTY STATER DELTA TIMER 3S-30S	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3269	ELEG0023	SIEMENS ELECTORNIC TIMER (3RP15131AP308K) 5S-100S	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3270	ELEG0024	TEMPERATURE CONTROLLER (513AX)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3271	ELEG0025	TEMPERATURE CONTROLLER (513)	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3272	ELEG0026	ROTAEY SWITCH (SAI2FR) (61192SCB03TDYR)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3273	ELEG0027	LIMIT SWITCH (240V/30V) JAI BALAJI	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3274	ELEG0028	ONDELAY TIMER 0.6S-60M PLY 2C/O CSA	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3275	ELEG0029	ONDELAY TIMER 0.6S-60M PLY 2C/O CSA	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3276	ELEG0030	STAR DELTA TIMER 3S-120S (2ASDT0) (24-240VAC/DC)	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3277	ELEG0031	TERMINAL PLATE CROMPTON (100 HP) (T17037)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3278	ELEG0032	TERMINAL PLATE CROMPTON (320 HP) (W60XL385XT30)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3279	ELEG0033	TERMINAL PLATE ABB 200HP (T17128) TAMCO	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3280	ELEG0034	TERMINAL PLATE CROMPTON T1 7138	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3281	ELEG0035	TERMINAL PLATE RX6 STUD 7009	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3282	ELEG0036	DISTRIBUSTION BOX	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3283	ELEG0037	RPM METER MULTISPAN PI-38-A2-00 (AC) 999 TO 9999)	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3284	ELEG0038	TECHNO METER CONTER (C-96X)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3285	ELEG0039	PROCERSS INDICATOR PIC101A-VI230	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3288	ELEG0042	SCHENIDER LADT2 TIMER DELAY BLOCKS	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3289	ELEG0043	L&T COIL-MK1 CAT NO: AA9000470000	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3290	ELEG0044	SCHENIDER LA7D3064 TERMINAL BLOCK	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3291	ELEG0045	TERMINAL PLATE TAMCO T1-7040	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3292	ELEG0046	TERMINAL PLATE TAMCO T1-7135	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3293	ELEG0047	MOTOR FANS CR.AD-112 (HOLE24.5XOD190) KEY WAY TYPE	59	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3294	ELEG0048	MOTOR FANS  CR (HOLE 24 X OD155) PIN TYPE	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3296	ELEG0050	MOTOR FANS   CR (HOLE48  X OD290) SCREW TYPE	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3297	ELEG0051	MOTOR FANS   CR (HOLE48  X OD290) PIN TYPE	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3298	ELEG0052	MOTOR FANS   CR (HOLE 93  X OD 400) KEY WAY TYPE	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3299	ELEG0053	TERMINAL BLOCK-PLATE Fr.ND200 CG (40HP)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3300	ELEG0054	TERMINAL BLOCK-PLATE Fr.ND160-180 CG (20-30HP)	59	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3301	ELEG0055	TERMINAL BOX 112 /132 CG (40-20hp)	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3302	ELEG0056	COLING FAN ND132 CG, (7.5HP)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3303	ELEG0057	COLING FAN ND160 CG, 4P (20HP)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3304	ELEG0058	COLING FAN F-80 (HOLE19XOD137)	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3305	ELEG0059	6 WAY PVC MCB BOX	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3306	ELEG0060	15" DULAUST FAG ALMOUCRD	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3307	ELEG0061	COPPER FLAT LUGS 10 SQMM	59	NOS	\N	0.000	0.000	0.000	70.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3308	ELEG0062	COPPER FLAT LUGS 16 SQMM	59	NOS	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3309	ELEG0063	COPPER FLAT LUGS 25 SQMM	59	NOS	\N	0.000	0.000	0.000	36.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3310	ELEG0064	COPPER FLAT LUGS 35 SQMM	59	NOS	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3312	ELEG0066	COPPER FLAT LUGS 70 SQMM	59	NOS	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3313	ELEG0067	COPPER FLAT LUGS 95 SQMM	59	NOS	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3314	ELEG0068	COPPER FEMALE LUGS  95 SQMM	59	NOS	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3315	ELEG0069	COPPER FEMALE LUGS  120 SQMM	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3316	ELEG0070	COPPER FLAT LUGS 120 SQMM	59	NOS	\N	0.000	0.000	0.000	35.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3317	ELEG0071	COPPER FLAT LUGS 150 SQMM	59	NOS	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3318	ELEG0072	ALUMINIUM FLAT LUGS  10 SQMM	59	NOS	\N	0.000	0.000	0.000	40.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3319	ELEG0073	ALUMINIUM FLAT LUGS  15 SQMM	59	NOS	\N	0.000	0.000	0.000	16.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3320	ELEG0074	ALUMINIUM FLAT LUGS  16 SQMM	59	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3321	ELEG0075	ALUMINIUM FLAT LUGS  25 SQMM	59	NOS	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3322	ELEG0076	ALUMINIUM FLAT LUGS  35 SQMM	59	NOS	\N	0.000	0.000	0.000	31.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3323	ELEG0077	ALUMINIUM FEMALE LUGS  150 SQMM	59	NOS	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3324	ELEG0078	ALUMINIUM FLAT LUGS  185 SQMM	59	NOS	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3325	ELEG0079	ALUMINIUM FLAT LUGS  240 SQMM	59	NOS	\N	0.000	0.000	0.000	23.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3326	ELEG0080	ALUMINIUM FLAT LUGS  300 SQMM	59	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-2054	OS0001	10-22-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	21.000	275.50	t	2026-07-15 18:39:14.282141	f	365	\N	A	\N	\N	\N	\N	0.00	\N	Rack 9, Box 99
+4439	RM-OCC-01	OCC (Old Corrugated Containers - Grade 11)	61	MT	\N	0.000	25.000	0.000	145.500	18500.00	t	2026-08-14 01:11:28.016628	f	365	OCC Grade 11 Furnish - Batch Dosing Point: Pulper 1	\N	\N	\N	\N	\N	0.00	\N	RM-YARD-A
+2757	MCNW0001	CHECKNUT WASHER MB 09	47	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2758	MCNW0002	CHECKNUT WASHER MB 12	47	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2759	MCNW0003	CHECKNUT WASHER MB 13	47	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2760	MCNW0004	CHECKNUT WASHER MB 14	47	Nos	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2761	MCNW0005	CHECKNUT WASHER MB 16	47	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2762	MCNW0006	CHECKNUT WASHER MB 18	47	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2763	MCNW0007	CHECKNUT WASHER MB 19	47	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2764	MCNW0008	CHECKNUT WASHER MB 20	47	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2765	MCNW0009	CHECKNUT WASHER MB 21	47	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2766	MCNW0010	CHECKNUT WASHER MB 22	47	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2767	MCNW0011	CHECKNUT WASHER MB 24	47	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2768	MCNW0012	CHECKNUT WASHER MB 40	47	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3189	ECT0028	LC1DWKM7C -62 KVAR CONTACTORS -CAPACITOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3221	ERE0024	L & T (SWITCHGEAR) 3355 THERMAL OVERLOAD RELAY (30AMPS-40AMPS)	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3224	EMC0002	L&t 160 AMPS SIZE 00	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3227	EMC0005	L& T SWITCHGEAR 400 AMPS (415 V -100 KA) SIZE -2	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3268	ELEG0022	SIEMENS ELECTORNIC TIMER (3RP15131AP308K) 3-60S	59	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3286	ELEG0040	PROCERSS INDICATOR PIC101A-VI230	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3311	ELEG0065	COPPER FLAT LUGS 50 SQMM	59	Nos	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3392	ELEG0084	TERMINAL PLATE TAMCO T1-9007	59	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-13 16:35:06.907613	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2783	MGU0001	Pressue Guage 0 to 16 kg/cm2 (150mmX1/2" BSP)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2784	MGU0002	Messureing Guage 0 to 28 kg cm /2, 0 to 400  (12"X 1/2" BSP)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2785	MGU0003	Messuring Guage 150mmx1/2" mm bar/mm wc -100/1000	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2786	MGU0004	Messuring Guage 0 to 40 kg /cm2 PSI (100mmx1/2" BSP)	48	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2787	MGU0005	Messuring Guage 0 to 10 kg /cm2 PSI (100mmx1/2" NPT)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2788	MGU0006	Messuring Guage 0 to 7 kg /cm2 PSI (80mmx3/8" BSP)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2789	MGU0007	Messuring Guage 0 to 7 (lb/in2) /(kg /cm2)FM (25MMX1/4 BSP)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2790	MGU0008	Messuring Guage 0 to 140 kg /cm2 (25MMX1/4 )	48	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2791	MGU0009	Messuring Guage 0 to 10 kg /cm2 (25MMX1/4 BSP)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2792	MGU0010	Messuring Guage 0 to 6 kg /cm2 FM (150MMX1/2" BSP	48	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2793	MGU0011	OXYGEN REGULATER DOUBLE GUAGE	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2797	MIMP001	CPC 100/320 WITH CHECKNUT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2798	MIMP002	SPR+T 125/330	49	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2799	MIMP003	SPR+T 125/260	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2800	MIMP004	SPR +T 125/400	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2801	MIMP005	WP 80/260	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2802	MIMP006	CPC 150 -320	49	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2803	MIMP007	CPC 65-260	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2804	MIMP008	TPR 80/320 (OPEN IMPELLER)	49	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2805	MIMP009	APPC 42 /150	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2806	MIMP010	TPR 125/400 (3VO)	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2807	MIMP011	SEPRATOR	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2808	MIMP012	SPR+T 125/260 WEAR PLATE /SIDE PLATE	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2809	MIMP013	SPR+T 125/260 GLAND COVER (5VO)	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2810	MIMP014	SPR+ T125/260 STUFFING BOX	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2811	MIMP015	SPR+ T125/330 STUFFING BOX	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2812	MIMP016	SWP 125/320	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2813	MIMP017	SPR+T 125/260 CASING COVER	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3393	ELEG0085	ELE HAND HALF (RUBBER) SET	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.912731	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3394	ELEG0086	20 W LED BULB	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.915702	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3395	ELEG0087	10 K POTENTIOAL METER	59	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.917694	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3396	EVFD001	VFD DRIVE /FREQUENCY CONVETER (6SL3210-1PE31-8UL0) ,POWER MODULE PM240-2, INPUT:-3AC 380 V-480V 47-63 HZ, 172 A, MOTOR: IEC 90 kW	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.921703	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3397	EVFD002	POWER CARD 6SL3246-0BA22 -1PA0 ( CU 2505-2DP)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.923591	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3398	EVFD003	POWER CARD 6SL3246-0BA22 -1FA0 ( CU 2505-2PN )	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.926498	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3399	EVFD004	INTERFACE MODULE 6ES7155-6AA02-0BN0 ( IM155 --8PN ST )	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.929514	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3400	EVFD005	SIEMENS -SIMATIC DIGITAL INPUT MODULE (8 DI DC 24V ET 200S )(6ES7131-4BF00-0AA0)	60	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-13 16:35:06.931614	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3401	EVFD006	SIEMENS -SIMATIC DIGITAL INPUT MODULE (DI 16 X 24VDC ST,ET 200SP) (6ES7131-6BH01-0BA0)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:06.934218	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3402	EVFD007	SIEMENS -SIMATIC DIGITAL OUTPUT MODULE (8 D0 DC 24V /0.5 A ET 200S )(6ES7132-4BF00-0AA0)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.937421	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3403	EVFD008	SIEMENS -SIMATIC DIGITAL OUTPUT MODULE (D0 16 X 24V DC /0.5 A ET 200SP) (6ES7132-6BH01-0BA0)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.940192	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3404	EVFD009	SIEMENS ANALOG INPUT MODULE ET 200SP AI 4 X U 2WIRE ST ET200 SP	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.942709	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3405	EVFD010	SIEMENS -SIMATIC ANALOG OUTPUT MODULE 2AO/ST (6ES7135-4GB01-0AB0)	60	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-13 16:35:06.94454	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3406	EVFD011	SIEMENS SIMATIC ANALOG OUTPUT MODULE (AQ4 X U/I ST ET 200SP) (6ES7135 -6HD00-0BA1)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.946735	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3407	EVFD012	SIEMENS POWER MODULE PM-E DC24 VST (6ES7138-4CA01-0AA0)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:06.949581	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3408	EVFD013	SIEMENS SIMATIC BUS CONNECTOR PROFIBUS DP (6ES7972 0BA42-0XA0)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:06.952841	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2853	GCW0002	14 "CUTT OFF WHEEL	45	Nos	\N	0.000	0.000	0.000	40.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3411	EVFD016	SIEMENS SITOP PSU 100L POWER SUPPLY DC24V/5A ,AC120/230V/2,1/1,15A/50-60 HZ (6EP133 -1LB00YSU/HD130538)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.961757	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3412	EVFD017	SIEMENS (6ES79564-8LE03-0AA0) 12MB SIMATIC MEMORY CARD	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.963365	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3413	EVFD018	SIEMENS BASIC OPEARATOR PANEL (6SL3255-0AA00-4CA1-BOP-2)-DISPLAY	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.966565	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2847	DB0001	DOCTOR BLADE 1.2X75X3600 MM RSE -BRONZE	45	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2848	DB0002	DOCTOR BLADE 6.0X75X4000 MM PLASTIC GREEN	45	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2849	DB0003	DOCTOR BLADE 2X75X3350 MM PLASTIC	45	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2850	GBW0001	4" BUFFIN WHEEL	45	Nos	\N	0.000	0.000	0.000	64.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2851	GGW0001	4" GRINDING WHEEL	45	Nos	\N	0.000	0.000	0.000	59.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2852	GCW0001	4" CUTT OFF WHEEL	45	Nos	\N	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3414	EVFD019	SIEMENS BASIC OPEARATOR PANEL (6SL3055-0AA00-4BA0-BOP-20)-DISPLAY	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:06.969893	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2831	MIMS009	APPC 42 /150 SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2832	MIMS010	TPR 125/400 (3VO) SHAFT	49	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2833	MIMS011	SEPRATOR SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2834	MIMS012	TURBO SHAFT -SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2835	MIMS013	SWP +125/320 SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2836	MIMS014	KSB PUMP SHAFT (EN 19) SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2837	MIMS015	BOTTOM FAN PUMP SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2838	MIMS016	PULP MILLL AFT PRESSURE SCREEN SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2839	MIMS017	VSL-08 PRESSURE SCREEN SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2864	MNO001	ROBO NOZZLE 0.4MM	51	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2865	MNO002	ROBO NOZZLE 0.7MM	51	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2866	MNO003	3/64 GAS CUTTER NOZZLE	51	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2867	MNO004	1/16 GAS CUTTER NOZZLE	51	Nos	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2868	MNO005	1/32 GAS CUTTER NOZZLE	51	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2859	LGO0001	SERVO GEAR OIL 320	52	Ltr	\N	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2860	LGR0001	SERVO GREASE MP3	52	Kgs	\N	0.000	0.000	0.000	120.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2861	LGR0002	SG 350 E.P MOLY GREASE HIGH TEMP	52	Kgs	\N	0.000	0.000	0.000	75.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2862	LHO0001	HYDRULIC OIL No: 68	52	Ltr	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2863	LLOC001	LUBRICANTING OIL CAN (REUSE)	52	Ltr	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3415	EVFD020	8 MM DRIVE SENSOR CABLE	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.973277	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3416	EVFD021	SIEMENS CENTRAL PROCESSING UNIT (CPU1510SP-1-PN) SINMATIC ET 200SP	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.974969	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3417	EVFD022	SIEMENS BASE UNITS 6ES7 193 -6BP00-0BA0 ,PRODUCT NO: 4200918239 ,ET -200SP	60	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-13 16:35:06.976841	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2873	PCK0005	150mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2874	PCK0006	200mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2875	PCK0007	250mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2876	PCK0008	SPARE PENUMATICS AIR MAX SEAL KIT (200MM -214MM) SHAFT SIZE :38MM	36	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2877	PUE0009	10X1/2" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2878	PUM0005	10X1/2" PU MALE CONNECTOR	36	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2879	PUM0009	10X1/2" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2880	PUM0001	10X1/4" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	41.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2881	PUE0006	10X1/8" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2882	PUM0013	10X1/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2883	PUC0002	10X10 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2884	PUT0002	10X10X10 PU T CONNECTOR	36	Nos	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2885	PUC0003	10X12 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2886	PUM0011	10X3/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2887	PUM0014	12X1/2" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2888	PUC0006	12X12 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2889	PUT0004	12X12X12 PU T CONNECTOR	36	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2890	PUM0012	4X3/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	13.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2891	PUE0001	6X1/2" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2892	PUM0002	6X1/2" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2893	PUE0007	6X1/4" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2869	PCK0001	50mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2870	PCK0002	80mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2871	PCK0003	100mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2872	PCK0004	125mm CYLINDER KITS	36	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2945	GEGR003	GLAND ROPE 10MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2946	GEGR004	GLAND ROPE 12MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2947	GEGR005	GLAND ROPE 16MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2948	GEGR006	GLAND ROPE 18MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2949	GEGR007	GLAND ROPE 20MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	7.500	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2951	GBFP002	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 40X400 mm	35	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2952	GBFP003	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 50X400 mm	35	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2953	GBFP004	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 65X400 mm	35	Nos	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2954	GBFP005	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 80X420 mm	35	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2894	PUM0003	6X1/4" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2895	PUE0003	6X1/8" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2896	PUE0008	6X3/8" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	34.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2897	PUM0004	6X3/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	71.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2898	PUC0007	6X6 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2899	PUT0003	6X6X6 PU T CONNECTOR	36	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2900	PUC0004	6X8 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2901	PUM0008	8X1/2" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2902	PUE0005	8X1/4" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2903	PUM0006	8X1/4" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	210.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2904	PUE0004	8X1/8" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	66.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2905	PUM0010	8X1/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	80.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2906	PUC0008	8X10 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	46.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2907	PUC0005	8X12 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	47.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2908	PUE0002	8X3/8" PU ELBOW CONNECTOR	36	Nos	\N	0.000	0.000	0.000	65.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2909	PUM0007	8X3/8" PU MAIL CONNECTOR	36	Nos	\N	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2910	PUC0001	8X8 PU COUPLER	36	Nos	\N	0.000	0.000	0.000	167.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2911	PUT0001	8X8X8 PU T CONNECTOR	36	Nos	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2913	PUTU002	Polyurethane Tubes 4 x 2 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2914	PUTU003	Polyurethane Tubes 6 x 4 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2915	PUTU004	Polyurethane Tubes 8 x 5 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2916	PUTU005	Polyurethane Tubes 10 x 6.5 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2917	PUTU006	Polyurethane Tubes 8 x 6 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	69.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2918	PUTU007	Polyurethane Tubes 10 x 8 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2919	PUTU008	Polyurethane Tubes 12 x 10 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2920	PUTU009	Polyurethane Tubes 12 x 8 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2921	PUTU010	Polyurethane Tubes 14 x 11 mm 100 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2922	PUTU011	Polyurethane Tubes 16 x 12 mm 50 mts	36	Mtr	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2923	PFRL001	3 /8" FR+L (JHFRCLM-14B) AIRMAX	36	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2924	PFRL002	1/2 "FR+L (JHFRCLM-15) AIRMAX	36	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2925	PREG001	3/8" REGULATOR (MO NO:R14624)	36	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2926	PREG002	1/2" REGULATOR ( R15634) AIRMAX	36	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2927	PNCV001	1/8-3/2" NC VALVE & SWITCH (JANATICS) MOUNTING VALVE (DS244P60-SH3A	36	Nos	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2928	PCV0001	1/4" COMPACT VALVE  (DS265SC61-W)-JANATICS	36	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2929	PDV0001	1/4" DISC ROTARY VALVE	36	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2930	PDV0002	1/2" DISC ROTARY VALVE	36	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2931	PRV0001	1/2" ROTARY VALVE	36	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2932	PCV0002	1/4" COMPACT VALVE  (DS255ER61)-JANATICS	36	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2933	PSM001	PNEUMATIC PP & PET STRAPPING MACHINE MODEL: XQD-19	36	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2934	PSM002	PNEUMATIC PP & PET STRAPPING MACHINE MODEL: AQD-19	36	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2935	PSH001	PNEUMATIC SHAFT 100 X 50 MM	36	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2936	PBR001	PNEUMATIC BAREL 100 X 50 MM	36	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2937	PCY001	PNEUMATIC CYLINDER 100 X 850 MM	36	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2938	PCY002	AIR MAX DUBLE ACTING CYLENDER SIZE 80X1050MM	36	Nos	8420-9100	0.000	0.000	0.000	10.000	10500.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2940	GECR002	LIFT SLING BELT 3TON X 4 MTR	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2942	GECR004	CRANE REMOTE	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2943	GEGR001	GLAND ROPE 6MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2944	GEGR002	GLAND ROPE 8MM (KGS)	35	Kgs	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3418	EVFD023	SIEMENS BASE UNITS 6ES7 193 -6BP00-0DA0 ,ET -200SP	60	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-13 16:35:06.979265	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3419	EVFD024	SIMATIC BUS CONNECTORS ,RJ 45 CONNECTORS (6GK1901-1BB10-2AB0)	60	NOS	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-13 16:35:06.982006	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3420	EVFD025	SIEMENS SERVER MODULE 6ES7193-6PA00-0AA0 SINMATIC ET ,POI NO: 4200936678	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.985559	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3421	EVFD026	SIMATIC INTERFACE MODULE IM151-1 STANDARD (6ES7151 1CA00-0AB0)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.987581	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3422	EVFD027	SIEMENS SINAMICS CONTROL UNIT CUA31 Ta 0 to 55 C 24VDC 0.6A (6SL3040-0PA01-0AA0) -OLD	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.989277	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3423	EVFD028	DRIVE CLIQ CABLE (6SL30604AF100AA0) 1 CABLE-3 MTRS	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.991025	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3424	EVFD029	SINAMICS CONTROL UNIT CU 230-2 DP ,(6SL3040-1MA00-0AA0) TA 0 TO 55 CENTRIGRADE SUPPLY 24VDC 6.5 A ,DIGITAL OUTPUT 24VDC 0.5 A	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.992733	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3425	EVFD030	6ES7512-1DM03-0AB0	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.995204	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3426	EVFD031	6ES7954-8LC040 -0AA0- MEMORY CARD	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.997039	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3427	EVFD032	6AV21232GB030AX0-KTP700 HMI SIEMENS Basic panel	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.998804	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3428	EVFD033	6ES72141AG400XB0 -CPU 1214C -SIEMENS CPU MODULE	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.000539	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3429	EVFD034	6ES72344HE320XB0 -SB 1234 4 AI/2 AO -SIEMENS ANALOG IP/OP	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.004488	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3430	EVFD035	6XV18300EH10 -PROFIBUS CABLE SIEMENS 100 MTR	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.006956	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3431	EVFD036	6XV18402AH10 -PROFINET CABLE SIEMENS 100 MTR	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.008879	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3432	EVFD037	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE311UL0- PM240-2 , 45kW -Siemens (G120 POWER MODULE PM240-2 45kW (CT)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.010336	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3433	EVFD038	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE315UL0- PM240-2 , 55kW -Siemens (G120 POWER MODULE PM240-2 55kW (CT)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.0121	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3434	EVFD039	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE245UL0- PM240-2 , 18.5kW -Siemens (G120 POWER MODULE PM240-2 18.5kW	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.013767	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3435	EVFD040	6SL3054 -0FC31-1BA0 -SIEMENS PLC (FlASH CARD)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.015634	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3436	EVFD041	6SL30550AA004BA0 -BASIC OPERATOR PANEL SIEMENS (BOP-20)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.017422	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3437	EVFD042	6SL30550AA005CA2- SMC30 -SIEMENS (SENCER MODULE)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.01931	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3438	EVFD043	6SL32440BB121FA0 -CU240 E-2 PN CONTROL UNIT ( CU240E-2)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.021996	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3439	EVFD044	6ES75455DA000AB0 -200SP CM DPU CPU MODULE SIEMENS (CM PROFIBUS DP) COMMUNICATION MODULE	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.023488	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3162	ECT0001	3TF30-10-0AP0-(230V/50HZ,276/60) (9A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3440	EVFD045	SCHNEIDER EMS -SUPPLY (CORE I5 12TH GEN ,16 GB RAM,512 GB SSD ,22" SCREEN ,KBD & MOUSE WIN 110 PRO WITH 3 YEARS WARRANTY (5 - MURR RJ45 CABLE -5 MTRS ,6 -SCALNCE SWITCH 8 PORT ,MAKE: MURR) SCHNEIDER MONITORING SOFTWARE 25DL )	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.025486	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3441	EVFD046	6SL 3210 PE 325 UL0 -PM 240--2 ,110 KW ,VFD -SIEMENS ,G120 POWER MODULE 110 KW (CT) VARIABLE FREQUENCY DRIVE	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.026749	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3442	EVFD047	FR-D740-036-E16 1.5 KW/2 HP. ,,SI NO: (C5504J082,C5504J094),MAKE MITUSBISHI	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.027888	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3443	EVFD048	SWITCH MODE POWER SUPPLY ART NO: 85135(MURR ELEKTRONIK)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.029016	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3444	EVFD049	PROGRAM MMABLE CONTROLLER S.NO 22YO53696 (MITSUBISHI MODEL :- FX5U-32MT/ES)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.030822	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3445	EVFD050	CONTROL UNITE ADAPTER CUA32 (6SL3040 OPA01)	60	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-13 16:35:07.033132	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3446	EVFD051	FERQUENCY CONVERTER EQUIMENT/CONTROL UNIT (CU320-2PN TA 0 TO 55C SUPPLY 24 VDL 6.5A DIGITAL OUTPUTS 24VDC, 0.5 A) MODEL:-65L304-IMA01-OAA0	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.035787	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3447	EVFD052	SIEMENS CIRCUIT BREAKER 1.6 (3RV6011-1AA10)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:07.038467	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3448	EVFD053	SIEMENS SIGNALLING SWITCH (3RV 2921-1M)	60	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 16:35:07.040637	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3449	EVFD054	SIEMENS CONTACTOR (3RT2016-1 PU1-8K) 9A,400, 4KW (A5E51557269017)	60	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-13 16:35:07.042864	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3450	EVFD055	SIEMENS SIMATIES (57-1200) 6ES7 214-1HG40-ORBO CPU 1214C DC/DC/RLY	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.044984	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3451	EVFD056	SINAMICS CONTROL UNIT CU 240E-2 6SL3244-OBB12-13A1	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:07.047043	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3453	EVFD058	SIMENS DRIVE CLIQ CABLE (6SL30604AF100AA0)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.05249	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2955	GBFP006	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 200X370 mm	35	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3452	EVFD057	SWITCH MODE POWER SUPPLY ART NO: 58812 (MURR ELEKTRONIK)	60	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 16:35:07.049919	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3022	GER0001	2" WIRE BRUSH	35	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3023	GER0002	1" WIRE BRUSH	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3024	GER0003	ANABOND RTV SILICON RED 80GR	35	Nos	2710	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3025	GER0004	ANABOND RTV SILICON RED 25GR	35	Nos	2710	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3028	GER0007	HOSE CLAMPS 3/4" GI	35	Nos	\N	0.000	0.000	0.000	66.000	18.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3015	GSSBN0023	1/4" X 1" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3021	GSSFT001	1 1/4" X 400mm FULL THRED BOLT	55	Nos	7318-1900	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3170	ECT0009	LC1D12M7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3409	EVFD014	SIEMENS ELECTRICAL SWITCH MODULE LTX LAN PORTS RJ45 (10/100 M BITS ,CLASS IP 20 -PROTOCOL (6GK5005-0BA001AB2)	60	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 16:35:06.956356	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3410	EVFD015	SIEMENS SITOP PSU 100L POWER SUPPLY DC 24V /10A (50HZ-60HZ)( AC-120/230V /4,1/2,0A 50-60HZ) (6EP1334-1LB00 YSU /K2100830)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.959371	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3031	GER0010	2" TUBE CLEANING BRUSH (ROUND)	35	Nos	\N	0.000	0.000	0.000	72.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3032	GER0011	5 Mtr MEASURING TAPE	35	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3033	GER0012	RUST RELEASE SPRAY (480ML)	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3034	GER0013	1/2" PVC TAP'S	35	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3035	GER0014	1/2" TEFLON TAPE	35	Nos	\N	0.000	0.000	0.000	33.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3036	GER0015	1" TEFLON TAPE	35	Nos	\N	0.000	0.000	0.000	56.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3037	GER0016	HOSE CLAMP 1" SS	35	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3030	GER0009	HOLE SAW DRILL BIT (1902) 6PC SET	35	Nos	\N	0.000	0.000	0.000	1.000	240.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3026	GER0005	GREAS GUN PESTOL TYPE	35	Nos	\N	0.000	0.000	0.000	2.000	1900.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3013	GSSBN0021	3/8" X 1 1/4 SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3014	GSSBN0022	5/16" X 1 1/4 SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3016	GSSSB001	12mmX2 1/2" STUD BOLT	55	Nos	7318-1500	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3017	GSSSB002	7/8" X 1 1/2" STUD BOLT	55	Nos	7318-1500	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3018	GSSSB003	3/4" X 7" STUD BOLT	55	Nos	7318-1500	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3019	GSSSB004	1" X 400mm STUD BOLT	55	Nos	7318-1500	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3020	GSSSB005	1 1/4" X 400mm STUD BOLT	55	Nos	7318-1500	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3027	GER0006	HOSE CLAMPS 1" GI	35	Nos	\N	0.000	0.000	0.000	50.000	20.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3029	GER0008	FEVIQUICK PKTS	35	Nos	\N	0.000	0.000	0.000	166.000	4.76	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3119	CHBSU012	BELT PRESS (SUCHEM - 638 )	28	Kgs	3906	0.000	0.000	0.000	18.000	290.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3121	CHSBC013	SE-BOND 102(CRACKING AGENT)	28	Kgs	3809 9200	0.000	0.000	0.000	0.000	170.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3122	CHPML010	PROMASK 192	28	Kgs	3824 9022	0.000	0.000	0.000	129.200	320.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3123	CHPSL011	PROSOLVE 126	28	Kgs	3824 9022	0.000	0.000	0.000	174.562	230.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3129	CHPHB017	PH BOOSTER [3230] (L)	28	Kgs	3824-9922	0.000	0.000	0.000	344.500	87.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3124	CHPDL009	PROSOLVE ADVANCE	28	Kgs	3824 9022	0.000	0.000	0.000	2087.600	230.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2107	OS0058	107-135.5-10	40	Nos	4016 9330	4.000	4.000	0.000	18.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+4449	MAT-PULP-512468	Bleached Hardwood Kraft Pulp Grade A-512468	28	MT	\N	4.000	2.000	0.000	5.000	55000.00	f	2026-08-14 01:51:52.558438	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+4450	MAT-PULP-592261	Bleached Hardwood Kraft Pulp Grade A-592261	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:12.540204	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+4452	MAT-PULP-613802	Bleached Hardwood Kraft Pulp Grade A-613802	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:33.847651	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+3163	ECT0002	3TF32-00-0AP0-(230V/50HZ,276/60) (16A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3164	ECT0003	3TF35-00-0AP0-(230V/50HZ) (38 A-415V) SIEMENS AIR BREAK POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3165	ECT0004	LC1E2510B5 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3166	ECT0005	LC1E2510B7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3167	ECT0006	LC1E 3810M5/B5 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3168	ECT0007	LC1E3810M7 /B7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3169	ECT0008	LC1E40M7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3125	CHBPS014	BLEACHING POWDER (S)	28	Kgs	2828 1010	0.000	0.000	0.000	50.000	38.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3126	CHHYP015	SODIUM HYPO CHLORIDE [HYPO] (L)	28	Kgs	2828 9019	0.000	0.000	0.000	102.200	18.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3130	CHASL018	ANTI SCALEN [3220] (L)	28	Kgs	3824-9922	0.000	0.000	0.000	600.000	92.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3131	CHOXL019	OXYGEN SCAVANGER [3210] (L)	28	Kgs	3824-9922	0.000	0.000	0.000	400.000	85.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3132	CHROL020	RO ANTI SCALEN [3291 (L)	28	Kgs	3824-9922	0.000	0.000	0.000	122.000	240.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3113	CHSFS002	SURFACE SIZE (700C)	28	Kgs	4811	0.000	0.000	0.000	3643.000	98.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3114	CHENL004	ENZYME (L)	28	Kgs	3507 9062	0.000	0.000	0.000	16.840	625.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3111	CHSTP001	STARCH	28	Kgs	3824	0.000	0.000	0.000	19834.000	36.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3115	CHSRA005	RETENTION AID (2024)	28	Kgs	3906 9090	0.000	0.000	0.000	808.700	350.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3116	CHDEL007	DEFOAMER (SE 100)	28	Kgs	3402 9099	0.000	0.000	0.000	485.000	215.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3117	CHCOA004	COAGULANT (CL 200)	28	Kgs	3824	0.000	0.000	0.000	2666.000	151.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3133	CHCSF021	CAUSTIC SODA FLAKES	28	Kgs	2815 1110	0.000	0.000	0.000	250.000	45.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3118	CHSKR006	KROFTA (303)	28	Kgs	3906 9090	0.000	0.000	0.000	737.000	255.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3134	CHDEL022	DESCALING [3250] (L)	28	Kgs	3824	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3112	CHPAS003	POLY ALUMINIUM CHLORIDE ( SOLID)	28	Kgs	2827-3200	0.000	0.000	0.000	30459.000	43.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3120	CHGYD008	GOLDEN YELLOW DYE	28	Kgs	3204-1990	0.000	0.000	0.000	3450.000	172.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3127	CHHCA016	HCL [BOILER]	28	Kgs	2806-1000	0.000	0.000	0.000	540.000	10.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3172	ECT0011	LC1D25M7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3173	ECT0012	LC1D32M7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3174	ECT0013	LC1D40AM7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3175	ECT0014	LC1D65AM7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3176	ECT0015	LC1D80AM7 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3177	ECT0016	MNX12 240 Vac POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3178	ECT0017	MNX18 240 Vac POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3179	ECT0018	MNX25 -240 Vac POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3180	ECT0019	MNX 32-110V POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3181	ECT0020	MNX 32-240V POWER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3182	ECT0021	MNX 40-110V (L&T)(SWITCHGEAR) CONTACTOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3183	ECT0022	MNX40-240V (L&T)(SWITCHGEAR) CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3184	ECT0023	ABB  25AMPS -230V/50 HZ CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3185	ECT0024	ABB -45 AMPS 230V /50 HZ/ 240V /60HZ CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3186	ECT0025	LC1DPKM7 -30 KVAR CONTACTORS -CAPACITOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3187	ECT0026	LC1DMKM7 -25 KVAR CONTACTORS -CAPACITOR	56	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3188	ECT0027	LC1DLKM7-20 KVAR CONTACTORS -CAPACITOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3190	ECT0029	LC1`DWK12M7 -SWITCHING CONTACTORS -CAPACITOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3191	ECT0030	3 kVAr X 440 V  POWER CAPACITOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3192	ECT0031	20 KVR CAPACITOR (L&T) 440V -RACK	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3193	ECT0032	LC1D1157 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3194	ECT0033	LC1D1400 SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3195	ECT0034	LA5D150830 SCHNEIDER CONTACTOR KIT (LC1D150)	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3196	ECT0035	LA5FF431 SCHNEIDER CONTACTOR KIT (LC1F150,LC1F115)	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3197	ECT0036	LAF400803 SCHNEIDER CONTACTOR KIT (LC1F400)	56	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3198	ERE0001	SCHNEIDER RELAY LRD 07 (1.6 AMPS -2.5 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3199	ERE0002	SCHNEIDER RELAY LRD 10 (4 AMPS -6 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3200	ERE0003	SCHNEIDER RELAY LRD 16 (9 AMPS -13AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3201	ERE0004	SCHNEIDER RELAY LRD 21 (12 AMPS -18AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3202	ERE0005	SCHNEIDER RELAY LRD 22 (16AMPS -24 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3203	ERE0006	SCHNEIDER RELAY LRD 32 (23AMPS-32 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+4453	MAT-PULP-620717	Bleached Hardwood Kraft Pulp Grade A-620717	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:40.760237	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+3204	ERE0007	SCHNEIDER RELAY LRD 35 (30AMPS-38 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3205	ERE0008	SCHNEIDER RELAY LRE35 (30AMPS-38 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3206	ERE0009	SCHNEIDER RELAY LRE353 (23AMPS-32 AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3207	ERE0010	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (2- 3.3 AMPS)	57	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3208	ERE0011	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (3- 5 AMPS)	57	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3209	ERE0012	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (9- 15 AMPS)	57	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3210	ERE0013	ABB THERMAL OVERLOAD RELAY (10 -14 AMPS)	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3211	ERE0014	MK1 STARTER THERMAL OVERLOAD RELAY (1.5 -2.5 AMPS)	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3212	ERE0015	MK1 STARTER THERMAL OVERLOAD RELAY (4- 6.5 AMPS)	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3213	ERE0016	MK1 STARTER THERMAL OVERLOAD RELAY (6-10 AMPS)	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3214	ERE0017	MK1 STARTER THERMAL OVERLOAD RELAY (9-14 AMPS)	57	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3215	ERE0018	LR 9F 5369 ELECTROIC OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3216	ERE0019	LR 9F7375 ELECTROIC OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3217	ERE0020	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (4.5- 7.5AMPS)	57	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3218	ERE0021	SIEMENS REAL (20AMPS-25AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3219	ERE0022	SIEMENS REAL (2.8AMPS-4AMPS) THERMAL OVERLOAD RELAY	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3220	ERE0023	L & T (SWITCHGEAR) 353 THERMAL OVERLOAD RELAY (23AMPS-32AMPS)	57	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3222	ERE0025	MINILEC  BP-VOLTAGE SENSING PHASE FAILURE RELAY 380-440V AC(S1 VMR7)	57	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3223	EMC0001	EATON 80 AMPS FUSE (690 V-200KA )-SIZE -1	58	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3333	STA004	REGISTRES NO 6	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3171	ECT0010	LC1D18M7SCHNEIDER CONTACTOR	56	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3226	EMC0004	200 AMPS HRC FUSE (SIZE-0)	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3228	EMC0006	MCB 6AMPS-1 P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3229	EMC0007	MCB 6AMPS -2 P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3230	EMC0008	MCB 6AMPS -3 P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3231	EMC0009	MCB 10AMPS-1 P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3232	EMC0010	MCB 10AMPS-3 P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3233	EMC0011	MCB 16 AMPS -1P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3234	EMC0012	MCB 16 AMPS -3P	58	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3235	EMC0013	MCB 25 AMPS -3P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3236	EMC0014	MCB 32AMPS-3P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3237	EMC0015	MCB 32AMPS-4P	58	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3238	EMC0016	MCB 40 AMPS -3P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3239	EMC0017	MCB 63AMPS -3P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3240	EMC0018	MCB 63 AMPS -4 P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3241	EMC0019	LV510307 MCCB 100 A -3P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3242	EMC0020	LV516303 MCCB 160 A 3P	58	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3243	EMC0021	LV525303 MCCB 250A 3P /SWITCH GEAR 25 KA	58	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3244	EMC0022	LV563307 300A -3P MCCB	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3245	EMC0023	MCB 32 AMPS 2P	58	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3246	EMC0024	MCB 25 AMPS 2P	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3247	ELEG0001	MOTOR STATR 9-14 AMP AMPER	59	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3248	ELEG0002	SIEMENS 3TY7 460-OYA CONTACTOR KIT	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3249	ELEG0003	REWIDER POTENTIO METER 10K	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3250	ELEG0004	PRESOR SWITCH 10A	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3251	ELEG0005	SMPS 24 V 10A	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3252	ELEG0006	MK1 STATOR COIL	59	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3253	ELEG0007	L&T MK1 STATOR RELAY KIT	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3254	ELEG0008	SIEMENS NET CONETER	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3255	ELEG0009	ADD ON BLOK	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3256	ELEG0010	L&T ADD ON BLOK 2NO2NC	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3257	ELEG0011	SIEMENS ADD ON BLOK 2NO2NC	59	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3258	ELEG0012	L&T COMPRSER TERMINAL	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3259	ELEG0013	PID CONTROLLER TN: 00442008 (JUMO MAKE)	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3260	ELEG0014	SWITCH GEAR MAKE CONTROLLER 3 PH ,380V,CAT: ST921660000	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3261	ELEG0015	SIREN 150-MFTER1, 90-120CB	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3262	ELEG0016	REPON/SIBASS FAN- 24 V	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3263	ELEG0017	100 WATS FLOOD LIGHT	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3264	ELEG0018	LED TUBE LIGHTS	59	Nos	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3265	ELEG0019	LX1FJ220 COIL SCHNEIDER	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3266	ELEG0020	12SDTO STATER DELTA TIMER 3S-120S	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3267	ELEG0021	120DTY STATER DELTA TIMER 3S-30S	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3269	ELEG0023	SIEMENS ELECTORNIC TIMER (3RP15131AP308K) 5S-100S	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3270	ELEG0024	TEMPERATURE CONTROLLER (513AX)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3271	ELEG0025	TEMPERATURE CONTROLLER (513)	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3272	ELEG0026	ROTAEY SWITCH (SAI2FR) (61192SCB03TDYR)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3273	ELEG0027	LIMIT SWITCH (240V/30V) JAI BALAJI	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3274	ELEG0028	ONDELAY TIMER 0.6S-60M PLY 2C/O CSA	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3275	ELEG0029	ONDELAY TIMER 0.6S-60M PLY 2C/O CSA	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3276	ELEG0030	STAR DELTA TIMER 3S-120S (2ASDT0) (24-240VAC/DC)	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3277	ELEG0031	TERMINAL PLATE CROMPTON (100 HP) (T17037)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3278	ELEG0032	TERMINAL PLATE CROMPTON (320 HP) (W60XL385XT30)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3279	ELEG0033	TERMINAL PLATE ABB 200HP (T17128) TAMCO	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3280	ELEG0034	TERMINAL PLATE CROMPTON T1 7138	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3281	ELEG0035	TERMINAL PLATE RX6 STUD 7009	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3282	ELEG0036	DISTRIBUSTION BOX	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3283	ELEG0037	RPM METER MULTISPAN PI-38-A2-00 (AC) 999 TO 9999)	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3284	ELEG0038	TECHNO METER CONTER (C-96X)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3285	ELEG0039	PROCERSS INDICATOR PIC101A-VI230	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3225	EMC0003	C& S 200 AMPS FUSE (500V-80KA) SIZE -1	58	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3288	ELEG0042	SCHENIDER LADT2 TIMER DELAY BLOCKS	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3289	ELEG0043	L&T COIL-MK1 CAT NO: AA9000470000	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3290	ELEG0044	SCHENIDER LA7D3064 TERMINAL BLOCK	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3291	ELEG0045	TERMINAL PLATE TAMCO T1-7040	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3292	ELEG0046	TERMINAL PLATE TAMCO T1-7135	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3293	ELEG0047	MOTOR FANS CR.AD-112 (HOLE24.5XOD190) KEY WAY TYPE	59	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3294	ELEG0048	MOTOR FANS  CR (HOLE 24 X OD155) PIN TYPE	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3295	ELEG0049	MOTOR FANS ND-200  CR (HOLE56  X OD260) KEY WAY TYPE #1728	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3296	ELEG0050	MOTOR FANS   CR (HOLE48  X OD290) SCREW TYPE	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3297	ELEG0051	MOTOR FANS   CR (HOLE48  X OD290) PIN TYPE	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3298	ELEG0052	MOTOR FANS   CR (HOLE 93  X OD 400) KEY WAY TYPE	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3299	ELEG0053	TERMINAL BLOCK-PLATE Fr.ND200 CG (40HP)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3300	ELEG0054	TERMINAL BLOCK-PLATE Fr.ND160-180 CG (20-30HP)	59	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3301	ELEG0055	TERMINAL BOX 112 /132 CG (40-20hp)	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3302	ELEG0056	COLING FAN ND132 CG, (7.5HP)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3303	ELEG0057	COLING FAN ND160 CG, 4P (20HP)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3304	ELEG0058	COLING FAN F-80 (HOLE19XOD137)	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3305	ELEG0059	6 WAY PVC MCB BOX	59	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3306	ELEG0060	15" DULAUST FAG ALMOUCRD	59	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3307	ELEG0061	COPPER FLAT LUGS 10 SQMM	59	Nos	\N	0.000	0.000	0.000	70.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3308	ELEG0062	COPPER FLAT LUGS 16 SQMM	59	Nos	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3309	ELEG0063	COPPER FLAT LUGS 25 SQMM	59	Nos	\N	0.000	0.000	0.000	36.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3310	ELEG0064	COPPER FLAT LUGS 35 SQMM	59	Nos	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3312	ELEG0066	COPPER FLAT LUGS 70 SQMM	59	Nos	\N	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3313	ELEG0067	COPPER FLAT LUGS 95 SQMM	59	Nos	\N	0.000	0.000	0.000	39.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3314	ELEG0068	COPPER FEMALE LUGS  95 SQMM	59	Nos	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3315	ELEG0069	COPPER FEMALE LUGS  120 SQMM	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3316	ELEG0070	COPPER FLAT LUGS 120 SQMM	59	Nos	\N	0.000	0.000	0.000	35.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3317	ELEG0071	COPPER FLAT LUGS 150 SQMM	59	Nos	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3318	ELEG0072	ALUMINIUM FLAT LUGS  10 SQMM	59	Nos	\N	0.000	0.000	0.000	40.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3319	ELEG0073	ALUMINIUM FLAT LUGS  15 SQMM	59	Nos	\N	0.000	0.000	0.000	16.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3320	ELEG0074	ALUMINIUM FLAT LUGS  16 SQMM	59	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3321	ELEG0075	ALUMINIUM FLAT LUGS  25 SQMM	59	Nos	\N	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3322	ELEG0076	ALUMINIUM FLAT LUGS  35 SQMM	59	Nos	\N	0.000	0.000	0.000	31.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3323	ELEG0077	ALUMINIUM FEMALE LUGS  150 SQMM	59	Nos	\N	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3324	ELEG0078	ALUMINIUM FLAT LUGS  185 SQMM	59	Nos	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3325	ELEG0079	ALUMINIUM FLAT LUGS  240 SQMM	59	Nos	\N	0.000	0.000	0.000	23.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3326	ELEG0080	ALUMINIUM FLAT LUGS  300 SQMM	59	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3327	ELEG0081	INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK	59	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3328	ELEG0082	TERMINAL PLATE ABB 200HP (T1-7040) TAMCO	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3329	ELEG0083	TERMINAL PLATE ABB 200HP (T1-7135) TAMCO	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3335	STA006	SMALL BOX FILE	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3287	ELEG0041	SCHENIDER LADSN20 CONTACT BLOCKS	59	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3336	STA007	SPRING FILES	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3337	STA008	L FOLDERS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3338	STA009	A4 COVER FOLDERS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3339	STA010	BLUE PENS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3340	STA011	BLACK PENS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3341	STA012	RED PENS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3342	STA013	BLUE MARKER	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3344	STA015	RED MARKER	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3345	STA016	BLUE PEN MARKER	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3346	STA017	BLACK PEN MARKER	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3347	STA018	RED PEN MARKER	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3348	STA019	GEM CLIPS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3343	STA014	BLACK MARKER	33	Nos	\N	0.000	0.000	0.000	-1.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3331	STA002	REGISTRES 200 PAGE	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3332	STA003	REGISTRES NO 6	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3334	STA005	BIG BOX FILES	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2074	OS0023	45-55-8	40	Nos	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
 3363	TESTWIRE01	Test Wire Audit Renamed	28	Nos	\N	0.000	0.000	0.000	0.000	0.00	f	2026-08-13 12:56:45.15756	t	365	\N	\N	\N	\N	\N	\N	0.00	6	\N
-3332	STA003	REGISTRES	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3334	STA005	BIG BOX FILES	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3335	STA006	SMALL BOX FILE	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3336	STA007	SPRING FILES	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3337	STA008	L FOLDERS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3338	STA009	A4 COVER FOLDERS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3339	STA010	BLUE PENS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3340	STA011	BLACK PENS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3341	STA012	RED PENS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3342	STA013	BLUE MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3344	STA015	RED MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3345	STA016	BLUE PEN MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3346	STA017	BLACK PEN MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3347	STA018	RED PEN MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3348	STA019	GEM CLIPS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3287	ELEG0041	SCHENIDER LADSN20 CONTACT BLOCKS	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3328	ELEG0082	TERMINAL PLATE ABB 200HP (T1-7040) TAMCO	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3329	ELEG0083	TERMINAL PLATE ABB 200HP (T1-7135) TAMCO	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3331	STA002	REGISTRES 200 PAGE	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3350	STA021	STAPELER NO10	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3351	STA022	STAPELER PINS BOX	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3352	STA023	HOLE PUNCHING MEHINE BIG	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3353	STA024	HOLE PUNCHING MEHINE SMALL	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3354	STA025	AA BATTERY	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3355	STA026	AAA BATTERY	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3356	STA027	9 VOLT BATTERY	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3357	STA028	BINDER CKIPS 41 MM	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3358	STA029	BINDER CKIPS 51 MM	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3359	STA030	CALCULATER CASIO	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3360	STA031	A4 PAPER BUNDELS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3361	STA032	A4 CLOTH COVERS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2071	OS0020	40-55-8 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-3349	STA020	BALL NIDELS	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2135	BE0008	6008- 2Z	39	NOS	6008- 2Z	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2192	BE0065	22222 E1 AM C3	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2223	BE0096	24184 CCK/W33/K M HD	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2350	MPS0024	SPR +T 125/320 SLEEVE/SWP	42	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2745	MNRV004	SS PLATE NRV 80 MM	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3055	MSSR0004	S.S 2" X 4" REDUCER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4454	MAT-PULP-639817	Bleached Hardwood Kraft Pulp Grade A-639817	28	MT	\N	4.000	2.000	0.000	11.000	54000.00	f	2026-08-14 01:53:59.918981	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-4439	RM-OCC-01	OCC (Old Corrugated Containers - Grade 11)	61	MT	\N	0.000	25.000	0.000	135.500	18500.00	t	2026-08-14 01:11:28.016628	f	365	OCC Grade 11 Furnish - Batch Dosing Point: Pulper 1	\N	\N	\N	\N	\N	0.00	\N	RM-YARD-A
-2945	GEGR003	GLAND ROPE 10MM (KGS)	35	NOS	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4455	MAT-PULP-635458	Bleached Hardwood Kraft Pulp Grade A-635458	28	MT	\N	4.000	2.000	0.000	11.000	54000.00	f	2026-08-14 02:10:35.705363	t	365	\N	\N	\N	\N	\N	\N	0.00	6	YARD-PULP-1
-2940	GECR002	LIFT SLING BELT 3TON X 4 MTR	35	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3461	GECR005	LIFT SLING WIRE ROPE 3 TON (10MM X 28MTR)	35	NOS	\N	2.000	2.000	0.000	29.000	100.00	t	2026-08-13 17:13:50.491878	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2951	GBFP002	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 40X400 mm	35	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2708	MV0004	C.I BODY S.S DISC BUTTERFLY VALVE 2"	46	NOS	\N	0.000	0.000	0.000	0.000	25.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3405	EVFD010	SIEMENS -SIMATIC ANALOG OUTPUT MODULE 2AO/ST (6ES7135-4GB01-0AB0)	60	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-13 16:35:06.94454	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-2955	GBFP006	SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 200X370 mm	35	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3432	EVFD037	VFD DRIVE /FREQUENCY CONVERTER 6SL32101PE311UL0- PM240-2 , 45kW -Siemens (G120 POWER MODULE PM240-2 45kW (CT)	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.010336	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3190	ECT0029	LC1`DWK12M7 -SWITCHING CONTACTORS -CAPACITOR	56	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3217	ERE0020	L & T (SWITCHGEAR) MN2 THERMAL OVERLOAD RELAY (4.5- 7.5AMPS)	57	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3225	EMC0003	C& S 200 AMPS FUSE (500V-80KA) SIZE -1	58	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3260	ELEG0014	SWITCH GEAR MAKE CONTROLLER 3 PH ,380V,CAT: ST921660000	59	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3295	ELEG0049	MOTOR FANS ND-200  CR (HOLE56  X OD260) KEY WAY TYPE #1728	59	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3327	ELEG0081	INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK	59	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:49:29.211122	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-4652	ELEG0088	6 W LED BULB	59	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.20311	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-4653	ELEG0089	MEHANICAL SEAL 25MM	59	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.204685	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-4654	ELEG0090	MEHANICAL SEAL 28MM	59	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.205345	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3396	EVFD001	VFD DRIVE /FREQUENCY CONVETER (6SL3210-1PE31-8UL0) ,POWER MODULE PM240-2, INPUT:-3AC 380 V-480V 47-63 HZ, 172 A, MOTOR: IEC 90 kW	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:06.921703	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3513	GER0039	SELF ADHESIVE TAPE (36 X 50) EACH BOX-48	35	NOS	\N	2.000	2.000	0.000	376.000	0.00	t	2026-08-13 17:13:50.583185	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2927	PNCV001	1/8-3/2" NC VALVE & SWITCH (JANATICS) MOUNTING VALVE (DS244P60-SH3A	36	NOS	\N	0.000	0.000	0.000	14.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	B	\N	\N	\N	\N	0.00	\N	\N
-3111	CHSTP001	STARCH	28	KG	3824	0.000	0.000	0.000	19850.000	36.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3119	CHBSU012	BELT PRESS (SUCHEM - 638 )	28	KG	3906	0.000	0.000	0.000	18.000	290.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3126	CHHYP015	SODIUM HYPO CHLORIDE [HYPO] (L)	28	KG	2828 9019	0.000	0.000	0.000	102.200	18.00	t	2026-08-09 11:48:09.915991	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-3333	STA004	REGISTRES NO 6	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3343	STA014	BLACK MARKER	33	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2062	OS0011	28-38-7/2 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-3440	EVFD045	SCHNEIDER EMS -SUPPLY (CORE I5 12TH GEN ,16 GB RAM,512 GB SSD ,22" SCREEN ,KBD & MOUSE WIN 110 PRO WITH 3 YEARS WARRANTY (5 - MURR RJ45 CABLE -5 MTRS ,6 -SCALNCE SWITCH 8 PORT ,MAKE: MURR) SCHNEIDER MONITORING SOFTWARE 25DL )	60	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 16:35:07.025486	f	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
-4655	GER0045	SCISSOR 212 MM SIZE	35	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.325711	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4656	GER0046	BOTTEN BATTERS	35	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.326766	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4657	GER0047	BLACK SAFTY GOGGLES	35	NOS	\N	2.000	1.000	0.000	7.000	0.00	t	2026-08-15 15:01:34.327526	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4659	STA033	RUBBER BANDS 1.5 INCH (500 NOS)	33	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.496026	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4661	LAB002	PH INDICATOR 125 ML SDFCL 31028 L03	63	NOS	3822	2.000	1.000	0.000	2.000	0.00	t	2026-08-15 15:01:34.505265	f	365	Quality Control Laboratory	B	\N	\N	\N	\N	0.00	\N	\N
-4662	LAB003	PH & ORP CALIBRATION SOLUCTION	63	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:01:34.506608	f	365	Quality Control Laboratory	B	\N	\N	\N	\N	0.00	\N	\N
-4658	GER0048	COCNUT BROOMS	35	NOS	\N	2.000	1.000	0.000	18.000	0.00	t	2026-08-15 15:01:34.329152	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4660	LAB001	FILTER PAPER 100 NOS (L101) 12.5 CM DIA CAT NO.1101-125	63	NOS	4823-2000	2.000	1.000	0.000	7.000	0.00	t	2026-08-15 15:01:34.503778	f	365	Quality Control Laboratory	B	\N	\N	\N	\N	0.00	\N	\N
-4664	OSL-0000	OIL MECHANICAL SEAL STOCK REPORT AUGUST-2026	40	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2055	OS0002	20-32-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2056	OS0004	20-52-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2057	OS0005	25-40-8 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2058	OS0007	25-42-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2059	OS0008	25-45-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2060	OS0009	25-52-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2061	OS0010	25-62-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2063	OS0012	30-47-7/10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2064	OS0013	30-62-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2065	OS0014	32-45-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2066	OS0015	32-52-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2067	OS0016	32-60-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2068	OS0017	35-47-7 OIL SEAL	40	NOS	4016 9330	5.000	5.000	0.000	25.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2069	OS0018	35-52-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2070	OS0019	35-55-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2072	OS0021	40-60-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2073	OS0022	42-55-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2074	OS0023	45-55-8 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2075	OS0024	45-60-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2076	OS0025	45-65-10/12 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2077	OS0026	45-75-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2078	OS0027	48-62-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2079	OS0028	50-65-8 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2080	OS0029	50-70-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2081	OS0030	50-72-8/10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2082	OS0031	50-75-12/10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2083	OS0033	55-70-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2084	OS0034	55-72-10/8 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2085	OS0035	55-75-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2086	OS0036	55-80-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2087	OS0037	60-80-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	11.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 5
-2088	OS0039	65-75-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 5
-2089	OS0040	65-80-10 OIL SEAL	40	NOS	4016 9330	3.000	3.000	0.000	13.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 5
-2090	OS0041	65-85-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2091	OS0042	65-90-10/12 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 5
-2092	OS0043	65-95-10 OIL SEAL	40	NOS	4016 9330	3.000	3.000	0.000	16.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 5
-2093	OS0044	70-80-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 4
-2094	OS0045	70-90-10 OIL SEAL	40	NOS	4016 9330	4.000	4.000	0.000	19.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2095	OS0047	75-100-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2097	OS0048	80-100-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2098	OS0049	80-105-10/12 OIL SEAL	40	NOS	4016 9330	3.000	3.000	0.000	14.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2099	OS0050	85-100-10/12 OIL SEAL	40	NOS	4016 9330	3.000	3.000	0.000	14.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2100	OS0051	85-105-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2101	OS0052	85-110-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2102	OS0053	85-115-10 OIL SEAL	40	NOS	4016 9330	4.000	4.000	0.000	18.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2103	OS0054	90-110-10/12 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2104	OS0055	90-115-10 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	11.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2105	OS0056	90-120-12 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2106	OS0057	95-120-10 OIL SEAL	40	NOS	4016 9330	3.000	3.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2108	OS0059	110-130-12 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 4
-2109	OS0060	115-140-15 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 4
-2110	OS0061	140-170-15 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2111	OS0062	145-165-13 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2112	OS0063	155-180-15 OIL SEAL	40	NOS	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2113	OS0064	185-215-15 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2114	OS0065	55-72-12 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2115	OS0066	55-60-8 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2116	OS0067	22-40-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2117	OS0068	20-52-8 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 2
-2118	OS0069	40-65-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2119	OS0070	45-55-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 3
-2120	OS0071	78-100-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2121	OS0072	60-85-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 6
-2122	OS0073	150-180-15 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 8
-2123	OS0074	65-100-1 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 7
-2124	OS0075	20-35-7 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 0
-2125	OS0076	25-42-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 0
-2126	OS0077	50-80-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 1
-2127	OS0078	60-90-10 OIL SEAL	40	NOS	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	Rack 0
-4665	BRG-0000	MECHANICAL BEARING STOCK AUGUST - 2026	39	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2129	BE0002	3309B-TVH-C3	39	NOS	3309B-TVH-C3	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2131	BE0004	3307 -BD-XL	39	NOS	3307 -BD-XL	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2132	BE0005	6001-c-2hrs /2z/C3	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2133	BE0006	6003 -2z	39	NOS	6003 -2z	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2136	BE0009	6009-2RSR/LLU/ZZ	39	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2137	BE0010	6011-2rs	39	NOS	6011-2rs	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2138	BE0011	6012	39	NOS	6012	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2139	BE0012	6201-2Z	39	NOS	6201-2Z	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2140	BE0013	6202-2Z-C3	39	NOS	6202-2Z-C3	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2142	BE0015	6204 -C HRS	39	NOS	6204 -C HRS	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2144	BE0017	6205-zz /2RS	39	NOS	6205-zz /2RS	1.000	1.000	0.000	6.000	280.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2145	BE0018	6206-2z	39	NOS	6206-2z	2.000	2.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2146	BE0019	6207-2z	39	NOS	6207-2z	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2147	BE0020	6208	39	NOS	6208	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2148	BE0021	6208-2Z- C3	39	NOS	6208-2Z- C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2149	BE0022	6209-zz	39	NOS	6209-zz	1.000	1.000	0.000	13.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2150	BE0023	6210	39	NOS	6210	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2151	BE0024	6210- 2z	39	NOS	6210- 2z	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2152	BE0025	6212-2z-L140	39	NOS	6212-2z-L140	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2153	BE0026	6212-C3	39	NOS	6212-C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2154	BE0027	6213 -2Z -L140 -C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2155	BE0028	6215-2rs/2z	39	NOS	6215-2rs/2z	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2156	BE0029	6215-c3	39	NOS	6215-c3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2157	BE0030	6302-2z	39	NOS	6302-2z	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2141	BE0014	6203-C-HRS 2Z	39	NOS	\N	1.000	1.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2158	BE0031	6303-2z	39	NOS	6303-2z	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2159	BE0032	6304-2Z /2RS1	39	NOS	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2160	BE0033	6305-2Z	39	NOS	6305-2Z	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2161	BE0034	6306-2z /L207-C3	39	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2162	BE0035	6307 -zz/ 2Z C3	39	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2163	BE0036	6308-zz	39	NOS	6308-zz	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2164	BE0037	6309-zz / L140	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2165	BE0038	6310-2z -C3/6310-2Z/R	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2166	BE0039	6311-2z	39	NOS	6311-2z	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2167	BE0040	6312- H-SN-C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2168	BE0041	6312-2z -L140 /6310-2Z-C3	39	NOS	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2169	BE0042	6313-2Z -L140- C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2170	BE0043	6313-c3	39	NOS	6313-c3	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2171	BE0044	6314-H-SN /6314-C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2172	BE0045	6315-C3	39	NOS	6315-C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2173	BE0046	6316-C3	39	NOS	6316-C3	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2174	BE0047	6318-C3	39	NOS	6318-C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2175	BE0048	6319-C3	39	NOS	6319-C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2176	BE0049	6321-C3	39	NOS	6321-C3	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2177	BE0050	6322-C3	39	NOS	6322-C3	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2178	BE0051	6404-A	39	NOS	6404-A	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2179	BE0052	6405	39	NOS	6405	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2180	BE0053	6406	39	NOS	6406	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2181	BE0054	6407	39	NOS	6407	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2182	BE0055	7206-B-XL -TVP	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2183	BE0056	7313 BEP -XL TVP	39	NOS	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2184	BE0057	7314 BEP	39	NOS	7314 BEP	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2185	BE0058	7319 B-XL-MP	39	NOS	7319 B-XL-MP	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2186	BE0059	22215-E-XL-C3	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2187	BE0060	22216 E1-XL	39	NOS	22216 E1-XL	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2188	BE0061	22218 E1-XL-C3	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2189	BE0062	22219 -E1-XL	39	NOS	22219 -E1-XL	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2190	BE0063	22220 E1-XL	39	NOS	22220 E1-XL	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2191	BE0064	22220 E1-XL-K	39	NOS	\N	1.000	1.000	0.000	1.000	7950.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2193	BE0066	22222 E1 XL	39	NOS	22222 E1 XL	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2194	BE0067	22222 E1-XL-K	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2195	BE0068	22224 E1-XL	39	NOS	22224 E1-XL	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2196	BE0069	22228 E1-C3	39	NOS	22228 E1-C3	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2197	BE0070	22311 CW 33C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2198	BE0071	22312 MBW33 C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2199	BE0072	22314 -E1-XL	39	NOS	22314 -E1-XL	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2200	BE0073	22314 KW33 M	39	NOS	22314 KW33 M	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2201	BE0074	22315-E1-XL-K-C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2202	BE0075	51109	39	NOS	51109	1.000	1.000	0.000	4.000	1050.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2203	BE0076	22316-E1-XL	39	NOS	22316-E1-XL	1.000	1.000	0.000	1.000	10450.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2204	BE0077	22318-E1-XL-K-C3	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2205	BE0078	22319 -E	39	NOS	22319 -E	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2206	BE0079	22320- E1-XL-C3	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2207	BE0080	22320 E1-XL-K	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2208	BE0081	22322 E1-XL - C3	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2209	BE0082	22322 E1-XL - K C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2210	BE0083	22322 E1-XL	39	NOS	22322 E1-XL	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2211	BE0084	22324-E1-XL	39	NOS	22324-E1-XL	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2212	BE0085	23044 BE-XL-K	39	NOS	\N	2.000	2.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2213	BE0086	2312 TVH C3	39	NOS	2312 TVH C3	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2214	BE0087	23124 E1AM	39	NOS	23124 E1AM	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2215	BE0088	23220 E1 AM	39	NOS	23220 E1 AM	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2216	BE0089	23222 E1 A-XL-K-M-C3	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2217	BE0090	23226 E1 AM	39	NOS	23226 E1 AM	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2218	BE0091	23234 BS-K -MB-C3	39	NOS	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2219	BE0092	23234 E1 A-K-M	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2220	BE0093	23244 -BE-XL-K	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2221	BE0094	23264 -BEA-XL-K- MB1-C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2222	BE0095	24032-C3	39	NOS	24032-C3	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2224	BE0097	29240 E MB	39	NOS	29240 E MB	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2225	BE0098	29418 -E1-XL-C3	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	PRESSER SCREEN MAN TOP & BOTTOM 	\N	\N	\N	\N	\N	0.00	\N	\N
-2226	BE0099	29420 E1-XL	39	NOS	29420 E1-XL	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2227	BE0100	30204 -A	39	NOS	30204 -A	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2228	BE0101	30206 -A	39	NOS	30206 -A	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2229	BE0102	30216-A	39	NOS	30216-A	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2230	BE0103	30305 CYC	39	NOS	30305 CYC	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2231	BE0104	30306 -A	39	NOS	30306 -A	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2232	BE0105	30310 A	39	NOS	30310 A	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2233	BE0106	30312 A	39	NOS	30312 A	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2234	BE0107	31316	39	NOS	31316	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2235	BE0108	32212- A J2 /Q	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2236	BE0109	32213-A	39	NOS	32213-A	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2237	BE0110	32214-AM	39	NOS	32214-AM	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2238	BE0111	32216- A-AM	39	NOS	32216- A-AM	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2239	BE0112	32305 J2 /Q	39	NOS	32305 J2 /Q	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2240	BE0113	32310-H	39	NOS	32310-H	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2241	BE0114	32313-H	39	NOS	32313-H	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2242	BE0115	51105	39	NOS	51105	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2243	BE0116	51211	39	NOS	51211	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2244	BE0117	51212	39	NOS	51212	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2245	BE0118	F-573288.24032 -S-	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2246	BE0119	F-573288.24032 -S-K30-C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2247	BE0120	FC 210	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2248	BE0121	GEM 020	39	NOS	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2249	BE0122	HB 209	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2250	BE0123	N 407 EM	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2251	BE0124	NA 4905	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2252	BE0125	NJ 303 E- XL -TVP2	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2253	BE0126	NJ205	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2254	BE0127	NJ313 -E-XL-M1-QP-C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2255	BE0128	NU 2320 E-XL -M1QP-C3	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2256	BE0129	NU 2320 INNER	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2257	BE0130	NU 2322 E1-XL	39	NOS	\N	1.000	1.000	0.000	2.000	31500.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2258	BE0131	NU 2322 EM ZVL	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2259	BE0132	NU 315 E-XL -M1QP-C3	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2260	BE0133	NU 317 -M1QP -C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2261	BE0134	NU 322 E1-XL M1QP -C3	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2262	BE0135	NU2217 -E-XL-M1-QP	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	PRESSER SCREEN MCN TOP & BOTTOM 	\N	\N	\N	\N	\N	0.00	\N	\N
-2263	BE0136	NU2220 E1 -AM-C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2264	BE0137	NU307	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2265	BE0138	NU309-XL -C3	39	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2266	BE0139	NU310 E-XL	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2267	BE0140	NU313 -E-XL M1 -QP-C3	39	NOS	\N	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2268	BE0141	NU319 E-XL -M1-QP -C3	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2269	BE0142	NU320 E-XL-M1-QP-C3 -2 old side	39	NOS	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2270	BE0143	NUP 313 E TVP2	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2271	BE0144	QJ 317 -N2-MPA-C3	39	NOS	\N	1.000	1.000	0.000	1.000	26175.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2272	BE0145	SYJ 513	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2273	BE0146	SYJ 517	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2274	BE0147	UC 210	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2275	BE0148	UC 211 -23	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2276	BE0149	UC 211 -32	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2277	BE0150	UC 215	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2278	BE0151	UC206	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2279	BE0152	UC208	39	NOS	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2280	BE0153	UCF 209 -J7	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2281	BE0154	UCF 210 (mm) /UCF 210 -K	39	NOS	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2282	BE0155	UCF 211 D1	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2283	BE0156	UCF 211 J7-32	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2284	BE0157	UCF-206	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2285	BE0158	UCFC 210	39	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2286	BE0159	UCFC-208 -J7	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2287	BE0160	UCFL 208	39	NOS	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2288	BE0161	UCP 206- J7 -NTN	39	NOS	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2289	BE0162	UCP 207	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2290	BE0163	UCP 208-J5	39	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2291	BE0164	UCP 209	39	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2292	BE0165	UCP 210	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2293	BE0166	UCP 211	39	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2294	BE0167	UCP 212 D1	39	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2295	BE0168	UCP 213	39	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2296	BE0169	UCP215	39	NOS	\N	1.000	1.000	0.000	5.000	7710.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2297	BE0170	ZVL 23044 KW33MC3	39	NOS	\N	1.000	1.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2654	BE0171	626 BEARING	39	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2655	BE0172	608 BEARING	39	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2656	BE0173	627 BEARING	39	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3380	BE0174	UJ CROSS (49 X 155) 4018	39	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3381	BE0175	UJ CROSS (47 X 134)	39	NOS	\N	0.000	0.000	0.000	4.000	1750.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3382	BE0176	UJ CROSS (72 X 185)	39	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3383	BE0177	UJ CROSS (74 X 244)	39	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3384	BE0178	UJ CROSS (57 X 152) 4113A OLD	39	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4666	TCP-0000	MECHANICAL COUPLING RUBBER TYRES AUGUST-2026	41	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2306	TF0001	TYRE F-45	41	NOS	4012-9010	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2307	TF0002	TYRE F-70	41	NOS	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2308	TF0003	TYRE F-90	41	NOS	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2309	TF0004	TYRE F-160	41	NOS	4012-9010	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2310	TP0001	TYRE PH-126	41	NOS	4012-9010	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2311	TP0002	TYRE PH-140	41	NOS	4012-9010	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2312	TP0003	TYRE PH-160	41	NOS	4012-9010	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2313	TP0004	TYRE PH-178	41	NOS	4012-9010	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2314	TP0005	TYRE PH-190	41	NOS	4012-9010	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2315	TP0006	TYRE PH-250	41	NOS	4012-9010	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4667	TCP-0013	MECHANICAL TYRE COUPLING STOCK AS AUGUST-2026	41	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2316	TCF0001	TYRE COUPLING F-70	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2317	TCP0002	TYRE COUPLING PH-106	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2318	TCP0003	TYRE COUPLING PH-140	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2319	TCP0004	TYRE COUPLING PH-160	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2320	TCP0005	TYRE COUPLING PH-178	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2321	TCP0006	TYRE COUPLING PH-190	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2322	TCP0007	TYRE COUPLING PH-250	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4668	TCP-0023	MECHANICAL COUPLING ( PIN BUSH)	41	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2323	CPB0001	FBC-6A4 (OD-254, 10 HPLES)	41	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2324	CPB0002	FBC-5L (6 HOLES)	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2325	CPB0003	FGC2-0.5L GARE COUPALING PART(OD-185, 6 HOLES)	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2326	CPB0004	FGC1-0.5L GEAR COUPALING PART(OD-170, 6 HOLES)	41	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4669	PSL-0000	MECHANICAL PUMP SLEEVE STOCKS AS ON 14/07/2026	42	NOS	\N	2.000	1.000	0.000	14072026.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2327	MPS0001	SWP 80/260	42	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2328	MPS0002	MEGA A 40	42	NOS	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2329	MPS0003	SEPRATOR SLEEVE 25X32X75 MM	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2330	MPS0004	OD-38 mm -108 LENGTH	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2331	MPS0005	CPC 65/260	42	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2332	MPS0006	CPC 150/320	42	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2333	MPS0007	ETP SLEEVE	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2334	MPS0008	VSL 04 SLEEVE	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2335	MPS0009	TURBO 900 SLEEVE	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2336	MPS0010	TPR 125/400+C (3VO)	42	NOS	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2337	MPS0011	TPR 80 /320	42	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2338	MPS0012	TPR 250+400+C	42	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2339	MPS0013	AAPGC 42/150	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2340	MPS0014	TURBO SLEEVE 400	42	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2341	MPS0015	TPR 150/320	42	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2342	MPS0016	CPC 100/320	42	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2343	MPS0017	SPR + T125/260	42	NOS	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2344	MPS0018	SPR + T125 /330	42	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2345	MPS0019	CPC 50 /320	42	NOS	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2346	MPS0020	VSL -08 SLEEVE	42	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2347	MPS0021	AGITATOR SLEEVES	42	NOS	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2348	MPS0022	AFT PRESSURE SCREEN SLEEVE (OD90XID70XLE229/230)	42	NOS	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2349	MPS0023	GUN METAL(OD50XID75XLE210 MM)/S.S 316 (ID63XID70XLE130 MM)	42	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2351	MPS0025	PULPER SLEEVE	42	NOS	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2352	MPS0026	BOTTOM FAN PUMP SLEEVE	42	NOS	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2353	MPS0027	HOLY ROLL SLEEVE	42	NOS	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4670	VBT-0001	MECHINICAL V-BELT STOCK AUGUST-2026	43	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2657	MVB0001	V-BELT SPB 1850	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2658	MVB0002	V-BELT GREEN SPB -PT 3150	43	NOS	4010-3999	0.000	0.000	0.000	6.000	1927.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2659	MVB0003	V-BELT BLACK SP 3300	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2660	MVB0004	V- BELT GREEN SPC-PT 3750 /BLACK SPC 3750	43	NOS	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2662	MVB0006	V-BELTBLACK SPC 4300	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2663	MVB0007	GREEN SPC -PT 4500	43	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2664	MVB0008	GREEN & BLACK SPC-PT 4750	43	NOS	4010-3999	0.000	0.000	0.000	8.000	4954.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2665	MVB0009	GREEN SPC 5300	43	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2666	MVB0010	GREEN SPC -PT 6000 /BLACK SPC-PT 6000	43	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2667	MVB0011	BLACK SPC 8500/ GREEN SPC -8500	43	NOS	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2668	MVB0012	BLACK XPA 1120	43	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2669	MVB0013	BLACK XPA 1450	43	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2670	MVB0014	BLACK B 47	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2671	MVB0015	BLACK C48	43	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2672	MVB0016	BLACK A 49	43	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2673	MVB0017	BLACK B50	43	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2674	MVB0018	BLACK B 58	43	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2675	MVB0019	BLACK B 62	43	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2676	MVB0020	BLACK C 73	43	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2677	MVB0021	GREEN SPA -PT 1220	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2678	MVB0022	BLACK SPB 1600	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2679	MVB0023	BLACK C 107/C 2774	43	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2680	MVB0024	BLACK B 68	43	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2681	MVB0025	BLACK C 114/C2952	43	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2682	MVB0026	BLACK C 103	43	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2683	MVB0027	BLACK C 104	43	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4671	WLD-0000	WELDING RODS STOCKS AUGUST-2026	44	PKT	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2840	SSR0001	SUPERON S.S (3.15X350 MM) PKT	44	PKT	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2841	SSR0002	SUPERON S.S (2.5X350 MM) PKT	44	PKT	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2842	MSR0001	MANGLAM M.S (2.50X350 MM) PKT	44	PKT	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2843	MSR0002	MANGLAM M.S (3.15X350 MM) PKT	44	PKT	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2844	MSR0003	MANDLAM M.S (4.00X450 MM) PKT	44	PKT	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2845	TWE0001	TUNGSTEN WELDING ELECTRODES 2.44MM	44	PKT	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2846	TWE0002	TUNGSTEN WELDING ELECTRODES 3MM	44	PKT	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4672	BLD-0002	BLADE STOCK AUGUST-2026	45	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2849	DB0003	DOCTOR BLADE 2X75X3350 MM PLASTIC	45	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4673	BLD-0009	CUTTING , BUFFING & GRANDING WHEEL STOCK AUGUST-2026	45	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2850	GBW0001	4" BUFFIN WHEEL	45	NOS	\N	0.000	0.000	0.000	64.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2851	GGW0001	4" GRINDING WHEEL	45	NOS	\N	0.000	0.000	0.000	59.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2852	GCW0001	4" CUTT OFF WHEEL	45	NOS	\N	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2854	GGW0002	7" GRINDING WHEEL	45	NOS	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2855	GEP0001	EMERY PAPER 36 GRIT -75 MM	45	NOS	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2856	GEP0002	EMERY PAPER 60 GRIT -75 MM	45	NOS	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2857	GRK0001	REWINDER KNIVES	45	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2858	GRC0001	REWINDER CUTTER	45	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4674	VLV-0000	VALVE STOCKS AS ON AUGUST-2026	46	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2705	MV0001	1.5 " GLOBE VALVE	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2706	MV0002	0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE	46	NOS	4802	0.000	0.000	0.000	12.000	100.00	t	2026-08-09 11:48:09.915991	f	365	e.g. Pulp Mill Section	\N	e.g. OEM Direct Procurement	e.g. SKF India / Schaeffler	e.g. Cycle-1 Verified	e.g. Vibration spectral sweep validations	0.00	\N	Rack 2, Box 4
-2707	MV0003	1" PISTION VALVES/BELLOW SEAL GLOBE VALVE	46	NOS	\N	-0.002	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2709	MV0005	C.I BODY S.S DISC BUTTERFLY VALVE 2.5"	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2710	MV0006	C.I BODY S.S DISC BUTTERFLY VALVE 3"	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2711	MV0007	C.I BODY S.S DISC BUTTERFLY VALVE 4"	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2712	MV0008	C.I BODY S.S DISC BUTTERFLY VALVE 6"	46	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2713	MV0009	C.I BODY S.S DISC BUTTERFLY VALVE 8"	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2714	MV0010	C.I BODY S.S DISC BUTTERFLY VALVE 12"	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2715	MV0011	S.S 304 BALL VALVE WITH FLANGE 1'	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2853	GCW0002	14 "CUTT OFF WHEEL	45	NOS	\N	0.000	0.000	0.000	41.000	150.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2716	MV0012	S.S 304 BALL VALVE WITH FLANGE 1' 1/2" (40 MM)	46	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2717	MV0013	S.S 304 BALL VALVE WITH FLANGE 2'	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2718	MV0014	S.S 304 BALL VALVE WITH FLANGE 2' 1/2"	46	NOS	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2719	MV0015	S.S BALL VALVE WITH 4" (100MM)	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2720	MV0016	PLATE VALVE 3" (KNIFE GATE VALVE)	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2721	MV0017	PLATE VALVE 4" (KNIFE GATE VALVE)	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2722	MV0018	PLATE VALVE 5" (KNIFE GATE VALVE)	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2723	MV0019	PLATE VALVE 6" (KNIFE GATE VALVE)	46	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2724	MV0020	PLATE VALVE 8" (KNIFE GATE VALVE)	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2725	MV0021	S.S NEEDLE VALVE 1/2"	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2726	MV0022	S.S BALL VALVE 8/10MM	46	NOS	\N	0.000	0.000	0.000	18.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2727	MV0023	S.S BALL VALVE 3/8"	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2728	MV0024	S.S BALL VALVE 6MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2729	MV0025	S.S BALL VALVE 15MM	46	NOS	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2730	MV0026	S.S BALL VALVE 20MM (3/4)	46	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2731	MV0027	S.S BALL VALVE 25MM / C.I BALL VALVE	46	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2732	MV0028	S.S BALL VALVE 32MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2733	MV0029	S.S BALL VALVE 40MM	46	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2734	MV0030	S.S BALL VALVE 50MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2735	MV0031	2 1/2" PISTON VALVE	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2736	MV0032	S.S DISC CHECK VALVE 1 1/2"	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2737	MV0033	C.I WAFER CHECK VALVE -4"	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2738	MV0034	4" FOOT VALVE	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2739	MV0035	1" BLOW DOWN VALVE	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2740	MV0036	1.5" BLOW DOWN VALVE	46	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2741	MV0037	3' GLOBE VALVE / NRV (BOILER)	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2742	MNRV001	SS PLATE NRV 25 MM	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2743	MNRV002	SS PLATE NRV 40 MM	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2744	MNRV003	SS PLATE NRV 50 MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2746	MNRV005	SS PLATE NRV 100 MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2747	MNRV006	SS PLATE NRV 150 MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2748	MNRV007	CI PLATE NRV 65 MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2749	MNRV008	CI PLATE NRV 80 MM	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2750	MNRV009	CI PLATE NRV 100 MM	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2751	MV0038	S.S DISC CHECK VALVE 25 MM	46	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2752	MV0039	S.S DISC CHECK VALVE 40 MM	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2753	MV0040	S.S DISC CHECK VALVE 50 MM	46	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2754	MV0041	S.S DISC CHECK VALVE 80 MM	46	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2755	MV0042	S.S DISC CHECK VALVE 100 MM	46	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2756	MV0043	3" PLATE VALVE	46	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3385	MV0044	200NB STOP VALVE PISTON TYPE	46	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4675	CNW-0000	CHECK NUT & WASHER AS ON AUGUST-2026	47	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2757	MCNW0001	CHECKNUT WASHER MB 09	47	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2758	MCNW0002	CHECKNUT WASHER MB 12	47	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2759	MCNW0003	CHECKNUT WASHER MB 13	47	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2760	MCNW0004	CHECKNUT WASHER MB 14	47	NOS	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2761	MCNW0005	CHECKNUT WASHER MB 16	47	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2762	MCNW0006	CHECKNUT WASHER MB 18	47	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2763	MCNW0007	CHECKNUT WASHER MB 19	47	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2764	MCNW0008	CHECKNUT WASHER MB 20	47	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2765	MCNW0009	CHECKNUT WASHER MB 21	47	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2766	MCNW0010	CHECKNUT WASHER MB 22	47	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2767	MCNW0011	CHECKNUT WASHER MB 24	47	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2768	MCNW0012	CHECKNUT WASHER MB 40	47	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2769	MCNW0013	CHECKNUT WASHER MB 44	47	NOS	\N	0.000	0.000	0.000	23.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2770	MCNW0014	CHECKNUT LOCK KM -09	47	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2771	MCNW0015	CHECKNUT LOCK KM -12	47	NOS	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2772	MCNW0016	CHECKNUT LOCK KM -13	47	NOS	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2773	MCNW0017	CHECKNUT LOCK KM -14	47	NOS	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2774	MCNW0018	CHECKNUT LOCK KM -16	47	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2775	MCNW0019	CHECKNUT LOCK KM -18	47	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2776	MCNW0020	CHECKNUT LOCK KM -19	47	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2777	MCNW0021	CHECKNUT LOCK KM -20	47	NOS	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2778	MCNW0022	CHECKNUT LOCK KM -21	47	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2779	MCNW0023	CHECKNUT LOCK KM -22	47	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2780	MCNW0024	CHECKNUT LOCK KM -24	47	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2781	MCNW0025	CHECKNUT LOCK KM -32	47	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2782	MCNW0026	CHECKNUT LOCK KM -315	47	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4676	GUG-0000	GUAGES STOCK AS ON AUGUST-2026	48	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2783	MGU0001	Pressue Guage 0 to 16 kg/cm2 (150mmX1/2" BSP)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2784	MGU0002	Messureing Guage 0 to 28 kg cm /2, 0 to 400  (12"X 1/2" BSP)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2785	MGU0003	Messuring Guage 150mmx1/2" mm bar/mm wc -100/1000	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2786	MGU0004	Messuring Guage 0 to 40 kg /cm2 PSI (100mmx1/2" BSP)	48	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2787	MGU0005	Messuring Guage 0 to 10 kg /cm2 PSI (100mmx1/2" NPT)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2788	MGU0006	Messuring Guage 0 to 7 kg /cm2 PSI (80mmx3/8" BSP)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2789	MGU0007	Messuring Guage 0 to 7 (lb/in2) /(kg /cm2)FM (25MMX1/4 BSP)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2790	MGU0008	Messuring Guage 0 to 140 kg /cm2 (25MMX1/4 )	48	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2791	MGU0009	Messuring Guage 0 to 10 kg /cm2 (25MMX1/4 BSP)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2792	MGU0010	Messuring Guage 0 to 6 kg /cm2 FM (150MMX1/2" BSP	48	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2793	MGU0011	OXYGEN REGULATER DOUBLE GUAGE	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2794	MGU0012	Temperature Guage 0 to 200 C  (BAUMER MAKE)	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2795	MGU0013	Temperature Guage 0 to 300 C (P163.59-00160)-150MM-1/2" BSP	48	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2796	MGU0014	Vaccum Gauge 0 to 760 mm Hg 1/2" Bspt Dial 6"	48	NOS	9026-2000	0.000	0.000	0.000	2.000	1700.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4677	SFT-0000	IMPELLERS STOCKS AS ON AUGUST-2026	49	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2797	MIMP001	CPC 100/320 WITH CHECKNUT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2798	MIMP002	SPR+T 125/330	49	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2799	MIMP003	SPR+T 125/260	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2800	MIMP004	SPR +T 125/400	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2801	MIMP005	WP 80/260	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2802	MIMP006	CPC 150 -320	49	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2803	MIMP007	CPC 65-260	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2804	MIMP008	TPR 80/320 (OPEN IMPELLER)	49	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2805	MIMP009	APPC 42 /150	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2806	MIMP010	TPR 125/400 (3VO)	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2807	MIMP011	SEPRATOR	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2808	MIMP012	SPR+T 125/260 WEAR PLATE /SIDE PLATE	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2809	MIMP013	SPR+T 125/260 GLAND COVER (5VO)	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2810	MIMP014	SPR+ T125/260 STUFFING BOX	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2811	MIMP015	SPR+ T125/330 STUFFING BOX	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2812	MIMP016	SWP 125/320	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2813	MIMP017	SPR+T 125/260 CASING COVER	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2814	MIMP018	APPC 42 /150 WEAR PLATE -1SET	49	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2815	MIMP019	CPC 125/320 IMPELLER	49	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2816	MIMP020	TURBO 400 IMPELLER	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2817	MIMP021	TURBO 400 SCREEN PLATE	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2818	MIMP022	CPC 100/320 BEARING BED /HOUSING	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2819	MIMP023	CPC 100/320 CAP OUTER ,	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2820	MIMP024	CPC 100/320 CAP INNER	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2821	MIMP025	SPR +T 125/330 CAP OUTER SAM TURB ( PART NO: 37.21 )	49	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2822	MIMP026	SPR +T 125/330 CAP INNER	49	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4678	SFT-0029	SHAFT STOCKS AS ON	49	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2823	MIMS001	CPC 100/320 SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2824	MIMS002	SPR+T 125/260 SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2825	MIMS003	SPR+T 125/330 SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2826	MIMS004	SPR + T 125 /400 (4 VO) SHAFT	49	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2827	MIMS005	WP 80/260 SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2828	MIMS006	CPC 150 -320 -SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2829	MIMS007	CPC 65-260 (EN19) -SHAFT	49	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2830	MIMS008	TPR 80/320 SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2831	MIMS009	APPC 42 /150 SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2832	MIMS010	TPR 125/400 (3VO) SHAFT	49	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2833	MIMS011	SEPRATOR SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2834	MIMS012	TURBO SHAFT -SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2835	MIMS013	SWP +125/320 SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2836	MIMS014	KSB PUMP SHAFT (EN 19) SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2837	MIMS015	BOTTOM FAN PUMP SHAFT	49	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2838	MIMS016	PULP MILLL AFT PRESSURE SCREEN SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2839	MIMS017	VSL-08 PRESSURE SCREEN SHAFT	49	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4679	PIP-0000	SS, MS PIPE FITTINS STOCK AS ON AUGUST-2026	50	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3038	MSSC0001	S.S 1/2" COLLER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3039	MSSC0002	S.S 1" COLLER	50	NOS	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3040	MSSC0003	S.S 1.5" COLLER	50	NOS	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3041	MSSC0004	S.S 2" COLLER	50	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3042	MSSC0005	S.S 2.5 " COLLER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3043	MSSC0006	S.S 3 " COLLER	50	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3044	MSSC0007	S.S 4 " COLLER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3045	MSSC0008	S.S 5" COLLER	50	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3046	MSSC0009	S.S 6" COLLER	50	NOS	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3047	MSSC0010	S.S 8 " COLLER	50	NOS	\N	0.000	0.000	0.000	18.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3048	MSSC0011	S.S 10" COLLER	50	NOS	\N	0.000	0.000	0.000	13.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3049	MSSC0012	S.S 12" COLLER	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3050	MSSC0013	S.S 14 " COLLER	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3051	MSSC0014	S.S 16" COLLER	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3052	MSSR0001	S.S 2" X 1" REDUCER	50	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3053	MSSR0002	S.S 1.5" X 2 " REDUCER	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3054	MSSR0003	S.S 2 1/2 " X 3" REDUCER	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3056	MSSR0005	S.S 2 1/2" X 4 REDUCER	50	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3057	MSSR0006	S.S 3 " X 4 " REDUCER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3058	MSSR0007	S.S 5" X 6" REDUCER	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3059	MSSR0008	S.S 6 X 4 REDUCER	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3060	MSSR0009	S.S 10" X 4" REDUCER	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3061	MSSR0010	S.S 12" X 3" REDUCER	50	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3062	MSSR0011	S.S 14" X 4" REDUCER	50	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3063	MSSBE001	S.S BEND 1/2"	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3064	MSSBE002	S.S 1" BEND	50	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3065	MSSBE003	S.S 1.25" BEND	50	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3066	MSSBE004	S.S 1 1/2 " BEND	50	NOS	\N	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3067	MSSBE005	S.S 2" BEND	50	NOS	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3068	MSSBE006	S.S 2.5" BEND	50	NOS	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3069	MSSBE007	S.S 3" BEND	50	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3070	MSSBE008	S.S 4" BEND	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3071	MSSBE009	S.S 5" BEND	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3072	MSSBE010	S.S 6" BEND	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3073	MSSBE011	S.S 8" BEND	50	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3074	MSSBE012	S.S 10" BEND	50	NOS	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3075	MSSBE013	S.S 14" BEND	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3076	MMSF0001	M.S FLANGE 1/2"	50	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3077	MMSF0002	M.S FLANGE 1 "	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3078	MMSF0003	M.S FLANGE 1 1/2 " or 1.5 "	50	NOS	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3079	MMSF0004	M.S FLANGE 2"	50	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3080	MMSF0005	M.S FLANGE 2.5"	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3081	MMSF0006	M.S FLANGE 3 "	50	NOS	\N	0.000	0.000	0.000	16.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3082	MMSF0007	M.S FLANGE 4"	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3083	MMSF0008	M.S FLANGE 5"	50	NOS	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3084	MMSF0009	M.S FLANGE 6"	50	NOS	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3085	MMSF0010	M.S FLANGE 8"	50	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3086	MMSF0011	M.S FLANGE 10"	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3087	MMSF0012	M.S FLANGE 12"	50	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3088	MMSF0013	M.S FLANGE 14"	50	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3089	MMSF0014	M.S FLANGE 16"	50	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3090	MSTF0001	STEAMLINE 3" FLANGES	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3091	MSTF0002	STEAMLINE 3" FLANGES	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3092	MSPN001	1/4" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3093	MSPN002	1/2" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	28.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3094	MSPN003	3/8" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3095	MSPN004	1" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	31.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3096	MSPN005	1.5" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3097	MSPN006	2" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3098	MSPN007	2.5" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3099	MSPN008	3" S.S NIPPLE	50	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3100	MSSS001	1/4" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3101	MSSS002	1" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3102	MSSS003	1/2" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	46.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3103	MSSS004	1 1/2" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3104	MSSS005	2" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	65.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3105	MSSS006	3/8" S.S SOCKET	50	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3106	MSSHX001	1" SS HEX NIPPLE	50	NOS	\N	0.000	0.000	0.000	47.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3107	MSSHX002	1/4" SS HEX NIPPLE	50	NOS	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3108	MSSHX003	1/2" SS HEX NIPPLE	50	NOS	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3109	MSSHX004	1 1/2" SS HEX NIPPLE	50	NOS	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3110	MSSHX005	3/4" SS HEX NIPPLE	50	NOS	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2864	MNO001	ROBO NOZZLE 0.4MM	51	NOS	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2865	MNO002	ROBO NOZZLE 0.7MM	51	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2867	MNO004	1/16 GAS CUTTER NOZZLE	51	NOS	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2868	MNO005	1/32 GAS CUTTER NOZZLE	51	NOS	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3379	MNO006	NOZZLE IN CERAMIC (BIG THREADED) L 80MM X CL 60MM X HOLE 14MM	51	NOS	8441	0.000	0.000	0.000	20.000	1250.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4680	LUB-0000	LUBRICANTS	52	LTR	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2859	LGO0001	SERVO GEAR OIL 320	52	LTR	\N	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2860	LGR0001	SERVO GREASE MP3	52	LTR	\N	0.000	0.000	0.000	120.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2861	LGR0002	SG 350 E.P MOLY GREASE HIGH TEMP	52	LTR	\N	0.000	0.000	0.000	75.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2862	LHO0001	HYDRULIC OIL No: 68	52	LTR	\N	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2863	LLOC001	LUBRICANTING OIL CAN (REUSE)	52	LTR	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4681	CMP-0000	COMPRESSOR SPARES STOCK AUGUST-2026	53	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3364	COM0001	OIL FILTER CPB-40	53	NOS	6211472200	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3365	COM0002	AIR FILTER CPB-40	53	NOS	6211472350	0.000	0.000	0.000	4.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3366	COM0003	VALVE REGULATOR CPB-40	53	NOS	1622878688	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3367	COM0004	ASSEMBLE CPB-60	53	NOS	16231810801	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3368	COM0005	SOLENOID VALVE CPB-60	53	NOS	1089862110	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3369	COM0006	AIR FILTER CPB-7	53	NOS	6211473750	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3370	COM0007	OIL SEPRATOR CPB-7	53	NOS	6221372650	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3371	COM0008	OIL FILTER CPB-7	53	NOS	6211472550	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3372	COM0009	ELEMENT CPB-7	53	NOS	2258293201	0.000	0.000	0.000	2.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4682	PUL-0000	PULLEY STOCK AUGUST-2026	54	NOS	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3373	PULL0001	TLP 200X3C/2517 FENNER	54	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3374	PULL0002	TLP 200X4C/3020 FENNER	54	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3375	PULL0003	TLP 375X7C/4040 FENNER	54	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3376	PULL0004	TLP 375X5C/3535 FENNER	54	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3377	PULL0005	TLP 425X5C/4040 FENNER	54	NOS	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3378	PULL0006	TLP 900X4C/ FENNER	54	NOS	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-4683	BNW-0000	BOLT & NUT STOCK AS ON	55	KG	\N	2.000	1.000	0.000	0.000	0.00	t	2026-08-15 15:42:00.623432	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2956	GMSB0001	1/2"X2" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	500.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2957	GMSB0002	1/2"X4" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	41.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2958	GMSB0003	1/2"X3" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	320.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2959	GMSB0004	1/2"X6" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2960	GMSB0005	3/8"X2" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2961	GMSB0006	3/8"X2 1/2" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2962	GMSB0007	3/8"X3" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	300.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2963	GMSB0008	3/4"X2" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	250.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2964	GMSB0009	3/4"X5" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2965	GMSB0010	5/8"X2" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	150.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2966	GMSB0011	5/8"X3" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2967	GMSB0012	5/8"X4" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	170.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2968	GMSB0013	5/8"X5" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2969	GMSB0014	5/8"X6" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2970	GMSB0015	5/8"X7" MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2971	GMSB0016	12mmX75mm MS BOLT & NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	250.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2972	GHTBN0001	10mmX75mm HTAC	55	KG	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2973	GHTBN0002	12mmX40/50mm HTAC	55	KG	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2974	GHTBN0003	14mmX50/65mm HTAC	55	KG	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2975	GHTBN0004	16mmX25/40/75mm HTAC	55	KG	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3386	GHTBN0005	3/8" X 2" HT BOLT & NUT, SPRING WASHER	55	KG	7318-1500	0.000	0.000	0.000	200.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2976	GSSAB0001	12mmX2 1/2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2977	GSSAB0002	16mmX1 1/2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2978	GSSAB0003	16mm X 2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2979	GSSAB0004	16mm X 2 1/2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2980	GSSAB0005	3/8" X 2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	87.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2981	GSSAB0006	10mm X 2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	28.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2982	GSSAB0007	10mm X 2 1/2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2983	GSSAB0008	8mm X 2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	36.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2984	GSSAB0009	8mm X 2 1/2" SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3387	GSSAB0010	5/16" X 25 MM SS ALLEN BOLT	55	KG	7318	0.000	0.000	0.000	150.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2985	GSSCAS0001	12mm X 1" SS CSK ALLEN SCREW	55	KG	7318	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2986	GSSCAS0002	10mm X 1/2" SS CSK ALLEN SCREW	55	KG	7318	0.000	0.000	0.000	72.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2987	GSSCAS0003	12mm X 3/4" SS CSK ALLEN SCREW	55	KG	7318	0.000	0.000	0.000	63.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2988	GSSCAS0004	3/8" X 2 1/2" SS CSK ALLEN SCREW	55	KG	7318	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2989	GSSCS0001	5/16" X 2 1/2" SS CSK SCREW	55	KG	7317-1400	0.000	0.000	0.000	75.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2990	GSSCS0002	5/16" X 1 1/4" SS CSK SCREW	55	KG	7317-1400	0.000	0.000	0.000	150.000	9.70	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2991	GSSCS0003	6MM X 25MM SS CSK SCREW	55	KG	7317-1400	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2992	GSSCS0004	8MM X 50MM SS CSK SCREW	55	KG	7317-1400	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2993	GSSBN0001	8mm X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2994	GSSBN0002	1/4" X 3" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	64.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2995	GSSBN0003	3/8" X 3" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	56.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2996	GSSBN0004	10mm X 3" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	97.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2997	GSSBN0005	14mm X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2998	GSSBN0006	12mm X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-2999	GSSBN0007	1/2" X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	68.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3000	GSSBN0008	16mm  X 1 1/2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3001	GSSBN0009	1/2" X 4" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3002	GSSBN0010	5/8" X 5" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3003	GSSBN0011	3/4" X 4" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3004	GSSBN0012	1" X 1/2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3005	GSSBN0013	1" X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3006	GSSBN0014	3/8" X 4" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	48.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3007	GSSBN0015	5/8" X 4" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3008	GSSBN0016	16MM X 3" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3009	GSSBN0017	1" X 4" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3010	GSSBN0018	3/4" X 2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3011	GSSBN0019	3/4" X 3" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3012	GSSBN0020	3/8" X 2 1/2" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3388	GSSBN0024	10 X 40 MM SS BOLT & LOCK NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3389	GSSBN0025	12 X 65 MM SS BOLT & LOCK NUT, WASHER	55	KG	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-13 13:43:41.315018	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3015	GSSBN0023	1/4" X 1" SS BOLT & NUT	55	KG	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3016	GSSSB001	12mmX2 1/2" STUD BOLT	55	KG	7318-1500	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3017	GSSSB002	7/8" X 1 1/2" STUD BOLT	55	KG	7318-1500	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3018	GSSSB003	3/4" X 7" STUD BOLT	55	KG	7318-1500	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3019	GSSSB004	1" X 400mm STUD BOLT	55	KG	7318-1500	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3020	GSSSB005	1 1/4" X 400mm STUD BOLT	55	KG	7318-1500	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
-3021	GSSFT001	1 1/4" X 400mm FULL THRED BOLT	55	KG	7318-1900	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2054	OS0001	10-22-7	40	Nos	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2055	OS0002	20-32-7	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2056	OS0004	20-52-7	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2057	OS0005	25-40-8	40	Nos	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2058	OS0007	25-42-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2060	OS0009	25-52-7	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2061	OS0010	25-62-7	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2062	OS0011	28-38-7/2	40	Nos	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2063	OS0012	30-47-7/10	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2064	OS0013	30-62-10	40	Nos	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2065	OS0014	32-45-7	40	Nos	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2066	OS0015	32-52-10	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2067	OS0016	32-60-10	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2068	OS0017	35-47-7	40	Nos	4016 9330	5.000	5.000	0.000	25.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2069	OS0018	35-52-10	40	Nos	4016 9330	2.000	2.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2070	OS0019	35-55-10	40	Nos	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2076	OS0025	45-65-10/12	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2077	OS0026	45-75-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2078	OS0027	48-62-10	40	Nos	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2079	OS0028	50-65-8	40	Nos	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2080	OS0029	50-70-10	40	Nos	4016 9330	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2081	OS0030	50-72-8/10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2083	OS0033	55-70-10	40	Nos	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2085	OS0035	55-75-10	40	Nos	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2086	OS0036	55-80-10	40	Nos	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2088	OS0039	65-75-10	40	Nos	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	5
+2089	OS0040	65-80-10	40	Nos	4016 9330	3.000	3.000	0.000	13.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	5
+2090	OS0041	65-85-10	40	Nos	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2091	OS0042	65-90-10/12	40	Nos	4016 9330	2.000	2.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	5
+2092	OS0043	65-95-10	40	Nos	4016 9330	3.000	3.000	0.000	16.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	5
+2093	OS0044	70-80-10	40	Nos	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	4
+2094	OS0045	70-90-10	40	Nos	4016 9330	4.000	4.000	0.000	19.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2095	OS0047	75-95-10	40	Nos	4016 9330	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	4
+2097	OS0048	80-100-10	40	Nos	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2098	OS0049	80-105-10/12	40	Nos	4016 9330	3.000	3.000	0.000	14.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2099	OS0050	85-100-10/12	40	Nos	4016 9330	3.000	3.000	0.000	14.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2100	OS0051	85-105-10	40	Nos	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2101	OS0052	85-110-10	40	Nos	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2102	OS0053	85-115-10	40	Nos	4016 9330	4.000	4.000	0.000	18.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2103	OS0054	90-110-10/12	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2104	OS0055	90-115-10	40	Nos	4016 9330	2.000	2.000	0.000	11.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2105	OS0056	90-120-12	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2108	OS0059	110-130-12	40	Nos	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	4
+2109	OS0060	115-140-15	40	Nos	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	4
+2110	OS0061	140-170-15	40	Nos	4016 9330	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	8
+2111	OS0062	145-165-13	40	Nos	4016 9330	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	8
+3353	STA024	HOLE PUNCHING MEHINE SMALL	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3354	STA025	AA BATTERY	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3355	STA026	AAA BATTERY	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3356	STA027	9 VOLT BATTERY	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3357	STA028	BINDER CKIPS 41 MM	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3358	STA029	BINDER CKIPS 51 MM	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3359	STA030	CALCULATER CASIO	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3360	STA031	A4 PAPER BUNDELS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3361	STA032	A4 CLOTH COVERS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3349	STA020	BALL NIDELS	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3350	STA021	STAPELER NO10	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3351	STA022	STAPELER PINS BOX	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3352	STA023	HOLE PUNCHING MEHINE BIG	33	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:53:06.935459	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2112	OS0063	155-180-15	40	Nos	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	8
+2114	OS0065	55-72-12	40	Nos	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2115	OS0066	55-60-8	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2116	OS0067	22-40-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2117	OS0068	20-52-8	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2118	OS0069	40-65-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2119	OS0070	45-55-10	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2072	OS0021	40-60-10	40	Nos	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2073	OS0022	42-55-10	40	Nos	4016 9330	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2075	OS0024	45-60-10	40	Nos	4016 9330	2.000	2.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
+2082	OS0031	50-75-12/10	40	Nos	4016 9330	2.000	2.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2084	OS0034	55-72-10/8	40	Nos	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2087	OS0037	60-80-10	40	Nos	4016 9330	2.000	2.000	0.000	11.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	5
+2106	OS0057	95-120-10	40	Nos	4016 9330	3.000	3.000	0.000	12.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	3
+2113	OS0064	185*215*15	40	Nos	4016 9330	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	8
+2120	OS0071	78-100-10	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2122	OS0073	150-180-15	40	Nos	4016 9330	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	8
+2123	OS0074	65-100-1	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	7
+2124	OS0075	20-35-7	40	Nos	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	0
+2125	OS0076	25-42-10	40	Nos	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	0
+2127	OS0078	60-90-10	40	Nos	4016 9330	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	0
+2121	OS0072	60-85-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	6
+2126	OS0077	50-80-10	40	Nos	4016 9330	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	0
+2071	OS0020	40-55-8	40	Nos	4016 9330	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	1
+2140	BE0013	6202-2Z-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2146	BE0019	6207-2z	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2147	BE0020	6208	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2152	BE0025	6212-2z-L140	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2153	BE0026	6212-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2154	BE0027	6213 -2Z -L140 -C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2155	BE0028	6215-2rs/2z	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2156	BE0029	6215-c3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2157	BE0030	6302-2z	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2158	BE0031	6303-2z	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2160	BE0033	6305-2Z	39	Nos	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2162	BE0035	6307 -zz/ 2Z C3	39	Nos	\N	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2166	BE0039	6311-2z	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2167	BE0040	6312- H-SN-C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2168	BE0041	6312-2z -L140 /6310-2Z-C3	39	Nos	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2169	BE0042	6313-2Z -L140- C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2170	BE0043	6313-c3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2171	BE0044	6314-H-SN /6314-C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2172	BE0045	6315-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2173	BE0046	6316-C3	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2174	BE0047	6318-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2175	BE0048	6319-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2176	BE0049	6321-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2177	BE0050	6322-C3	39	Nos	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2178	BE0051	6404-A	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2179	BE0052	6405	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2180	BE0053	6406	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2181	BE0054	6407	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2182	BE0055	7206-B-XL -TVP	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2183	BE0056	7313 BEP -XL TVP	39	Nos	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2184	BE0057	7314 BEP	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2185	BE0058	7319 B-XL-MP	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2186	BE0059	22215-E-XL-C3	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2187	BE0060	22216 E1-XL	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2188	BE0061	22218 E1-XL-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2135	BE0008	6008- 2Z	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2138	BE0011	6012	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2141	BE0014	6203-C-HRS 2Z	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2142	BE0015	6204 -C HRS	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2145	BE0018	6206-2z	39	Nos	\N	2.000	2.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2148	BE0021	6208-2Z- C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2149	BE0022	6209-zz	39	Nos	\N	1.000	1.000	0.000	13.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2144	BE0017	6205-zz /2RS	39	Nos	\N	1.000	1.000	0.000	6.000	280.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2150	BE0023	6210	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2151	BE0024	6210- 2z	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2159	BE0032	6304-2Z /2RS1	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2161	BE0034	6306-2z /L207-C3	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2163	BE0036	6308-zz	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2165	BE0038	6310-2z -C3/6310-2Z/R	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2189	BE0062	22219 -E1-XL	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2190	BE0063	22220 E1-XL	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2193	BE0066	22222 E1 XL	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2194	BE0067	22222 E1-XL-K	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2195	BE0068	22224 E1-XL	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2196	BE0069	22228 E1-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2197	BE0070	22311 CW 33C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2198	BE0071	22312 MBW33 C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2199	BE0072	22314 -E1-XL	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2200	BE0073	22314 KW33 M	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2201	BE0074	22315-E1-XL-K-C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2204	BE0077	22318-E1-XL-K-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2205	BE0078	22319 -E	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2206	BE0079	22320- E1-XL-C3	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2207	BE0080	22320 E1-XL-K	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2208	BE0081	22322 E1-XL - C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2209	BE0082	22322 E1-XL - K C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2211	BE0084	22324-E1-XL	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2213	BE0086	2312 TVH C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2214	BE0087	23124 E1AM	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2215	BE0088	23220 E1 AM	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2216	BE0089	23222 E1 A-XL-K-M-C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2217	BE0090	23226 E1 AM	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2218	BE0091	23234 BS-K -MB-C3	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2219	BE0092	23234 E1 A-K-M	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2220	BE0093	23244 -BE-XL-K	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2221	BE0094	23264 -BEA-XL-K- MB1-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2224	BE0097	29240 E MB	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2225	BE0098	29418 -E1-XL-C3	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2226	BE0099	29420 E1-XL	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2227	BE0100	30204 -A	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2228	BE0101	30206 -A	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2229	BE0102	30216-A	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2230	BE0103	30305 CYC	39	Nos	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2231	BE0104	30306 -A	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2232	BE0105	30310 A	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2234	BE0107	31316	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2235	BE0108	32212- A J2 /Q	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2236	BE0109	32213-A	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2237	BE0110	32214-AM	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2238	BE0111	32216- A-AM	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2239	BE0112	32305 J2 /Q	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2240	BE0113	32310-H	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2241	BE0114	32313-H	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2242	BE0115	51105	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2243	BE0116	51211	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2244	BE0117	51212	39	Nos	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2246	BE0119	F-573288.24032 -S-K30-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2247	BE0120	FC 210	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2248	BE0121	GEM 020	39	Nos	\N	2.000	2.000	0.000	8.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2249	BE0122	HB 209	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2250	BE0123	N 407 EM	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2251	BE0124	NA 4905	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2252	BE0125	NJ 303 E- XL -TVP2	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2253	BE0126	NJ205	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2254	BE0127	NJ313 -E-XL-M1-QP-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2255	BE0128	NU 2320 E-XL -M1QP-C3	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2192	BE0065	22222 E1 AM C3	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2210	BE0083	22322 E1-XL	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2203	BE0076	22316-E1-XL	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2202	BE0075	51109	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2256	BE0129	NU 2320 INNER	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2212	BE0085	23044 BE-XL-K	39	Nos	\N	2.000	2.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2222	BE0095	24032-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2233	BE0106	30312 A	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2245	BE0118	F-573288.24032 -S-	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2258	BE0131	NU 2322 EM ZVL	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2259	BE0132	NU 315 E-XL -M1QP-C3	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2261	BE0134	NU 322 E1-XL M1QP -C3	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2262	BE0135	NU2217 -E-XL-M1-QP	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2263	BE0136	NU2220 E1 -AM-C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2264	BE0137	NU307	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2265	BE0138	NU309-XL -C3	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2266	BE0139	NU310 E-XL	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2267	BE0140	NU313 -E-XL M1 -QP-C3	39	Nos	\N	2.000	2.000	0.000	9.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2268	BE0141	NU319 E-XL -M1-QP -C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2269	BE0142	NU320 E-XL-M1-QP-C3 -2 old side	39	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2270	BE0143	NUP 313 E TVP2	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2272	BE0145	SYJ 513	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2273	BE0146	SYJ 517	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2274	BE0147	UC 210	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2275	BE0148	UC 211 -23	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2276	BE0149	UC 211 -32	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2277	BE0150	UC 215	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2278	BE0151	UC206	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2279	BE0152	UC208	39	Nos	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2280	BE0153	UCF 209 -J7	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2281	BE0154	UCF 210 (mm) /UCF 210 -K	39	Nos	\N	1.000	1.000	0.000	7.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2282	BE0155	UCF 211 D1	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2283	BE0156	UCF 211 J7-32	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2284	BE0157	UCF-206	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2285	BE0158	UCFC 210	39	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2286	BE0159	UCFC-208 -J7	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2287	BE0160	UCFL 208	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2288	BE0161	UCP 206- J7 -NTN	39	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2289	BE0162	UCP 207	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2290	BE0163	UCP 208-J5	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2291	BE0164	UCP 209	39	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2292	BE0165	UCP 210	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2293	BE0166	UCP 211	39	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2294	BE0167	UCP 212 D1	39	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2295	BE0168	UCP 213	39	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2297	BE0170	ZVL 23044 KW33MC3	39	Nos	\N	1.000	1.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2260	BE0133	NU 317 -M1QP -C3	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2334	MPS0008	VSL 04 SLEEVE	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2335	MPS0009	TURBO 900 SLEEVE	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2337	MPS0011	TPR 80 /320	42	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2339	MPS0013	AAPGC 42/150	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2341	MPS0015	TPR 150/320	42	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2343	MPS0017	SPR + T125/260	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2344	MPS0018	SPR + T125 /330	42	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2345	MPS0019	CPC 50 /320	42	Nos	\N	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2347	MPS0021	AGITATOR SLEEVES	42	Nos	\N	1.000	1.000	0.000	5.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2348	MPS0022	AFT PRESSURE SCREEN SLEEVE (OD90XID70XLE229/230)	42	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2351	MPS0025	PULPER SLEEVE	42	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2352	MPS0026	BOTTOM FAN PUMP SLEEVE	42	Nos	\N	1.000	1.000	0.000	4.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2333	MPS0007	ETP SLEEVE	42	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2336	MPS0010	TPR 125/400+C (3VO)	42	Nos	\N	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2338	MPS0012	TPR 250+400+C	42	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2223	BE0096	24184 CCK/W33/K M HD	39	Nos	\N	1.000	1.000	0.000	1.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2654	BE0171	626 BEARING	39	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2271	BE0144	QJ 317 -N2-MPA-C3	39	Nos	\N	1.000	1.000	0.000	1.000	26175.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2296	BE0169	UCP215	39	Nos	\N	1.000	1.000	0.000	5.000	7710.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2257	BE0130	NU 2322 E1-XL	39	Nos	\N	1.000	1.000	0.000	2.000	31500.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2655	BE0172	608 BEARING	39	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2340	MPS0014	TURBO SLEEVE 400	42	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2346	MPS0020	VSL -08 SLEEVE	42	Nos	\N	1.000	1.000	0.000	3.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2353	MPS0027	HOLY ROLL SLEEVE	42	Nos	\N	1.000	1.000	0.000	6.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2840	SSR0001	SUPERON S.S (3.15X350 MM) PKT	44	Pkt	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2841	SSR0002	SUPERON S.S (2.5X350 MM) PKT	44	Pkt	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2842	MSR0001	MANGLAM M.S (2.50X350 MM) PKT	44	Pkt	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2843	MSR0002	MANGLAM M.S (3.15X350 MM) PKT	44	Pkt	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2844	MSR0003	MANDLAM M.S (4.00X450 MM) PKT	44	Pkt	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2845	TWE0001	TUNGSTEN WELDING ELECTRODES 2.44MM	44	Pkt	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2846	TWE0002	TUNGSTEN WELDING ELECTRODES 3MM	44	Pkt	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2854	GGW0002	7" GRINDING WHEEL	45	Nos	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2855	GEP0001	EMERY PAPER 36 GRIT -75 MM	45	Nos	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2856	GEP0002	EMERY PAPER 60 GRIT -75 MM	45	Nos	\N	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2857	GRK0001	REWINDER KNIVES	45	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2858	GRC0001	REWINDER CUTTER	45	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2709	MV0005	C.I BODY S.S DISC BUTTERFLY VALVE 2.5"	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2710	MV0006	C.I BODY S.S DISC BUTTERFLY VALVE 3"	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2711	MV0007	C.I BODY S.S DISC BUTTERFLY VALVE 4"	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2712	MV0008	C.I BODY S.S DISC BUTTERFLY VALVE 6"	46	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2713	MV0009	C.I BODY S.S DISC BUTTERFLY VALVE 8"	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2714	MV0010	C.I BODY S.S DISC BUTTERFLY VALVE 12"	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2715	MV0011	S.S 304 BALL VALVE WITH FLANGE 1'	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2716	MV0012	S.S 304 BALL VALVE WITH FLANGE 1' 1/2" (40 MM)	46	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2717	MV0013	S.S 304 BALL VALVE WITH FLANGE 2'	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2718	MV0014	S.S 304 BALL VALVE WITH FLANGE 2' 1/2"	46	Nos	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2719	MV0015	S.S BALL VALVE WITH 4" (100MM)	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2720	MV0016	PLATE VALVE 3" (KNIFE GATE VALVE)	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2721	MV0017	PLATE VALVE 4" (KNIFE GATE VALVE)	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2722	MV0018	PLATE VALVE 5" (KNIFE GATE VALVE)	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2723	MV0019	PLATE VALVE 6" (KNIFE GATE VALVE)	46	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2724	MV0020	PLATE VALVE 8" (KNIFE GATE VALVE)	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2725	MV0021	S.S NEEDLE VALVE 1/2"	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2726	MV0022	S.S BALL VALVE 8/10MM	46	Nos	\N	0.000	0.000	0.000	18.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2727	MV0023	S.S BALL VALVE 3/8"	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2728	MV0024	S.S BALL VALVE 6MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2729	MV0025	S.S BALL VALVE 15MM	46	Nos	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2730	MV0026	S.S BALL VALVE 20MM (3/4)	46	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2731	MV0027	S.S BALL VALVE 25MM / C.I BALL VALVE	46	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2732	MV0028	S.S BALL VALVE 32MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2733	MV0029	S.S BALL VALVE 40MM	46	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2734	MV0030	S.S BALL VALVE 50MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2735	MV0031	2 1/2" PISTON VALVE	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2736	MV0032	S.S DISC CHECK VALVE 1 1/2"	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2737	MV0033	C.I WAFER CHECK VALVE -4"	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2738	MV0034	4" FOOT VALVE	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2739	MV0035	1" BLOW DOWN VALVE	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2740	MV0036	1.5" BLOW DOWN VALVE	46	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2741	MV0037	3' GLOBE VALVE / NRV (BOILER)	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2742	MNRV001	SS PLATE NRV 25 MM	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2743	MNRV002	SS PLATE NRV 40 MM	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2744	MNRV003	SS PLATE NRV 50 MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2745	MNRV004	SS PLATE NRV 80 MM	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2746	MNRV005	SS PLATE NRV 100 MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2747	MNRV006	SS PLATE NRV 150 MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2748	MNRV007	CI PLATE NRV 65 MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2749	MNRV008	CI PLATE NRV 80 MM	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2750	MNRV009	CI PLATE NRV 100 MM	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2350	MPS0024	SPR +T 125/320 SLEEVE/SWP	42	Nos	\N	1.000	1.000	0.000	2.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2708	MV0004	C.I BODY S.S DISC BUTTERFLY VALVE 2"	46	Nos	\N	0.000	0.000	0.000	3.000	25.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2707	MV0003	1" PISTION VALVES/BELLOW SEAL GLOBE VALVE	46	Nos	\N	-0.002	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2751	MV0038	S.S DISC CHECK VALVE 25 MM	46	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2752	MV0039	S.S DISC CHECK VALVE 40 MM	46	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2753	MV0040	S.S DISC CHECK VALVE 50 MM	46	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2754	MV0041	S.S DISC CHECK VALVE 80 MM	46	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2755	MV0042	S.S DISC CHECK VALVE 100 MM	46	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2756	MV0043	3" PLATE VALVE	46	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2769	MCNW0013	CHECKNUT WASHER MB 44	47	Nos	\N	0.000	0.000	0.000	23.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2770	MCNW0014	CHECKNUT LOCK KM -09	47	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2771	MCNW0015	CHECKNUT LOCK KM -12	47	Nos	\N	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2772	MCNW0016	CHECKNUT LOCK KM -13	47	Nos	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2773	MCNW0017	CHECKNUT LOCK KM -14	47	Nos	\N	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2774	MCNW0018	CHECKNUT LOCK KM -16	47	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2775	MCNW0019	CHECKNUT LOCK KM -18	47	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2776	MCNW0020	CHECKNUT LOCK KM -19	47	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2777	MCNW0021	CHECKNUT LOCK KM -20	47	Nos	\N	0.000	0.000	0.000	8.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2778	MCNW0022	CHECKNUT LOCK KM -21	47	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2779	MCNW0023	CHECKNUT LOCK KM -22	47	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2780	MCNW0024	CHECKNUT LOCK KM -24	47	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2781	MCNW0025	CHECKNUT LOCK KM -32	47	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2782	MCNW0026	CHECKNUT LOCK KM -315	47	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2794	MGU0012	Temperature Guage 0 to 200 C  (BAUMER MAKE)	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2795	MGU0013	Temperature Guage 0 to 300 C (P163.59-00160)-150MM-1/2" BSP	48	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2814	MIMP018	APPC 42 /150 WEAR PLATE -1SET	49	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2815	MIMP019	CPC 125/320 IMPELLER	49	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2816	MIMP020	TURBO 400 IMPELLER	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2817	MIMP021	TURBO 400 SCREEN PLATE	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2819	MIMP023	CPC 100/320 CAP OUTER ,	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2820	MIMP024	CPC 100/320 CAP INNER	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2821	MIMP025	SPR +T 125/330 CAP OUTER SAM TURB ( PART NO: 37.21 )	49	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2822	MIMP026	SPR +T 125/330 CAP INNER	49	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2823	MIMS001	CPC 100/320 SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2824	MIMS002	SPR+T 125/260 SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2825	MIMS003	SPR+T 125/330 SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2826	MIMS004	SPR + T 125 /400 (4 VO) SHAFT	49	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2827	MIMS005	WP 80/260 SHAFT	49	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2828	MIMS006	CPC 150 -320 -SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2829	MIMS007	CPC 65-260 (EN19) -SHAFT	49	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2830	MIMS008	TPR 80/320 SHAFT	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3038	MSSC0001	S.S 1/2" COLLER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3039	MSSC0002	S.S 1" COLLER	50	Nos	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3040	MSSC0003	S.S 1.5" COLLER	50	Nos	\N	0.000	0.000	0.000	17.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3041	MSSC0004	S.S 2" COLLER	50	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3042	MSSC0005	S.S 2.5 " COLLER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3043	MSSC0006	S.S 3 " COLLER	50	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3044	MSSC0007	S.S 4 " COLLER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3045	MSSC0008	S.S 5" COLLER	50	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3046	MSSC0009	S.S 6" COLLER	50	Nos	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3047	MSSC0010	S.S 8 " COLLER	50	Nos	\N	0.000	0.000	0.000	18.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3048	MSSC0011	S.S 10" COLLER	50	Nos	\N	0.000	0.000	0.000	13.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3049	MSSC0012	S.S 12" COLLER	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3050	MSSC0013	S.S 14 " COLLER	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3051	MSSC0014	S.S 16" COLLER	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3052	MSSR0001	S.S 2" X 1" REDUCER	50	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3053	MSSR0002	S.S 1.5" X 2 " REDUCER	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3054	MSSR0003	S.S 2 1/2 " X 3" REDUCER	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3055	MSSR0004	S.S 2" X 4" REDUCER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3056	MSSR0005	S.S 2 1/2" X 4 REDUCER	50	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3057	MSSR0006	S.S 3 " X 4 " REDUCER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3058	MSSR0007	S.S 5" X 6" REDUCER	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3060	MSSR0009	S.S 10" X 4" REDUCER	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3061	MSSR0010	S.S 12" X 3" REDUCER	50	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3062	MSSR0011	S.S 14" X 4" REDUCER	50	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2818	MIMP022	CPC 100/320 BEARING BED /HOUSING	49	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3063	MSSBE001	S.S BEND 1/2"	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3064	MSSBE002	S.S 1" BEND	50	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3065	MSSBE003	S.S 1.25" BEND	50	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3066	MSSBE004	S.S 1 1/2 " BEND	50	Nos	\N	0.000	0.000	0.000	32.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3067	MSSBE005	S.S 2" BEND	50	Nos	\N	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3068	MSSBE006	S.S 2.5" BEND	50	Nos	\N	0.000	0.000	0.000	12.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3069	MSSBE007	S.S 3" BEND	50	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3070	MSSBE008	S.S 4" BEND	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3071	MSSBE009	S.S 5" BEND	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3072	MSSBE010	S.S 6" BEND	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3073	MSSBE011	S.S 8" BEND	50	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3074	MSSBE012	S.S 10" BEND	50	Nos	\N	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3075	MSSBE013	S.S 14" BEND	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3076	MMSF0001	M.S FLANGE 1/2"	50	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3077	MMSF0002	M.S FLANGE 1 "	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3078	MMSF0003	M.S FLANGE 1 1/2 " or 1.5 "	50	Nos	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3079	MMSF0004	M.S FLANGE 2"	50	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3080	MMSF0005	M.S FLANGE 2.5"	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3081	MMSF0006	M.S FLANGE 3 "	50	Nos	\N	0.000	0.000	0.000	16.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3082	MMSF0007	M.S FLANGE 4"	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3083	MMSF0008	M.S FLANGE 5"	50	Nos	\N	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3084	MMSF0009	M.S FLANGE 6"	50	Nos	\N	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3085	MMSF0010	M.S FLANGE 8"	50	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3086	MMSF0011	M.S FLANGE 10"	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3087	MMSF0012	M.S FLANGE 12"	50	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3088	MMSF0013	M.S FLANGE 14"	50	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3089	MMSF0014	M.S FLANGE 16"	50	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3090	MSTF0001	STEAMLINE 3" FLANGES	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3091	MSTF0002	STEAMLINE 3" FLANGES	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3092	MSPN001	1/4" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	6.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3093	MSPN002	1/2" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	28.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3094	MSPN003	3/8" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3095	MSPN004	1" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	31.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3096	MSPN005	1.5" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3097	MSPN006	2" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	10.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3098	MSPN007	2.5" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	2.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3099	MSPN008	3" S.S NIPPLE	50	Nos	\N	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3100	MSSS001	1/4" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	3.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3101	MSSS002	1" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3102	MSSS003	1/2" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	46.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3103	MSSS004	1 1/2" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	9.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3105	MSSS006	3/8" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	4.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3106	MSSHX001	1" SS HEX NIPPLE	50	Nos	\N	0.000	0.000	0.000	47.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3107	MSSHX002	1/4" SS HEX NIPPLE	50	Nos	\N	0.000	0.000	0.000	7.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3108	MSSHX003	1/2" SS HEX NIPPLE	50	Nos	\N	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3109	MSSHX004	1 1/2" SS HEX NIPPLE	50	Nos	\N	0.000	0.000	0.000	27.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3110	MSSHX005	3/4" SS HEX NIPPLE	50	Nos	\N	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2956	GMSB0001	1/2"X2" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	500.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2957	GMSB0002	1/2"X4" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	45.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2958	GMSB0003	1/2"X3" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	320.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2959	GMSB0004	1/2"X6" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2960	GMSB0005	3/8"X2" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2961	GMSB0006	3/8"X2 1/2" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2962	GMSB0007	3/8"X3" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	300.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2963	GMSB0008	3/4"X2" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	250.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2964	GMSB0009	3/4"X5" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2965	GMSB0010	5/8"X2" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	150.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2966	GMSB0011	5/8"X3" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2967	GMSB0012	5/8"X4" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	170.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2968	GMSB0013	5/8"X5" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2969	GMSB0014	5/8"X6" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2970	GMSB0015	5/8"X7" MS BOLT & NUT, WASHER	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2972	GHTBN0001	10mmX75mm HTAC	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3104	MSSS005	2" S.S SOCKET	50	Nos	\N	0.000	0.000	0.000	65.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2973	GHTBN0002	12mmX40/50mm HTAC	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2974	GHTBN0003	14mmX50/65mm HTAC	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2975	GHTBN0004	16mmX25/40/75mm HTAC	55	Nos	7318-1500	0.000	0.000	0.000	0.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2976	GSSAB0001	12mmX2 1/2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	29.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2977	GSSAB0002	16mmX1 1/2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	24.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2978	GSSAB0003	16mm X 2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	19.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2979	GSSAB0004	16mm X 2 1/2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2980	GSSAB0005	3/8" X 2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	87.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2981	GSSAB0006	10mm X 2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	28.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2982	GSSAB0007	10mm X 2 1/2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	21.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2983	GSSAB0008	8mm X 2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	36.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2984	GSSAB0009	8mm X 2 1/2" SS ALLEN BOLT	55	Nos	7318	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2985	GSSCAS0001	12mm X 1" SS CSK ALLEN SCREW	55	Nos	7318	0.000	0.000	0.000	11.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2986	GSSCAS0002	10mm X 1/2" SS CSK ALLEN SCREW	55	Nos	7318	0.000	0.000	0.000	72.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2987	GSSCAS0003	12mm X 3/4" SS CSK ALLEN SCREW	55	Nos	7318	0.000	0.000	0.000	63.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2988	GSSCAS0004	3/8" X 2 1/2" SS CSK ALLEN SCREW	55	Nos	7318	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2989	GSSCS0001	5/16" X 2 1/2" SS CSK SCREW	55	Nos	7317-1400	0.000	0.000	0.000	75.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2991	GSSCS0003	6MM X 25MM SS CSK SCREW	55	Nos	7317-1400	0.000	0.000	0.000	200.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2993	GSSBN0001	8mm X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	43.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2994	GSSBN0002	1/4" X 3" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	64.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2995	GSSBN0003	3/8" X 3" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	56.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2996	GSSBN0004	10mm X 3" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	97.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2997	GSSBN0005	14mm X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2998	GSSBN0006	12mm X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	60.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2999	GSSBN0007	1/2" X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	68.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3000	GSSBN0008	16mm  X 1 1/2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3001	GSSBN0009	1/2" X 4" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	100.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3002	GSSBN0010	5/8" X 5" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3003	GSSBN0011	3/4" X 4" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	20.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3004	GSSBN0012	1" X 1/2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	15.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3005	GSSBN0013	1" X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	5.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3006	GSSBN0014	3/8" X 4" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	48.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3007	GSSBN0015	5/8" X 4" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3008	GSSBN0016	16MM X 3" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3009	GSSBN0017	1" X 4" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	30.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3010	GSSBN0018	3/4" X 2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3011	GSSBN0019	3/4" X 3" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	25.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3012	GSSBN0020	3/8" X 2 1/2" SS BOLT & NUT	55	Nos	7318-1500	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2990	GSSCS0002	5/16" X 1 1/4" SS CSK SCREW	55	Nos	7317-1400	0.000	0.000	0.000	150.000	9.70	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2992	GSSCS0004	8MM X 50MM SS CSK SCREW	55	Nos	7317-1400	0.000	0.000	0.000	50.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+4448	MAT-PULP-505444	Bleached Hardwood Kraft Pulp Grade A-505444	28	MT	\N	4.000	2.000	0.000	5.000	55000.00	f	2026-08-14 01:51:45.613925	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+4451	MAT-PULP-605170	Bleached Hardwood Kraft Pulp Grade A-605170	28	MT	\N	4.000	2.000	0.000	15.000	54000.00	f	2026-08-14 01:53:25.225077	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+4455	MAT-PULP-635458	Bleached Hardwood Kraft Pulp Grade A-635458	28	MT	\N	4.000	2.000	0.000	12.500	54000.00	f	2026-08-14 02:10:35.705363	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+4454	MAT-PULP-639817	Bleached Hardwood Kraft Pulp Grade A-639817	28	MT	\N	4.000	2.000	0.000	12.500	54000.00	f	2026-08-14 01:53:59.918981	t	365	\N	\N	\N	\N	\N	\N	0.00	\N	YARD-PULP-1
+3059	MSSR0008	S.S 6 X 4 REDUCER	50	Nos	\N	0.000	0.000	0.000	-1.000	0.00	t	2026-08-09 11:48:09.915991	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+3364	COM0001	OIL FILTER CPB-40	53	Nos	\N	0.000	0.000	0.000	700.000	0.00	t	2026-08-13 13:20:46.101235	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	\N
+2305	PF0004	NEW PRESS FELTS BOTTOM( 15.1 X 3.5 M) 1650 ,voith 12507946, (89.55) 12759027	29	Nos	5911-9010	1.000	1.000	0.000	2.000	261152.62	t	2026-07-15 18:39:14.282141	t	60	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2303	URG001	1 ST UNIRUN GROUP VOITH  41 X 3.5 (12595227)	29	NOS	5911-9010	1.000	1.000	0.000	0.000	0.00	t	2026-07-15 18:39:14.282141	t	365	\N	A	\N	\N	\N	\N	0.00	\N	Rack 2, Box 4
+2299	BW0001	BOTTOM WIRE (44.953 X 3.65)- (1.5 LAYER),W&F -60216	29	Nos	5911-2000	1.000	1.000	0.000	1.000	507516.00	t	2026-07-15 18:39:14.282141	t	90	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2300	PF0001	PRESS FELTS (14.1 X 3.5 M) 1650 GSM V3 (81.43 KGS) ,12579028	29	Nos	5911-9010	1.000	1.000	0.000	1.000	243858.71	t	2026-07-15 18:39:14.282141	t	60	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2301	DS0001	DRYER SCREEN (29 X 3.5 M) -SHALIMAR-18164	29	Nos	5911-2000	1.000	1.000	0.000	1.000	158847.00	t	2026-07-15 18:39:14.282141	t	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2302	DS0002	DRYER SCREEN (32 X 3.5 M) SHALIMAR-18163 ,18165	29	Nos	5911-2000	1.000	1.000	0.000	2.000	175280.00	t	2026-07-15 18:39:14.282141	t	365	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2304	PF0003	NEW PRESS FELTS TOP ( 15.1 X 3.5 M) 1450 , WT: 79.28 (12559803, 9026)	29	Nos	5911-9010	1.000	1.000	0.000	2.000	230430.49	t	2026-07-15 18:39:14.282141	t	60	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2298	TW0001	TOP WIRE (20.250 X 3.65 M) SHALIMAR -48497, W&F -	29	Nos	5911-2000	1.000	1.000	0.000	1.000	235171.00	t	2026-07-15 18:39:14.282141	t	90	\N	A	\N	\N	\N	\N	0.00	\N	\N
+2059	OS0008	25-45-10	40	Nos	4016 9330	2.000	2.000	0.000	10.000	0.00	t	2026-07-15 18:39:14.282141	f	365	\N	\N	\N	\N	\N	\N	0.00	\N	2
 \.
 
 
 --
--- TOC entry 6599 (class 0 OID 25264)
--- Dependencies: 331
 -- Data for Name: motor_electrical_specs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8468,42 +8085,39 @@ COPY public.motor_electrical_specs (id, sr_no, motor_name, kw, hp, rpm, full_amp
 
 
 --
--- TOC entry 6601 (class 0 OID 25272)
--- Dependencies: 333
 -- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.notifications (id, user_id, type, title, message, ref_table, ref_id, is_read, created_at) FROM stdin;
 1	1	critical	Critical bearing: Bottom Wire Tension Roll-3	Bottom Wire Tension Roll-3 flagged Critical (F/S) during Night shift bearing check.	equipment_inspection	4	f	2026-07-10 19:19:37.154374+05:30
+2	2	critical	Critical bearing: Bottom Wire Tension Roll-3	Bottom Wire Tension Roll-3 flagged Critical (F/S) during Night shift bearing check.	equipment_inspection	4	f	2026-07-10 19:19:37.179892+05:30
 3	10	critical	Critical bearing: Bottom Wire Tension Roll-3	Bottom Wire Tension Roll-3 flagged Critical (F/S) during Night shift bearing check.	equipment_inspection	4	f	2026-07-10 19:19:37.184042+05:30
 4	1	info	GRN GRN-20260813-1 received	GRN GRN-20260813-1 against PO PO-20260813-0003 received & stock updated. Ready for AP bill processing.	grn	3	f	2026-08-14 01:53:12.694951+05:30
+5	2	info	GRN GRN-20260813-1 received	GRN GRN-20260813-1 against PO PO-20260813-0003 received & stock updated. Ready for AP bill processing.	grn	3	f	2026-08-14 01:53:12.694951+05:30
 6	17	info	GRN GRN-20260813-1 received	GRN GRN-20260813-1 against PO PO-20260813-0003 received & stock updated. Ready for AP bill processing.	grn	3	f	2026-08-14 01:53:12.694951+05:30
 7	1	info	GRN GRN-20260813-2 received	GRN GRN-20260813-2 against PO PO-20260813-0004 received & stock updated. Ready for AP bill processing.	grn	4	f	2026-08-14 01:53:25.319764+05:30
+8	2	info	GRN GRN-20260813-2 received	GRN GRN-20260813-2 against PO PO-20260813-0004 received & stock updated. Ready for AP bill processing.	grn	4	f	2026-08-14 01:53:25.319764+05:30
 9	17	info	GRN GRN-20260813-2 received	GRN GRN-20260813-2 against PO PO-20260813-0004 received & stock updated. Ready for AP bill processing.	grn	4	f	2026-08-14 01:53:25.319764+05:30
 10	1	info	GRN GRN-20260813-3 received	GRN GRN-20260813-3 against PO PO-20260813-0005 received & stock updated. Ready for AP bill processing.	grn	5	f	2026-08-14 01:53:33.935166+05:30
+11	2	info	GRN GRN-20260813-3 received	GRN GRN-20260813-3 against PO PO-20260813-0005 received & stock updated. Ready for AP bill processing.	grn	5	f	2026-08-14 01:53:33.935166+05:30
 12	17	info	GRN GRN-20260813-3 received	GRN GRN-20260813-3 against PO PO-20260813-0005 received & stock updated. Ready for AP bill processing.	grn	5	f	2026-08-14 01:53:33.935166+05:30
 13	1	info	GRN GRN-20260813-4 received	GRN GRN-20260813-4 against PO PO-20260813-0006 received & stock updated. Ready for AP bill processing.	grn	6	f	2026-08-14 01:53:40.866548+05:30
+14	2	info	GRN GRN-20260813-4 received	GRN GRN-20260813-4 against PO PO-20260813-0006 received & stock updated. Ready for AP bill processing.	grn	6	f	2026-08-14 01:53:40.866548+05:30
 15	17	info	GRN GRN-20260813-4 received	GRN GRN-20260813-4 against PO PO-20260813-0006 received & stock updated. Ready for AP bill processing.	grn	6	f	2026-08-14 01:53:40.866548+05:30
 16	1	info	GRN GRN-20260813-5 received	GRN GRN-20260813-5 against PO PO-20260813-0007 received & stock updated. Ready for AP bill processing.	grn	7	f	2026-08-14 01:54:00.067303+05:30
+17	2	info	GRN GRN-20260813-5 received	GRN GRN-20260813-5 against PO PO-20260813-0007 received & stock updated. Ready for AP bill processing.	grn	7	f	2026-08-14 01:54:00.067303+05:30
 18	17	info	GRN GRN-20260813-5 received	GRN GRN-20260813-5 against PO PO-20260813-0007 received & stock updated. Ready for AP bill processing.	grn	7	f	2026-08-14 01:54:00.067303+05:30
 19	1	info	GRN GRN-20260813-6 received	GRN GRN-20260813-6 against PO PO-20260813-0008 received & stock updated. Ready for AP bill processing.	grn	8	f	2026-08-14 02:10:35.847788+05:30
+20	2	info	GRN GRN-20260813-6 received	GRN GRN-20260813-6 against PO PO-20260813-0008 received & stock updated. Ready for AP bill processing.	grn	8	f	2026-08-14 02:10:35.847788+05:30
 21	17	info	GRN GRN-20260813-6 received	GRN GRN-20260813-6 against PO PO-20260813-0008 received & stock updated. Ready for AP bill processing.	grn	8	f	2026-08-14 02:10:35.847788+05:30
-2	2	critical	Critical bearing: Bottom Wire Tension Roll-3	Bottom Wire Tension Roll-3 flagged Critical (F/S) during Night shift bearing check.	equipment_inspection	4	t	2026-07-10 19:19:37.179892+05:30
-5	2	info	GRN GRN-20260813-1 received	GRN GRN-20260813-1 against PO PO-20260813-0003 received & stock updated. Ready for AP bill processing.	grn	3	t	2026-08-14 01:53:12.694951+05:30
-8	2	info	GRN GRN-20260813-2 received	GRN GRN-20260813-2 against PO PO-20260813-0004 received & stock updated. Ready for AP bill processing.	grn	4	t	2026-08-14 01:53:25.319764+05:30
-14	2	info	GRN GRN-20260813-4 received	GRN GRN-20260813-4 against PO PO-20260813-0006 received & stock updated. Ready for AP bill processing.	grn	6	t	2026-08-14 01:53:40.866548+05:30
-17	2	info	GRN GRN-20260813-5 received	GRN GRN-20260813-5 against PO PO-20260813-0007 received & stock updated. Ready for AP bill processing.	grn	7	t	2026-08-14 01:54:00.067303+05:30
-20	2	info	GRN GRN-20260813-6 received	GRN GRN-20260813-6 against PO PO-20260813-0008 received & stock updated. Ready for AP bill processing.	grn	8	t	2026-08-14 02:10:35.847788+05:30
-11	2	info	GRN GRN-20260813-3 received	GRN GRN-20260813-3 against PO PO-20260813-0005 received & stock updated. Ready for AP bill processing.	grn	5	t	2026-08-14 01:53:33.935166+05:30
-22	1	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-15 17:09:23.219637+05:30
-23	12	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-15 17:09:23.222116+05:30
-24	2	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-15 17:09:23.222978+05:30
+22	1	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-16 19:16:38.351325+05:30
+23	12	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-16 19:16:38.359901+05:30
+24	2	warning	Pending Ack: IND-20260813-0014	1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.	indents	27	f	2026-08-16 19:16:38.362368+05:30
+28	17	info	New Vendor Bill BILL-20260816-0001	Vendor Bill BILL-20260816-0001 (Invoice CHAINTEST-INV-01, ₹637200) booked and awaiting approval/payment.	vendor_bills	5	f	2026-08-17 00:10:27.986588+05:30
 \.
 
 
 --
--- TOC entry 6603 (class 0 OID 25284)
--- Dependencies: 335
 -- Data for Name: onboarding_checklist; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8512,8 +8126,6 @@ COPY public.onboarding_checklist (id, employee_id, task_id, due_date, status, co
 
 
 --
--- TOC entry 6605 (class 0 OID 25296)
--- Dependencies: 337
 -- Data for Name: onboarding_tasks_master; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8562,8 +8174,6 @@ COPY public.onboarding_tasks_master (id, task_title, responsible, dept_code, due
 
 
 --
--- TOC entry 6607 (class 0 OID 25306)
--- Dependencies: 339
 -- Data for Name: packing_records; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8572,8 +8182,6 @@ COPY public.packing_records (id, pack_number, date, reel_id, packing_type, wrap_
 
 
 --
--- TOC entry 6609 (class 0 OID 25317)
--- Dependencies: 341
 -- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8584,8 +8192,6 @@ COPY public.payments (id, payment_number, sales_order_id, amount, payment_date, 
 
 
 --
--- TOC entry 6611 (class 0 OID 25333)
--- Dependencies: 343
 -- Data for Name: payroll_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8594,8 +8200,6 @@ COPY public.payroll_details (id, payroll_run_id, employee_id, salary_structure_i
 
 
 --
--- TOC entry 6613 (class 0 OID 25366)
--- Dependencies: 345
 -- Data for Name: payroll_runs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8604,8 +8208,6 @@ COPY public.payroll_runs (id, month, status, total_employees, total_gross, total
 
 
 --
--- TOC entry 6615 (class 0 OID 25377)
--- Dependencies: 347
 -- Data for Name: payrolls; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8614,8 +8216,6 @@ COPY public.payrolls (id, employee_id, month, present_days, basic_salary, allowa
 
 
 --
--- TOC entry 6617 (class 0 OID 25390)
--- Dependencies: 349
 -- Data for Name: plant_sections; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8646,8 +8246,6 @@ COPY public.plant_sections (id, section_code, name, icon, description, sort_orde
 
 
 --
--- TOC entry 6619 (class 0 OID 25402)
--- Dependencies: 351
 -- Data for Name: po_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8660,21 +8258,11 @@ COPY public.po_items (id, po_id, material_id, qty, received_qty, uom, unit_price
 18	19	4453	10.000	10.000	MT	54000.00	18.00	540000.00
 19	20	4454	10.000	10.000	MT	54000.00	18.00	540000.00
 20	21	4455	10.000	10.000	MT	54000.00	18.00	540000.00
-21	22	2129	1.000	0.000	Nos	1200.00	18.00	1200.00
-22	23	2142	10.000	0.000	Nos	312.00	18.00	3120.00
-23	24	3488	10.000	10.000	NOS	250.00	18.00	2950.00
-24	24	3496	5.000	5.000	NOS	500.00	18.00	2950.00
-25	25	3488	10.000	10.000	NOS	250.00	18.00	2950.00
-26	25	3496	5.000	5.000	NOS	500.00	18.00	2950.00
-27	26	2853	1.000	0.000	NOS	150.00	18.00	150.00
-28	27	3488	10.000	10.000	NOS	250.00	18.00	2950.00
-29	27	3496	5.000	5.000	NOS	500.00	18.00	2950.00
+21	22	2131	3.000	0.000	Nos	1200.00	18.00	3600.00
 \.
 
 
 --
--- TOC entry 6621 (class 0 OID 25408)
--- Dependencies: 353
 -- Data for Name: production_summary; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8683,8 +8271,6 @@ COPY public.production_summary (id, date, shift_type, machine_id, total_reels, t
 
 
 --
--- TOC entry 6623 (class 0 OID 25423)
--- Dependencies: 355
 -- Data for Name: purchase_orders; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8699,18 +8285,21 @@ COPY public.purchase_orders (id, po_number, date, vendor_id, indent_id, delivery
 19	PO-20260813-0006	2026-08-14	15	24	2026-08-27	30 Days Net	Received	540000.00	97200.00	637200.00	1	1	Urgent mill requirement	2026-08-14 01:53:40.84915
 20	PO-20260813-0007	2026-08-14	16	26	2026-08-27	30 Days Net	Received	540000.00	97200.00	637200.00	1	1	Urgent mill requirement	2026-08-14 01:54:00.030308
 21	PO-20260813-0008	2026-08-14	17	32	2026-08-27	30 Days Net	Received	540000.00	97200.00	637200.00	1	1	Urgent mill requirement	2026-08-14 02:10:35.814051
-22	PO-20260814-0001	2026-08-14	2	\N	2026-08-14	30 days	Draft	1200.00	216.00	1416.00	\N	6	\N	2026-08-14 11:26:00.330627
-23	PO-20260814-0002	2026-08-14	2	\N	2026-08-14	30 days	Draft	3120.00	561.60	3681.60	\N	6	\N	2026-08-14 11:45:35.846751
-24	PO-P2P-1786794967615	2026-08-15	2	52	\N	\N	Received	5000.00	900.00	5900.00	\N	21	P2P Test Order to Vendor	2026-08-15 17:26:07.615933
-25	PO-P2P-1786795104113	2026-08-15	2	54	\N	\N	Received	5000.00	900.00	5900.00	\N	21	P2P Test Order to Vendor	2026-08-15 17:28:24.113424
-26	PO-20260815-0001	2026-08-15	21	\N	2026-08-15	\N	Draft	150.00	27.00	177.00	\N	6	screw	2026-08-15 17:32:54.387669
-27	PO-P2P-1786795797460	2026-08-15	2	57	\N	\N	Received	5000.00	900.00	5900.00	\N	21	P2P Test Order to Vendor	2026-08-15 17:39:57.460626
+22	PO-20260814-0001	2026-08-14	2	\N	2026-08-14	30 days	Draft	3600.00	648.00	4248.00	\N	6	\N	2026-08-14 17:46:19.596758
+23	PO-TEST-656612	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:20:56.615661
+24	PO-TEST-689834	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:21:29.837116
+25	PO-TEST-721518	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:22:01.520726
+26	PO-TEST-766672	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:22:46.674199
+27	PO-TEST-945814	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:25:45.816305
+28	PO-TEST-048388	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:27:28.390592
+29	PO-TEST-903990	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:41:43.99225
+30	PO-TEST-302130	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 18:48:22.132114
+31	PO-TEST-638364	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 19:10:38.367084
+32	PO-TEST-599636	2026-08-16	2	\N	\N	\N	Approved	45000.00	\N	53100.00	\N	21	\N	2026-08-16 19:43:19.638688
 \.
 
 
 --
--- TOC entry 6625 (class 0 OID 25435)
--- Dependencies: 357
 -- Data for Name: quality_lab_tests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8721,20 +8310,23 @@ COPY public.quality_lab_tests (id, reel_id, section_id, shift_id, test_time, fre
 
 
 --
--- TOC entry 6627 (class 0 OID 25445)
--- Dependencies: 359
 -- Data for Name: quality_tests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.quality_tests (id, test_number, test_type, reference_type, reference_id, tested_by, test_date, gsm, moisture_pct, caliper_micron, burst_factor, cobb_value, brightness_pct, thickness_micron, width_mm, weight_kg, tensile_strength, tear_strength, result, remarks, created_at) FROM stdin;
 1	QT-20260705-0001	Incoming	GRN	\N	1	2026-07-05 19:35:44.645005	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pending	\N	2026-07-05 19:35:44.645005
 2	QT-20260710-0001	GSM	\N	\N	6	2026-07-10 19:38:26.062132	80.00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pending	\N	2026-07-10 19:38:26.062132
+4	QC-TEST-766692	Incoming	GRN	11	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 18:22:46.693543
+5	QC-TEST-945834	Incoming	GRN	12	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 18:25:45.834638
+6	QC-TEST-048412	Incoming	GRN	13	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 18:27:28.41348
+7	QC-TEST-904003	Incoming	GRN	14	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 18:41:44.004967
+8	QC-TEST-302151	Incoming	GRN	15	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 18:48:22.151848
+9	QC-TEST-638388	Incoming	GRN	16	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 19:10:38.388885
+10	QC-TEST-599663	Incoming	GRN	19	21	2026-08-16 00:00:00	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Pass	300 Kg rejected due to high moisture, 700 Kg accepted	2026-08-16 19:43:19.663596
 \.
 
 
 --
--- TOC entry 6629 (class 0 OID 25458)
--- Dependencies: 361
 -- Data for Name: reels; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8747,8 +8339,6 @@ COPY public.reels (id, reel_number, barcode, shift_id, machine_id, grade_id, ope
 
 
 --
--- TOC entry 6631 (class 0 OID 25474)
--- Dependencies: 363
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8762,8 +8352,6 @@ COPY public.roles (id, name, level, permissions, created_at) FROM stdin;
 
 
 --
--- TOC entry 6633 (class 0 OID 25485)
--- Dependencies: 365
 -- Data for Name: salary_structures; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8777,8 +8365,6 @@ COPY public.salary_structures (id, code, name, grade, basic_pct, hra_pct, da_pct
 
 
 --
--- TOC entry 6635 (class 0 OID 25500)
--- Dependencies: 367
 -- Data for Name: sales_orders; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8788,8 +8374,6 @@ COPY public.sales_orders (id, so_number, date, customer_id, delivery_date, grade
 
 
 --
--- TOC entry 6637 (class 0 OID 25513)
--- Dependencies: 369
 -- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8838,8 +8422,6 @@ seed_store_inventory_import.sql	2026-08-06 18:46:18.178606
 
 
 --
--- TOC entry 6638 (class 0 OID 25520)
--- Dependencies: 370
 -- Data for Name: scrap_records; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8849,8 +8431,6 @@ COPY public.scrap_records (id, scrap_number, date, scrap_type, source_department
 
 
 --
--- TOC entry 6640 (class 0 OID 25533)
--- Dependencies: 372
 -- Data for Name: section_alarms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8859,8 +8439,6 @@ COPY public.section_alarms (id, section_id, equipment_id, tag_name, alarm_code, 
 
 
 --
--- TOC entry 6642 (class 0 OID 25546)
--- Dependencies: 374
 -- Data for Name: section_energy_allocations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8870,8 +8448,6 @@ COPY public.section_energy_allocations (id, allocated_date, section_id, power_kw
 
 
 --
--- TOC entry 6644 (class 0 OID 25556)
--- Dependencies: 376
 -- Data for Name: section_equipment; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8923,8 +8499,6 @@ COPY public.section_equipment (id, section_id, machine_id, tag_name, equipment_n
 
 
 --
--- TOC entry 6646 (class 0 OID 25568)
--- Dependencies: 378
 -- Data for Name: section_kpi_snapshots; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12288,364 +11862,583 @@ COPY public.section_kpi_snapshots (id, section_id, snapshot_time, kpi_data, crea
 8656	21	2026-08-14 02:00:00	{"_alarms": {}}	2026-08-14 02:07:32.561323
 8657	19	2026-08-14 02:00:00	{"_alarms": {}}	2026-08-14 02:07:32.563544
 8658	85	2026-08-14 02:00:00	{"_alarms": {}}	2026-08-14 02:07:32.565711
-8704	2	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.0474
-8705	3	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.049413
-8706	4	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.050867
-8707	5	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.052603
-8708	6	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.05374
-8710	8	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.057539
-8711	9	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.059171
-8712	10	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.061196
-8713	11	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.062411
-8714	12	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.063765
-8715	13	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.065076
-8716	14	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.06629
-8717	15	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.067401
-8718	20	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.068587
-8719	16	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.069704
-8720	17	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.070872
-8703	1	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.035875
-8709	7	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.055292
-8721	18	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.072018
-8722	21	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.073906
-8723	19	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.076775
-8724	85	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:12:28.080519
-8747	1	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.724875
-8748	2	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.741897
-8749	3	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.743121
-8750	4	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.74422
-8751	5	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.745409
-8752	6	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.746641
-8753	7	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.748323
-8754	8	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.749413
-8755	9	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.750475
-8756	10	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.751495
-8757	11	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.752499
-8758	12	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.753571
-8759	13	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.754669
-8760	14	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.755835
-8761	15	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.756993
-8762	20	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.758033
-8763	16	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.759173
-8764	17	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.76024
-8765	18	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.761228
-8766	21	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.762242
-8767	19	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.763311
-8768	85	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:42:40.764298
-8769	1	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.71245
-8770	2	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.715371
-8771	3	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.7166
-8772	4	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.717739
-8773	5	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.718879
-8774	6	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.719939
-8775	7	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.721033
-8776	8	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.722104
-8777	9	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.723138
-8778	10	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.7242
-8779	11	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.725196
-8780	12	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.726281
-8781	13	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.727327
-8782	14	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.728804
-8783	15	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.729857
-8784	20	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.730871
-8785	16	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.731919
-8786	17	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.733159
-8787	18	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.734184
-8788	21	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.735195
-8789	19	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.736243
-8790	85	2026-08-14 13:00:00	{"_alarms": {}}	2026-08-14 13:42:40.737245
-8791	1	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.824183
-8792	2	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.827285
-8793	3	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.82854
-8794	4	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.829731
-8795	5	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.830935
-8796	6	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.83209
-8797	7	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.833244
-8798	8	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.834335
-8799	9	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.835318
-8800	10	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.836344
-8801	11	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.837363
-8802	12	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.838432
-8803	13	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.839458
-8804	14	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.840438
-8805	15	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.841434
-8806	20	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.842375
-8807	16	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.843301
-8808	17	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.844232
-8809	18	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.845164
-8810	21	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.846061
-8811	19	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.847072
-8812	85	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:42:40.848287
-8813	1	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.729309
-8814	2	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.733862
-8815	3	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.735002
-8816	4	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.736123
-8817	5	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.737238
-8818	6	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.738324
-8819	7	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.73984
-8820	8	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.740871
-8821	9	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.74187
-8822	10	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.742966
-8823	11	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.744875
-8824	12	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.746175
-8825	13	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.747391
-8826	14	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.748451
-8827	15	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.749543
-8828	20	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.75061
-8829	16	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.751673
-8830	17	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.752765
-8831	18	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.753849
-8832	21	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.75484
-8833	19	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.755909
-8834	85	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:42:40.756914
-8835	1	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.694253
-8836	2	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.703371
-8837	3	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.706085
-8838	4	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.708231
-8839	5	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.710365
-8840	6	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.712157
-8841	7	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.714057
-8842	8	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.71604
-8843	9	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.717686
-8844	10	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.719226
-8845	11	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.720623
-8846	12	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.721925
-8847	13	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.723234
-8848	14	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.724476
-8849	15	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.725706
-8850	20	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.72685
-8851	16	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.728036
-8852	17	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.729267
-8853	18	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.730415
-8854	21	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.731807
-8855	19	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.733223
-8856	85	2026-08-14 16:00:00	{"_alarms": {}}	2026-08-14 16:42:40.734397
-8857	1	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.7768
-8858	2	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.786564
-8859	3	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.787674
-8860	4	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.788678
-8861	5	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.78977
-8862	6	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.79077
-8863	7	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.792263
-8864	8	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.793462
-8865	9	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.794434
-8866	10	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.795438
-8867	11	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.79643
-8868	12	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.797759
-8869	13	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.798759
-8870	14	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.799746
-8871	15	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.80079
-8872	20	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.801804
-8873	16	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.802838
-8874	17	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.803863
-8875	18	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.804898
-8876	21	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.805837
-8877	19	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.806797
-8878	85	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:42:40.80776
-8879	1	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.004044
-8880	2	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.009658
-8881	3	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.010916
-8882	4	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.012021
-8883	5	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.013169
-8884	6	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.014227
-8885	7	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.015763
-8886	8	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.016874
-8887	9	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.018108
-8888	10	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.019249
-8889	11	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.020244
-8890	12	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.021251
-8891	13	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.022254
-8892	14	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.023235
-8893	15	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.024234
-8894	20	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.025183
-8895	16	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.026174
-8896	17	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.027169
-8897	18	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.02817
-8898	21	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.02934
-8899	19	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.030322
-8900	85	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:42:41.031366
-8901	1	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.927129
-8902	2	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.944122
-8903	3	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.945344
-8904	4	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.946537
-8905	5	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.947759
-8906	6	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.949315
-8907	7	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.95096
-8908	8	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.952086
-8909	9	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.95315
-8910	10	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.954224
-8911	11	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.955264
-8912	12	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.956334
-8913	13	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.957404
-8914	14	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.958327
-8915	15	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.959366
-8916	20	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.960351
-8917	16	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.961317
-8918	17	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.962245
-8919	18	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.96344
-8920	21	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.964846
-8921	19	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.965965
-8922	85	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:42:40.967073
-8923	1	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.425828
-8924	2	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.47476
-8925	3	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.476943
-8926	4	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.479579
-8927	5	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.481457
-8928	6	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.483297
-8929	7	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.484863
-8930	8	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.486643
-8931	9	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.488152
-8932	10	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.491058
-8933	11	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.493048
-8934	12	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.495733
-8935	13	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.497145
-8936	14	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.498647
-8937	15	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.500351
-8938	20	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.501948
-8939	16	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.50331
-8940	17	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.504648
-8941	18	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.506291
-8942	21	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.508009
-8943	19	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.50977
-8944	85	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:08:50.511669
-8945	1	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.441699
-8946	2	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.444987
-8947	3	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.446462
-8948	4	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.447776
-8949	5	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.449068
-8950	6	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.450318
-8951	7	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.451623
-8952	8	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.452914
-8953	9	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.454177
-8954	10	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.455412
-8955	11	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.456554
-8956	12	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.457797
-8957	13	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.459027
-8958	14	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.460156
-8959	15	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.461402
-8960	20	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.462596
-8961	16	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.463745
-8962	17	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.464892
-8963	18	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.466049
-8964	21	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.467148
-8965	19	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.468278
-8966	85	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:08:45.469387
-8967	1	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.343107
-8968	2	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.355606
-8969	3	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.356968
-8970	4	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.358215
-8971	5	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.359463
-8972	6	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.360785
-8973	7	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.362538
-8974	8	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.363818
-8975	9	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.365112
-8976	10	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.366329
-8977	11	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.36746
-8978	12	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.368589
-8979	13	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.369671
-8980	14	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.370675
-8981	15	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.371725
-8982	20	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.372718
-8983	16	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.373753
-8984	17	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.374791
-8985	18	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.375812
-8986	21	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.3768
-8987	19	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.377818
-8988	85	2026-08-15 13:00:00	{"_alarms": {}}	2026-08-15 13:08:45.378798
-8989	1	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.441488
-8990	2	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.454694
-8991	3	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.456029
-8992	4	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.457296
-8993	5	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.458609
-8994	6	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.459875
-8995	7	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.461166
-8996	8	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.462362
-8997	9	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.463502
-8998	10	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.464643
-8999	11	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.465773
-9000	12	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.466953
-9001	13	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.468063
-9002	14	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.469907
-9003	15	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.471652
-9004	20	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.472901
-9005	16	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.474103
-9006	17	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.475324
-9007	18	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.476509
-9008	21	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.477612
-9009	19	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.478734
-9010	85	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:08:45.479827
-9012	2	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.36682
-9013	3	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.368052
-9014	4	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.369174
-9015	5	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.370321
-9016	6	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.371479
-9018	8	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.374606
-9019	9	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.37583
-9020	10	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.377189
-9021	11	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.378344
-9022	12	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.379541
-9023	13	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.380809
-9024	14	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.381959
-9025	15	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.383288
-9026	20	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.384438
-9027	16	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.385565
-9011	1	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.360879
-9017	7	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.373282
-9028	17	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.386669
-9029	18	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.389333
-9030	21	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.390429
-9031	19	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.391569
-9032	85	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:08:45.392657
-9122	2	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.279954
-9123	3	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.282511
-9124	4	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.284774
-9125	5	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.286992
-9126	6	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.289148
-9127	7	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.291371
-9128	8	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.293679
-9129	9	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.296138
-9130	10	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.300874
-9131	11	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.303096
-9132	12	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.305684
-9133	13	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.307498
-9134	14	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.309376
-9135	15	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.311292
-9136	20	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.312999
-9137	16	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.314933
-9138	17	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.31646
-9139	18	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.31782
-9055	1	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.35382
-9056	2	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.358142
-9057	3	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.359883
-9058	4	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.362615
-9059	5	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.364071
-9060	6	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.365802
-9061	7	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.367352
-9062	8	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.368619
-9063	9	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.369743
-9064	10	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.370786
-9065	11	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.372226
-9066	12	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.373558
-9067	13	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.374837
-9068	14	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.376549
-9069	15	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.377631
-9070	20	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.37898
-9071	16	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.380059
-9072	17	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.381107
-9073	18	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.382191
-9074	21	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.383833
-9075	19	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.386039
-9076	85	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:25:11.387689
-9121	1	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.268492
-9140	21	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.319148
-9141	19	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.321341
-9142	85	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:08:50.322717
+8703	1	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.234707
+8704	2	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.295809
+8705	3	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.299983
+8706	4	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.303209
+8707	5	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.306696
+8708	6	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.309627
+8709	7	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.313464
+8710	8	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.316991
+8711	9	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.320237
+8712	10	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.323623
+8713	11	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.326782
+8714	12	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.33069
+8715	13	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.33379
+8716	14	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.33689
+8717	15	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.340337
+8718	20	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.344808
+8719	16	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.348276
+8720	17	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.351357
+8721	18	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.354018
+8722	21	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.358583
+8723	19	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.361516
+8724	85	2026-08-14 10:00:00	{"_alarms": {}}	2026-08-14 10:19:01.364971
+8725	1	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.176479
+8726	2	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.192937
+8727	3	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.195009
+8728	4	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.196336
+8729	5	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.197708
+8730	6	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.199178
+8731	7	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.201249
+8732	8	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.20262
+8733	9	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.203945
+8734	10	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.205858
+8735	11	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.20725
+8736	12	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.208983
+8737	13	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.211252
+8738	14	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.212875
+8739	15	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.214313
+8740	20	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.215776
+8741	16	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.217759
+8742	17	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.219216
+8743	18	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.220714
+8744	21	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.222163
+8745	19	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.223602
+8746	85	2026-08-14 11:00:00	{"_alarms": {}}	2026-08-14 11:18:56.225635
+8747	1	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.295098
+8748	2	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.308727
+8749	3	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.314691
+8750	4	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.318967
+8751	5	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.323168
+8752	6	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.327749
+8753	7	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.332881
+8754	8	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.33671
+8755	9	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.340771
+8756	10	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.34622
+8757	11	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.350069
+8758	12	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.353772
+8759	13	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.358118
+8760	14	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.362474
+8761	15	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.366291
+8762	20	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.369892
+8763	16	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.37399
+8764	17	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.378741
+8765	18	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.384423
+8766	21	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.388129
+8767	19	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.392668
+8768	85	2026-08-14 12:00:00	{"_alarms": {}}	2026-08-14 12:18:56.397136
+8769	1	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.446263
+8770	2	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.453691
+8771	3	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.455991
+8772	4	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.458247
+8773	5	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.460505
+8774	6	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.467495
+8775	7	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.470464
+8776	8	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.472828
+8777	9	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.475461
+8778	10	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.479215
+8779	11	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.482534
+8780	12	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.486252
+8781	13	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.498961
+8782	14	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.501681
+8783	15	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.504228
+8784	20	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.508361
+8785	16	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.512088
+8786	17	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.514906
+8787	18	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.517335
+8788	21	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.51965
+8789	19	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.522266
+8790	85	2026-08-14 14:00:00	{"_alarms": {}}	2026-08-14 14:08:24.52446
+8791	1	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.594602
+8792	2	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.60257
+8793	3	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.605146
+8794	4	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.607286
+8795	5	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.610848
+8796	6	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.613041
+8797	7	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.61585
+8798	8	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.6185
+8799	9	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.620286
+8800	10	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.622087
+8801	11	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.624135
+8802	12	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.626869
+8803	13	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.628894
+8804	14	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.631178
+8805	15	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.633482
+8806	20	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.635495
+8807	16	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.637535
+8808	17	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.639598
+8809	18	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.641833
+8810	21	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.644146
+8811	19	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.646743
+8812	85	2026-08-14 15:00:00	{"_alarms": {}}	2026-08-14 15:08:23.648183
+8813	1	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.352091
+8814	2	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.378027
+8815	3	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.380523
+8816	4	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.382083
+8817	5	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.383676
+8818	6	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.385134
+8819	7	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.387573
+8820	8	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.389127
+8821	9	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.390713
+8822	10	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.395676
+8823	11	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.39731
+8824	12	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.399091
+8825	13	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.401219
+8826	14	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.402965
+8827	15	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.404656
+8828	20	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.406103
+8829	16	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.407725
+8830	17	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.409205
+8831	18	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.416264
+8832	21	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.417594
+8833	19	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.418979
+8834	85	2026-08-14 17:00:00	{"_alarms": {}}	2026-08-14 17:41:56.420477
+8835	1	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.749457
+8836	2	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.757146
+8837	3	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.759574
+8838	4	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.761523
+8839	5	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.764151
+8840	6	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.766156
+8841	7	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.768563
+8842	8	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.771507
+8843	9	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.773534
+8844	10	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.775523
+8845	11	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.777347
+8846	12	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.780058
+8847	13	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.782267
+8848	14	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.784128
+8849	15	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.786472
+8850	20	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.788463
+8851	16	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.790344
+8852	17	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.792321
+8853	18	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.794323
+8854	21	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.796636
+8855	19	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.79989
+8856	85	2026-08-14 18:00:00	{"_alarms": {}}	2026-08-14 18:41:57.802469
+8857	1	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.130494
+8858	2	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.141217
+8859	3	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.143116
+8860	4	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.145232
+8861	5	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.150029
+8862	6	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.153205
+8863	7	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.155351
+8864	8	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.160009
+8865	9	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.161851
+8866	10	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.164018
+8867	11	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.16581
+8868	12	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.170535
+8869	13	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.172687
+8870	14	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.174317
+8871	15	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.178965
+8872	20	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.180887
+8873	16	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.182852
+8874	17	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.186386
+8875	18	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.188565
+8876	21	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.190654
+8877	19	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.192718
+8878	85	2026-08-14 19:00:00	{"_alarms": {}}	2026-08-14 19:56:00.223922
+8879	1	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:37.124605
+8880	2	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.845395
+8881	3	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.849932
+8882	4	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.852709
+8883	5	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.855087
+8884	6	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.857624
+8885	7	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.862991
+8886	8	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.865453
+8887	9	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.867797
+8888	10	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.874226
+8889	11	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.876383
+8890	12	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.878453
+8891	13	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.882098
+8892	14	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.884558
+8893	15	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.886673
+8894	20	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.888631
+8895	16	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.892757
+8896	17	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.89468
+8897	18	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.897346
+8898	21	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.899309
+8899	19	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.901212
+8900	85	2026-08-14 21:00:00	{"_alarms": {}}	2026-08-14 21:04:38.90334
+8901	1	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.662259
+8902	2	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.681345
+8903	3	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.687527
+8904	4	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.691839
+8905	5	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.6973
+8906	6	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.708014
+8907	7	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.712996
+8908	8	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.719737
+8909	9	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.72362
+8910	10	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.72801
+8911	11	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.737485
+8912	12	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.757293
+8913	13	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.763066
+8914	14	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.76871
+8915	15	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.773813
+8916	20	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.779491
+8917	16	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.78431
+8918	17	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.788937
+8919	18	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.793092
+8920	21	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.797528
+8921	19	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.803163
+8922	85	2026-08-14 22:00:00	{"_alarms": {}}	2026-08-14 22:04:36.807725
+8923	1	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.832357
+8924	2	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.868584
+8925	3	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.872769
+8926	4	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.876614
+8927	5	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.881084
+8928	6	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.88507
+8929	7	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.889815
+8930	8	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.893235
+8931	9	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.897654
+8932	10	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.902459
+8933	11	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.905654
+8934	12	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.908656
+8935	13	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.914125
+8936	14	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.917472
+8937	15	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.920995
+8938	20	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.924848
+8939	16	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.930061
+8940	17	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.934128
+8941	18	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.937973
+8942	21	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.941703
+8943	19	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.945885
+8944	85	2026-08-14 23:00:00	{"_alarms": {}}	2026-08-14 23:04:13.950271
+8945	1	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.200417
+8946	2	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.207533
+8947	3	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.212062
+8948	4	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.21485
+8949	5	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.218285
+8950	6	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.220286
+8951	7	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.222969
+8952	8	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.226101
+8953	9	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.227774
+8954	10	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.230336
+8955	11	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.232261
+8956	12	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.236473
+8957	13	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.238936
+8958	14	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.240872
+8959	15	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.244712
+8960	20	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.247395
+8961	16	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.249577
+8962	17	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.251551
+8963	18	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.253844
+8964	21	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.255883
+8965	19	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.258146
+8966	85	2026-08-15 01:00:00	{"_alarms": {}}	2026-08-15 01:45:54.260173
+8967	1	2026-08-15 06:00:00	{"_alarms": {}}	2026-08-15 06:32:47.612341
+8989	1	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.972431
+8968	2	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.395867
+8969	3	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.734664
+8970	4	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.737163
+8971	5	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.739433
+8972	6	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.741608
+8973	7	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.744257
+8974	8	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.746899
+8975	9	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.749038
+8976	10	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.752116
+8977	11	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.754592
+8978	12	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.757898
+8979	13	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.764407
+8980	14	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.76699
+8981	15	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.769117
+8982	20	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.77114
+8983	16	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.773847
+8984	17	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.777402
+8985	18	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.779374
+8986	21	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.781842
+8987	19	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.784023
+8988	85	2026-08-15 08:00:00	{"_alarms": {}}	2026-08-15 08:32:47.786035
+9011	1	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.379545
+9012	2	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.604495
+9013	3	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.62264
+9014	4	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.627769
+9015	5	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.638218
+9016	6	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.645881
+9017	7	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.649836
+9018	8	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.665937
+9019	9	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.668284
+9020	10	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.676598
+9021	11	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.678739
+9022	12	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.681905
+9023	13	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.684202
+9024	14	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.687232
+9025	15	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.756407
+9026	20	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.764986
+9027	16	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.768469
+9028	17	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.771248
+9029	18	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.774494
+9030	21	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.778541
+9031	19	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.785743
+9032	85	2026-08-15 10:00:00	{"_alarms": {}}	2026-08-15 10:10:37.789339
+9033	1	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.634672
+9034	2	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.657615
+9035	3	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.660392
+9036	4	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.66434
+9037	5	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.666062
+9038	6	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.667922
+9039	7	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.669546
+9040	8	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.671755
+9041	9	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.674476
+9042	10	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.67668
+9043	11	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.678692
+9044	12	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.680092
+9045	13	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.68246
+9046	14	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.685016
+9047	15	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.686538
+9048	20	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.688235
+9049	16	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.690722
+9050	17	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.692775
+9051	18	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.694969
+9052	21	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.697476
+9053	19	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.699372
+9054	85	2026-08-15 11:00:00	{"_alarms": {}}	2026-08-15 11:10:35.701287
+9055	1	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.545454
+9056	2	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.556905
+9057	3	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.559185
+9058	4	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.561723
+9059	5	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.570139
+9060	6	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.580422
+9061	7	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.583306
+9062	8	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.596224
+9063	9	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.598354
+9064	10	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.602328
+9065	11	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.605538
+9066	12	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.626863
+9067	13	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.631138
+9068	14	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.650212
+9069	15	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.657554
+9070	20	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.666456
+9071	16	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.669482
+9072	17	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.767334
+9073	18	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.770703
+9074	21	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.772558
+9075	19	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.788523
+9076	85	2026-08-15 12:00:00	{"_alarms": {}}	2026-08-15 12:38:41.791194
+9077	1	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:31.083025
+9078	2	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.255399
+9079	3	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.261881
+9080	4	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.269817
+9081	5	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.274102
+9082	6	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.27803
+9083	7	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.284747
+9084	8	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.288053
+9085	9	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.292923
+9086	10	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.299071
+9087	11	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.303117
+9088	12	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.306519
+9089	13	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.309228
+9090	14	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.311532
+9091	15	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.314442
+9092	20	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.316384
+9093	16	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.318404
+9094	17	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.327651
+9095	18	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.333358
+9096	21	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.366656
+9097	19	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.373586
+9098	85	2026-08-15 14:00:00	{"_alarms": {}}	2026-08-15 14:27:35.378128
+9099	1	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.34858
+9100	2	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.354831
+9101	3	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.356323
+9102	4	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.357956
+9103	5	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.361746
+9104	6	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.363636
+9105	7	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.365331
+9106	8	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.369074
+9107	9	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.370718
+9108	10	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.372182
+9109	11	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.373631
+9110	12	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.380616
+9111	13	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.38212
+9112	14	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.383622
+9113	15	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.385024
+9114	20	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.386642
+9115	16	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.387964
+9116	17	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.389588
+9117	18	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.391124
+9118	21	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.392592
+9119	19	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.397983
+9120	85	2026-08-15 15:00:00	{"_alarms": {}}	2026-08-15 15:42:43.399528
+9121	1	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.200732
+9122	2	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.230364
+9123	3	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.232998
+9124	4	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.235699
+9125	5	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.238323
+9126	6	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.240849
+9127	7	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.249333
+9128	8	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.253168
+9129	9	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.256338
+9130	10	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.259348
+9131	11	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.263445
+9132	12	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.266754
+9133	13	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.269885
+9134	14	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.273796
+9135	15	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.27686
+9136	20	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.279395
+9137	16	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.283007
+9138	17	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.286094
+9139	18	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.28884
+9140	21	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.291999
+9141	19	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.294745
+9142	85	2026-08-15 16:00:00	{"_alarms": {}}	2026-08-15 16:42:43.297208
+9143	1	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.970031
+9144	2	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.980243
+9145	3	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.985742
+9146	4	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.989604
+9147	5	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.993668
+9148	6	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.995512
+9149	7	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:47.998732
+9150	8	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.000323
+9151	9	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.001901
+9152	10	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.003919
+9153	11	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.005981
+9154	12	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.007938
+9155	13	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.010676
+9156	14	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.012259
+9157	15	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.013951
+9158	20	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.015661
+9159	16	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.017333
+9160	17	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.018791
+9161	18	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.020218
+9162	21	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.021514
+9163	19	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.023102
+9164	85	2026-08-15 17:00:00	{"_alarms": {}}	2026-08-15 17:52:48.024466
+9165	1	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.318985
+9166	2	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.352965
+9167	3	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.357609
+9168	4	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.362004
+9169	5	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.365482
+9170	6	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.367559
+9171	7	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.369531
+9172	8	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.372051
+9173	9	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.373943
+9174	10	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.376487
+9175	11	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.380969
+9176	12	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.38401
+9177	13	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.386183
+9178	14	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.389382
+9179	15	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.39147
+9180	20	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.393761
+9181	16	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.396424
+9182	17	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.398736
+9183	18	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.401012
+9184	21	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.403518
+9185	19	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.405326
+9186	85	2026-08-16 19:00:00	{"_alarms": {}}	2026-08-16 19:16:33.40723
+9187	1	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.405384
+9188	2	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.413871
+9189	3	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.415882
+9190	4	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.417896
+9191	5	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.420431
+9192	6	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.422147
+9193	7	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.423868
+9194	8	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.426255
+9195	9	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.427987
+9196	10	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.429836
+9197	11	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.432575
+9198	12	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.434334
+9199	13	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.436093
+9200	14	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.437833
+9201	15	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.439519
+9202	20	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.441261
+9203	16	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.442899
+9204	17	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.444612
+9205	18	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.446356
+9206	21	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.448209
+9207	19	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.450815
+9208	85	2026-08-16 20:00:00	{"_alarms": {}}	2026-08-16 20:16:28.452568
+9210	2	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.463468
+9211	3	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.465136
+9212	4	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.466636
+9213	5	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.468773
+9214	6	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.469988
+9216	8	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.473476
+9217	9	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.474779
+9209	1	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.457191
+9215	7	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.471341
+9218	10	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.476044
+9219	11	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.478418
+9220	12	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.47978
+9221	13	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.481192
+9222	14	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.483418
+9223	15	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.484789
+9224	20	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.486167
+9225	16	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.48775
+9226	17	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.489276
+9227	18	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.490727
+9228	21	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.492095
+9229	19	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.493791
+9230	85	2026-08-16 21:00:00	{"_alarms": {}}	2026-08-16 21:16:28.495484
+9407	1	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.124785
+9253	1	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.704419
+9254	2	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.768911
+9255	3	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.773847
+9256	4	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.778378
+9257	5	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.783056
+9258	6	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.78746
+9259	7	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.791032
+9260	8	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.796164
+9261	9	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.801144
+9262	10	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.804557
+9263	11	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.809614
+9264	12	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.813683
+9265	13	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.816811
+9266	14	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.820965
+9267	15	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.824717
+9268	20	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.828143
+9269	16	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.832404
+9270	17	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.836215
+9271	18	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.84047
+9272	21	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.844335
+9273	19	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.847933
+9274	85	2026-08-17 00:00:00	{"_alarms": {}}	2026-08-17 00:03:26.850998
+9385	1	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:34.061336
+9386	2	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.857144
+9387	3	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.869941
+9388	4	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.871969
+9389	5	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.876589
+9390	6	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.885297
+9391	7	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.916975
+9392	8	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.925173
+9393	9	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.937953
+9394	10	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.954395
+9395	11	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.968274
+9396	12	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.974162
+9397	13	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:37.980634
+9398	14	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.005839
+9399	15	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.011512
+9400	20	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.017701
+9401	16	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.043008
+9402	17	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.053265
+9403	18	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.061389
+9404	21	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.067974
+9405	19	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.070144
+9406	85	2026-08-17 02:00:00	{"_alarms": {}}	2026-08-17 02:48:38.072469
+9408	2	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.290858
+9409	3	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.298622
+9410	4	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.307056
+9411	5	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.314486
+9412	6	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.322419
+9413	7	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.333433
+9414	8	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.339828
+9415	9	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.348252
+9416	10	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.370735
+9417	11	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.375953
+9418	12	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.384052
+9419	13	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.390553
+9420	14	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.39684
+9421	15	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.410817
+9422	20	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.470667
+9423	16	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.475896
+9424	17	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.489449
+9425	18	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.497006
+9426	21	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.502303
+9427	19	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.513305
+9428	85	2026-08-17 10:00:00	{"_alarms": {}}	2026-08-17 10:38:48.51855
 \.
 
 
 --
--- TOC entry 6648 (class 0 OID 25579)
--- Dependencies: 380
 -- Data for Name: section_process_readings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12664,8 +12457,6 @@ COPY public.section_process_readings (id, section_id, equipment_id, tag_name, pa
 
 
 --
--- TOC entry 6650 (class 0 OID 25591)
--- Dependencies: 382
 -- Data for Name: section_sops; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12674,8 +12465,6 @@ COPY public.section_sops (id, section_id, sop_type, title, version, steps, appro
 
 
 --
--- TOC entry 6652 (class 0 OID 25606)
--- Dependencies: 384
 -- Data for Name: sections; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12705,8 +12494,6 @@ COPY public.sections (id, name, code, department_id, is_active, created_at) FROM
 
 
 --
--- TOC entry 6654 (class 0 OID 25614)
--- Dependencies: 386
 -- Data for Name: separation_records; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12715,8 +12502,6 @@ COPY public.separation_records (id, employee_id, separation_type, resignation_da
 
 
 --
--- TOC entry 6656 (class 0 OID 25629)
--- Dependencies: 388
 -- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12725,8 +12510,6 @@ COPY public.sessions (id, user_id, created_at, expires_at) FROM stdin;
 
 
 --
--- TOC entry 6657 (class 0 OID 25635)
--- Dependencies: 389
 -- Data for Name: shift_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12735,8 +12518,6 @@ COPY public.shift_reports (id, date, shift_type, section, operator_id, data, rem
 
 
 --
--- TOC entry 6659 (class 0 OID 25649)
--- Dependencies: 391
 -- Data for Name: shifts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12748,8 +12529,6 @@ COPY public.shifts (id, date, shift_type, start_time, end_time, supervisor_id, m
 
 
 --
--- TOC entry 6661 (class 0 OID 25663)
--- Dependencies: 393
 -- Data for Name: stock_ledger; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -12761,7 +12540,20 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2171	2679	2026-08-01	opening	\N	OPENING	5.000	0.000	5.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2172	3055	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2173	2940	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+884	2191	2026-08-08	grn	\N	IGRN	1.000	0.000	2.000	7950.00	7950.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.807899	\N	f	\N
+885	2271	2026-08-08	grn	\N	IGRN	1.000	0.000	2.000	26175.00	26175.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.812133	\N	f	\N
+886	2296	2026-08-08	grn	\N	IGRN	5.000	0.000	10.000	7710.00	38550.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.816971	\N	f	\N
+887	3381	2026-08-08	grn	\N	IGRN	4.000	0.000	8.000	1750.00	7000.00	\N	\N	[Vendor GRN 202608-18] | Party: MZ AUTO MOBILES | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.821707	\N	f	\N
+888	2202	2026-08-11	grn	\N	IGRN	4.000	0.000	8.000	1050.00	4200.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.826226	\N	f	\N
+889	2203	2026-08-11	grn	\N	IGRN	1.000	0.000	2.000	10450.00	10450.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.831202	\N	f	\N
+890	2257	2026-08-11	grn	\N	IGRN	2.000	0.000	4.000	31500.00	63000.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.835796	\N	f	\N
+891	3405	2026-08-12	grn	\N	IGRN	2.000	0.000	3.000	0.00	0.00	\N	\N	[Vendor GRN 202608-22] | Party: PRAMATIC INDUSTRIAL AUTOMATION SOLUCTIONS PVT LTD | Inv: DC: 260/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.841021	\N	f	\N
+892	3452	2026-08-12	grn	\N	IGRN	2.000	0.000	2.000	0.00	0.00	\N	\N	[Vendor GRN 202608-22] | Party: PRAMATIC INDUSTRIAL AUTOMATION SOLUCTIONS PVT LTD | Inv: DC: 260/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.845524	\N	f	\N
+893	2990	2026-08-12	grn	\N	IGRN	150.000	0.000	300.000	9.70	1455.00	\N	\N	[Vendor GRN 202608-23] | Party: IMPERIAL ENGINEERING | Inv: 2083 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.849694	\N	f	\N
+894	3461	2026-08-12	grn	\N	IGRN	28.000	0.000	29.000	100.00	2800.00	\N	\N	[Vendor GRN 202608-24] | Party: IMPERIAL ENGINEERING | Inv: 2083 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.853926	\N	f	\N
+903	2706	2026-08-13	grn	\N	PO	5.000	0.000	17.001	100.00	500.00	\N	Rack 2, Box 4	[Vendor GRN] | Ref: TEST-VENDORID-001 | Party: Test Vendor Co | QC: Accepted	6	2026-08-13 20:51:06.752678	\N	f	1
 53	2074	2026-08-13	issue	\N	indent	0.000	1.000	9.000	0.00	0.00	\N	\N	Indent IND-20260813-0001	6	2026-08-13 17:01:32.356616	\N	f	\N
+905	2708	2026-08-13	grn	\N	PO	3.000	0.000	3.000	25.00	75.00	\N	\N	[Vendor GRN] | Ref: FULLLOOP-TEST-003 | Party: Test Vendor Co | QC: Accepted	6	2026-08-13 20:53:48.022567	\N	f	1
 2687	2303	2026-08-13	issue	15	indent	0.000	1.000	0.000	0.00	0.00	LOT-TEST-VTH	\N	Store Issue for Indent IND-20260813-0003	6	2026-08-13 23:40:55.670167	\N	f	\N
 2174	2319	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2175	2263	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12792,6 +12584,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2200	3258	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2201	3094	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2202	2120	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	6	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2203	2163	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2204	3262	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2205	2775	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2206	2134	2026-08-01	opening	\N	OPENING	10.000	0.000	10.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12829,6 +12622,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2237	2228	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2238	2055	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	2	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2239	3231	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2240	2956	2026-08-01	opening	\N	OPENING	500.000	0.000	500.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2241	2841	2026-08-01	opening	\N	OPENING	7.000	0.000	7.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2242	2783	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2243	2298	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	235171.00	235171.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12848,7 +12642,6 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2257	3175	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2258	3193	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2259	2953	2026-08-01	opening	\N	OPENING	14.000	0.000	14.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2240	2956	2026-08-15	opening	\N	OPENING	508.000	0.000	500.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2260	2756	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2261	3218	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2262	2993	2026-08-01	opening	\N	OPENING	43.000	0.000	43.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12896,6 +12689,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2304	3005	2026-08-01	opening	\N	OPENING	5.000	0.000	5.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2305	2211	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2306	2189	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2307	3461	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	100.00	100.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2308	3171	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2309	3009	2026-08-01	opening	\N	OPENING	30.000	0.000	30.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2310	3045	2026-08-01	opening	\N	OPENING	5.000	0.000	5.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12944,6 +12738,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2349	2985	2026-08-01	opening	\N	OPENING	11.000	0.000	11.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2350	3303	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2351	3100	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+904	2707	2026-08-13	grn	\N	PO	2.000	0.000	3.000	50.00	100.00	\N	\N	[Vendor GRN] | Ref: TEST-OTHER-002 | Party: Direct OEM Test Supplier XYZ | QC: Accepted	6	2026-08-13 20:52:09.126705	\N	f	\N
 2689	4440	2026-08-14	opening	\N	OPENING	92.000	0.000	92.000	22000.00	2024000.00	\N	RM-YARD-B	Opening Stock Balance for Raw Material Furnish	\N	2026-08-14 01:11:28.016628	\N	f	\N
 2690	4441	2026-08-14	opening	\N	OPENING	68.400	0.000	68.400	24500.00	1675800.00	\N	RM-YARD-A	Opening Stock Balance for Raw Material Furnish	\N	2026-08-14 01:11:28.016628	\N	f	\N
 2691	4442	2026-08-14	opening	\N	OPENING	38.200	0.000	38.200	28000.00	1069600.00	\N	RM-SHED-C	Opening Stock Balance for Raw Material Furnish	\N	2026-08-14 01:11:28.016628	\N	f	\N
@@ -12957,10 +12752,10 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2353	2191	2026-08-01	opening	\N	OPENING	0.000	0.000	0.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2354	2061	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	2	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2355	3174	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+1801	3230	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1802	2335	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1803	3309	2026-08-01	opening	\N	OPENING	36.000	0.000	36.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1804	2080	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	1	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-1801	3230	2026-08-14	opening	\N	OPENING	3.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1805	3407	2026-08-01	opening	\N	OPENING	5.000	0.000	5.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1807	2299	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	507516.00	507516.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1808	2196	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -12983,6 +12778,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 1825	3097	2026-08-01	opening	\N	OPENING	10.000	0.000	10.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1826	2990	2026-08-01	opening	\N	OPENING	0.000	0.000	0.000	9.70	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1827	2082	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	1	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+1828	2054	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	2	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1829	2332	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1830	2785	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1831	3093	2026-08-01	opening	\N	OPENING	28.000	0.000	28.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13080,6 +12876,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 1923	3251	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1924	2828	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1925	3101	2026-08-01	opening	\N	OPENING	21.000	0.000	21.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+1926	2303	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	Rack 2, Box 4	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1927	2109	2026-08-01	opening	\N	OPENING	9.000	0.000	9.000	0.00	0.00	\N	4	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1928	2945	2026-08-01	opening	\N	OPENING	15.000	0.000	15.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1929	2149	2026-08-01	opening	\N	OPENING	13.000	0.000	13.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13094,14 +12891,37 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 1938	3007	2026-08-01	opening	\N	OPENING	30.000	0.000	30.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1939	2741	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1940	3229	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+861	2938	2026-08-01	grn	\N	IGRN	5.000	0.000	10.000	10260.00	51300.00	\N	\N	[Vendor GRN 202608-01] | Party: AIRMAX PNEUMATICS LTD | Inv: MKT/26-27/1262 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.68871	\N	f	\N
+862	4045	2026-08-01	grn	\N	IGRN	1.000	0.000	2.000	1665000.00	1665000.00	\N	\N	[Vendor GRN 202608-02] | Party: BHAGYANAGAR DIESELS (GODREJ) | Inv: SAL/26-27/101 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.69663	\N	f	\N
+863	2796	2026-08-01	grn	\N	IGRN	2.000	0.000	4.000	1700.00	3400.00	\N	\N	[Vendor GRN 202608-03] | Party: FLOWSTAR VALVES | Inv: FSV/200 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.701044	\N	f	\N
+864	3030	2026-08-01	grn	\N	IGRN	1.000	0.000	1.000	240.00	240.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.706406	\N	f	\N
+865	3026	2026-08-01	grn	\N	IGRN	1.000	0.000	2.000	1900.00	1900.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.711188	\N	f	\N
+866	3027	2026-08-01	grn	\N	IGRN	25.000	0.000	50.000	20.00	500.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.7156	\N	f	\N
+867	3028	2026-08-01	grn	\N	IGRN	25.000	0.000	66.000	18.00	450.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.719889	\N	f	\N
+868	3029	2026-08-01	grn	\N	IGRN	84.000	0.000	166.000	4.76	400.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.725532	\N	f	\N
+869	2664	2026-08-03	grn	\N	IGRN	8.000	0.000	16.000	4954.00	27742.40	\N	\N	[Vendor GRN 202608-05] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.729584	\N	f	\N
+870	2658	2026-08-03	grn	\N	IGRN	6.000	0.000	12.000	1927.00	8093.40	\N	\N	[Vendor GRN 202608-05] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.733931	\N	f	\N
+871	3379	2026-08-01	grn	\N	IGRN	20.000	0.000	40.000	1250.00	25000.00	\N	\N	[Vendor GRN 202608-06] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.738749	\N	f	\N
+872	2992	2026-08-05	grn	\N	IGRN	50.000	0.000	100.000	0.00	0.00	\N	\N	[Vendor GRN 202608-07] | Party: SHINE ENGINEERING CO | Inv: DC :913 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.743479	\N	f	\N
+873	3120	2026-08-05	grn	\N	IGRN	475.000	0.000	3450.000	172.00	81700.00	\N	\N	[Vendor GRN 202608-08] | Party: SIGMAEXOR CHEMICALS PVT LTD | Inv: 19 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.747179	\N	f	\N
+874	3127	2026-08-05	grn	\N	IGRN	300.000	0.000	540.000	10.00	3000.00	\N	\N	[Vendor GRN 202608-09] | Party: SIGMAEXOR CHEMICALS PVT LTD | Inv: 19 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.751795	\N	f	\N
+875	3112	2026-08-06	grn	\N	IGRN	15000.000	0.000	30466.000	43.00	645000.00	\N	\N	[Vendor GRN 202608-10] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.757172	\N	f	\N
+876	3129	2026-08-06	grn	\N	IGRN	150.000	0.000	344.500	87.00	13050.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.761778	\N	f	\N
+877	3130	2026-08-06	grn	\N	IGRN	300.000	0.000	600.000	92.00	27600.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.766412	\N	f	\N
+878	3131	2026-08-06	grn	\N	IGRN	175.000	0.000	400.000	85.00	14875.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.772043	\N	f	\N
+879	3132	2026-08-06	grn	\N	IGRN	50.000	0.000	122.000	240.00	12000.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.778047	\N	f	\N
+880	3392	2026-08-08	grn	\N	IGRN	4.000	0.000	8.000	0.00	0.00	\N	\N	[Vendor GRN 20260/-14] | Party: DATTU ELECTRICALS | Inv: 4855 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.789268	\N	f	\N
+881	4046	2026-08-08	grn	\N	IGRN	6.000	0.000	12.000	0.00	0.00	\N	\N	[Vendor GRN 202608-16] | Party: DATTU ELECTRICALS | Inv: 4861 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.793794	\N	f	\N
+882	2143	2026-08-08	grn	\N	IGRN	6.000	0.000	12.000	195.00	1170.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.798523	\N	f	\N
+883	2144	2026-08-08	grn	\N	IGRN	6.000	0.000	12.000	280.00	1680.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-13 17:47:46.80287	\N	f	\N
 1941	2676	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1942	2864	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1943	3233	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1944	2872	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1945	2130	2026-08-01	opening	\N	OPENING	5.000	0.000	5.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-1926	2303	2026-08-15	opening	\N	OPENING	1.000	0.000	1.000	273543.22	273543.22	\N	Rack 2, Box 4	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1946	2244	2026-08-01	opening	\N	OPENING	8.000	0.000	8.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1947	3111	2026-08-01	opening	\N	OPENING	19850.000	0.000	19850.000	36.00	714600.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+1948	2706	2026-08-01	opening	\N	OPENING	12.001	0.000	12.001	100.00	1200.10	\N	Rack 2, Box 4	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1949	2900	2026-08-01	opening	\N	OPENING	50.000	0.000	50.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1950	3168	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1951	3032	2026-08-01	opening	\N	OPENING	8.000	0.000	8.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13115,6 +12935,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 1959	2682	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1960	3132	2026-08-01	opening	\N	OPENING	72.000	0.000	72.000	240.00	17280.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1961	2306	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+1962	3263	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1963	2977	2026-08-01	opening	\N	OPENING	24.000	0.000	24.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1964	3311	2026-08-01	opening	\N	OPENING	25.000	0.000	25.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 1965	2800	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13156,7 +12977,6 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2001	2782	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2002	3495	2026-08-01	opening	\N	OPENING	9.000	0.000	9.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2003	2954	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-1962	3263	2026-08-15	opening	\N	OPENING	3.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2004	3322	2026-08-01	opening	\N	OPENING	31.000	0.000	31.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2005	4046	2026-08-01	opening	\N	OPENING	0.000	0.000	0.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2006	2680	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13248,6 +13068,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2092	2786	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2093	2236	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2094	3512	2026-08-01	opening	\N	OPENING	6.000	0.000	6.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2095	3185	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2096	2295	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2097	2677	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2098	2816	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13267,10 +13088,10 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2112	3234	2026-08-01	opening	\N	OPENING	4.000	0.000	4.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2113	2751	2026-08-01	opening	\N	OPENING	7.000	0.000	7.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2114	3026	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	1900.00	1900.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2697	4439	2026-08-14	grn	\N	PO	10.000	0.000	155.500	18500.00	185000.00	\N	RM-YARD-A	[Vendor GRN] | Ref: PO-2026-0099 | QC: Accepted | Test Inward Delivery | Party: ITC Paperboard	1	2026-08-14 01:16:38.370486	\N	f	\N
 2698	4439	2026-08-14	issue	\N	ISSUE	0.000	5.000	150.500	18500.00	92500.00	\N	\N	[Store Issue] | Purpose: Pulp Mill Batch Pulper Charging | Pulp Mill | Shift A batch	1	2026-08-14 01:16:38.394679	\N	f	\N
 2699	4448	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 01:51:45.613925	\N	f	\N
 2700	4449	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 01:51:52.558438	\N	f	\N
-2095	3185	2026-08-14	opening	\N	OPENING	2.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2701	4450	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 01:53:12.540204	\N	f	\N
 2702	4450	2026-08-14	GRN	16	PO	10.000	0.000	15.000	54000.00	540000.00	\N	\N	Auto-GRN GRN-20260813-1 from PO PO-20260813-0003	6	2026-08-14 01:53:12.694951	\N	f	\N
 2703	4451	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 01:53:25.225077	\N	f	\N
@@ -13282,9 +13103,12 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2709	4454	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 01:53:59.918981	\N	f	\N
 2710	4454	2026-08-14	GRN	20	PO	10.000	0.000	15.000	54000.00	540000.00	\N	\N	Auto-GRN GRN-20260813-5 from PO PO-20260813-0007	6	2026-08-14 01:54:00.067303	\N	f	\N
 2711	4454	2026-08-14	issue	\N	indent	0.000	4.000	11.000	54000.00	216000.00	\N	\N	Indent IND-20260813-0014	6	2026-08-14 01:54:00.145124	\N	f	\N
+2712	4454	2026-08-14	return	\N	DEPT_RETURN	1.500	0.000	12.500	54000.00	81000.00	\N	YARD-PULP-1	[Dept Return - Dispatch] | Ref: RET-639817 | QC: Accepted | Surplus pulp from Batch #401 returned clean & dry	6	2026-08-14 01:54:00.170558	\N	f	\N
 2713	4455	2026-08-14	opening	\N	\N	0.000	0.000	5.000	55000.00	275000.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 02:10:35.705363	\N	f	\N
 2714	4455	2026-08-14	GRN	21	PO	10.000	0.000	15.000	54000.00	540000.00	\N	\N	Auto-GRN GRN-20260813-6 from PO PO-20260813-0008	6	2026-08-14 02:10:35.847788	\N	f	\N
 2715	4455	2026-08-14	issue	\N	indent	0.000	4.000	11.000	54000.00	216000.00	\N	\N	Indent IND-20260813-0017	6	2026-08-14 02:10:35.911769	\N	f	\N
+2716	4455	2026-08-14	return	\N	DEPT_RETURN	1.500	0.000	12.500	54000.00	81000.00	\N	YARD-PULP-1	[Dept Return - Dispatch] | Ref: RET-635458 | QC: Accepted | Surplus pulp from Batch #401 returned clean & dry	6	2026-08-14 02:10:35.93454	\N	f	\N
+2115	2957	2026-08-01	opening	\N	OPENING	45.000	0.000	45.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2116	3403	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2117	2843	2026-08-01	opening	\N	OPENING	17.000	0.000	17.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2118	2776	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13324,7 +13148,6 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2152	3317	2026-08-01	opening	\N	OPENING	12.000	0.000	12.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2153	2958	2026-08-01	opening	\N	OPENING	320.000	0.000	320.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2154	2117	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	2	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2115	2957	2026-08-15	opening	\N	OPENING	45.000	0.000	41.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2155	3056	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2156	3409	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2157	3117	2026-08-01	opening	\N	OPENING	2666.000	0.000	2666.000	151.00	402566.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13582,6 +13405,7 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2597	2832	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2598	2929	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2599	3070	2026-08-01	opening	\N	OPENING	1.000	0.000	1.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
+2600	2141	2026-08-01	opening	\N	OPENING	6.000	0.000	6.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2601	3273	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2602	2113	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	8	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2603	2944	2026-08-01	opening	\N	OPENING	3.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
@@ -13667,247 +13491,21 @@ COPY public.stock_ledger (id, material_id, date, transaction_type, reference_id,
 2683	2185	2026-08-01	opening	\N	OPENING	2.000	0.000	2.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2684	3039	2026-08-01	opening	\N	OPENING	15.000	0.000	15.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
 2685	2850	2026-08-01	opening	\N	OPENING	64.000	0.000	64.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2717	3343	2026-08-14	adjustment_plus	\N	\N	1.000	0.000	0.000	0.00	0.00	\N	\N	Reconcile legacy negative stock discrepancy	1	2026-08-14 10:57:06.421318	\N	f	\N
-1948	2706	2026-08-14	opening	\N	OPENING	5.000	1.000	17.000	100.00	1700.00	\N	Rack 2, Box 4	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2307	3461	2026-08-14	opening	\N	OPENING	0.000	0.000	1.000	2800.00	2800.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2718	2939	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.757422	\N	f	\N
-2719	2940	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.761713	\N	f	\N
-2720	2941	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.763255	\N	f	\N
-2721	2942	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.764895	\N	f	\N
-2722	3461	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.766793	\N	f	\N
-2723	2943	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.768193	\N	f	\N
-2724	2944	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.769475	\N	f	\N
-2725	2945	2026-08-14	opening	\N	\N	15.000	0.000	15.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.770631	\N	f	\N
-2726	2946	2026-08-14	opening	\N	\N	7.500	0.000	7.500	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.771734	\N	f	\N
-2727	2947	2026-08-14	opening	\N	\N	7.500	0.000	7.500	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.772767	\N	f	\N
-2728	2949	2026-08-14	opening	\N	\N	7.500	0.000	7.500	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.774355	\N	f	\N
-2729	2950	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.775413	\N	f	\N
-2730	2951	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.776409	\N	f	\N
-2731	2952	2026-08-14	opening	\N	\N	6.000	0.000	6.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.777365	\N	f	\N
-2732	2953	2026-08-14	opening	\N	\N	14.000	0.000	14.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.778401	\N	f	\N
-2733	2954	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.779406	\N	f	\N
-2734	2955	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.780536	\N	f	\N
-2735	3023	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.784402	\N	f	\N
-2736	3025	2026-08-14	opening	\N	\N	15.000	0.000	15.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.78646	\N	f	\N
-2737	3026	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.787572	\N	f	\N
-2738	3029	2026-08-14	opening	\N	\N	82.000	0.000	82.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.788643	\N	f	\N
-2739	3031	2026-08-14	opening	\N	\N	72.000	0.000	72.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.790236	\N	f	\N
-2740	3032	2026-08-14	opening	\N	\N	8.000	0.000	8.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.791189	\N	f	\N
-2741	3033	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.792198	\N	f	\N
-2742	3034	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.79321	\N	f	\N
-2743	3035	2026-08-14	opening	\N	\N	33.000	0.000	33.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.794195	\N	f	\N
-2744	3036	2026-08-14	opening	\N	\N	56.000	0.000	56.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.795182	\N	f	\N
-2745	3488	2026-08-14	opening	\N	\N	15.000	0.000	15.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.796255	\N	f	\N
-2746	3489	2026-08-14	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.798849	\N	f	\N
-2747	3028	2026-08-14	opening	\N	\N	41.000	0.000	41.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.800253	\N	f	\N
-2748	3037	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.801512	\N	f	\N
-2749	3027	2026-08-14	opening	\N	\N	25.000	0.000	25.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.802662	\N	f	\N
-2750	3493	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.803834	\N	f	\N
-2751	3494	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.80492	\N	f	\N
-2752	3495	2026-08-14	opening	\N	\N	9.000	0.000	9.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.806025	\N	f	\N
-2753	3496	2026-08-14	opening	\N	\N	22.000	0.000	22.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.807099	\N	f	\N
-2754	3497	2026-08-14	opening	\N	\N	20.000	0.000	20.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.808177	\N	f	\N
-2755	3498	2026-08-14	opening	\N	\N	20.000	0.000	20.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.809275	\N	f	\N
-2756	3499	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.810383	\N	f	\N
-2757	3500	2026-08-14	opening	\N	\N	7.000	0.000	7.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.811499	\N	f	\N
-2758	3501	2026-08-14	opening	\N	\N	9.000	0.000	9.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.812603	\N	f	\N
-2759	3502	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.813767	\N	f	\N
-2760	3503	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.814885	\N	f	\N
-2761	3504	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.816156	\N	f	\N
-2762	3505	2026-08-14	opening	\N	\N	21.000	0.000	21.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.817538	\N	f	\N
-2763	3506	2026-08-14	opening	\N	\N	13.000	0.000	13.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.81869	\N	f	\N
-2764	3507	2026-08-14	opening	\N	\N	5.000	0.000	5.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.819762	\N	f	\N
-2765	3508	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.820888	\N	f	\N
-2766	3509	2026-08-14	opening	\N	\N	28.000	0.000	28.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.822018	\N	f	\N
-2767	3510	2026-08-14	opening	\N	\N	7.000	0.000	7.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.823043	\N	f	\N
-2768	3511	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.824038	\N	f	\N
-2769	3512	2026-08-14	opening	\N	\N	6.000	0.000	6.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.825047	\N	f	\N
-2770	3513	2026-08-14	opening	\N	\N	376.000	0.000	376.000	0.00	0.00	\N	\N	Opening balance from General Store Excel	\N	2026-08-14 16:27:43.826066	\N	f	\N
-2771	2869	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.843742	\N	f	\N
-2772	2870	2026-08-14	opening	\N	\N	9.000	0.000	9.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.845003	\N	f	\N
-2773	2871	2026-08-14	opening	\N	\N	7.000	0.000	7.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.846376	\N	f	\N
-2774	2872	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.847581	\N	f	\N
-2775	2873	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.84884	\N	f	\N
-2776	2874	2026-08-14	opening	\N	\N	10.000	0.000	10.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.850315	\N	f	\N
-2777	2875	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.851574	\N	f	\N
-2778	2877	2026-08-14	opening	\N	\N	21.000	0.000	21.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.853265	\N	f	\N
-2779	2878	2026-08-14	opening	\N	\N	6.000	0.000	6.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.854415	\N	f	\N
-2780	2879	2026-08-14	opening	\N	\N	24.000	0.000	24.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.855546	\N	f	\N
-2781	2880	2026-08-14	opening	\N	\N	41.000	0.000	41.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.856566	\N	f	\N
-2782	2881	2026-08-14	opening	\N	\N	21.000	0.000	21.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.857615	\N	f	\N
-2783	2882	2026-08-14	opening	\N	\N	9.000	0.000	9.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.858573	\N	f	\N
-2784	2883	2026-08-14	opening	\N	\N	60.000	0.000	60.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.860174	\N	f	\N
-2785	2884	2026-08-14	opening	\N	\N	24.000	0.000	24.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.861128	\N	f	\N
-2786	2885	2026-08-14	opening	\N	\N	43.000	0.000	43.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.86219	\N	f	\N
-2787	2886	2026-08-14	opening	\N	\N	29.000	0.000	29.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.863317	\N	f	\N
-2788	2887	2026-08-14	opening	\N	\N	8.000	0.000	8.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.864262	\N	f	\N
-2789	2888	2026-08-14	opening	\N	\N	20.000	0.000	20.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.865216	\N	f	\N
-2790	2889	2026-08-14	opening	\N	\N	9.000	0.000	9.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.866522	\N	f	\N
-2791	2890	2026-08-14	opening	\N	\N	13.000	0.000	13.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.86773	\N	f	\N
-2792	2891	2026-08-14	opening	\N	\N	30.000	0.000	30.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.868689	\N	f	\N
-2793	2892	2026-08-14	opening	\N	\N	60.000	0.000	60.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.869612	\N	f	\N
-2794	2893	2026-08-14	opening	\N	\N	43.000	0.000	43.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.870602	\N	f	\N
-2795	2894	2026-08-14	opening	\N	\N	11.000	0.000	11.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.87158	\N	f	\N
-2796	2895	2026-08-14	opening	\N	\N	11.000	0.000	11.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.874121	\N	f	\N
-2797	2896	2026-08-14	opening	\N	\N	34.000	0.000	34.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.875079	\N	f	\N
-2798	2897	2026-08-14	opening	\N	\N	71.000	0.000	71.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.876019	\N	f	\N
-2799	2898	2026-08-14	opening	\N	\N	39.000	0.000	39.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.876937	\N	f	\N
-2800	2899	2026-08-14	opening	\N	\N	21.000	0.000	21.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.877876	\N	f	\N
-2801	2900	2026-08-14	opening	\N	\N	50.000	0.000	50.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.878853	\N	f	\N
-2802	2901	2026-08-14	opening	\N	\N	30.000	0.000	30.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.879854	\N	f	\N
-2803	2902	2026-08-14	opening	\N	\N	27.000	0.000	27.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.880747	\N	f	\N
-2804	2903	2026-08-14	opening	\N	\N	210.000	0.000	210.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.881705	\N	f	\N
-2805	2904	2026-08-14	opening	\N	\N	66.000	0.000	66.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.882981	\N	f	\N
-2806	2905	2026-08-14	opening	\N	\N	80.000	0.000	80.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.884193	\N	f	\N
-2807	2906	2026-08-14	opening	\N	\N	46.000	0.000	46.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.885136	\N	f	\N
-2808	2907	2026-08-14	opening	\N	\N	47.000	0.000	47.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.886081	\N	f	\N
-2809	2908	2026-08-14	opening	\N	\N	65.000	0.000	65.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.887094	\N	f	\N
-2810	2909	2026-08-14	opening	\N	\N	32.000	0.000	32.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.888092	\N	f	\N
-2811	2910	2026-08-14	opening	\N	\N	167.000	0.000	167.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.889056	\N	f	\N
-2812	2911	2026-08-14	opening	\N	\N	17.000	0.000	17.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.890014	\N	f	\N
-2813	2917	2026-08-14	opening	\N	\N	69.000	0.000	69.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.893535	\N	f	\N
-2814	2918	2026-08-14	opening	\N	\N	200.000	0.000	200.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.894504	\N	f	\N
-2815	2919	2026-08-14	opening	\N	\N	100.000	0.000	100.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.895434	\N	f	\N
-2816	2923	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.89788	\N	f	\N
-2817	2924	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.898929	\N	f	\N
-2818	2925	2026-08-14	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.900301	\N	f	\N
-2819	2926	2026-08-14	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.901357	\N	f	\N
-2820	2927	2026-08-14	opening	\N	\N	14.000	0.000	14.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.902339	\N	f	\N
-2821	2928	2026-08-14	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.903307	\N	f	\N
-2822	2929	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.904244	\N	f	\N
-2823	2930	2026-08-14	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.90516	\N	f	\N
-2824	2931	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.906072	\N	f	\N
-2825	2932	2026-08-14	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.906989	\N	f	\N
-2826	2934	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.908276	\N	f	\N
-2827	2935	2026-08-14	opening	\N	\N	6.000	0.000	6.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.910369	\N	f	\N
-2828	2936	2026-08-14	opening	\N	\N	3.000	0.000	3.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.911285	\N	f	\N
-2829	2937	2026-08-14	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.912188	\N	f	\N
-2830	2938	2026-08-14	opening	\N	\N	5.000	0.000	5.000	0.00	0.00	\N	\N	Opening balance from Hydraulic & Pneumatic Excel	\N	2026-08-14 16:27:43.913097	\N	f	\N
-2831	3330	2026-08-14	opening	\N	\N	6.000	0.000	6.000	0.00	0.00	\N	\N	Opening balance from Stationery Excel	\N	2026-08-14 16:27:43.922647	\N	f	\N
-2832	3111	2026-08-14	opening	\N	\N	19850.000	0.000	19850.000	36.00	714600.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.953063	\N	f	\N
-2833	3112	2026-08-14	opening	\N	\N	15466.000	0.000	15466.000	31.50	487179.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.954361	\N	f	\N
-2834	3113	2026-08-14	opening	\N	\N	3643.000	0.000	3643.000	98.00	357014.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.955532	\N	f	\N
-2835	3114	2026-08-14	opening	\N	\N	16.840	0.000	16.840	625.00	10525.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.956617	\N	f	\N
-2836	3115	2026-08-14	opening	\N	\N	808.700	0.000	808.700	350.00	283045.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.957652	\N	f	\N
-2837	3116	2026-08-14	opening	\N	\N	485.000	0.000	485.000	215.00	104275.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.958715	\N	f	\N
-2838	3117	2026-08-14	opening	\N	\N	2666.000	0.000	2666.000	151.00	402566.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.95976	\N	f	\N
-2839	3118	2026-08-14	opening	\N	\N	737.000	0.000	737.000	255.00	187935.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.960779	\N	f	\N
-2840	3119	2026-08-14	opening	\N	\N	18.000	0.000	18.000	290.00	5220.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.961891	\N	f	\N
-2841	3120	2026-08-14	opening	\N	\N	2975.000	0.000	2975.000	180.00	535500.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.962862	\N	f	\N
-2842	3122	2026-08-14	opening	\N	\N	129.200	0.000	129.200	320.00	41344.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.96432	\N	f	\N
-2843	3123	2026-08-14	opening	\N	\N	174.562	0.000	174.562	230.00	40149.26	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.965274	\N	f	\N
-2844	3124	2026-08-14	opening	\N	\N	2087.600	0.000	2087.600	230.00	480148.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.96619	\N	f	\N
-2845	3125	2026-08-14	opening	\N	\N	50.000	0.000	50.000	38.00	1900.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.967371	\N	f	\N
-2846	3126	2026-08-14	opening	\N	\N	102.200	0.000	102.200	18.00	1839.60	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.968471	\N	f	\N
-2847	3127	2026-08-14	opening	\N	\N	240.000	0.000	240.000	10.00	2400.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.969924	\N	f	\N
-2848	3127	2026-08-14	opening	\N	\N	300.000	0.000	300.000	10.00	3000.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.970852	\N	f	\N
-2849	3129	2026-08-14	opening	\N	\N	194.500	0.000	194.500	87.00	16921.50	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.97178	\N	f	\N
-2850	3130	2026-08-14	opening	\N	\N	300.000	0.000	300.000	92.00	27600.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.972697	\N	f	\N
-2851	3131	2026-08-14	opening	\N	\N	225.000	0.000	225.000	85.00	19125.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.973643	\N	f	\N
-2852	3132	2026-08-14	opening	\N	\N	72.000	0.000	72.000	240.00	17280.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.974607	\N	f	\N
-2853	3133	2026-08-14	opening	\N	\N	250.000	0.000	250.000	45.00	11250.00	\N	\N	Opening balance from Chemical Excel	\N	2026-08-14 16:27:43.975521	\N	f	\N
-2854	2298	2026-08-14	opening	\N	\N	1.000	0.000	1.000	235171.00	235171.00	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.984203	\N	f	\N
-2855	2299	2026-08-14	opening	\N	\N	1.000	0.000	1.000	507516.00	507516.00	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.985437	\N	f	\N
-2856	2300	2026-08-14	opening	\N	\N	1.000	0.000	1.000	243858.71	243858.71	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.98645	\N	f	\N
-2857	2301	2026-08-14	opening	\N	\N	1.000	0.000	1.000	158847.00	158847.00	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.987517	\N	f	\N
-2858	2302	2026-08-14	opening	\N	\N	2.000	0.000	2.000	175280.00	350560.00	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.988505	\N	f	\N
-2859	2303	2026-08-14	opening	\N	\N	1.000	0.000	1.000	273543.22	273543.22	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.989537	\N	f	\N
-2860	2304	2026-08-14	opening	\N	\N	2.000	0.000	2.000	230430.49	460860.98	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.990414	\N	f	\N
-2861	2305	2026-08-14	opening	\N	\N	2.000	0.000	2.000	261152.62	522305.24	\N	\N	Opening balance from Clothing Excel	\N	2026-08-14 16:27:43.991262	\N	f	\N
-2862	2938	2026-08-01	grn	\N	IGRN	5.000	0.000	10.000	10260.00	51300.00	\N	\N	[Vendor GRN 202608-01] | Party: AIRMAX PNEUMATICS LTD | Inv: MKT/26-27/1262 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.482375	\N	f	\N
-2863	4045	2026-08-01	grn	\N	IGRN	1.000	0.000	1.000	1665000.00	1665000.00	\N	\N	[Vendor GRN 202608-02] | Party: BHAGYANAGAR DIESELS (GODREJ) | Inv: SAL/26-27/101 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.4893	\N	f	\N
-2864	2796	2026-08-01	grn	\N	IGRN	2.000	0.000	2.000	1700.00	3400.00	\N	\N	[Vendor GRN 202608-03] | Party: FLOWSTAR VALVES | Inv: FSV/200 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.493467	\N	f	\N
-2865	3030	2026-08-01	grn	\N	IGRN	1.000	0.000	1.000	240.00	240.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.497163	\N	f	\N
-2866	3026	2026-08-01	grn	\N	IGRN	1.000	0.000	2.000	1900.00	1900.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.500765	\N	f	\N
-2867	3027	2026-08-01	grn	\N	IGRN	25.000	0.000	50.000	20.00	500.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.504897	\N	f	\N
-2868	3028	2026-08-01	grn	\N	IGRN	25.000	0.000	66.000	18.00	450.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.508604	\N	f	\N
-2869	3029	2026-08-01	grn	\N	IGRN	84.000	0.000	166.000	4.76	400.00	\N	\N	[Vendor GRN 202608-04] | Party: ENAR MILL STORES | Inv: 242 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.512106	\N	f	\N
-2870	2664	2026-08-03	grn	\N	IGRN	8.000	0.000	8.000	4954.00	27742.40	\N	\N	[Vendor GRN 202608-05] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.515564	\N	f	\N
-2871	2658	2026-08-03	grn	\N	IGRN	6.000	0.000	6.000	1927.00	8093.40	\N	\N	[Vendor GRN 202608-05] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.519795	\N	f	\N
-2872	3379	2026-08-01	grn	\N	IGRN	20.000	0.000	20.000	1250.00	25000.00	\N	\N	[Vendor GRN 202608-06] | Party: SHREE GOKUL COMMERCIAL CORPORATION | Inv: 282/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.523516	\N	f	\N
-2873	2992	2026-08-05	grn	\N	IGRN	50.000	0.000	50.000	0.00	0.00	\N	\N	[Vendor GRN 202608-07] | Party: SHINE ENGINEERING CO | Inv: DC :913 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.527418	\N	f	\N
-2874	3120	2026-08-05	grn	\N	IGRN	475.000	0.000	3450.000	172.00	81700.00	\N	\N	[Vendor GRN 202608-08] | Party: SIGMAEXOR CHEMICALS PVT LTD | Inv: 19 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.530842	\N	f	\N
-2875	3127	2026-08-05	grn	\N	IGRN	300.000	0.000	540.000	10.00	3000.00	\N	\N	[Vendor GRN 202608-09] | Party: SIGMAEXOR CHEMICALS PVT LTD | Inv: 19 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.534193	\N	f	\N
-2876	3112	2026-08-06	grn	\N	IGRN	15000.000	0.000	30466.000	43.00	645000.00	\N	\N	[Vendor GRN 202608-10] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.538333	\N	f	\N
-2877	3129	2026-08-06	grn	\N	IGRN	150.000	0.000	344.500	87.00	13050.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.541771	\N	f	\N
-2878	3130	2026-08-06	grn	\N	IGRN	300.000	0.000	600.000	92.00	27600.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.545153	\N	f	\N
-2879	3131	2026-08-06	grn	\N	IGRN	175.000	0.000	400.000	85.00	14875.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.548534	\N	f	\N
-2880	3132	2026-08-06	grn	\N	IGRN	50.000	0.000	122.000	240.00	12000.00	\N	\N	[Vendor GRN 202608-11] | Party: VISHAL CHEMICALS | Inv: 939/26/27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.552681	\N	f	\N
-2881	3392	2026-08-08	grn	\N	IGRN	4.000	0.000	8.000	0.00	0.00	\N	\N	[Vendor GRN 20260/-14] | Party: DATTU ELECTRICALS | Inv: 4855 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.556826	\N	f	\N
-2882	4046	2026-08-08	grn	\N	IGRN	6.000	0.000	6.000	0.00	0.00	\N	\N	[Vendor GRN 202608-16] | Party: DATTU ELECTRICALS | Inv: 4861 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.560069	\N	f	\N
-2883	2143	2026-08-08	grn	\N	IGRN	6.000	0.000	6.000	195.00	1170.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.563478	\N	f	\N
-2884	2144	2026-08-08	grn	\N	IGRN	6.000	0.000	6.000	280.00	1680.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.567066	\N	f	\N
-2885	2191	2026-08-08	grn	\N	IGRN	1.000	0.000	1.000	7950.00	7950.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.570988	\N	f	\N
-2886	2271	2026-08-08	grn	\N	IGRN	1.000	0.000	1.000	26175.00	26175.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.574716	\N	f	\N
-2887	2296	2026-08-08	grn	\N	IGRN	5.000	0.000	5.000	7710.00	38550.00	\N	\N	[Vendor GRN 202608-17] | Party: SUN RISE BEARING CORPORATION | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.578242	\N	f	\N
-2888	3381	2026-08-08	grn	\N	IGRN	4.000	0.000	4.000	1750.00	7000.00	\N	\N	[Vendor GRN 202608-18] | Party: MZ AUTO MOBILES | Inv: SIV-31080 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.581466	\N	f	\N
-2889	2202	2026-08-11	grn	\N	IGRN	4.000	0.000	4.000	1050.00	4200.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.584757	\N	f	\N
-2890	2203	2026-08-11	grn	\N	IGRN	1.000	0.000	1.000	10450.00	10450.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.588662	\N	f	\N
-2891	2257	2026-08-11	grn	\N	IGRN	2.000	0.000	2.000	31500.00	63000.00	\N	\N	[Vendor GRN 202608-21] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31107 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.591868	\N	f	\N
-2892	3405	2026-08-12	grn	\N	IGRN	2.000	0.000	3.000	0.00	0.00	\N	\N	[Vendor GRN 202608-22] | Party: PRAMATIC INDUSTRIAL AUTOMATION SOLUCTIONS PVT LTD | Inv: DC: 260/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.59512	\N	f	\N
-2893	3452	2026-08-12	grn	\N	IGRN	2.000	0.000	2.000	0.00	0.00	\N	\N	[Vendor GRN 202608-22] | Party: PRAMATIC INDUSTRIAL AUTOMATION SOLUCTIONS PVT LTD | Inv: DC: 260/26-27 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.598346	\N	f	\N
-2894	2990	2026-08-12	grn	\N	IGRN	150.000	0.000	150.000	9.70	1455.00	\N	\N	[Vendor GRN 202608-23] | Party: IMPERIAL ENGINEERING | Inv: 2083 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.601544	\N	f	\N
-2895	3461	2026-08-12	grn	\N	IGRN	28.000	0.000	29.000	100.00	2800.00	\N	\N	[Vendor GRN 202608-24] | Party: IMPERIAL ENGINEERING | Inv: 2083 | Transport: VRL | LR: 1091407145	\N	2026-08-14 16:27:44.60501	\N	f	\N
-2203	2163	2026-08-14	opening	\N	OPENING	6.000	0.000	3.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2896	3327	2026-08-14	opening	\N	\N	14.000	0.000	7.000	0.00	0.00	\N	\N	Opening Stock / Master Entry	6	2026-08-14 18:15:52.762353	\N	f	\N
-2897	3380	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bearing)	\N	2026-08-15 15:01:18.787665	\N	f	\N
-2898	3382	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bearing)	\N	2026-08-15 15:01:18.797529	\N	f	\N
-2899	3383	2026-08-15	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bearing)	\N	2026-08-15 15:01:18.801748	\N	f	\N
-2900	3384	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bearing)	\N	2026-08-15 15:01:18.803061	\N	f	\N
-2901	2318	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Tyre Coupling & Pin Bush)	\N	2026-08-15 15:01:18.817783	\N	f	\N
-2902	2320	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Tyre Coupling & Pin Bush)	\N	2026-08-15 15:01:18.820843	\N	f	\N
-2903	2321	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Tyre Coupling & Pin Bush)	\N	2026-08-15 15:01:18.822553	\N	f	\N
-2904	2322	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Tyre Coupling & Pin Bush)	\N	2026-08-15 15:01:18.824001	\N	f	\N
-2905	3385	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Valve)	\N	2026-08-15 15:01:18.979419	\N	f	\N
-2906	3364	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.18088	\N	f	\N
-2907	3365	2026-08-15	opening	\N	\N	4.000	0.000	4.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.182149	\N	f	\N
-2908	3366	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.183418	\N	f	\N
-2909	3367	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.184788	\N	f	\N
-2910	3368	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.186073	\N	f	\N
-2911	3369	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.187374	\N	f	\N
-2912	3370	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.188903	\N	f	\N
-2913	3371	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.191303	\N	f	\N
-2914	3372	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Compressor)	\N	2026-08-15 15:01:19.192836	\N	f	\N
-2915	3373	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Pulley)	\N	2026-08-15 15:01:19.194866	\N	f	\N
-2916	3374	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Pulley)	\N	2026-08-15 15:01:19.197074	\N	f	\N
-2917	3375	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Pulley)	\N	2026-08-15 15:01:19.198654	\N	f	\N
-2918	3376	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Pulley)	\N	2026-08-15 15:01:19.200099	\N	f	\N
-2919	3377	2026-08-15	opening	\N	\N	1.000	0.000	1.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Pulley)	\N	2026-08-15 15:01:19.201738	\N	f	\N
-2920	2968	2026-08-15	opening	\N	\N	100.000	0.000	100.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:33.951241	\N	f	\N
-2921	2970	2026-08-15	opening	\N	\N	50.000	0.000	50.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:33.95489	\N	f	\N
-2922	3386	2026-08-15	opening	\N	\N	200.000	0.000	200.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:33.961843	\N	f	\N
-2923	3387	2026-08-15	opening	\N	\N	150.000	0.000	150.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:33.971698	\N	f	\N
-2924	3388	2026-08-15	opening	\N	\N	50.000	0.000	50.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:34.00415	\N	f	\N
-2925	3389	2026-08-15	opening	\N	\N	50.000	0.000	50.000	0.00	0.00	\N	\N	Opening Stock / Mechanical Store (Bolts & Nuts/Washers)	\N	2026-08-15 15:01:34.005577	\N	f	\N
-2926	3517	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / General Store Excel	\N	2026-08-15 15:01:34.323552	\N	f	\N
-2927	3518	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / General Store Excel	\N	2026-08-15 15:01:34.324932	\N	f	\N
-2928	4657	2026-08-15	opening	\N	\N	7.000	0.000	7.000	0.00	0.00	\N	\N	Opening Stock / General Store Excel	\N	2026-08-15 15:01:34.328341	\N	f	\N
-2929	4658	2026-08-15	opening	\N	\N	22.000	0.000	22.000	0.00	0.00	\N	\N	Opening Stock / General Store Excel	\N	2026-08-15 15:01:34.329936	\N	f	\N
-2931	4661	2026-08-15	opening	\N	\N	2.000	0.000	2.000	0.00	0.00	\N	\N	Opening Stock / Quality Control Excel	\N	2026-08-15 15:01:34.505997	\N	f	\N
-2936	4669	2026-08-15	opening	\N	\N	14072026.000	0.000	14072026.000	0.00	0.00	\N	\N	Mechanical Excel Import	\N	2026-08-15 15:42:00.623432	\N	f	\N
-2934	2054	2026-08-15	grn	\N	\N	8.000	0.000	23.000	275.50	2204.00	\N	\N	GRN Receipt	\N	2026-08-15 15:19:21.844568	\N	f	\N
-2935	2054	2026-08-15	issue	\N	\N	0.000	2.000	20.000	275.50	551.00	\N	\N	Issue Record	\N	2026-08-15 15:19:21.844568	\N	f	\N
-2930	4660	2026-08-15	opening	\N	\N	9.000	0.000	7.000	0.00	0.00	\N	\N	Opening Stock / Quality Control Excel	\N	2026-08-15 15:01:34.504439	\N	f	\N
-1828	2054	2026-08-15	opening	\N	OPENING	15.000	0.000	15.000	275.50	4132.50	\N	2	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2945	3488	2026-08-15	issue	\N	indent	0.000	2.000	13.000	0.00	0.00	\N	\N	Indent IND-VERIF-1786790098624	6	2026-08-15 16:07:48.548237	\N	f	\N
-2600	2141	2026-08-15	opening	\N	OPENING	10.000	0.000	10.000	0.00	0.00	\N	\N	Initial Opening Balance (Verified)	\N	2026-08-13 22:00:47.279345	\N	f	\N
-2946	2141	2026-08-15	issue	\N	indent	0.000	2.000	4.000	0.00	0.00	\N	\N	Indent IND-20260815-0001	6	2026-08-15 16:10:46.668536	\N	f	\N
-2948	4658	2026-08-15	issue	\N	indent	0.000	2.000	20.000	0.00	0.00	\N	\N	Indent IND-20260815-0002	6	2026-08-15 16:43:24.699948	\N	f	\N
-2949	3488	2026-08-15	issue	\N	indent	0.000	2.000	11.000	0.00	0.00	\N	\N	Indent IND-VERIF-1786790080639	6	2026-08-15 16:43:50.770831	\N	f	\N
-2950	4658	2026-08-15	issue	\N	indent	0.000	2.000	18.000	0.00	0.00	\N	\N	Indent IND-20260815-0003	6	2026-08-15 16:46:11.262088	\N	f	\N
-2959	3488	2026-08-15	GRN	24	PO	10.000	0.000	21.000	250.00	2500.00	\N	\N	GRN GRN-P2P-1786794967620 Inward	21	2026-08-15 17:26:07.631403	\N	f	2
-2960	3496	2026-08-15	GRN	24	PO	4.000	0.000	26.000	500.00	2000.00	\N	\N	GRN GRN-P2P-1786794967620 Inward (4 accepted)	21	2026-08-15 17:26:07.631403	\N	f	2
-2961	3488	2026-08-15	GRN	25	PO	10.000	0.000	31.000	250.00	2500.00	\N	\N	GRN GRN-P2P-1786795104118 Inward	21	2026-08-15 17:28:24.128213	\N	f	2
-2962	3496	2026-08-15	GRN	25	PO	4.000	0.000	30.000	500.00	2000.00	\N	\N	GRN GRN-P2P-1786795104118 Inward (4 accepted)	21	2026-08-15 17:28:24.128213	\N	f	2
-2963	2853	2026-08-15	grn	\N	PO	1.000	0.000	41.000	150.00	150.00	\N	\N	[Vendor GRN] | Ref: PO-20260815-0001 | Party: ENAR MILL STORES | QC: Accepted | Auto-populated from PO PO-20260815-0001	6	2026-08-15 17:34:00.070928	\N	f	\N
-2964	3488	2026-08-15	GRN	27	PO	10.000	0.000	41.000	250.00	2500.00	\N	\N	GRN GRN-P2P-1786795797464 Inward	21	2026-08-15 17:39:57.471919	\N	f	2
-2965	3496	2026-08-15	GRN	27	PO	4.000	0.000	34.000	500.00	2000.00	\N	\N	GRN GRN-P2P-1786795797464 Inward (4 accepted)	21	2026-08-15 17:39:57.471919	\N	f	2
+2717	3059	2026-08-15	issue	\N	indent	0.000	1.000	-1.000	0.00	0.00	\N	\N	Indent IND-20260815-0001	6	2026-08-15 15:10:37.056553	\N	f	\N
+2718	3365	2026-08-16	grn	12	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-945827 QC Accepted	21	2026-08-16 18:25:45.840106	\N	f	\N
+2719	3366	2026-08-16	grn	13	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-048405 QC Accepted	21	2026-08-16 18:27:28.417996	\N	f	\N
+2720	3367	2026-08-16	grn	14	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-903999 QC Accepted	21	2026-08-16 18:41:44.008341	\N	f	\N
+2721	3367	2026-08-16	issue	1	ISSUE	0.000	40.000	680.000	45.00	1800.00	\N	\N	Issued to PM2 Bleaching Tower	21	2026-08-16 18:41:44.050088	\N	f	\N
+2722	3368	2026-08-16	grn	15	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-302145 QC Accepted	21	2026-08-16 18:48:22.155953	\N	f	\N
+2723	3368	2026-08-16	issue	1	ISSUE	0.000	40.000	680.000	45.00	1800.00	\N	\N	Issued to PM2 Bleaching Tower	21	2026-08-16 18:48:22.204862	\N	f	\N
+2724	3369	2026-08-16	grn	16	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-638381 QC Accepted	21	2026-08-16 19:10:38.394454	\N	f	\N
+2725	3369	2026-08-16	issue	1	ISSUE	0.000	40.000	680.000	45.00	1800.00	\N	\N	Issued to PM2 Bleaching Tower	21	2026-08-16 19:10:38.459815	\N	f	\N
+2726	3370	2026-08-16	grn	19	GRN	700.000	0.000	700.000	45.00	31500.00	\N	\N	GRN #GRN-TEST-599654 QC Accepted	21	2026-08-16 19:43:19.669969	\N	f	\N
+2727	3370	2026-08-16	issue	1	ISSUE	0.000	40.000	680.000	45.00	1800.00	\N	\N	Issued to PM2 Bleaching Tower	21	2026-08-16 19:43:19.738691	\N	f	\N
 \.
 
 
 --
--- TOC entry 6663 (class 0 OID 25678)
--- Dependencies: 395
 -- Data for Name: store_indent_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13916,8 +13514,6 @@ COPY public.store_indent_log (id, indent_id, action, from_status, to_status, act
 
 
 --
--- TOC entry 6665 (class 0 OID 25686)
--- Dependencies: 397
 -- Data for Name: store_indents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13926,8 +13522,6 @@ COPY public.store_indents (id, indent_number, indent_date, department_id, materi
 
 
 --
--- TOC entry 6667 (class 0 OID 25700)
--- Dependencies: 399
 -- Data for Name: store_issues; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13936,8 +13530,54 @@ COPY public.store_issues (id, issue_number, issue_date, material_id, department_
 
 
 --
--- TOC entry 6669 (class 0 OID 25716)
--- Dependencies: 401
+-- Data for Name: store_return_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.store_return_items (id, return_id, material_id, qty, uom, condition_grade, action_taken, remarks) FROM stdin;
+1	1	3367	20.000	Kg	Good	Restocked to Store	Unopened bag
+2	2	3368	20.000	Kg	Good	Restocked to Store	Unopened bag
+3	3	3369	20.000	Kg	Good	Restocked to Store	Unopened bag
+4	4	3370	20.000	Kg	Good	Restocked to Store	Unopened bag
+\.
+
+
+--
+-- Data for Name: store_returns; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.store_returns (id, return_number, department_id, indent_id, return_date, status, returned_by, inspected_by, remarks, created_at) FROM stdin;
+1	SRV-TEST-904038	1	\N	2026-08-16	Restocked	21	\N	Excess chemical from shift run	2026-08-16 18:41:44.039413
+2	SRV-TEST-302195	1	\N	2026-08-16	Restocked	21	\N	Excess chemical from shift run	2026-08-16 18:48:22.196
+3	SRV-TEST-638448	1	\N	2026-08-16	Restocked	21	\N	Excess chemical from shift run	2026-08-16 19:10:38.449368
+4	SRV-TEST-599721	1	\N	2026-08-16	Restocked	21	\N	Excess chemical from shift run	2026-08-16 19:43:19.722323
+\.
+
+
+--
+-- Data for Name: store_transfer_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.store_transfer_items (id, transfer_id, material_id, qty, uom, batch_number, remarks) FROM stdin;
+1	1	3367	50.000	Kg	\N	\N
+2	2	3368	50.000	Kg	\N	\N
+3	3	3369	50.000	Kg	\N	\N
+4	4	3370	50.000	Kg	\N	\N
+\.
+
+
+--
+-- Data for Name: store_transfers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.store_transfers (id, transfer_number, from_warehouse_id, to_warehouse_id, transfer_date, status, requested_by, approved_by, dispatched_by, received_by, remarks, created_at) FROM stdin;
+1	STO-TEST-904028	1	1	2026-08-16	Completed	21	\N	\N	\N	Inter-Store Relocation	2026-08-16 18:41:44.02959
+2	STO-TEST-302186	1	1	2026-08-16	Completed	21	\N	\N	\N	Inter-Store Relocation	2026-08-16 18:48:22.187147
+3	STO-TEST-638439	1	1	2026-08-16	Completed	21	\N	\N	\N	Inter-Store Relocation	2026-08-16 19:10:38.440257
+4	STO-TEST-599708	1	1	2026-08-16	Completed	21	\N	\N	\N	Inter-Store Relocation	2026-08-16 19:43:19.708899
+\.
+
+
+--
 -- Data for Name: system_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13960,8 +13600,6 @@ COPY public.system_settings (id, key, value, category, label, updated_by, update
 
 
 --
--- TOC entry 6671 (class 0 OID 25725)
--- Dependencies: 403
 -- Data for Name: training_attendance; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13970,8 +13608,6 @@ COPY public.training_attendance (id, training_id, employee_id, nominated_by, sta
 
 
 --
--- TOC entry 6673 (class 0 OID 25737)
--- Dependencies: 405
 -- Data for Name: training_programs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -13980,8 +13616,6 @@ COPY public.training_programs (id, title, category, trainer_name, trainer_type, 
 
 
 --
--- TOC entry 6675 (class 0 OID 25750)
--- Dependencies: 407
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -14005,16 +13639,14 @@ COPY public.users (id, employee_code, name, email, mobile, password_hash, role_i
 11	DH-UTIL	Head - Utility	head.util@mkpapermill.com	9000000009	$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa	3	9	\N	t	2026-07-08 12:53:16.080436	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
 14	DH-HR	Head - HR & Payroll	head.hr@mkpapermill.com	9000000012	$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa	3	12	\N	t	2026-06-30 00:43:08.913652	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
 10	DH-MAINT	Head - Maintenance	head.maint@mkpapermill.com	9000000008	$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa	3	8	\N	t	2026-06-30 00:43:42.699467	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
-23	STORE-DESK	Store Issue Desk	store@mkpapermill.com	9000000004	$2a$10$AH7XN2rc2.PZlteRF2gQP.0FtS1Yfq6ED/dPzvUaUZ3hMoiLp1ASG	2	4	\N	t	2026-08-15 11:09:03.686523	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
-1	EMP001	Admin	admin@mkpapermill.com	9999999999	$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq	5	16	\N	t	2026-08-15 17:15:59.506466	2026-06-26 18:13:01.372505	2026-06-26 18:13:01.372505	f
-2	PH-001	Plant Head	planthead@mkpapermill.com	9000000099	$2a$10$Mki/Rc2R/Hv5UqJR9lknWOsRNNGm6.2U.j7FIEYo3Mpfxi6TEaZci	4	16	\N	t	2026-08-15 13:40:48.250251	2026-06-29 09:48:42.952885	2026-07-10 19:40:06.471594	f
-6	DH-STORE	Head - Store Management	head.store@mkpapermill.com	9000000004	$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa	3	4	\N	t	2026-08-15 17:22:01.08251	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
+23	STORE-DESK	Store Issue Desk	store@mkpapermill.com	9000000004	$2a$10$AH7XN2rc2.PZlteRF2gQP.0FtS1Yfq6ED/dPzvUaUZ3hMoiLp1ASG	2	4	\N	t	2026-08-15 15:12:34.00832	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
+2	PH-001	Plant Head	planthead@mkpapermill.com	9000000099	$2a$10$Mki/Rc2R/Hv5UqJR9lknWOsRNNGm6.2U.j7FIEYo3Mpfxi6TEaZci	4	16	\N	t	2026-08-16 21:32:13.363396	2026-06-29 09:48:42.952885	2026-07-10 19:40:06.471594	f
+1	EMP001	Admin	admin@mkpapermill.com	9999999999	$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq	5	16	\N	t	2026-08-17 00:15:16.536852	2026-06-26 18:13:01.372505	2026-06-26 18:13:01.372505	f
+6	DH-STORE	Head - Store Management	head.store@mkpapermill.com	9000000004	$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa	3	4	\N	t	2026-08-17 10:47:33.138973	2026-06-29 09:48:42.952885	2026-06-29 09:48:42.952885	f
 \.
 
 
 --
--- TOC entry 6677 (class 0 OID 25763)
--- Dependencies: 409
 -- Data for Name: utility_readings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -14023,67 +13655,44 @@ COPY public.utility_readings (id, date, shift_type, reading_time, power_units, d
 
 
 --
--- TOC entry 6684 (class 0 OID 27270)
--- Dependencies: 416
 -- Data for Name: vendor_bills; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.vendor_bills (id, bill_number, vendor_id, po_id, grn_id, vendor_invoice_number, invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount, igst_amount, total_tax, roundoff, total_amount, paid_amount, balance_amount, status, remarks, created_by, approved_by, approved_at, created_at) FROM stdin;
-1	BILL-P2P-1786794967636	2	24	9	INV-VEND-2026-001	2026-08-15	2026-09-14	4500.00	405.00	405.00	0.00	810.00	0.00	5310.00	5310.00	0.00	Paid	Commercial invoice verified against GRN accepted items	21	21	2026-08-15 17:26:07.640582	2026-08-15 17:26:07.636557
-2	BILL-P2P-1786795104137	2	25	10	INV-VEND-2026-001	2026-08-15	2026-09-14	4500.00	405.00	405.00	0.00	810.00	0.00	5310.00	5310.00	0.00	Paid	Commercial invoice verified against GRN accepted items	21	21	2026-08-15 17:28:24.140676	2026-08-15 17:28:24.137518
-3	BILL-P2P-1786795797476	2	27	11	INV-VEND-2026-001	2026-08-15	2026-09-14	4500.00	405.00	405.00	0.00	810.00	0.00	5310.00	5310.00	0.00	Paid	Commercial invoice verified against GRN accepted items	21	21	2026-08-15 17:39:57.479151	2026-08-15 17:39:57.476705
+COPY public.vendor_bills (id, bill_number, vendor_id, po_id, grn_id, vendor_invoice_number, invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount, igst_amount, total_tax, roundoff, total_amount, paid_amount, balance_amount, status, remarks, created_by, created_at, updated_at, approved_by, approved_at) FROM stdin;
+1	BILL-TEST-904019	2	\N	\N	\N	2026-08-16	2026-09-15	0.00	0.00	0.00	0.00	0.00	0.00	50000.00	0.00	34070.00	Approved	\N	\N	2026-08-16 18:41:44.020538	2026-08-16 18:41:44.020538	\N	\N
+2	BILL-TEST-302173	2	\N	\N	\N	2026-08-16	2026-09-15	0.00	0.00	0.00	0.00	0.00	0.00	50000.00	0.00	34070.00	Approved	\N	\N	2026-08-16 18:48:22.17349	2026-08-16 18:48:22.17349	\N	\N
+3	BILL-TEST-638427	2	\N	\N	\N	2026-08-16	2026-09-15	0.00	0.00	0.00	0.00	0.00	0.00	50000.00	0.00	34070.00	Approved	\N	\N	2026-08-16 19:10:38.428196	2026-08-16 19:10:38.428196	\N	\N
+4	BILL-TEST-599691	2	\N	\N	\N	2026-08-16	2026-09-15	0.00	0.00	0.00	0.00	0.00	0.00	50000.00	0.00	34070.00	Approved	\N	\N	2026-08-16 19:43:19.692374	2026-08-16 19:43:19.692374	\N	\N
 \.
 
 
 --
--- TOC entry 6686 (class 0 OID 27331)
--- Dependencies: 418
 -- Data for Name: vendor_payments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.vendor_payments (id, payment_number, vendor_id, bill_id, po_id, amount, payment_date, payment_mode, bank_name, reference_number, status, remarks, recorded_by, confirmed_by, confirmed_at, created_at) FROM stdin;
-1	VPY-P2P-1786794967641	2	1	24	5310.00	2026-08-15	Bank Transfer (NEFT/RTGS)	HDFC Bank - Current A/c 001992837	UTR-HDFC-991823746	Paid	Full settlement against Bill and GRN	21	\N	\N	2026-08-15 17:26:07.64165
-2	VPY-P2P-1786795104142	2	2	25	5310.00	2026-08-15	Bank Transfer (NEFT/RTGS)	HDFC Bank - Current A/c 001992837	UTR-HDFC-991823746	Paid	Full settlement against Bill and GRN	21	\N	\N	2026-08-15 17:28:24.143006
-3	VPY-P2P-1786795797481	2	3	27	5310.00	2026-08-15	Bank Transfer (NEFT/RTGS)	HDFC Bank - Current A/c 001992837	UTR-HDFC-991823746	Paid	Full settlement against Bill and GRN	21	\N	\N	2026-08-15 17:39:57.481402
 \.
 
 
 --
--- TOC entry 6679 (class 0 OID 25771)
--- Dependencies: 411
 -- Data for Name: vendors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.vendors (id, code, name, gstin, pan, address, city, state, pincode, contact_person, mobile, email, payment_terms, credit_days, rating, is_active, created_at, deleted_by) FROM stdin;
-2	VND-0002	Global Scrap Co	\N	\N	123 Scrap Yard	\N	\N	\N	\N	\N	global@scrap.com	30 days	30	3.0	t	2026-07-10 23:54:50.226885	\N
-1	TESTVEND1	Test Vendor Co	\N	\N	\N	\N	\N	\N	\N	9999999999	\N		30	0.0	f	2026-07-10 19:59:04.165562	6
-10	VND-0003	Test Precision Vendor 505444	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor505444@test.com	30 Days Net	30	3.0	f	2026-08-14 01:51:45.58649	6
-11	VND-0004	Test Precision Vendor 512468	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor512468@test.com	30 Days Net	30	3.0	f	2026-08-14 01:51:52.539561	6
-12	VND-0005	Test Precision Vendor 592261	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor592261@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:12.350854	6
-13	VND-0006	Test Precision Vendor 605170	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor605170@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:25.214085	6
-14	VND-0007	Test Precision Vendor 613802	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor613802@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:33.838412	6
-15	VND-0008	Test Precision Vendor 620717	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor620717@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:40.749841	6
-17	VND-0010	Test Precision Vendor 635458	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor635458@test.com	30 Days Net	30	3.0	f	2026-08-14 02:10:35.531935	6
-16	VND-0009	Test Precision Vendor 639817	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor639817@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:59.89915	6
-18	VEN-AIRMAX	AIRMAX PNEUMATICS LTD	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.526019	\N
-19	VEN-BHAGYA	BHAGYANAGAR DIESELS (GODREJ)	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.530825	\N
-20	VEN-FLOWST	FLOWSTAR VALVES	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.532079	\N
-21	VEN-ENARMI	ENAR MILL STORES	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.533132	\N
-22	VEN-SHREEG	SHREE GOKUL COMMERCIAL CORPORATION	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.536746	\N
-23	VEN-SHINEE	SHINE ENGINEERING CO	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.539239	\N
-24	VEN-SIGMAE	SIGMAEXOR CHEMICALS PVT LTD	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.540279	\N
-25	VEN-VISHAL	VISHAL CHEMICALS	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.541923	\N
-26	VEN-DATTUE	DATTU ELECTRICALS	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.546178	\N
-27	VEN-SUNRIS	SUN RISE BEARING CORPORATION	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.547916	\N
-28	VEN-MZAUTO	MZ AUTO MOBILES	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.551805	\N
-32	VEN-PRAMAT	PRAMATIC INDUSTRIAL AUTOMATION SOLUCTIONS PVT LTD	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.555566	\N
-33	VEN-IMPERI	IMPERIAL ENGINEERING	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	30	0.0	t	2026-08-15 15:01:34.557223	\N
+COPY public.vendors (id, code, name, gstin, pan, address, city, state, pincode, contact_person, mobile, email, payment_terms, credit_days, rating, is_active, created_at, deleted_by, bank_name, account_number, ifsc_code, branch_name, account_holder_name, account_type) FROM stdin;
+2	VND-0002	Global Scrap Co	\N	\N	123 Scrap Yard	\N	\N	\N	\N	\N	global@scrap.com	30 days	30	3.0	t	2026-07-10 23:54:50.226885	\N	\N	\N	\N	\N	\N	Current
+1	TESTVEND1	Test Vendor Co	\N	\N	\N	\N	\N	\N	\N	9999999999	\N		30	0.0	f	2026-07-10 19:59:04.165562	6	\N	\N	\N	\N	\N	Current
+10	VND-0003	Test Precision Vendor 505444	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor505444@test.com	30 Days Net	30	3.0	f	2026-08-14 01:51:45.58649	6	\N	\N	\N	\N	\N	Current
+11	VND-0004	Test Precision Vendor 512468	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor512468@test.com	30 Days Net	30	3.0	f	2026-08-14 01:51:52.539561	6	\N	\N	\N	\N	\N	Current
+12	VND-0005	Test Precision Vendor 592261	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor592261@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:12.350854	6	\N	\N	\N	\N	\N	Current
+13	VND-0006	Test Precision Vendor 605170	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor605170@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:25.214085	6	\N	\N	\N	\N	\N	Current
+14	VND-0007	Test Precision Vendor 613802	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor613802@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:33.838412	6	\N	\N	\N	\N	\N	Current
+15	VND-0008	Test Precision Vendor 620717	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor620717@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:40.749841	6	\N	\N	\N	\N	\N	Current
+17	VND-0010	Test Precision Vendor 635458	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor635458@test.com	30 Days Net	30	3.0	f	2026-08-14 02:10:35.531935	6	\N	\N	\N	\N	\N	Current
+16	VND-0009	Test Precision Vendor 639817	\N	\N	\N	\N	\N	\N	Rajesh Sharma	9876543210	vendor639817@test.com	30 Days Net	30	3.0	f	2026-08-14 01:53:59.89915	6	\N	\N	\N	\N	\N	Current
 \.
 
 
 --
--- TOC entry 6681 (class 0 OID 25783)
--- Dependencies: 413
 -- Data for Name: warehouses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -14097,8 +13706,6 @@ COPY public.warehouses (id, name, code, is_active, created_at) FROM stdin;
 
 
 --
--- TOC entry 6791 (class 0 OID 0)
--- Dependencies: 221
 -- Name: adjustment_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14106,8 +13713,6 @@ SELECT pg_catalog.setval('public.adjustment_requests_id_seq', 1, true);
 
 
 --
--- TOC entry 6792 (class 0 OID 0)
--- Dependencies: 223
 -- Name: appraisal_competencies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14115,8 +13720,6 @@ SELECT pg_catalog.setval('public.appraisal_competencies_id_seq', 1, false);
 
 
 --
--- TOC entry 6793 (class 0 OID 0)
--- Dependencies: 225
 -- Name: appraisal_cycles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14124,8 +13727,6 @@ SELECT pg_catalog.setval('public.appraisal_cycles_id_seq', 1, false);
 
 
 --
--- TOC entry 6794 (class 0 OID 0)
--- Dependencies: 227
 -- Name: appraisal_goals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14133,8 +13734,6 @@ SELECT pg_catalog.setval('public.appraisal_goals_id_seq', 1, false);
 
 
 --
--- TOC entry 6795 (class 0 OID 0)
--- Dependencies: 229
 -- Name: approval_matrix_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14142,8 +13741,6 @@ SELECT pg_catalog.setval('public.approval_matrix_id_seq', 3, true);
 
 
 --
--- TOC entry 6796 (class 0 OID 0)
--- Dependencies: 231
 -- Name: asset_events_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14151,8 +13748,6 @@ SELECT pg_catalog.setval('public.asset_events_id_seq', 2, true);
 
 
 --
--- TOC entry 6797 (class 0 OID 0)
--- Dependencies: 233
 -- Name: attendance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14160,8 +13755,6 @@ SELECT pg_catalog.setval('public.attendance_id_seq', 1, false);
 
 
 --
--- TOC entry 6798 (class 0 OID 0)
--- Dependencies: 235
 -- Name: attendance_regularization_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14169,44 +13762,34 @@ SELECT pg_catalog.setval('public.attendance_regularization_id_seq', 1, false);
 
 
 --
--- TOC entry 6799 (class 0 OID 0)
--- Dependencies: 237
 -- Name: audit_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.audit_log_id_seq', 160, true);
+SELECT pg_catalog.setval('public.audit_log_id_seq', 129, true);
 
 
 --
--- TOC entry 6800 (class 0 OID 0)
--- Dependencies: 239
 -- Name: boiler_performance_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.boiler_performance_logs_id_seq', 2, true);
+SELECT pg_catalog.setval('public.boiler_performance_logs_id_seq', 3, true);
 
 
 --
--- TOC entry 6801 (class 0 OID 0)
--- Dependencies: 241
 -- Name: chemical_consumption_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chemical_consumption_id_seq', 4, true);
+SELECT pg_catalog.setval('public.chemical_consumption_id_seq', 6, true);
 
 
 --
--- TOC entry 6802 (class 0 OID 0)
--- Dependencies: 243
 -- Name: chemical_limit_alerts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chemical_limit_alerts_id_seq', 2, true);
+SELECT pg_catalog.setval('public.chemical_limit_alerts_id_seq', 3, true);
 
 
 --
--- TOC entry 6803 (class 0 OID 0)
--- Dependencies: 245
 -- Name: clearance_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14214,8 +13797,6 @@ SELECT pg_catalog.setval('public.clearance_items_id_seq', 1, false);
 
 
 --
--- TOC entry 6804 (class 0 OID 0)
--- Dependencies: 247
 -- Name: customers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14223,17 +13804,13 @@ SELECT pg_catalog.setval('public.customers_id_seq', 9, true);
 
 
 --
--- TOC entry 6805 (class 0 OID 0)
--- Dependencies: 249
 -- Name: daily_production_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.daily_production_reports_id_seq', 34, true);
+SELECT pg_catalog.setval('public.daily_production_reports_id_seq', 35, true);
 
 
 --
--- TOC entry 6806 (class 0 OID 0)
--- Dependencies: 251
 -- Name: departments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14241,35 +13818,27 @@ SELECT pg_catalog.setval('public.departments_id_seq', 20, true);
 
 
 --
--- TOC entry 6807 (class 0 OID 0)
--- Dependencies: 253
 -- Name: dispatch_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dispatch_items_id_seq', 1, false);
+SELECT pg_catalog.setval('public.dispatch_items_id_seq', 1, true);
 
 
 --
--- TOC entry 6808 (class 0 OID 0)
--- Dependencies: 255
 -- Name: dispatch_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dispatch_orders_id_seq', 1, false);
+SELECT pg_catalog.setval('public.dispatch_orders_id_seq', 1, true);
 
 
 --
--- TOC entry 6809 (class 0 OID 0)
--- Dependencies: 257
 -- Name: downtime_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.downtime_entries_id_seq', 10, true);
+SELECT pg_catalog.setval('public.downtime_entries_id_seq', 12, true);
 
 
 --
--- TOC entry 6810 (class 0 OID 0)
--- Dependencies: 259
 -- Name: downtime_reason_codes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14277,26 +13846,20 @@ SELECT pg_catalog.setval('public.downtime_reason_codes_id_seq', 10, true);
 
 
 --
--- TOC entry 6811 (class 0 OID 0)
--- Dependencies: 261
 -- Name: dpr_chemical_lines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dpr_chemical_lines_id_seq', 22, true);
+SELECT pg_catalog.setval('public.dpr_chemical_lines_id_seq', 23, true);
 
 
 --
--- TOC entry 6812 (class 0 OID 0)
--- Dependencies: 263
 -- Name: dpr_downtime_lines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dpr_downtime_lines_id_seq', 10, true);
+SELECT pg_catalog.setval('public.dpr_downtime_lines_id_seq', 11, true);
 
 
 --
--- TOC entry 6813 (class 0 OID 0)
--- Dependencies: 265
 -- Name: dpr_grade_standards_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14304,17 +13867,13 @@ SELECT pg_catalog.setval('public.dpr_grade_standards_id_seq', 8, true);
 
 
 --
--- TOC entry 6814 (class 0 OID 0)
--- Dependencies: 267
 -- Name: dpr_gsm_breakup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dpr_gsm_breakup_id_seq', 89, true);
+SELECT pg_catalog.setval('public.dpr_gsm_breakup_id_seq', 90, true);
 
 
 --
--- TOC entry 6815 (class 0 OID 0)
--- Dependencies: 269
 -- Name: ehs_incidents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14322,8 +13881,6 @@ SELECT pg_catalog.setval('public.ehs_incidents_id_seq', 1, true);
 
 
 --
--- TOC entry 6816 (class 0 OID 0)
--- Dependencies: 271
 -- Name: employee_documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14331,8 +13888,6 @@ SELECT pg_catalog.setval('public.employee_documents_id_seq', 1, false);
 
 
 --
--- TOC entry 6817 (class 0 OID 0)
--- Dependencies: 273
 -- Name: employee_leave_balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14340,8 +13895,6 @@ SELECT pg_catalog.setval('public.employee_leave_balances_id_seq', 5, true);
 
 
 --
--- TOC entry 6818 (class 0 OID 0)
--- Dependencies: 275
 -- Name: employee_leave_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14349,8 +13902,6 @@ SELECT pg_catalog.setval('public.employee_leave_types_id_seq', 16, true);
 
 
 --
--- TOC entry 6819 (class 0 OID 0)
--- Dependencies: 277
 -- Name: employee_loans_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14358,8 +13909,6 @@ SELECT pg_catalog.setval('public.employee_loans_id_seq', 1, false);
 
 
 --
--- TOC entry 6820 (class 0 OID 0)
--- Dependencies: 279
 -- Name: employee_salary_assignments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14367,8 +13916,6 @@ SELECT pg_catalog.setval('public.employee_salary_assignments_id_seq', 1, false);
 
 
 --
--- TOC entry 6821 (class 0 OID 0)
--- Dependencies: 281
 -- Name: employees_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14376,8 +13923,6 @@ SELECT pg_catalog.setval('public.employees_id_seq', 5, true);
 
 
 --
--- TOC entry 6822 (class 0 OID 0)
--- Dependencies: 283
 -- Name: eod_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14385,8 +13930,6 @@ SELECT pg_catalog.setval('public.eod_reports_id_seq', 1, true);
 
 
 --
--- TOC entry 6823 (class 0 OID 0)
--- Dependencies: 285
 -- Name: equipment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14394,8 +13937,6 @@ SELECT pg_catalog.setval('public.equipment_id_seq', 196, true);
 
 
 --
--- TOC entry 6824 (class 0 OID 0)
--- Dependencies: 287
 -- Name: equipment_inspection_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14403,8 +13944,6 @@ SELECT pg_catalog.setval('public.equipment_inspection_id_seq', 29, true);
 
 
 --
--- TOC entry 6825 (class 0 OID 0)
--- Dependencies: 289
 -- Name: etp_readings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14412,26 +13951,20 @@ SELECT pg_catalog.setval('public.etp_readings_id_seq', 1, false);
 
 
 --
--- TOC entry 6826 (class 0 OID 0)
--- Dependencies: 291
 -- Name: furnish_mix_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.furnish_mix_log_id_seq', 6, true);
+SELECT pg_catalog.setval('public.furnish_mix_log_id_seq', 7, true);
 
 
 --
--- TOC entry 6827 (class 0 OID 0)
--- Dependencies: 293
 -- Name: gate_passes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.gate_passes_id_seq', 1, false);
+SELECT pg_catalog.setval('public.gate_passes_id_seq', 16, true);
 
 
 --
--- TOC entry 6828 (class 0 OID 0)
--- Dependencies: 295
 -- Name: grades_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14439,26 +13972,20 @@ SELECT pg_catalog.setval('public.grades_id_seq', 5, true);
 
 
 --
--- TOC entry 6829 (class 0 OID 0)
--- Dependencies: 297
 -- Name: grn_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.grn_id_seq', 11, true);
+SELECT pg_catalog.setval('public.grn_id_seq', 19, true);
 
 
 --
--- TOC entry 6830 (class 0 OID 0)
--- Dependencies: 299
 -- Name: grn_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.grn_items_id_seq', 14, true);
+SELECT pg_catalog.setval('public.grn_items_id_seq', 8, true);
 
 
 --
--- TOC entry 6831 (class 0 OID 0)
--- Dependencies: 301
 -- Name: holidays_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14466,17 +13993,13 @@ SELECT pg_catalog.setval('public.holidays_id_seq', 20, true);
 
 
 --
--- TOC entry 6832 (class 0 OID 0)
--- Dependencies: 303
 -- Name: indent_audit_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indent_audit_log_id_seq', 32, true);
+SELECT pg_catalog.setval('public.indent_audit_log_id_seq', 17, true);
 
 
 --
--- TOC entry 6833 (class 0 OID 0)
--- Dependencies: 305
 -- Name: indent_comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14484,26 +14007,20 @@ SELECT pg_catalog.setval('public.indent_comments_id_seq', 1, false);
 
 
 --
--- TOC entry 6834 (class 0 OID 0)
--- Dependencies: 307
 -- Name: indent_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indent_items_id_seq', 66, true);
+SELECT pg_catalog.setval('public.indent_items_id_seq', 37, true);
 
 
 --
--- TOC entry 6835 (class 0 OID 0)
--- Dependencies: 309
 -- Name: indents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indents_id_seq', 58, true);
+SELECT pg_catalog.setval('public.indents_id_seq', 37, true);
 
 
 --
--- TOC entry 6836 (class 0 OID 0)
--- Dependencies: 311
 -- Name: inspection_round_scans_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14511,26 +14028,20 @@ SELECT pg_catalog.setval('public.inspection_round_scans_id_seq', 1, true);
 
 
 --
--- TOC entry 6837 (class 0 OID 0)
--- Dependencies: 313
 -- Name: installed_assets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.installed_assets_id_seq', 7, true);
+SELECT pg_catalog.setval('public.installed_assets_id_seq', 9, true);
 
 
 --
--- TOC entry 6838 (class 0 OID 0)
--- Dependencies: 315
 -- Name: lab_samples_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.lab_samples_id_seq', 1, false);
+SELECT pg_catalog.setval('public.lab_samples_id_seq', 1, true);
 
 
 --
--- TOC entry 6839 (class 0 OID 0)
--- Dependencies: 317
 -- Name: leave_applications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14538,26 +14049,20 @@ SELECT pg_catalog.setval('public.leave_applications_id_seq', 1, true);
 
 
 --
--- TOC entry 6840 (class 0 OID 0)
--- Dependencies: 319
 -- Name: machine_events_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.machine_events_id_seq', 3, true);
+SELECT pg_catalog.setval('public.machine_events_id_seq', 4, true);
 
 
 --
--- TOC entry 6841 (class 0 OID 0)
--- Dependencies: 321
 -- Name: machine_positions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.machine_positions_id_seq', 9, true);
+SELECT pg_catalog.setval('public.machine_positions_id_seq', 14, true);
 
 
 --
--- TOC entry 6842 (class 0 OID 0)
--- Dependencies: 322
 -- Name: machines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14565,17 +14070,13 @@ SELECT pg_catalog.setval('public.machines_id_seq', 27, true);
 
 
 --
--- TOC entry 6843 (class 0 OID 0)
--- Dependencies: 324
 -- Name: maintenance_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.maintenance_logs_id_seq', 1, true);
+SELECT pg_catalog.setval('public.maintenance_logs_id_seq', 3, true);
 
 
 --
--- TOC entry 6844 (class 0 OID 0)
--- Dependencies: 326
 -- Name: maintenance_schedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14583,26 +14084,27 @@ SELECT pg_catalog.setval('public.maintenance_schedule_id_seq', 1, false);
 
 
 --
--- TOC entry 6845 (class 0 OID 0)
--- Dependencies: 328
 -- Name: material_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.material_categories_id_seq', 63, true);
+SELECT pg_catalog.setval('public.material_categories_id_seq', 62, true);
 
 
 --
--- TOC entry 6846 (class 0 OID 0)
--- Dependencies: 330
+-- Name: material_rejections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.material_rejections_id_seq', 7, true);
+
+
+--
 -- Name: materials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.materials_id_seq', 4689, true);
+SELECT pg_catalog.setval('public.materials_id_seq', 4455, true);
 
 
 --
--- TOC entry 6847 (class 0 OID 0)
--- Dependencies: 332
 -- Name: motor_electrical_specs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14610,17 +14112,13 @@ SELECT pg_catalog.setval('public.motor_electrical_specs_id_seq', 332, true);
 
 
 --
--- TOC entry 6848 (class 0 OID 0)
--- Dependencies: 334
 -- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notifications_id_seq', 24, true);
+SELECT pg_catalog.setval('public.notifications_id_seq', 28, true);
 
 
 --
--- TOC entry 6849 (class 0 OID 0)
--- Dependencies: 336
 -- Name: onboarding_checklist_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14628,8 +14126,6 @@ SELECT pg_catalog.setval('public.onboarding_checklist_id_seq', 20, true);
 
 
 --
--- TOC entry 6850 (class 0 OID 0)
--- Dependencies: 338
 -- Name: onboarding_tasks_master_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14637,17 +14133,13 @@ SELECT pg_catalog.setval('public.onboarding_tasks_master_id_seq', 40, true);
 
 
 --
--- TOC entry 6851 (class 0 OID 0)
--- Dependencies: 340
 -- Name: packing_records_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.packing_records_id_seq', 1, false);
+SELECT pg_catalog.setval('public.packing_records_id_seq', 1, true);
 
 
 --
--- TOC entry 6852 (class 0 OID 0)
--- Dependencies: 342
 -- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14655,8 +14147,6 @@ SELECT pg_catalog.setval('public.payments_id_seq', 3, true);
 
 
 --
--- TOC entry 6853 (class 0 OID 0)
--- Dependencies: 344
 -- Name: payroll_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14664,8 +14154,6 @@ SELECT pg_catalog.setval('public.payroll_details_id_seq', 1, false);
 
 
 --
--- TOC entry 6854 (class 0 OID 0)
--- Dependencies: 346
 -- Name: payroll_runs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14673,8 +14161,6 @@ SELECT pg_catalog.setval('public.payroll_runs_id_seq', 1, false);
 
 
 --
--- TOC entry 6855 (class 0 OID 0)
--- Dependencies: 348
 -- Name: payrolls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14682,8 +14168,6 @@ SELECT pg_catalog.setval('public.payrolls_id_seq', 1, false);
 
 
 --
--- TOC entry 6856 (class 0 OID 0)
--- Dependencies: 350
 -- Name: plant_sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14691,17 +14175,13 @@ SELECT pg_catalog.setval('public.plant_sections_id_seq', 85, true);
 
 
 --
--- TOC entry 6857 (class 0 OID 0)
--- Dependencies: 352
 -- Name: po_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.po_items_id_seq', 29, true);
+SELECT pg_catalog.setval('public.po_items_id_seq', 21, true);
 
 
 --
--- TOC entry 6858 (class 0 OID 0)
--- Dependencies: 354
 -- Name: production_summary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14709,44 +14189,34 @@ SELECT pg_catalog.setval('public.production_summary_id_seq', 1, false);
 
 
 --
--- TOC entry 6859 (class 0 OID 0)
--- Dependencies: 356
 -- Name: purchase_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.purchase_orders_id_seq', 27, true);
+SELECT pg_catalog.setval('public.purchase_orders_id_seq', 32, true);
 
 
 --
--- TOC entry 6860 (class 0 OID 0)
--- Dependencies: 358
 -- Name: quality_lab_tests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.quality_lab_tests_id_seq', 2, true);
+SELECT pg_catalog.setval('public.quality_lab_tests_id_seq', 3, true);
 
 
 --
--- TOC entry 6861 (class 0 OID 0)
--- Dependencies: 360
 -- Name: quality_tests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.quality_tests_id_seq', 2, true);
+SELECT pg_catalog.setval('public.quality_tests_id_seq', 10, true);
 
 
 --
--- TOC entry 6862 (class 0 OID 0)
--- Dependencies: 362
 -- Name: reels_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reels_id_seq', 43, true);
+SELECT pg_catalog.setval('public.reels_id_seq', 44, true);
 
 
 --
--- TOC entry 6863 (class 0 OID 0)
--- Dependencies: 364
 -- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14754,8 +14224,6 @@ SELECT pg_catalog.setval('public.roles_id_seq', 5, true);
 
 
 --
--- TOC entry 6864 (class 0 OID 0)
--- Dependencies: 366
 -- Name: salary_structures_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14763,44 +14231,34 @@ SELECT pg_catalog.setval('public.salary_structures_id_seq', 10, true);
 
 
 --
--- TOC entry 6865 (class 0 OID 0)
--- Dependencies: 368
 -- Name: sales_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.sales_orders_id_seq', 2, true);
+SELECT pg_catalog.setval('public.sales_orders_id_seq', 3, true);
 
 
 --
--- TOC entry 6866 (class 0 OID 0)
--- Dependencies: 371
 -- Name: scrap_records_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.scrap_records_id_seq', 1, true);
+SELECT pg_catalog.setval('public.scrap_records_id_seq', 2, true);
 
 
 --
--- TOC entry 6867 (class 0 OID 0)
--- Dependencies: 373
 -- Name: section_alarms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.section_alarms_id_seq', 1, false);
+SELECT pg_catalog.setval('public.section_alarms_id_seq', 1, true);
 
 
 --
--- TOC entry 6868 (class 0 OID 0)
--- Dependencies: 375
 -- Name: section_energy_allocations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.section_energy_allocations_id_seq', 2, true);
+SELECT pg_catalog.setval('public.section_energy_allocations_id_seq', 3, true);
 
 
 --
--- TOC entry 6869 (class 0 OID 0)
--- Dependencies: 377
 -- Name: section_equipment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14808,17 +14266,13 @@ SELECT pg_catalog.setval('public.section_equipment_id_seq', 43, true);
 
 
 --
--- TOC entry 6870 (class 0 OID 0)
--- Dependencies: 379
 -- Name: section_kpi_snapshots_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 9208, true);
+SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 9450, true);
 
 
 --
--- TOC entry 6871 (class 0 OID 0)
--- Dependencies: 381
 -- Name: section_process_readings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14826,8 +14280,6 @@ SELECT pg_catalog.setval('public.section_process_readings_id_seq', 10, true);
 
 
 --
--- TOC entry 6872 (class 0 OID 0)
--- Dependencies: 383
 -- Name: section_sops_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14835,8 +14287,6 @@ SELECT pg_catalog.setval('public.section_sops_id_seq', 1, false);
 
 
 --
--- TOC entry 6873 (class 0 OID 0)
--- Dependencies: 385
 -- Name: sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14844,8 +14294,6 @@ SELECT pg_catalog.setval('public.sections_id_seq', 29, true);
 
 
 --
--- TOC entry 6874 (class 0 OID 0)
--- Dependencies: 387
 -- Name: separation_records_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14853,17 +14301,13 @@ SELECT pg_catalog.setval('public.separation_records_id_seq', 1, false);
 
 
 --
--- TOC entry 6875 (class 0 OID 0)
--- Dependencies: 390
 -- Name: shift_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.shift_reports_id_seq', 1, false);
+SELECT pg_catalog.setval('public.shift_reports_id_seq', 1, true);
 
 
 --
--- TOC entry 6876 (class 0 OID 0)
--- Dependencies: 392
 -- Name: shifts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14871,26 +14315,20 @@ SELECT pg_catalog.setval('public.shifts_id_seq', 3, true);
 
 
 --
--- TOC entry 6877 (class 0 OID 0)
--- Dependencies: 394
 -- Name: stock_ledger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.stock_ledger_id_seq', 2965, true);
+SELECT pg_catalog.setval('public.stock_ledger_id_seq', 2730, true);
 
 
 --
--- TOC entry 6878 (class 0 OID 0)
--- Dependencies: 396
 -- Name: store_indent_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.store_indent_log_id_seq', 10, true);
+SELECT pg_catalog.setval('public.store_indent_log_id_seq', 9, true);
 
 
 --
--- TOC entry 6879 (class 0 OID 0)
--- Dependencies: 398
 -- Name: store_indents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14898,17 +14336,41 @@ SELECT pg_catalog.setval('public.store_indents_id_seq', 1, false);
 
 
 --
--- TOC entry 6880 (class 0 OID 0)
--- Dependencies: 400
 -- Name: store_issues_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.store_issues_id_seq', 3, true);
+SELECT pg_catalog.setval('public.store_issues_id_seq', 4, true);
 
 
 --
--- TOC entry 6881 (class 0 OID 0)
--- Dependencies: 402
+-- Name: store_return_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.store_return_items_id_seq', 4, true);
+
+
+--
+-- Name: store_returns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.store_returns_id_seq', 4, true);
+
+
+--
+-- Name: store_transfer_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.store_transfer_items_id_seq', 4, true);
+
+
+--
+-- Name: store_transfers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.store_transfers_id_seq', 4, true);
+
+
+--
 -- Name: system_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14916,8 +14378,6 @@ SELECT pg_catalog.setval('public.system_settings_id_seq', 14, true);
 
 
 --
--- TOC entry 6882 (class 0 OID 0)
--- Dependencies: 404
 -- Name: training_attendance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14925,8 +14385,6 @@ SELECT pg_catalog.setval('public.training_attendance_id_seq', 1, false);
 
 
 --
--- TOC entry 6883 (class 0 OID 0)
--- Dependencies: 406
 -- Name: training_programs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14934,8 +14392,6 @@ SELECT pg_catalog.setval('public.training_programs_id_seq', 1, false);
 
 
 --
--- TOC entry 6884 (class 0 OID 0)
--- Dependencies: 408
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14943,8 +14399,6 @@ SELECT pg_catalog.setval('public.users_id_seq', 23, true);
 
 
 --
--- TOC entry 6885 (class 0 OID 0)
--- Dependencies: 410
 -- Name: utility_readings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14952,35 +14406,27 @@ SELECT pg_catalog.setval('public.utility_readings_id_seq', 3, true);
 
 
 --
--- TOC entry 6886 (class 0 OID 0)
--- Dependencies: 415
 -- Name: vendor_bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendor_bills_id_seq', 3, true);
+SELECT pg_catalog.setval('public.vendor_bills_id_seq', 5, true);
 
 
 --
--- TOC entry 6887 (class 0 OID 0)
--- Dependencies: 417
 -- Name: vendor_payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendor_payments_id_seq', 3, true);
+SELECT pg_catalog.setval('public.vendor_payments_id_seq', 1, true);
 
 
 --
--- TOC entry 6888 (class 0 OID 0)
--- Dependencies: 412
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendors_id_seq', 33, true);
+SELECT pg_catalog.setval('public.vendors_id_seq', 17, true);
 
 
 --
--- TOC entry 6889 (class 0 OID 0)
--- Dependencies: 414
 -- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -14988,7 +14434,6 @@ SELECT pg_catalog.setval('public.warehouses_id_seq', 5, true);
 
 
 --
--- TOC entry 5756 (class 2606 OID 25889)
 -- Name: adjustment_requests adjustment_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -14997,7 +14442,6 @@ ALTER TABLE ONLY public.adjustment_requests
 
 
 --
--- TOC entry 5758 (class 2606 OID 25891)
 -- Name: appraisal_competencies appraisal_competencies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15006,7 +14450,6 @@ ALTER TABLE ONLY public.appraisal_competencies
 
 
 --
--- TOC entry 5760 (class 2606 OID 25893)
 -- Name: appraisal_cycles appraisal_cycles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15015,7 +14458,6 @@ ALTER TABLE ONLY public.appraisal_cycles
 
 
 --
--- TOC entry 5762 (class 2606 OID 25895)
 -- Name: appraisal_goals appraisal_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15024,7 +14466,6 @@ ALTER TABLE ONLY public.appraisal_goals
 
 
 --
--- TOC entry 5765 (class 2606 OID 25897)
 -- Name: approval_matrix approval_matrix_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15033,7 +14474,6 @@ ALTER TABLE ONLY public.approval_matrix
 
 
 --
--- TOC entry 5767 (class 2606 OID 25899)
 -- Name: asset_events asset_events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15042,7 +14482,6 @@ ALTER TABLE ONLY public.asset_events
 
 
 --
--- TOC entry 5769 (class 2606 OID 25901)
 -- Name: attendance attendance_employee_id_date_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15051,7 +14490,6 @@ ALTER TABLE ONLY public.attendance
 
 
 --
--- TOC entry 5771 (class 2606 OID 25903)
 -- Name: attendance attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15060,7 +14498,6 @@ ALTER TABLE ONLY public.attendance
 
 
 --
--- TOC entry 5775 (class 2606 OID 25905)
 -- Name: attendance_regularization attendance_regularization_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15069,7 +14506,6 @@ ALTER TABLE ONLY public.attendance_regularization
 
 
 --
--- TOC entry 5778 (class 2606 OID 25907)
 -- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15078,7 +14514,6 @@ ALTER TABLE ONLY public.audit_log
 
 
 --
--- TOC entry 5782 (class 2606 OID 25909)
 -- Name: boiler_performance_logs boiler_performance_logs_log_time_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15087,7 +14522,6 @@ ALTER TABLE ONLY public.boiler_performance_logs
 
 
 --
--- TOC entry 5784 (class 2606 OID 25911)
 -- Name: boiler_performance_logs boiler_performance_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15096,7 +14530,6 @@ ALTER TABLE ONLY public.boiler_performance_logs
 
 
 --
--- TOC entry 5786 (class 2606 OID 25913)
 -- Name: chemical_consumption chemical_consumption_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15105,7 +14538,6 @@ ALTER TABLE ONLY public.chemical_consumption
 
 
 --
--- TOC entry 5788 (class 2606 OID 25915)
 -- Name: chemical_limit_alerts chemical_limit_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15114,7 +14546,6 @@ ALTER TABLE ONLY public.chemical_limit_alerts
 
 
 --
--- TOC entry 5790 (class 2606 OID 25917)
 -- Name: clearance_items clearance_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15123,7 +14554,6 @@ ALTER TABLE ONLY public.clearance_items
 
 
 --
--- TOC entry 5792 (class 2606 OID 25919)
 -- Name: customers customers_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15132,7 +14562,6 @@ ALTER TABLE ONLY public.customers
 
 
 --
--- TOC entry 5794 (class 2606 OID 25921)
 -- Name: customers customers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15141,7 +14570,6 @@ ALTER TABLE ONLY public.customers
 
 
 --
--- TOC entry 5796 (class 2606 OID 25923)
 -- Name: daily_production_reports daily_production_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15150,7 +14578,6 @@ ALTER TABLE ONLY public.daily_production_reports
 
 
 --
--- TOC entry 5798 (class 2606 OID 25925)
 -- Name: daily_production_reports daily_production_reports_report_date_machine_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15159,7 +14586,6 @@ ALTER TABLE ONLY public.daily_production_reports
 
 
 --
--- TOC entry 5801 (class 2606 OID 25927)
 -- Name: departments departments_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15168,7 +14594,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 5803 (class 2606 OID 25929)
 -- Name: departments departments_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15177,7 +14602,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 5805 (class 2606 OID 25931)
 -- Name: departments departments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15186,7 +14610,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 5807 (class 2606 OID 25933)
 -- Name: dispatch_items dispatch_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15195,7 +14618,6 @@ ALTER TABLE ONLY public.dispatch_items
 
 
 --
--- TOC entry 5809 (class 2606 OID 25935)
 -- Name: dispatch_orders dispatch_orders_do_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15204,7 +14626,6 @@ ALTER TABLE ONLY public.dispatch_orders
 
 
 --
--- TOC entry 5811 (class 2606 OID 25937)
 -- Name: dispatch_orders dispatch_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15213,7 +14634,6 @@ ALTER TABLE ONLY public.dispatch_orders
 
 
 --
--- TOC entry 5813 (class 2606 OID 25939)
 -- Name: downtime_entries downtime_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15222,7 +14642,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 5815 (class 2606 OID 25941)
 -- Name: downtime_reason_codes downtime_reason_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15231,7 +14650,6 @@ ALTER TABLE ONLY public.downtime_reason_codes
 
 
 --
--- TOC entry 5817 (class 2606 OID 25943)
 -- Name: downtime_reason_codes downtime_reason_codes_reason_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15240,7 +14658,6 @@ ALTER TABLE ONLY public.downtime_reason_codes
 
 
 --
--- TOC entry 5819 (class 2606 OID 25945)
 -- Name: dpr_chemical_lines dpr_chemical_lines_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15249,7 +14666,6 @@ ALTER TABLE ONLY public.dpr_chemical_lines
 
 
 --
--- TOC entry 5822 (class 2606 OID 25947)
 -- Name: dpr_downtime_lines dpr_downtime_lines_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15258,7 +14674,6 @@ ALTER TABLE ONLY public.dpr_downtime_lines
 
 
 --
--- TOC entry 5825 (class 2606 OID 25949)
 -- Name: dpr_grade_standards dpr_grade_standards_grade_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15267,7 +14682,6 @@ ALTER TABLE ONLY public.dpr_grade_standards
 
 
 --
--- TOC entry 5827 (class 2606 OID 25951)
 -- Name: dpr_grade_standards dpr_grade_standards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15276,7 +14690,6 @@ ALTER TABLE ONLY public.dpr_grade_standards
 
 
 --
--- TOC entry 5829 (class 2606 OID 25953)
 -- Name: dpr_gsm_breakup dpr_gsm_breakup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15285,7 +14698,6 @@ ALTER TABLE ONLY public.dpr_gsm_breakup
 
 
 --
--- TOC entry 5832 (class 2606 OID 25955)
 -- Name: ehs_incidents ehs_incidents_incident_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15294,7 +14706,6 @@ ALTER TABLE ONLY public.ehs_incidents
 
 
 --
--- TOC entry 5834 (class 2606 OID 25957)
 -- Name: ehs_incidents ehs_incidents_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15303,7 +14714,6 @@ ALTER TABLE ONLY public.ehs_incidents
 
 
 --
--- TOC entry 5836 (class 2606 OID 25959)
 -- Name: employee_documents employee_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15312,7 +14722,6 @@ ALTER TABLE ONLY public.employee_documents
 
 
 --
--- TOC entry 5839 (class 2606 OID 25961)
 -- Name: employee_leave_balances employee_leave_balances_employee_id_leave_type_id_year_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15321,7 +14730,6 @@ ALTER TABLE ONLY public.employee_leave_balances
 
 
 --
--- TOC entry 5841 (class 2606 OID 25963)
 -- Name: employee_leave_balances employee_leave_balances_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15330,7 +14738,6 @@ ALTER TABLE ONLY public.employee_leave_balances
 
 
 --
--- TOC entry 5844 (class 2606 OID 25965)
 -- Name: employee_leave_types employee_leave_types_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15339,7 +14746,6 @@ ALTER TABLE ONLY public.employee_leave_types
 
 
 --
--- TOC entry 5846 (class 2606 OID 25967)
 -- Name: employee_leave_types employee_leave_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15348,7 +14754,6 @@ ALTER TABLE ONLY public.employee_leave_types
 
 
 --
--- TOC entry 5848 (class 2606 OID 25969)
 -- Name: employee_loans employee_loans_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15357,7 +14762,6 @@ ALTER TABLE ONLY public.employee_loans
 
 
 --
--- TOC entry 5850 (class 2606 OID 25971)
 -- Name: employee_salary_assignments employee_salary_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15366,7 +14770,6 @@ ALTER TABLE ONLY public.employee_salary_assignments
 
 
 --
--- TOC entry 5853 (class 2606 OID 25973)
 -- Name: employees employees_employee_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15375,7 +14778,6 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- TOC entry 5855 (class 2606 OID 25975)
 -- Name: employees employees_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15384,7 +14786,6 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- TOC entry 5858 (class 2606 OID 25977)
 -- Name: eod_reports eod_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15393,7 +14794,6 @@ ALTER TABLE ONLY public.eod_reports
 
 
 --
--- TOC entry 5860 (class 2606 OID 25979)
 -- Name: equipment equipment_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15402,7 +14802,6 @@ ALTER TABLE ONLY public.equipment
 
 
 --
--- TOC entry 5864 (class 2606 OID 25981)
 -- Name: equipment_inspection equipment_inspection_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15411,7 +14810,6 @@ ALTER TABLE ONLY public.equipment_inspection
 
 
 --
--- TOC entry 5862 (class 2606 OID 25983)
 -- Name: equipment equipment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15420,7 +14818,6 @@ ALTER TABLE ONLY public.equipment
 
 
 --
--- TOC entry 5866 (class 2606 OID 25985)
 -- Name: etp_readings etp_readings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15429,7 +14826,6 @@ ALTER TABLE ONLY public.etp_readings
 
 
 --
--- TOC entry 5868 (class 2606 OID 25987)
 -- Name: furnish_mix_log furnish_mix_log_batch_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15438,7 +14834,6 @@ ALTER TABLE ONLY public.furnish_mix_log
 
 
 --
--- TOC entry 5870 (class 2606 OID 25989)
 -- Name: furnish_mix_log furnish_mix_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15447,7 +14842,6 @@ ALTER TABLE ONLY public.furnish_mix_log
 
 
 --
--- TOC entry 5873 (class 2606 OID 25991)
 -- Name: gate_passes gate_passes_gp_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15456,7 +14850,6 @@ ALTER TABLE ONLY public.gate_passes
 
 
 --
--- TOC entry 5875 (class 2606 OID 25993)
 -- Name: gate_passes gate_passes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15465,7 +14858,6 @@ ALTER TABLE ONLY public.gate_passes
 
 
 --
--- TOC entry 5877 (class 2606 OID 25995)
 -- Name: grades grades_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15474,7 +14866,6 @@ ALTER TABLE ONLY public.grades
 
 
 --
--- TOC entry 5879 (class 2606 OID 25997)
 -- Name: grades grades_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15483,7 +14874,6 @@ ALTER TABLE ONLY public.grades
 
 
 --
--- TOC entry 5881 (class 2606 OID 25999)
 -- Name: grn grn_grn_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15492,7 +14882,6 @@ ALTER TABLE ONLY public.grn
 
 
 --
--- TOC entry 5885 (class 2606 OID 26001)
 -- Name: grn_items grn_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15501,7 +14890,6 @@ ALTER TABLE ONLY public.grn_items
 
 
 --
--- TOC entry 5883 (class 2606 OID 26003)
 -- Name: grn grn_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15510,7 +14898,6 @@ ALTER TABLE ONLY public.grn
 
 
 --
--- TOC entry 5887 (class 2606 OID 26005)
 -- Name: holidays holidays_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15519,7 +14906,6 @@ ALTER TABLE ONLY public.holidays
 
 
 --
--- TOC entry 5890 (class 2606 OID 26007)
 -- Name: indent_audit_log indent_audit_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15528,7 +14914,6 @@ ALTER TABLE ONLY public.indent_audit_log
 
 
 --
--- TOC entry 5892 (class 2606 OID 26009)
 -- Name: indent_comments indent_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15537,7 +14922,6 @@ ALTER TABLE ONLY public.indent_comments
 
 
 --
--- TOC entry 5895 (class 2606 OID 26011)
 -- Name: indent_items indent_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15546,7 +14930,6 @@ ALTER TABLE ONLY public.indent_items
 
 
 --
--- TOC entry 5900 (class 2606 OID 26013)
 -- Name: indents indents_indent_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15555,7 +14938,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 5902 (class 2606 OID 26015)
 -- Name: indents indents_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15564,7 +14946,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 5905 (class 2606 OID 26017)
 -- Name: inspection_round_scans inspection_round_scans_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15573,7 +14954,6 @@ ALTER TABLE ONLY public.inspection_round_scans
 
 
 --
--- TOC entry 5907 (class 2606 OID 26019)
 -- Name: installed_assets installed_assets_asset_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15582,7 +14962,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 5909 (class 2606 OID 26021)
 -- Name: installed_assets installed_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15591,7 +14970,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 5911 (class 2606 OID 26023)
 -- Name: lab_samples lab_samples_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15600,7 +14978,6 @@ ALTER TABLE ONLY public.lab_samples
 
 
 --
--- TOC entry 5913 (class 2606 OID 26025)
 -- Name: lab_samples lab_samples_sample_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15609,7 +14986,6 @@ ALTER TABLE ONLY public.lab_samples
 
 
 --
--- TOC entry 5917 (class 2606 OID 26027)
 -- Name: leave_applications leave_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15618,7 +14994,6 @@ ALTER TABLE ONLY public.leave_applications
 
 
 --
--- TOC entry 5922 (class 2606 OID 26029)
 -- Name: machine_events machine_events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15627,7 +15002,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 5924 (class 2606 OID 26031)
 -- Name: machine_positions machine_positions_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15636,7 +15010,6 @@ ALTER TABLE ONLY public.machine_positions
 
 
 --
--- TOC entry 5926 (class 2606 OID 26033)
 -- Name: machine_positions machine_positions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15645,7 +15018,6 @@ ALTER TABLE ONLY public.machine_positions
 
 
 --
--- TOC entry 5752 (class 2606 OID 26035)
 -- Name: machines machines_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15654,7 +15026,6 @@ ALTER TABLE ONLY public.machines
 
 
 --
--- TOC entry 5754 (class 2606 OID 21190)
 -- Name: machines machines_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15663,7 +15034,6 @@ ALTER TABLE ONLY public.machines
 
 
 --
--- TOC entry 5928 (class 2606 OID 26037)
 -- Name: maintenance_logs maintenance_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15672,7 +15042,6 @@ ALTER TABLE ONLY public.maintenance_logs
 
 
 --
--- TOC entry 5930 (class 2606 OID 26039)
 -- Name: maintenance_schedule maintenance_schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15681,7 +15050,6 @@ ALTER TABLE ONLY public.maintenance_schedule
 
 
 --
--- TOC entry 5932 (class 2606 OID 26041)
 -- Name: material_categories material_categories_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15690,7 +15058,6 @@ ALTER TABLE ONLY public.material_categories
 
 
 --
--- TOC entry 5934 (class 2606 OID 26043)
 -- Name: material_categories material_categories_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15699,7 +15066,6 @@ ALTER TABLE ONLY public.material_categories
 
 
 --
--- TOC entry 5936 (class 2606 OID 26045)
 -- Name: material_categories material_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15708,7 +15074,22 @@ ALTER TABLE ONLY public.material_categories
 
 
 --
--- TOC entry 5938 (class 2606 OID 26047)
+-- Name: material_rejections material_rejections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: material_rejections material_rejections_rejection_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_rejection_number_key UNIQUE (rejection_number);
+
+
+--
 -- Name: materials materials_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15717,7 +15098,6 @@ ALTER TABLE ONLY public.materials
 
 
 --
--- TOC entry 5940 (class 2606 OID 26049)
 -- Name: materials materials_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15726,7 +15106,6 @@ ALTER TABLE ONLY public.materials
 
 
 --
--- TOC entry 5943 (class 2606 OID 26051)
 -- Name: motor_electrical_specs motor_electrical_specs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15735,7 +15114,6 @@ ALTER TABLE ONLY public.motor_electrical_specs
 
 
 --
--- TOC entry 5946 (class 2606 OID 26053)
 -- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15744,7 +15122,6 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- TOC entry 5949 (class 2606 OID 26055)
 -- Name: onboarding_checklist onboarding_checklist_employee_id_task_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15753,7 +15130,6 @@ ALTER TABLE ONLY public.onboarding_checklist
 
 
 --
--- TOC entry 5951 (class 2606 OID 26057)
 -- Name: onboarding_checklist onboarding_checklist_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15762,7 +15138,6 @@ ALTER TABLE ONLY public.onboarding_checklist
 
 
 --
--- TOC entry 5953 (class 2606 OID 26059)
 -- Name: onboarding_tasks_master onboarding_tasks_master_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15771,7 +15146,6 @@ ALTER TABLE ONLY public.onboarding_tasks_master
 
 
 --
--- TOC entry 5955 (class 2606 OID 26061)
 -- Name: packing_records packing_records_pack_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15780,7 +15154,6 @@ ALTER TABLE ONLY public.packing_records
 
 
 --
--- TOC entry 5957 (class 2606 OID 26063)
 -- Name: packing_records packing_records_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15789,7 +15162,6 @@ ALTER TABLE ONLY public.packing_records
 
 
 --
--- TOC entry 5959 (class 2606 OID 26065)
 -- Name: payments payments_payment_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15798,7 +15170,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- TOC entry 5961 (class 2606 OID 26067)
 -- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15807,7 +15178,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- TOC entry 5964 (class 2606 OID 26069)
 -- Name: payroll_details payroll_details_payroll_run_id_employee_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15816,7 +15186,6 @@ ALTER TABLE ONLY public.payroll_details
 
 
 --
--- TOC entry 5966 (class 2606 OID 26071)
 -- Name: payroll_details payroll_details_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15825,7 +15194,6 @@ ALTER TABLE ONLY public.payroll_details
 
 
 --
--- TOC entry 5968 (class 2606 OID 26073)
 -- Name: payroll_runs payroll_runs_month_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15834,7 +15202,6 @@ ALTER TABLE ONLY public.payroll_runs
 
 
 --
--- TOC entry 5970 (class 2606 OID 26075)
 -- Name: payroll_runs payroll_runs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15843,7 +15210,6 @@ ALTER TABLE ONLY public.payroll_runs
 
 
 --
--- TOC entry 5973 (class 2606 OID 26077)
 -- Name: payrolls payrolls_employee_id_month_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15852,7 +15218,6 @@ ALTER TABLE ONLY public.payrolls
 
 
 --
--- TOC entry 5975 (class 2606 OID 26079)
 -- Name: payrolls payrolls_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15861,7 +15226,6 @@ ALTER TABLE ONLY public.payrolls
 
 
 --
--- TOC entry 5977 (class 2606 OID 26081)
 -- Name: plant_sections plant_sections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15870,7 +15234,6 @@ ALTER TABLE ONLY public.plant_sections
 
 
 --
--- TOC entry 5979 (class 2606 OID 26083)
 -- Name: plant_sections plant_sections_section_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15879,7 +15242,6 @@ ALTER TABLE ONLY public.plant_sections
 
 
 --
--- TOC entry 5981 (class 2606 OID 26085)
 -- Name: po_items po_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15888,7 +15250,6 @@ ALTER TABLE ONLY public.po_items
 
 
 --
--- TOC entry 5983 (class 2606 OID 26087)
 -- Name: production_summary production_summary_date_shift_type_machine_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15897,7 +15258,6 @@ ALTER TABLE ONLY public.production_summary
 
 
 --
--- TOC entry 5985 (class 2606 OID 26089)
 -- Name: production_summary production_summary_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15906,7 +15266,6 @@ ALTER TABLE ONLY public.production_summary
 
 
 --
--- TOC entry 5987 (class 2606 OID 26091)
 -- Name: purchase_orders purchase_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15915,7 +15274,6 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- TOC entry 5989 (class 2606 OID 26093)
 -- Name: purchase_orders purchase_orders_po_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15924,7 +15282,6 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- TOC entry 5994 (class 2606 OID 26095)
 -- Name: quality_lab_tests quality_lab_tests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15933,7 +15290,6 @@ ALTER TABLE ONLY public.quality_lab_tests
 
 
 --
--- TOC entry 5996 (class 2606 OID 26097)
 -- Name: quality_tests quality_tests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15942,7 +15298,6 @@ ALTER TABLE ONLY public.quality_tests
 
 
 --
--- TOC entry 5998 (class 2606 OID 26099)
 -- Name: quality_tests quality_tests_test_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15951,7 +15306,6 @@ ALTER TABLE ONLY public.quality_tests
 
 
 --
--- TOC entry 6004 (class 2606 OID 26101)
 -- Name: reels reels_barcode_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15960,7 +15314,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6006 (class 2606 OID 26103)
 -- Name: reels reels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15969,7 +15322,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6008 (class 2606 OID 26105)
 -- Name: reels reels_reel_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15978,7 +15330,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6010 (class 2606 OID 26107)
 -- Name: roles roles_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15987,7 +15338,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 6012 (class 2606 OID 26109)
 -- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -15996,7 +15346,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 6014 (class 2606 OID 26111)
 -- Name: salary_structures salary_structures_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16005,7 +15354,6 @@ ALTER TABLE ONLY public.salary_structures
 
 
 --
--- TOC entry 6016 (class 2606 OID 26113)
 -- Name: salary_structures salary_structures_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16014,7 +15362,6 @@ ALTER TABLE ONLY public.salary_structures
 
 
 --
--- TOC entry 6018 (class 2606 OID 26115)
 -- Name: sales_orders sales_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16023,7 +15370,6 @@ ALTER TABLE ONLY public.sales_orders
 
 
 --
--- TOC entry 6020 (class 2606 OID 26117)
 -- Name: sales_orders sales_orders_so_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16032,7 +15378,6 @@ ALTER TABLE ONLY public.sales_orders
 
 
 --
--- TOC entry 6022 (class 2606 OID 26119)
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16041,7 +15386,6 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- TOC entry 6024 (class 2606 OID 26121)
 -- Name: scrap_records scrap_records_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16050,7 +15394,6 @@ ALTER TABLE ONLY public.scrap_records
 
 
 --
--- TOC entry 6026 (class 2606 OID 26123)
 -- Name: scrap_records scrap_records_scrap_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16059,7 +15402,6 @@ ALTER TABLE ONLY public.scrap_records
 
 
 --
--- TOC entry 6030 (class 2606 OID 26125)
 -- Name: section_alarms section_alarms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16068,7 +15410,6 @@ ALTER TABLE ONLY public.section_alarms
 
 
 --
--- TOC entry 6032 (class 2606 OID 26127)
 -- Name: section_energy_allocations section_energy_allocations_allocated_date_section_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16077,7 +15418,6 @@ ALTER TABLE ONLY public.section_energy_allocations
 
 
 --
--- TOC entry 6034 (class 2606 OID 26129)
 -- Name: section_energy_allocations section_energy_allocations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16086,7 +15426,6 @@ ALTER TABLE ONLY public.section_energy_allocations
 
 
 --
--- TOC entry 6036 (class 2606 OID 26131)
 -- Name: section_equipment section_equipment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16095,7 +15434,6 @@ ALTER TABLE ONLY public.section_equipment
 
 
 --
--- TOC entry 6038 (class 2606 OID 26133)
 -- Name: section_equipment section_equipment_tag_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16104,7 +15442,6 @@ ALTER TABLE ONLY public.section_equipment
 
 
 --
--- TOC entry 6041 (class 2606 OID 26135)
 -- Name: section_kpi_snapshots section_kpi_snapshots_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16113,7 +15450,6 @@ ALTER TABLE ONLY public.section_kpi_snapshots
 
 
 --
--- TOC entry 6045 (class 2606 OID 26137)
 -- Name: section_process_readings section_process_readings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16122,7 +15458,6 @@ ALTER TABLE ONLY public.section_process_readings
 
 
 --
--- TOC entry 6047 (class 2606 OID 26139)
 -- Name: section_sops section_sops_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16131,7 +15466,6 @@ ALTER TABLE ONLY public.section_sops
 
 
 --
--- TOC entry 6049 (class 2606 OID 26141)
 -- Name: sections sections_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16140,7 +15474,6 @@ ALTER TABLE ONLY public.sections
 
 
 --
--- TOC entry 6051 (class 2606 OID 26143)
 -- Name: sections sections_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16149,7 +15482,6 @@ ALTER TABLE ONLY public.sections
 
 
 --
--- TOC entry 6053 (class 2606 OID 26145)
 -- Name: sections sections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16158,7 +15490,6 @@ ALTER TABLE ONLY public.sections
 
 
 --
--- TOC entry 6056 (class 2606 OID 26147)
 -- Name: separation_records separation_records_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16167,7 +15498,6 @@ ALTER TABLE ONLY public.separation_records
 
 
 --
--- TOC entry 6058 (class 2606 OID 26149)
 -- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16176,7 +15506,6 @@ ALTER TABLE ONLY public.sessions
 
 
 --
--- TOC entry 6060 (class 2606 OID 26151)
 -- Name: shift_reports shift_reports_date_shift_type_section_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16185,7 +15514,6 @@ ALTER TABLE ONLY public.shift_reports
 
 
 --
--- TOC entry 6062 (class 2606 OID 26153)
 -- Name: shift_reports shift_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16194,7 +15522,6 @@ ALTER TABLE ONLY public.shift_reports
 
 
 --
--- TOC entry 6064 (class 2606 OID 26155)
 -- Name: shifts shifts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16203,7 +15530,6 @@ ALTER TABLE ONLY public.shifts
 
 
 --
--- TOC entry 6070 (class 2606 OID 26157)
 -- Name: stock_ledger stock_ledger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16212,7 +15538,6 @@ ALTER TABLE ONLY public.stock_ledger
 
 
 --
--- TOC entry 6074 (class 2606 OID 26159)
 -- Name: store_indent_log store_indent_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16221,7 +15546,6 @@ ALTER TABLE ONLY public.store_indent_log
 
 
 --
--- TOC entry 6079 (class 2606 OID 26161)
 -- Name: store_indents store_indents_indent_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16230,7 +15554,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6081 (class 2606 OID 26163)
 -- Name: store_indents store_indents_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16239,7 +15562,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6083 (class 2606 OID 26165)
 -- Name: store_issues store_issues_issue_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16248,7 +15570,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6085 (class 2606 OID 26167)
 -- Name: store_issues store_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16257,7 +15578,54 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6087 (class 2606 OID 26169)
+-- Name: store_return_items store_return_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_return_items
+    ADD CONSTRAINT store_return_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_returns store_returns_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_returns store_returns_return_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_return_number_key UNIQUE (return_number);
+
+
+--
+-- Name: store_transfer_items store_transfer_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfer_items
+    ADD CONSTRAINT store_transfer_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_transfers store_transfers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_transfers store_transfers_transfer_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_transfer_number_key UNIQUE (transfer_number);
+
+
+--
 -- Name: system_settings system_settings_key_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16266,7 +15634,6 @@ ALTER TABLE ONLY public.system_settings
 
 
 --
--- TOC entry 6089 (class 2606 OID 26171)
 -- Name: system_settings system_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16275,7 +15642,6 @@ ALTER TABLE ONLY public.system_settings
 
 
 --
--- TOC entry 6092 (class 2606 OID 26173)
 -- Name: training_attendance training_attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16284,7 +15650,6 @@ ALTER TABLE ONLY public.training_attendance
 
 
 --
--- TOC entry 6094 (class 2606 OID 26175)
 -- Name: training_attendance training_attendance_training_id_employee_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16293,7 +15658,6 @@ ALTER TABLE ONLY public.training_attendance
 
 
 --
--- TOC entry 6096 (class 2606 OID 26177)
 -- Name: training_programs training_programs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16302,7 +15666,6 @@ ALTER TABLE ONLY public.training_programs
 
 
 --
--- TOC entry 6098 (class 2606 OID 26179)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16311,7 +15674,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 6100 (class 2606 OID 26181)
 -- Name: users users_employee_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16320,7 +15682,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 6102 (class 2606 OID 26183)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16329,7 +15690,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 6105 (class 2606 OID 26185)
 -- Name: utility_readings utility_readings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16338,7 +15698,6 @@ ALTER TABLE ONLY public.utility_readings
 
 
 --
--- TOC entry 6119 (class 2606 OID 27304)
 -- Name: vendor_bills vendor_bills_bill_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16347,7 +15706,6 @@ ALTER TABLE ONLY public.vendor_bills
 
 
 --
--- TOC entry 6121 (class 2606 OID 27302)
 -- Name: vendor_bills vendor_bills_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16356,7 +15714,6 @@ ALTER TABLE ONLY public.vendor_bills
 
 
 --
--- TOC entry 6125 (class 2606 OID 27351)
 -- Name: vendor_payments vendor_payments_payment_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16365,7 +15722,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6127 (class 2606 OID 27349)
 -- Name: vendor_payments vendor_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16374,7 +15730,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6107 (class 2606 OID 26187)
 -- Name: vendors vendors_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16383,7 +15738,6 @@ ALTER TABLE ONLY public.vendors
 
 
 --
--- TOC entry 6109 (class 2606 OID 26189)
 -- Name: vendors vendors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16392,7 +15746,6 @@ ALTER TABLE ONLY public.vendors
 
 
 --
--- TOC entry 6111 (class 2606 OID 26191)
 -- Name: warehouses warehouses_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16401,7 +15754,6 @@ ALTER TABLE ONLY public.warehouses
 
 
 --
--- TOC entry 6113 (class 2606 OID 26193)
 -- Name: warehouses warehouses_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16410,7 +15762,6 @@ ALTER TABLE ONLY public.warehouses
 
 
 --
--- TOC entry 6115 (class 2606 OID 26195)
 -- Name: warehouses warehouses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16419,7 +15770,6 @@ ALTER TABLE ONLY public.warehouses
 
 
 --
--- TOC entry 6027 (class 1259 OID 26196)
 -- Name: idx_alarms_active; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16427,7 +15777,6 @@ CREATE INDEX idx_alarms_active ON public.section_alarms USING btree (section_id,
 
 
 --
--- TOC entry 6028 (class 1259 OID 26197)
 -- Name: idx_alarms_section; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16435,7 +15784,6 @@ CREATE INDEX idx_alarms_section ON public.section_alarms USING btree (section_id
 
 
 --
--- TOC entry 5763 (class 1259 OID 26198)
 -- Name: idx_appr_goals_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16443,7 +15791,6 @@ CREATE INDEX idx_appr_goals_emp ON public.appraisal_goals USING btree (employee_
 
 
 --
--- TOC entry 5776 (class 1259 OID 26199)
 -- Name: idx_att_reg_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16451,7 +15798,6 @@ CREATE INDEX idx_att_reg_emp ON public.attendance_regularization USING btree (em
 
 
 --
--- TOC entry 5772 (class 1259 OID 26200)
 -- Name: idx_attendance_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16459,7 +15805,6 @@ CREATE INDEX idx_attendance_date ON public.attendance USING btree (date);
 
 
 --
--- TOC entry 5773 (class 1259 OID 26201)
 -- Name: idx_attendance_emp_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16467,7 +15812,6 @@ CREATE INDEX idx_attendance_emp_date ON public.attendance USING btree (employee_
 
 
 --
--- TOC entry 5779 (class 1259 OID 26202)
 -- Name: idx_audit_log_module; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16475,7 +15819,6 @@ CREATE INDEX idx_audit_log_module ON public.audit_log USING btree (module, creat
 
 
 --
--- TOC entry 5780 (class 1259 OID 26203)
 -- Name: idx_audit_log_user; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16483,7 +15826,6 @@ CREATE INDEX idx_audit_log_user ON public.audit_log USING btree (user_id);
 
 
 --
--- TOC entry 5820 (class 1259 OID 26204)
 -- Name: idx_dpr_chem_report; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16491,7 +15833,6 @@ CREATE INDEX idx_dpr_chem_report ON public.dpr_chemical_lines USING btree (repor
 
 
 --
--- TOC entry 5799 (class 1259 OID 26205)
 -- Name: idx_dpr_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16499,7 +15840,6 @@ CREATE INDEX idx_dpr_date ON public.daily_production_reports USING btree (report
 
 
 --
--- TOC entry 5823 (class 1259 OID 26206)
 -- Name: idx_dpr_dt_report; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16507,7 +15847,6 @@ CREATE INDEX idx_dpr_dt_report ON public.dpr_downtime_lines USING btree (report_
 
 
 --
--- TOC entry 5830 (class 1259 OID 26207)
 -- Name: idx_dpr_gsm_report; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16515,7 +15854,6 @@ CREATE INDEX idx_dpr_gsm_report ON public.dpr_gsm_breakup USING btree (report_id
 
 
 --
--- TOC entry 5837 (class 1259 OID 26208)
 -- Name: idx_emp_docs_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16523,7 +15861,6 @@ CREATE INDEX idx_emp_docs_emp ON public.employee_documents USING btree (employee
 
 
 --
--- TOC entry 5856 (class 1259 OID 26209)
 -- Name: idx_employees_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16531,7 +15868,6 @@ CREATE INDEX idx_employees_user_id ON public.employees USING btree (user_id);
 
 
 --
--- TOC entry 5871 (class 1259 OID 26210)
 -- Name: idx_furnish_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16539,7 +15875,27 @@ CREATE INDEX idx_furnish_date ON public.furnish_mix_log USING btree (report_date
 
 
 --
--- TOC entry 5893 (class 1259 OID 26211)
+-- Name: idx_gate_passes_po; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_gate_passes_po ON public.gate_passes USING btree (po_id);
+
+
+--
+-- Name: idx_gate_passes_vendor; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_gate_passes_vendor ON public.gate_passes USING btree (vendor_id);
+
+
+--
+-- Name: idx_grn_gate_pass; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_grn_gate_pass ON public.grn USING btree (gate_pass_id);
+
+
+--
 -- Name: idx_indent_items_ack; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16547,7 +15903,13 @@ CREATE INDEX idx_indent_items_ack ON public.indent_items USING btree (ack_status
 
 
 --
--- TOC entry 6071 (class 1259 OID 26212)
+-- Name: idx_indent_items_maintenance_log; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_indent_items_maintenance_log ON public.indent_items USING btree (maintenance_log_id) WHERE (maintenance_log_id IS NOT NULL);
+
+
+--
 -- Name: idx_indent_log_created; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16555,7 +15917,6 @@ CREATE INDEX idx_indent_log_created ON public.store_indent_log USING btree (crea
 
 
 --
--- TOC entry 6072 (class 1259 OID 26213)
 -- Name: idx_indent_log_indent; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16563,7 +15924,6 @@ CREATE INDEX idx_indent_log_indent ON public.store_indent_log USING btree (inden
 
 
 --
--- TOC entry 5896 (class 1259 OID 26214)
 -- Name: idx_indents_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16571,7 +15931,6 @@ CREATE INDEX idx_indents_date ON public.indents USING btree (date);
 
 
 --
--- TOC entry 5897 (class 1259 OID 26215)
 -- Name: idx_indents_dept; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16579,7 +15938,6 @@ CREATE INDEX idx_indents_dept ON public.indents USING btree (department_id);
 
 
 --
--- TOC entry 5898 (class 1259 OID 26216)
 -- Name: idx_indents_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16587,7 +15945,13 @@ CREATE INDEX idx_indents_status ON public.indents USING btree (status);
 
 
 --
--- TOC entry 6039 (class 1259 OID 26217)
+-- Name: idx_installed_assets_unique_active_serial; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX idx_installed_assets_unique_active_serial ON public.installed_assets USING btree (lower(TRIM(BOTH FROM serial_number))) WHERE ((serial_number IS NOT NULL) AND ((status)::text <> ALL ((ARRAY['retired'::character varying, 'scrapped'::character varying])::text[])));
+
+
+--
 -- Name: idx_kpi_section_hour; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16595,7 +15959,6 @@ CREATE UNIQUE INDEX idx_kpi_section_hour ON public.section_kpi_snapshots USING b
 
 
 --
--- TOC entry 5914 (class 1259 OID 26218)
 -- Name: idx_leave_app_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16603,7 +15966,6 @@ CREATE INDEX idx_leave_app_emp ON public.leave_applications USING btree (employe
 
 
 --
--- TOC entry 5915 (class 1259 OID 26219)
 -- Name: idx_leave_app_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16611,7 +15973,6 @@ CREATE INDEX idx_leave_app_status ON public.leave_applications USING btree (stat
 
 
 --
--- TOC entry 5842 (class 1259 OID 26220)
 -- Name: idx_leave_bal_emp_year; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16619,7 +15980,27 @@ CREATE INDEX idx_leave_bal_emp_year ON public.employee_leave_balances USING btre
 
 
 --
--- TOC entry 5918 (class 1259 OID 26221)
+-- Name: idx_material_rejections_grn; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_material_rejections_grn ON public.material_rejections USING btree (grn_id);
+
+
+--
+-- Name: idx_material_rejections_po; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_material_rejections_po ON public.material_rejections USING btree (po_id);
+
+
+--
+-- Name: idx_material_rejections_vendor; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_material_rejections_vendor ON public.material_rejections USING btree (vendor_id);
+
+
+--
 -- Name: idx_me_equipment; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16627,7 +16008,6 @@ CREATE INDEX idx_me_equipment ON public.machine_events USING btree (equipment_id
 
 
 --
--- TOC entry 5919 (class 1259 OID 26222)
 -- Name: idx_me_event_type; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16635,7 +16015,6 @@ CREATE INDEX idx_me_event_type ON public.machine_events USING btree (event_type,
 
 
 --
--- TOC entry 5920 (class 1259 OID 26223)
 -- Name: idx_me_section_time; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16643,7 +16022,6 @@ CREATE INDEX idx_me_section_time ON public.machine_events USING btree (section_i
 
 
 --
--- TOC entry 5941 (class 1259 OID 26224)
 -- Name: idx_motor_specs_section; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16651,7 +16029,6 @@ CREATE INDEX idx_motor_specs_section ON public.motor_electrical_specs USING btre
 
 
 --
--- TOC entry 5944 (class 1259 OID 26225)
 -- Name: idx_notif_user; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16659,7 +16036,6 @@ CREATE INDEX idx_notif_user ON public.notifications USING btree (user_id, is_rea
 
 
 --
--- TOC entry 5947 (class 1259 OID 26226)
 -- Name: idx_onboard_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16667,7 +16043,6 @@ CREATE INDEX idx_onboard_emp ON public.onboarding_checklist USING btree (employe
 
 
 --
--- TOC entry 5962 (class 1259 OID 26227)
 -- Name: idx_payroll_det_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16675,7 +16050,6 @@ CREATE INDEX idx_payroll_det_emp ON public.payroll_details USING btree (employee
 
 
 --
--- TOC entry 5971 (class 1259 OID 26228)
 -- Name: idx_payrolls_employee_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16683,7 +16057,6 @@ CREATE INDEX idx_payrolls_employee_id ON public.payrolls USING btree (employee_i
 
 
 --
--- TOC entry 5990 (class 1259 OID 26229)
 -- Name: idx_qlt_reel; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16691,7 +16064,6 @@ CREATE INDEX idx_qlt_reel ON public.quality_lab_tests USING btree (reel_id);
 
 
 --
--- TOC entry 5991 (class 1259 OID 26230)
 -- Name: idx_qlt_section; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16699,7 +16071,6 @@ CREATE INDEX idx_qlt_section ON public.quality_lab_tests USING btree (section_id
 
 
 --
--- TOC entry 5992 (class 1259 OID 26231)
 -- Name: idx_qlt_shift; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16707,7 +16078,6 @@ CREATE INDEX idx_qlt_shift ON public.quality_lab_tests USING btree (shift_id, te
 
 
 --
--- TOC entry 5999 (class 1259 OID 26232)
 -- Name: idx_reels_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16715,7 +16085,6 @@ CREATE INDEX idx_reels_date ON public.reels USING btree (start_time);
 
 
 --
--- TOC entry 6000 (class 1259 OID 26233)
 -- Name: idx_reels_machine; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16723,7 +16092,6 @@ CREATE INDEX idx_reels_machine ON public.reels USING btree (machine_id);
 
 
 --
--- TOC entry 6001 (class 1259 OID 26234)
 -- Name: idx_reels_shift; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16731,7 +16099,6 @@ CREATE INDEX idx_reels_shift ON public.reels USING btree (shift_id);
 
 
 --
--- TOC entry 6002 (class 1259 OID 26235)
 -- Name: idx_reels_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16739,7 +16106,6 @@ CREATE INDEX idx_reels_status ON public.reels USING btree (status);
 
 
 --
--- TOC entry 5903 (class 1259 OID 26236)
 -- Name: idx_round_scans_section; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16747,7 +16113,6 @@ CREATE INDEX idx_round_scans_section ON public.inspection_round_scans USING btre
 
 
 --
--- TOC entry 5851 (class 1259 OID 26237)
 -- Name: idx_sal_assign_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16755,7 +16120,6 @@ CREATE INDEX idx_sal_assign_emp ON public.employee_salary_assignments USING btre
 
 
 --
--- TOC entry 6054 (class 1259 OID 26238)
 -- Name: idx_sep_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16763,7 +16127,6 @@ CREATE INDEX idx_sep_emp ON public.separation_records USING btree (employee_id);
 
 
 --
--- TOC entry 6042 (class 1259 OID 26239)
 -- Name: idx_spr_section_time; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16771,7 +16134,6 @@ CREATE INDEX idx_spr_section_time ON public.section_process_readings USING btree
 
 
 --
--- TOC entry 6043 (class 1259 OID 26240)
 -- Name: idx_spr_tag_time; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16779,7 +16141,6 @@ CREATE INDEX idx_spr_tag_time ON public.section_process_readings USING btree (ta
 
 
 --
--- TOC entry 6065 (class 1259 OID 26241)
 -- Name: idx_stock_ledger_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16787,7 +16148,6 @@ CREATE INDEX idx_stock_ledger_date ON public.stock_ledger USING btree (date);
 
 
 --
--- TOC entry 6066 (class 1259 OID 26242)
 -- Name: idx_stock_ledger_material; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16795,7 +16155,6 @@ CREATE INDEX idx_stock_ledger_material ON public.stock_ledger USING btree (mater
 
 
 --
--- TOC entry 6067 (class 1259 OID 26243)
 -- Name: idx_stock_ledger_shift; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16803,7 +16162,6 @@ CREATE INDEX idx_stock_ledger_shift ON public.stock_ledger USING btree (shift, d
 
 
 --
--- TOC entry 6068 (class 1259 OID 26244)
 -- Name: idx_stock_ledger_vendor; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16811,7 +16169,6 @@ CREATE INDEX idx_stock_ledger_vendor ON public.stock_ledger USING btree (vendor_
 
 
 --
--- TOC entry 6075 (class 1259 OID 26245)
 -- Name: idx_store_indents_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16819,7 +16176,6 @@ CREATE INDEX idx_store_indents_date ON public.store_indents USING btree (indent_
 
 
 --
--- TOC entry 6076 (class 1259 OID 26246)
 -- Name: idx_store_indents_dept; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16827,7 +16183,6 @@ CREATE INDEX idx_store_indents_dept ON public.store_indents USING btree (departm
 
 
 --
--- TOC entry 6077 (class 1259 OID 26247)
 -- Name: idx_store_indents_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16835,7 +16190,20 @@ CREATE INDEX idx_store_indents_status ON public.store_indents USING btree (statu
 
 
 --
--- TOC entry 6090 (class 1259 OID 26248)
+-- Name: idx_store_returns_dept; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_store_returns_dept ON public.store_returns USING btree (department_id);
+
+
+--
+-- Name: idx_store_transfers_status; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_store_transfers_status ON public.store_transfers USING btree (status);
+
+
+--
 -- Name: idx_training_att_emp; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16843,7 +16211,6 @@ CREATE INDEX idx_training_att_emp ON public.training_attendance USING btree (emp
 
 
 --
--- TOC entry 6103 (class 1259 OID 26249)
 -- Name: idx_utility_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16851,7 +16218,6 @@ CREATE INDEX idx_utility_date ON public.utility_readings USING btree (date);
 
 
 --
--- TOC entry 6116 (class 1259 OID 27378)
 -- Name: idx_vendor_bills_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16859,7 +16225,6 @@ CREATE INDEX idx_vendor_bills_status ON public.vendor_bills USING btree (status)
 
 
 --
--- TOC entry 6117 (class 1259 OID 27377)
 -- Name: idx_vendor_bills_vendor; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16867,7 +16232,6 @@ CREATE INDEX idx_vendor_bills_vendor ON public.vendor_bills USING btree (vendor_
 
 
 --
--- TOC entry 6122 (class 1259 OID 27380)
 -- Name: idx_vendor_payments_bill; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16875,7 +16239,6 @@ CREATE INDEX idx_vendor_payments_bill ON public.vendor_payments USING btree (bil
 
 
 --
--- TOC entry 6123 (class 1259 OID 27379)
 -- Name: idx_vendor_payments_vendor; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16883,7 +16246,6 @@ CREATE INDEX idx_vendor_payments_vendor ON public.vendor_payments USING btree (v
 
 
 --
--- TOC entry 5888 (class 1259 OID 26250)
 -- Name: uq_holidays_date; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -16891,7 +16253,6 @@ CREATE UNIQUE INDEX uq_holidays_date ON public.holidays USING btree (holiday_dat
 
 
 --
--- TOC entry 6129 (class 2606 OID 26251)
 -- Name: adjustment_requests adjustment_requests_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16900,7 +16261,6 @@ ALTER TABLE ONLY public.adjustment_requests
 
 
 --
--- TOC entry 6130 (class 2606 OID 26256)
 -- Name: adjustment_requests adjustment_requests_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16909,7 +16269,6 @@ ALTER TABLE ONLY public.adjustment_requests
 
 
 --
--- TOC entry 6131 (class 2606 OID 26261)
 -- Name: adjustment_requests adjustment_requests_requested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16918,7 +16277,6 @@ ALTER TABLE ONLY public.adjustment_requests
 
 
 --
--- TOC entry 6132 (class 2606 OID 26266)
 -- Name: appraisal_competencies appraisal_competencies_cycle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16927,7 +16285,6 @@ ALTER TABLE ONLY public.appraisal_competencies
 
 
 --
--- TOC entry 6133 (class 2606 OID 26271)
 -- Name: appraisal_competencies appraisal_competencies_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16936,7 +16293,6 @@ ALTER TABLE ONLY public.appraisal_competencies
 
 
 --
--- TOC entry 6134 (class 2606 OID 26276)
 -- Name: appraisal_cycles appraisal_cycles_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16945,7 +16301,6 @@ ALTER TABLE ONLY public.appraisal_cycles
 
 
 --
--- TOC entry 6135 (class 2606 OID 26281)
 -- Name: appraisal_goals appraisal_goals_cycle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16954,7 +16309,6 @@ ALTER TABLE ONLY public.appraisal_goals
 
 
 --
--- TOC entry 6136 (class 2606 OID 26286)
 -- Name: appraisal_goals appraisal_goals_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16963,7 +16317,6 @@ ALTER TABLE ONLY public.appraisal_goals
 
 
 --
--- TOC entry 6137 (class 2606 OID 26291)
 -- Name: appraisal_goals appraisal_goals_set_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16972,7 +16325,6 @@ ALTER TABLE ONLY public.appraisal_goals
 
 
 --
--- TOC entry 6138 (class 2606 OID 26296)
 -- Name: asset_events asset_events_asset_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16981,7 +16333,6 @@ ALTER TABLE ONLY public.asset_events
 
 
 --
--- TOC entry 6139 (class 2606 OID 26301)
 -- Name: asset_events asset_events_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16990,7 +16341,6 @@ ALTER TABLE ONLY public.asset_events
 
 
 --
--- TOC entry 6140 (class 2606 OID 26306)
 -- Name: attendance attendance_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -16999,7 +16349,6 @@ ALTER TABLE ONLY public.attendance
 
 
 --
--- TOC entry 6141 (class 2606 OID 26311)
 -- Name: attendance_regularization attendance_regularization_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17008,7 +16357,6 @@ ALTER TABLE ONLY public.attendance_regularization
 
 
 --
--- TOC entry 6142 (class 2606 OID 26316)
 -- Name: attendance_regularization attendance_regularization_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17017,7 +16365,6 @@ ALTER TABLE ONLY public.attendance_regularization
 
 
 --
--- TOC entry 6143 (class 2606 OID 26321)
 -- Name: audit_log audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17026,7 +16373,6 @@ ALTER TABLE ONLY public.audit_log
 
 
 --
--- TOC entry 6144 (class 2606 OID 26326)
 -- Name: boiler_performance_logs boiler_performance_logs_logged_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17035,7 +16381,6 @@ ALTER TABLE ONLY public.boiler_performance_logs
 
 
 --
--- TOC entry 6145 (class 2606 OID 26331)
 -- Name: chemical_consumption chemical_consumption_chemical_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17044,7 +16389,6 @@ ALTER TABLE ONLY public.chemical_consumption
 
 
 --
--- TOC entry 6146 (class 2606 OID 26336)
 -- Name: chemical_consumption chemical_consumption_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17053,7 +16397,6 @@ ALTER TABLE ONLY public.chemical_consumption
 
 
 --
--- TOC entry 6147 (class 2606 OID 26341)
 -- Name: chemical_limit_alerts chemical_limit_alerts_chemical_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17062,7 +16405,6 @@ ALTER TABLE ONLY public.chemical_limit_alerts
 
 
 --
--- TOC entry 6148 (class 2606 OID 26346)
 -- Name: clearance_items clearance_items_cleared_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17071,7 +16413,6 @@ ALTER TABLE ONLY public.clearance_items
 
 
 --
--- TOC entry 6149 (class 2606 OID 26351)
 -- Name: clearance_items clearance_items_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17080,7 +16421,6 @@ ALTER TABLE ONLY public.clearance_items
 
 
 --
--- TOC entry 6150 (class 2606 OID 26356)
 -- Name: clearance_items clearance_items_separation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17089,7 +16429,6 @@ ALTER TABLE ONLY public.clearance_items
 
 
 --
--- TOC entry 6151 (class 2606 OID 26361)
 -- Name: customers customers_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17098,7 +16437,6 @@ ALTER TABLE ONLY public.customers
 
 
 --
--- TOC entry 6152 (class 2606 OID 26366)
 -- Name: daily_production_reports daily_production_reports_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17107,7 +16445,6 @@ ALTER TABLE ONLY public.daily_production_reports
 
 
 --
--- TOC entry 6153 (class 2606 OID 26371)
 -- Name: daily_production_reports daily_production_reports_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17116,7 +16453,6 @@ ALTER TABLE ONLY public.daily_production_reports
 
 
 --
--- TOC entry 6154 (class 2606 OID 26376)
 -- Name: daily_production_reports daily_production_reports_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17125,7 +16461,6 @@ ALTER TABLE ONLY public.daily_production_reports
 
 
 --
--- TOC entry 6155 (class 2606 OID 26381)
 -- Name: dispatch_items dispatch_items_dispatch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17134,7 +16469,6 @@ ALTER TABLE ONLY public.dispatch_items
 
 
 --
--- TOC entry 6156 (class 2606 OID 26386)
 -- Name: dispatch_items dispatch_items_reel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17143,7 +16477,6 @@ ALTER TABLE ONLY public.dispatch_items
 
 
 --
--- TOC entry 6157 (class 2606 OID 26391)
 -- Name: dispatch_orders dispatch_orders_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17152,7 +16485,6 @@ ALTER TABLE ONLY public.dispatch_orders
 
 
 --
--- TOC entry 6158 (class 2606 OID 26396)
 -- Name: dispatch_orders dispatch_orders_dispatched_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17161,7 +16493,6 @@ ALTER TABLE ONLY public.dispatch_orders
 
 
 --
--- TOC entry 6159 (class 2606 OID 26401)
 -- Name: dispatch_orders dispatch_orders_so_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17170,7 +16501,6 @@ ALTER TABLE ONLY public.dispatch_orders
 
 
 --
--- TOC entry 6160 (class 2606 OID 26406)
 -- Name: downtime_entries downtime_entries_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17179,7 +16509,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 6161 (class 2606 OID 26411)
 -- Name: downtime_entries downtime_entries_reason_code_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17188,7 +16517,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 6162 (class 2606 OID 26416)
 -- Name: downtime_entries downtime_entries_reel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17197,7 +16525,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 6163 (class 2606 OID 26421)
 -- Name: downtime_entries downtime_entries_reported_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17206,7 +16533,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 6164 (class 2606 OID 26426)
 -- Name: downtime_entries downtime_entries_shift_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17215,7 +16541,6 @@ ALTER TABLE ONLY public.downtime_entries
 
 
 --
--- TOC entry 6165 (class 2606 OID 26431)
 -- Name: dpr_chemical_lines dpr_chemical_lines_chemical_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17224,7 +16549,6 @@ ALTER TABLE ONLY public.dpr_chemical_lines
 
 
 --
--- TOC entry 6166 (class 2606 OID 26436)
 -- Name: dpr_chemical_lines dpr_chemical_lines_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17233,7 +16557,6 @@ ALTER TABLE ONLY public.dpr_chemical_lines
 
 
 --
--- TOC entry 6167 (class 2606 OID 26441)
 -- Name: dpr_downtime_lines dpr_downtime_lines_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17242,7 +16565,6 @@ ALTER TABLE ONLY public.dpr_downtime_lines
 
 
 --
--- TOC entry 6168 (class 2606 OID 26446)
 -- Name: dpr_gsm_breakup dpr_gsm_breakup_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17251,7 +16573,6 @@ ALTER TABLE ONLY public.dpr_gsm_breakup
 
 
 --
--- TOC entry 6169 (class 2606 OID 26451)
 -- Name: ehs_incidents ehs_incidents_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17260,7 +16581,6 @@ ALTER TABLE ONLY public.ehs_incidents
 
 
 --
--- TOC entry 6170 (class 2606 OID 26456)
 -- Name: ehs_incidents ehs_incidents_reported_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17269,7 +16589,6 @@ ALTER TABLE ONLY public.ehs_incidents
 
 
 --
--- TOC entry 6171 (class 2606 OID 26461)
 -- Name: employee_documents employee_documents_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17278,7 +16597,6 @@ ALTER TABLE ONLY public.employee_documents
 
 
 --
--- TOC entry 6172 (class 2606 OID 26466)
 -- Name: employee_documents employee_documents_uploaded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17287,7 +16605,6 @@ ALTER TABLE ONLY public.employee_documents
 
 
 --
--- TOC entry 6173 (class 2606 OID 26471)
 -- Name: employee_leave_balances employee_leave_balances_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17296,7 +16613,6 @@ ALTER TABLE ONLY public.employee_leave_balances
 
 
 --
--- TOC entry 6174 (class 2606 OID 26476)
 -- Name: employee_leave_balances employee_leave_balances_leave_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17305,7 +16621,6 @@ ALTER TABLE ONLY public.employee_leave_balances
 
 
 --
--- TOC entry 6175 (class 2606 OID 26481)
 -- Name: employee_loans employee_loans_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17314,7 +16629,6 @@ ALTER TABLE ONLY public.employee_loans
 
 
 --
--- TOC entry 6176 (class 2606 OID 26486)
 -- Name: employee_loans employee_loans_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17323,7 +16637,6 @@ ALTER TABLE ONLY public.employee_loans
 
 
 --
--- TOC entry 6177 (class 2606 OID 26491)
 -- Name: employee_salary_assignments employee_salary_assignments_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17332,7 +16645,6 @@ ALTER TABLE ONLY public.employee_salary_assignments
 
 
 --
--- TOC entry 6178 (class 2606 OID 26496)
 -- Name: employee_salary_assignments employee_salary_assignments_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17341,7 +16653,6 @@ ALTER TABLE ONLY public.employee_salary_assignments
 
 
 --
--- TOC entry 6179 (class 2606 OID 26501)
 -- Name: employee_salary_assignments employee_salary_assignments_salary_structure_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17350,7 +16661,6 @@ ALTER TABLE ONLY public.employee_salary_assignments
 
 
 --
--- TOC entry 6180 (class 2606 OID 26506)
 -- Name: employees employees_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17359,7 +16669,6 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- TOC entry 6181 (class 2606 OID 26511)
 -- Name: employees employees_reporting_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17368,7 +16677,6 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- TOC entry 6182 (class 2606 OID 26516)
 -- Name: employees employees_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17377,7 +16685,6 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- TOC entry 6183 (class 2606 OID 26521)
 -- Name: eod_reports eod_reports_sent_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17386,7 +16693,6 @@ ALTER TABLE ONLY public.eod_reports
 
 
 --
--- TOC entry 6185 (class 2606 OID 26526)
 -- Name: equipment_inspection equipment_inspection_equipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17395,7 +16701,6 @@ ALTER TABLE ONLY public.equipment_inspection
 
 
 --
--- TOC entry 6186 (class 2606 OID 26531)
 -- Name: equipment_inspection equipment_inspection_inspector_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17404,7 +16709,6 @@ ALTER TABLE ONLY public.equipment_inspection
 
 
 --
--- TOC entry 6184 (class 2606 OID 26536)
 -- Name: equipment equipment_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17413,7 +16717,6 @@ ALTER TABLE ONLY public.equipment
 
 
 --
--- TOC entry 6187 (class 2606 OID 26541)
 -- Name: etp_readings etp_readings_logged_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17422,7 +16725,6 @@ ALTER TABLE ONLY public.etp_readings
 
 
 --
--- TOC entry 6188 (class 2606 OID 26546)
 -- Name: furnish_mix_log furnish_mix_log_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17431,7 +16733,6 @@ ALTER TABLE ONLY public.furnish_mix_log
 
 
 --
--- TOC entry 6189 (class 2606 OID 26551)
 -- Name: furnish_mix_log furnish_mix_log_prepared_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17440,7 +16741,14 @@ ALTER TABLE ONLY public.furnish_mix_log
 
 
 --
--- TOC entry 6190 (class 2606 OID 26556)
+-- Name: gate_passes gate_passes_po_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.gate_passes
+    ADD CONSTRAINT gate_passes_po_id_fkey FOREIGN KEY (po_id) REFERENCES public.purchase_orders(id) ON DELETE SET NULL;
+
+
+--
 -- Name: gate_passes gate_passes_security_guard_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17449,7 +16757,14 @@ ALTER TABLE ONLY public.gate_passes
 
 
 --
--- TOC entry 6191 (class 2606 OID 26561)
+-- Name: gate_passes gate_passes_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.gate_passes
+    ADD CONSTRAINT gate_passes_vendor_id_fkey FOREIGN KEY (vendor_id) REFERENCES public.vendors(id) ON DELETE SET NULL;
+
+
+--
 -- Name: grades grades_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17458,7 +16773,14 @@ ALTER TABLE ONLY public.grades
 
 
 --
--- TOC entry 6194 (class 2606 OID 26566)
+-- Name: grn grn_gate_pass_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grn
+    ADD CONSTRAINT grn_gate_pass_id_fkey FOREIGN KEY (gate_pass_id) REFERENCES public.gate_passes(id) ON DELETE SET NULL;
+
+
+--
 -- Name: grn_items grn_items_grn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17467,7 +16789,6 @@ ALTER TABLE ONLY public.grn_items
 
 
 --
--- TOC entry 6195 (class 2606 OID 26571)
 -- Name: grn_items grn_items_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17476,7 +16797,6 @@ ALTER TABLE ONLY public.grn_items
 
 
 --
--- TOC entry 6192 (class 2606 OID 26576)
 -- Name: grn grn_received_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17485,7 +16805,6 @@ ALTER TABLE ONLY public.grn
 
 
 --
--- TOC entry 6193 (class 2606 OID 26581)
 -- Name: grn grn_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17494,7 +16813,6 @@ ALTER TABLE ONLY public.grn
 
 
 --
--- TOC entry 6196 (class 2606 OID 26586)
 -- Name: indent_audit_log indent_audit_log_indent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17503,7 +16821,6 @@ ALTER TABLE ONLY public.indent_audit_log
 
 
 --
--- TOC entry 6197 (class 2606 OID 26591)
 -- Name: indent_audit_log indent_audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17512,7 +16829,6 @@ ALTER TABLE ONLY public.indent_audit_log
 
 
 --
--- TOC entry 6198 (class 2606 OID 26596)
 -- Name: indent_comments indent_comments_issue_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17521,7 +16837,6 @@ ALTER TABLE ONLY public.indent_comments
 
 
 --
--- TOC entry 6199 (class 2606 OID 26601)
 -- Name: indent_comments indent_comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17530,7 +16845,6 @@ ALTER TABLE ONLY public.indent_comments
 
 
 --
--- TOC entry 6200 (class 2606 OID 26606)
 -- Name: indent_items indent_items_ack_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17539,7 +16853,6 @@ ALTER TABLE ONLY public.indent_items
 
 
 --
--- TOC entry 6201 (class 2606 OID 26611)
 -- Name: indent_items indent_items_indent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17548,7 +16861,14 @@ ALTER TABLE ONLY public.indent_items
 
 
 --
--- TOC entry 6202 (class 2606 OID 26616)
+-- Name: indent_items indent_items_maintenance_log_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.indent_items
+    ADD CONSTRAINT indent_items_maintenance_log_id_fkey FOREIGN KEY (maintenance_log_id) REFERENCES public.maintenance_logs(id) ON DELETE SET NULL;
+
+
+--
 -- Name: indent_items indent_items_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17557,7 +16877,6 @@ ALTER TABLE ONLY public.indent_items
 
 
 --
--- TOC entry 6203 (class 2606 OID 27264)
 -- Name: indents indents_cancelled_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17566,7 +16885,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6204 (class 2606 OID 26621)
 -- Name: indents indents_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17575,7 +16893,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6205 (class 2606 OID 26626)
 -- Name: indents indents_issued_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17584,7 +16901,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6206 (class 2606 OID 26631)
 -- Name: indents indents_l1_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17593,7 +16909,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6207 (class 2606 OID 26636)
 -- Name: indents indents_l2_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17602,7 +16917,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6208 (class 2606 OID 26641)
 -- Name: indents indents_l3_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17611,7 +16925,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6209 (class 2606 OID 26646)
 -- Name: indents indents_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17620,7 +16933,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6210 (class 2606 OID 26651)
 -- Name: indents indents_raised_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17629,7 +16941,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6211 (class 2606 OID 26656)
 -- Name: indents indents_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17638,7 +16949,6 @@ ALTER TABLE ONLY public.indents
 
 
 --
--- TOC entry 6212 (class 2606 OID 26661)
 -- Name: inspection_round_scans inspection_round_scans_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17647,7 +16957,6 @@ ALTER TABLE ONLY public.inspection_round_scans
 
 
 --
--- TOC entry 6213 (class 2606 OID 26666)
 -- Name: inspection_round_scans inspection_round_scans_uploaded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17656,7 +16965,6 @@ ALTER TABLE ONLY public.inspection_round_scans
 
 
 --
--- TOC entry 6214 (class 2606 OID 26671)
 -- Name: installed_assets installed_assets_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17665,7 +16973,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6215 (class 2606 OID 26676)
 -- Name: installed_assets installed_assets_issued_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17674,7 +16981,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6216 (class 2606 OID 26681)
 -- Name: installed_assets installed_assets_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17683,7 +16989,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6217 (class 2606 OID 26686)
 -- Name: installed_assets installed_assets_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17692,7 +16997,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6218 (class 2606 OID 26691)
 -- Name: installed_assets installed_assets_position_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17701,7 +17005,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6219 (class 2606 OID 26696)
 -- Name: installed_assets installed_assets_requested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17710,7 +17013,6 @@ ALTER TABLE ONLY public.installed_assets
 
 
 --
--- TOC entry 6220 (class 2606 OID 26701)
 -- Name: lab_samples lab_samples_collected_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17719,7 +17021,6 @@ ALTER TABLE ONLY public.lab_samples
 
 
 --
--- TOC entry 6221 (class 2606 OID 26706)
 -- Name: lab_samples lab_samples_tested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17728,7 +17029,6 @@ ALTER TABLE ONLY public.lab_samples
 
 
 --
--- TOC entry 6222 (class 2606 OID 26711)
 -- Name: leave_applications leave_applications_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17737,7 +17037,6 @@ ALTER TABLE ONLY public.leave_applications
 
 
 --
--- TOC entry 6223 (class 2606 OID 26716)
 -- Name: leave_applications leave_applications_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17746,7 +17045,6 @@ ALTER TABLE ONLY public.leave_applications
 
 
 --
--- TOC entry 6224 (class 2606 OID 26721)
 -- Name: leave_applications leave_applications_leave_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17755,7 +17053,6 @@ ALTER TABLE ONLY public.leave_applications
 
 
 --
--- TOC entry 6225 (class 2606 OID 26726)
 -- Name: machine_events machine_events_alarm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17764,7 +17061,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6226 (class 2606 OID 26731)
 -- Name: machine_events machine_events_downtime_entry_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17773,7 +17069,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6227 (class 2606 OID 26736)
 -- Name: machine_events machine_events_equipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17782,7 +17077,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6228 (class 2606 OID 26741)
 -- Name: machine_events machine_events_reported_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17791,7 +17085,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6229 (class 2606 OID 26746)
 -- Name: machine_events machine_events_resolved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17800,7 +17093,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6230 (class 2606 OID 26751)
 -- Name: machine_events machine_events_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17809,7 +17101,6 @@ ALTER TABLE ONLY public.machine_events
 
 
 --
--- TOC entry 6231 (class 2606 OID 26756)
 -- Name: machine_positions machine_positions_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17818,7 +17109,6 @@ ALTER TABLE ONLY public.machine_positions
 
 
 --
--- TOC entry 6128 (class 2606 OID 26761)
 -- Name: machines machines_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17827,7 +17117,6 @@ ALTER TABLE ONLY public.machines
 
 
 --
--- TOC entry 6232 (class 2606 OID 26766)
 -- Name: maintenance_logs maintenance_logs_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17836,7 +17125,6 @@ ALTER TABLE ONLY public.maintenance_logs
 
 
 --
--- TOC entry 6233 (class 2606 OID 26771)
 -- Name: maintenance_logs maintenance_logs_performed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17845,7 +17133,6 @@ ALTER TABLE ONLY public.maintenance_logs
 
 
 --
--- TOC entry 6234 (class 2606 OID 26776)
 -- Name: maintenance_logs maintenance_logs_schedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17854,7 +17141,6 @@ ALTER TABLE ONLY public.maintenance_logs
 
 
 --
--- TOC entry 6235 (class 2606 OID 26781)
 -- Name: maintenance_schedule maintenance_schedule_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17863,7 +17149,6 @@ ALTER TABLE ONLY public.maintenance_schedule
 
 
 --
--- TOC entry 6236 (class 2606 OID 26786)
 -- Name: maintenance_schedule maintenance_schedule_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17872,7 +17157,6 @@ ALTER TABLE ONLY public.maintenance_schedule
 
 
 --
--- TOC entry 6237 (class 2606 OID 26791)
 -- Name: maintenance_schedule maintenance_schedule_position_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17881,7 +17165,6 @@ ALTER TABLE ONLY public.maintenance_schedule
 
 
 --
--- TOC entry 6238 (class 2606 OID 26796)
 -- Name: material_categories material_categories_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17890,7 +17173,62 @@ ALTER TABLE ONLY public.material_categories
 
 
 --
--- TOC entry 6239 (class 2606 OID 26801)
+-- Name: material_rejections material_rejections_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id);
+
+
+--
+-- Name: material_rejections material_rejections_grn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_grn_id_fkey FOREIGN KEY (grn_id) REFERENCES public.grn(id) ON DELETE SET NULL;
+
+
+--
+-- Name: material_rejections material_rejections_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_material_id_fkey FOREIGN KEY (material_id) REFERENCES public.materials(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: material_rejections material_rejections_outward_gate_pass_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_outward_gate_pass_id_fkey FOREIGN KEY (outward_gate_pass_id) REFERENCES public.gate_passes(id) ON DELETE SET NULL;
+
+
+--
+-- Name: material_rejections material_rejections_po_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_po_id_fkey FOREIGN KEY (po_id) REFERENCES public.purchase_orders(id) ON DELETE SET NULL;
+
+
+--
+-- Name: material_rejections material_rejections_qc_test_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_qc_test_id_fkey FOREIGN KEY (qc_test_id) REFERENCES public.quality_tests(id) ON DELETE SET NULL;
+
+
+--
+-- Name: material_rejections material_rejections_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.material_rejections
+    ADD CONSTRAINT material_rejections_vendor_id_fkey FOREIGN KEY (vendor_id) REFERENCES public.vendors(id) ON DELETE SET NULL;
+
+
+--
 -- Name: materials materials_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17899,7 +17237,6 @@ ALTER TABLE ONLY public.materials
 
 
 --
--- TOC entry 6240 (class 2606 OID 26806)
 -- Name: materials materials_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17908,7 +17245,6 @@ ALTER TABLE ONLY public.materials
 
 
 --
--- TOC entry 6241 (class 2606 OID 26811)
 -- Name: notifications notifications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17917,7 +17253,6 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- TOC entry 6242 (class 2606 OID 26816)
 -- Name: onboarding_checklist onboarding_checklist_completed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17926,7 +17261,6 @@ ALTER TABLE ONLY public.onboarding_checklist
 
 
 --
--- TOC entry 6243 (class 2606 OID 26821)
 -- Name: onboarding_checklist onboarding_checklist_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17935,7 +17269,6 @@ ALTER TABLE ONLY public.onboarding_checklist
 
 
 --
--- TOC entry 6244 (class 2606 OID 26826)
 -- Name: onboarding_checklist onboarding_checklist_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17944,7 +17277,6 @@ ALTER TABLE ONLY public.onboarding_checklist
 
 
 --
--- TOC entry 6245 (class 2606 OID 26831)
 -- Name: packing_records packing_records_packed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17953,7 +17285,6 @@ ALTER TABLE ONLY public.packing_records
 
 
 --
--- TOC entry 6246 (class 2606 OID 26836)
 -- Name: packing_records packing_records_reel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17962,7 +17293,6 @@ ALTER TABLE ONLY public.packing_records
 
 
 --
--- TOC entry 6247 (class 2606 OID 26841)
 -- Name: payments payments_confirmed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17971,7 +17301,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- TOC entry 6248 (class 2606 OID 26846)
 -- Name: payments payments_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17980,7 +17309,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- TOC entry 6249 (class 2606 OID 26851)
 -- Name: payments payments_sales_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17989,7 +17317,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- TOC entry 6250 (class 2606 OID 26856)
 -- Name: payroll_details payroll_details_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17998,7 +17325,6 @@ ALTER TABLE ONLY public.payroll_details
 
 
 --
--- TOC entry 6251 (class 2606 OID 26861)
 -- Name: payroll_details payroll_details_payroll_run_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18007,7 +17333,6 @@ ALTER TABLE ONLY public.payroll_details
 
 
 --
--- TOC entry 6252 (class 2606 OID 26866)
 -- Name: payroll_details payroll_details_salary_structure_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18016,7 +17341,6 @@ ALTER TABLE ONLY public.payroll_details
 
 
 --
--- TOC entry 6253 (class 2606 OID 26871)
 -- Name: payroll_runs payroll_runs_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18025,7 +17349,6 @@ ALTER TABLE ONLY public.payroll_runs
 
 
 --
--- TOC entry 6254 (class 2606 OID 26876)
 -- Name: payroll_runs payroll_runs_generated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18034,7 +17357,6 @@ ALTER TABLE ONLY public.payroll_runs
 
 
 --
--- TOC entry 6255 (class 2606 OID 26881)
 -- Name: payroll_runs payroll_runs_paid_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18043,7 +17365,6 @@ ALTER TABLE ONLY public.payroll_runs
 
 
 --
--- TOC entry 6256 (class 2606 OID 26886)
 -- Name: payrolls payrolls_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18052,7 +17373,6 @@ ALTER TABLE ONLY public.payrolls
 
 
 --
--- TOC entry 6257 (class 2606 OID 26891)
 -- Name: payrolls payrolls_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18061,7 +17381,6 @@ ALTER TABLE ONLY public.payrolls
 
 
 --
--- TOC entry 6258 (class 2606 OID 26896)
 -- Name: plant_sections plant_sections_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18070,7 +17389,6 @@ ALTER TABLE ONLY public.plant_sections
 
 
 --
--- TOC entry 6259 (class 2606 OID 26901)
 -- Name: po_items po_items_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18079,7 +17397,6 @@ ALTER TABLE ONLY public.po_items
 
 
 --
--- TOC entry 6260 (class 2606 OID 26906)
 -- Name: po_items po_items_po_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18088,7 +17405,6 @@ ALTER TABLE ONLY public.po_items
 
 
 --
--- TOC entry 6261 (class 2606 OID 26911)
 -- Name: production_summary production_summary_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18097,7 +17413,6 @@ ALTER TABLE ONLY public.production_summary
 
 
 --
--- TOC entry 6262 (class 2606 OID 26916)
 -- Name: purchase_orders purchase_orders_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18106,7 +17421,6 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- TOC entry 6263 (class 2606 OID 26921)
 -- Name: purchase_orders purchase_orders_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18115,7 +17429,6 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- TOC entry 6264 (class 2606 OID 26926)
 -- Name: purchase_orders purchase_orders_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18124,7 +17437,6 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- TOC entry 6265 (class 2606 OID 26931)
 -- Name: quality_lab_tests quality_lab_tests_lab_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18133,7 +17445,6 @@ ALTER TABLE ONLY public.quality_lab_tests
 
 
 --
--- TOC entry 6266 (class 2606 OID 26936)
 -- Name: quality_lab_tests quality_lab_tests_reel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18142,7 +17453,6 @@ ALTER TABLE ONLY public.quality_lab_tests
 
 
 --
--- TOC entry 6267 (class 2606 OID 26941)
 -- Name: quality_lab_tests quality_lab_tests_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18151,7 +17461,6 @@ ALTER TABLE ONLY public.quality_lab_tests
 
 
 --
--- TOC entry 6268 (class 2606 OID 26946)
 -- Name: quality_lab_tests quality_lab_tests_shift_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18160,7 +17469,6 @@ ALTER TABLE ONLY public.quality_lab_tests
 
 
 --
--- TOC entry 6269 (class 2606 OID 26951)
 -- Name: quality_tests quality_tests_tested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18169,7 +17477,6 @@ ALTER TABLE ONLY public.quality_tests
 
 
 --
--- TOC entry 6270 (class 2606 OID 26956)
 -- Name: reels reels_grade_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18178,7 +17485,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6271 (class 2606 OID 26961)
 -- Name: reels reels_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18187,7 +17493,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6272 (class 2606 OID 26966)
 -- Name: reels reels_operator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18196,7 +17501,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6273 (class 2606 OID 26971)
 -- Name: reels reels_shift_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18205,7 +17509,6 @@ ALTER TABLE ONLY public.reels
 
 
 --
--- TOC entry 6274 (class 2606 OID 26976)
 -- Name: sales_orders sales_orders_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18214,7 +17517,6 @@ ALTER TABLE ONLY public.sales_orders
 
 
 --
--- TOC entry 6275 (class 2606 OID 26981)
 -- Name: sales_orders sales_orders_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18223,7 +17525,6 @@ ALTER TABLE ONLY public.sales_orders
 
 
 --
--- TOC entry 6276 (class 2606 OID 26986)
 -- Name: sales_orders sales_orders_grade_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18232,7 +17533,6 @@ ALTER TABLE ONLY public.sales_orders
 
 
 --
--- TOC entry 6277 (class 2606 OID 26991)
 -- Name: scrap_records scrap_records_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18241,7 +17541,6 @@ ALTER TABLE ONLY public.scrap_records
 
 
 --
--- TOC entry 6278 (class 2606 OID 26996)
 -- Name: scrap_records scrap_records_source_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18250,7 +17549,6 @@ ALTER TABLE ONLY public.scrap_records
 
 
 --
--- TOC entry 6279 (class 2606 OID 27001)
 -- Name: section_alarms section_alarms_acknowledged_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18259,7 +17557,6 @@ ALTER TABLE ONLY public.section_alarms
 
 
 --
--- TOC entry 6280 (class 2606 OID 27006)
 -- Name: section_alarms section_alarms_equipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18268,7 +17565,6 @@ ALTER TABLE ONLY public.section_alarms
 
 
 --
--- TOC entry 6281 (class 2606 OID 27011)
 -- Name: section_alarms section_alarms_maintenance_log_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18277,7 +17573,6 @@ ALTER TABLE ONLY public.section_alarms
 
 
 --
--- TOC entry 6282 (class 2606 OID 27016)
 -- Name: section_alarms section_alarms_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18286,7 +17581,6 @@ ALTER TABLE ONLY public.section_alarms
 
 
 --
--- TOC entry 6283 (class 2606 OID 27021)
 -- Name: section_energy_allocations section_energy_allocations_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18295,7 +17589,6 @@ ALTER TABLE ONLY public.section_energy_allocations
 
 
 --
--- TOC entry 6284 (class 2606 OID 27026)
 -- Name: section_equipment section_equipment_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18304,7 +17597,6 @@ ALTER TABLE ONLY public.section_equipment
 
 
 --
--- TOC entry 6285 (class 2606 OID 27031)
 -- Name: section_equipment section_equipment_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18313,7 +17605,6 @@ ALTER TABLE ONLY public.section_equipment
 
 
 --
--- TOC entry 6286 (class 2606 OID 27036)
 -- Name: section_kpi_snapshots section_kpi_snapshots_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18322,7 +17613,6 @@ ALTER TABLE ONLY public.section_kpi_snapshots
 
 
 --
--- TOC entry 6287 (class 2606 OID 27041)
 -- Name: section_process_readings section_process_readings_equipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18331,7 +17621,6 @@ ALTER TABLE ONLY public.section_process_readings
 
 
 --
--- TOC entry 6288 (class 2606 OID 27046)
 -- Name: section_process_readings section_process_readings_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18340,7 +17629,6 @@ ALTER TABLE ONLY public.section_process_readings
 
 
 --
--- TOC entry 6289 (class 2606 OID 27051)
 -- Name: section_process_readings section_process_readings_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18349,7 +17637,6 @@ ALTER TABLE ONLY public.section_process_readings
 
 
 --
--- TOC entry 6290 (class 2606 OID 27056)
 -- Name: section_process_readings section_process_readings_shift_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18358,7 +17645,6 @@ ALTER TABLE ONLY public.section_process_readings
 
 
 --
--- TOC entry 6291 (class 2606 OID 27061)
 -- Name: section_sops section_sops_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18367,7 +17653,6 @@ ALTER TABLE ONLY public.section_sops
 
 
 --
--- TOC entry 6292 (class 2606 OID 27066)
 -- Name: section_sops section_sops_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18376,7 +17661,6 @@ ALTER TABLE ONLY public.section_sops
 
 
 --
--- TOC entry 6293 (class 2606 OID 27071)
 -- Name: sections sections_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18385,7 +17669,6 @@ ALTER TABLE ONLY public.sections
 
 
 --
--- TOC entry 6294 (class 2606 OID 27076)
 -- Name: separation_records separation_records_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18394,7 +17677,6 @@ ALTER TABLE ONLY public.separation_records
 
 
 --
--- TOC entry 6295 (class 2606 OID 27081)
 -- Name: separation_records separation_records_closed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18403,7 +17685,6 @@ ALTER TABLE ONLY public.separation_records
 
 
 --
--- TOC entry 6296 (class 2606 OID 27086)
 -- Name: separation_records separation_records_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18412,7 +17693,6 @@ ALTER TABLE ONLY public.separation_records
 
 
 --
--- TOC entry 6297 (class 2606 OID 27091)
 -- Name: separation_records separation_records_initiated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18421,7 +17701,6 @@ ALTER TABLE ONLY public.separation_records
 
 
 --
--- TOC entry 6298 (class 2606 OID 27096)
 -- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18430,7 +17709,6 @@ ALTER TABLE ONLY public.sessions
 
 
 --
--- TOC entry 6299 (class 2606 OID 27101)
 -- Name: shift_reports shift_reports_operator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18439,7 +17717,6 @@ ALTER TABLE ONLY public.shift_reports
 
 
 --
--- TOC entry 6300 (class 2606 OID 27106)
 -- Name: shifts shifts_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18448,7 +17725,6 @@ ALTER TABLE ONLY public.shifts
 
 
 --
--- TOC entry 6301 (class 2606 OID 27111)
 -- Name: shifts shifts_supervisor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18457,7 +17733,6 @@ ALTER TABLE ONLY public.shifts
 
 
 --
--- TOC entry 6302 (class 2606 OID 27116)
 -- Name: stock_ledger stock_ledger_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18466,7 +17741,6 @@ ALTER TABLE ONLY public.stock_ledger
 
 
 --
--- TOC entry 6303 (class 2606 OID 27121)
 -- Name: stock_ledger stock_ledger_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18475,7 +17749,6 @@ ALTER TABLE ONLY public.stock_ledger
 
 
 --
--- TOC entry 6304 (class 2606 OID 27126)
 -- Name: stock_ledger stock_ledger_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18484,7 +17757,6 @@ ALTER TABLE ONLY public.stock_ledger
 
 
 --
--- TOC entry 6305 (class 2606 OID 27131)
 -- Name: store_indent_log store_indent_log_actor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18493,7 +17765,6 @@ ALTER TABLE ONLY public.store_indent_log
 
 
 --
--- TOC entry 6306 (class 2606 OID 27136)
 -- Name: store_indent_log store_indent_log_indent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18502,7 +17773,6 @@ ALTER TABLE ONLY public.store_indent_log
 
 
 --
--- TOC entry 6307 (class 2606 OID 27141)
 -- Name: store_indents store_indents_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18511,7 +17781,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6308 (class 2606 OID 27146)
 -- Name: store_indents store_indents_closed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18520,7 +17789,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6309 (class 2606 OID 27151)
 -- Name: store_indents store_indents_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18529,7 +17797,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6310 (class 2606 OID 27156)
 -- Name: store_indents store_indents_issued_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18538,7 +17805,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6311 (class 2606 OID 27161)
 -- Name: store_indents store_indents_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18547,7 +17813,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6312 (class 2606 OID 27166)
 -- Name: store_indents store_indents_requested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18556,7 +17821,6 @@ ALTER TABLE ONLY public.store_indents
 
 
 --
--- TOC entry 6313 (class 2606 OID 27171)
 -- Name: store_issues store_issues_acknowledged_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18565,7 +17829,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6314 (class 2606 OID 27176)
 -- Name: store_issues store_issues_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18574,7 +17837,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6315 (class 2606 OID 27181)
 -- Name: store_issues store_issues_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18583,7 +17845,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6316 (class 2606 OID 27186)
 -- Name: store_issues store_issues_issued_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18592,7 +17853,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6317 (class 2606 OID 27191)
 -- Name: store_issues store_issues_machine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18601,7 +17861,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6318 (class 2606 OID 27196)
 -- Name: store_issues store_issues_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18610,7 +17869,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6319 (class 2606 OID 27201)
 -- Name: store_issues store_issues_position_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18619,7 +17877,6 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6320 (class 2606 OID 27206)
 -- Name: store_issues store_issues_substitute_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18628,7 +17885,118 @@ ALTER TABLE ONLY public.store_issues
 
 
 --
--- TOC entry 6321 (class 2606 OID 27211)
+-- Name: store_return_items store_return_items_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_return_items
+    ADD CONSTRAINT store_return_items_material_id_fkey FOREIGN KEY (material_id) REFERENCES public.materials(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: store_return_items store_return_items_return_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_return_items
+    ADD CONSTRAINT store_return_items_return_id_fkey FOREIGN KEY (return_id) REFERENCES public.store_returns(id) ON DELETE CASCADE;
+
+
+--
+-- Name: store_returns store_returns_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_department_id_fkey FOREIGN KEY (department_id) REFERENCES public.departments(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: store_returns store_returns_indent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_indent_id_fkey FOREIGN KEY (indent_id) REFERENCES public.indents(id) ON DELETE SET NULL;
+
+
+--
+-- Name: store_returns store_returns_inspected_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_inspected_by_fkey FOREIGN KEY (inspected_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_returns store_returns_returned_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_returns
+    ADD CONSTRAINT store_returns_returned_by_fkey FOREIGN KEY (returned_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_transfer_items store_transfer_items_material_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfer_items
+    ADD CONSTRAINT store_transfer_items_material_id_fkey FOREIGN KEY (material_id) REFERENCES public.materials(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: store_transfer_items store_transfer_items_transfer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfer_items
+    ADD CONSTRAINT store_transfer_items_transfer_id_fkey FOREIGN KEY (transfer_id) REFERENCES public.store_transfers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: store_transfers store_transfers_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_transfers store_transfers_dispatched_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_dispatched_by_fkey FOREIGN KEY (dispatched_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_transfers store_transfers_from_warehouse_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_from_warehouse_id_fkey FOREIGN KEY (from_warehouse_id) REFERENCES public.warehouses(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: store_transfers store_transfers_received_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_received_by_fkey FOREIGN KEY (received_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_transfers store_transfers_requested_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_requested_by_fkey FOREIGN KEY (requested_by) REFERENCES public.users(id);
+
+
+--
+-- Name: store_transfers store_transfers_to_warehouse_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.store_transfers
+    ADD CONSTRAINT store_transfers_to_warehouse_id_fkey FOREIGN KEY (to_warehouse_id) REFERENCES public.warehouses(id) ON DELETE RESTRICT;
+
+
+--
 -- Name: system_settings system_settings_updated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18637,7 +18005,6 @@ ALTER TABLE ONLY public.system_settings
 
 
 --
--- TOC entry 6322 (class 2606 OID 27216)
 -- Name: training_attendance training_attendance_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18646,7 +18013,6 @@ ALTER TABLE ONLY public.training_attendance
 
 
 --
--- TOC entry 6323 (class 2606 OID 27221)
 -- Name: training_attendance training_attendance_nominated_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18655,7 +18021,6 @@ ALTER TABLE ONLY public.training_attendance
 
 
 --
--- TOC entry 6324 (class 2606 OID 27226)
 -- Name: training_attendance training_attendance_training_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18664,7 +18029,6 @@ ALTER TABLE ONLY public.training_attendance
 
 
 --
--- TOC entry 6325 (class 2606 OID 27231)
 -- Name: training_programs training_programs_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18673,7 +18037,6 @@ ALTER TABLE ONLY public.training_programs
 
 
 --
--- TOC entry 6326 (class 2606 OID 27236)
 -- Name: users users_department_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18682,7 +18045,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 6327 (class 2606 OID 27241)
 -- Name: users users_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18691,7 +18053,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 6328 (class 2606 OID 27246)
 -- Name: utility_readings utility_readings_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18700,7 +18061,6 @@ ALTER TABLE ONLY public.utility_readings
 
 
 --
--- TOC entry 6330 (class 2606 OID 27325)
 -- Name: vendor_bills vendor_bills_approved_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18709,7 +18069,6 @@ ALTER TABLE ONLY public.vendor_bills
 
 
 --
--- TOC entry 6331 (class 2606 OID 27320)
 -- Name: vendor_bills vendor_bills_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18718,34 +18077,30 @@ ALTER TABLE ONLY public.vendor_bills
 
 
 --
--- TOC entry 6332 (class 2606 OID 27315)
 -- Name: vendor_bills vendor_bills_grn_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.vendor_bills
-    ADD CONSTRAINT vendor_bills_grn_id_fkey FOREIGN KEY (grn_id) REFERENCES public.grn(id);
+    ADD CONSTRAINT vendor_bills_grn_id_fkey FOREIGN KEY (grn_id) REFERENCES public.grn(id) ON DELETE SET NULL;
 
 
 --
--- TOC entry 6333 (class 2606 OID 27310)
 -- Name: vendor_bills vendor_bills_po_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.vendor_bills
-    ADD CONSTRAINT vendor_bills_po_id_fkey FOREIGN KEY (po_id) REFERENCES public.purchase_orders(id);
+    ADD CONSTRAINT vendor_bills_po_id_fkey FOREIGN KEY (po_id) REFERENCES public.purchase_orders(id) ON DELETE SET NULL;
 
 
 --
--- TOC entry 6334 (class 2606 OID 27305)
 -- Name: vendor_bills vendor_bills_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.vendor_bills
-    ADD CONSTRAINT vendor_bills_vendor_id_fkey FOREIGN KEY (vendor_id) REFERENCES public.vendors(id);
+    ADD CONSTRAINT vendor_bills_vendor_id_fkey FOREIGN KEY (vendor_id) REFERENCES public.vendors(id) ON DELETE RESTRICT;
 
 
 --
--- TOC entry 6335 (class 2606 OID 27357)
 -- Name: vendor_payments vendor_payments_bill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18754,7 +18109,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6336 (class 2606 OID 27372)
 -- Name: vendor_payments vendor_payments_confirmed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18763,7 +18117,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6337 (class 2606 OID 27362)
 -- Name: vendor_payments vendor_payments_po_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18772,7 +18125,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6338 (class 2606 OID 27367)
 -- Name: vendor_payments vendor_payments_recorded_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18781,7 +18133,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6339 (class 2606 OID 27352)
 -- Name: vendor_payments vendor_payments_vendor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18790,7 +18141,6 @@ ALTER TABLE ONLY public.vendor_payments
 
 
 --
--- TOC entry 6329 (class 2606 OID 27251)
 -- Name: vendors vendors_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -18798,11 +18148,9 @@ ALTER TABLE ONLY public.vendors
     ADD CONSTRAINT vendors_deleted_by_fkey FOREIGN KEY (deleted_by) REFERENCES public.users(id);
 
 
--- Completed on 2026-08-15 17:45:54
-
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict fO7A20Gx7RVk2myi9vBIBOyd3EPnXFxpwczDgENXaDHB4x6CcSL2aptQ9bTQZfm
+\unrestrict 7u7kcR1PCvVtw81f0pPlsBZAEcoX1b1s4dIOP6a6TvGE90IYgyrQu9U4VtNaJkw
 

@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "transfer_number": "STO-TEST-904028",
+    "from_warehouse_id": 1,
+    "to_warehouse_id": 1,
+    "transfer_date": "2026-08-15T18:30:00.000Z",
+    "status": "Completed",
+    "requested_by": 21,
+    "approved_by": null,
+    "dispatched_by": null,
+    "received_by": null,
+    "remarks": "Inter-Store Relocation",
+    "created_at": "2026-08-16T13:11:44.029Z"
+  },
+  {
+    "id": 2,
+    "transfer_number": "STO-TEST-302186",
+    "from_warehouse_id": 1,
+    "to_warehouse_id": 1,
+    "transfer_date": "2026-08-15T18:30:00.000Z",
+    "status": "Completed",
+    "requested_by": 21,
+    "approved_by": null,
+    "dispatched_by": null,
+    "received_by": null,
+    "remarks": "Inter-Store Relocation",
+    "created_at": "2026-08-16T13:18:22.187Z"
+  },
+  {
+    "id": 3,
+    "transfer_number": "STO-TEST-638439",
+    "from_warehouse_id": 1,
+    "to_warehouse_id": 1,
+    "transfer_date": "2026-08-15T18:30:00.000Z",
+    "status": "Completed",
+    "requested_by": 21,
+    "approved_by": null,
+    "dispatched_by": null,
+    "received_by": null,
+    "remarks": "Inter-Store Relocation",
+    "created_at": "2026-08-16T13:40:38.440Z"
+  },
+  {
+    "id": 4,
+    "transfer_number": "STO-TEST-599708",
+    "from_warehouse_id": 1,
+    "to_warehouse_id": 1,
+    "transfer_date": "2026-08-15T18:30:00.000Z",
+    "status": "Completed",
+    "requested_by": 21,
+    "approved_by": null,
+    "dispatched_by": null,
+    "received_by": null,
+    "remarks": "Inter-Store Relocation",
+    "created_at": "2026-08-16T14:13:19.708Z"
+  }
+]

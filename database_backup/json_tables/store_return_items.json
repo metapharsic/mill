@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "return_id": 1,
+    "material_id": 3367,
+    "qty": "20.000",
+    "uom": "Kg",
+    "condition_grade": "Good",
+    "action_taken": "Restocked to Store",
+    "remarks": "Unopened bag"
+  },
+  {
+    "id": 2,
+    "return_id": 2,
+    "material_id": 3368,
+    "qty": "20.000",
+    "uom": "Kg",
+    "condition_grade": "Good",
+    "action_taken": "Restocked to Store",
+    "remarks": "Unopened bag"
+  },
+  {
+    "id": 3,
+    "return_id": 3,
+    "material_id": 3369,
+    "qty": "20.000",
+    "uom": "Kg",
+    "condition_grade": "Good",
+    "action_taken": "Restocked to Store",
+    "remarks": "Unopened bag"
+  },
+  {
+    "id": 4,
+    "return_id": 4,
+    "material_id": 3370,
+    "qty": "20.000",
+    "uom": "Kg",
+    "condition_grade": "Good",
+    "action_taken": "Restocked to Store",
+    "remarks": "Unopened bag"
+  }
+]

@@ -13,7 +13,8 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
+    "remarks": null,
+    "rejection_reason": null
   },
   {
     "id": 4,
@@ -29,7 +30,8 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
+    "remarks": null,
+    "rejection_reason": null
   },
   {
     "id": 5,
@@ -45,7 +47,8 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
+    "remarks": null,
+    "rejection_reason": null
   },
   {
     "id": 6,
@@ -61,7 +64,8 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
+    "remarks": null,
+    "rejection_reason": null
   },
   {
     "id": 7,
@@ -77,7 +81,8 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
+    "remarks": null,
+    "rejection_reason": null
   },
   {
     "id": 8,
@@ -93,102 +98,7 @@
     "mfg_date": null,
     "expiry_date": null,
     "bin_location": null,
-    "remarks": null
-  },
-  {
-    "id": 9,
-    "grn_id": 9,
-    "material_id": 3488,
-    "po_qty": "10.000",
-    "received_qty": "10.000",
-    "accepted_qty": "10.000",
-    "rejected_qty": "0.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 3, Box 2",
-    "remarks": null
-  },
-  {
-    "id": 10,
-    "grn_id": 9,
-    "material_id": 3496,
-    "po_qty": "5.000",
-    "received_qty": "5.000",
-    "accepted_qty": "4.000",
-    "rejected_qty": "1.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 1, Box 5",
-    "remarks": "1 unit rejected due to gasket defect"
-  },
-  {
-    "id": 11,
-    "grn_id": 10,
-    "material_id": 3488,
-    "po_qty": "10.000",
-    "received_qty": "10.000",
-    "accepted_qty": "10.000",
-    "rejected_qty": "0.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 3, Box 2",
-    "remarks": null
-  },
-  {
-    "id": 12,
-    "grn_id": 10,
-    "material_id": 3496,
-    "po_qty": "5.000",
-    "received_qty": "5.000",
-    "accepted_qty": "4.000",
-    "rejected_qty": "1.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 1, Box 5",
-    "remarks": "1 unit rejected due to gasket defect"
-  },
-  {
-    "id": 13,
-    "grn_id": 11,
-    "material_id": 3488,
-    "po_qty": "10.000",
-    "received_qty": "10.000",
-    "accepted_qty": "10.000",
-    "rejected_qty": "0.000",
-    "uom": "NOS",
-    "unit_price": "250.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 3, Box 2",
-    "remarks": null
-  },
-  {
-    "id": 14,
-    "grn_id": 11,
-    "material_id": 3496,
-    "po_qty": "5.000",
-    "received_qty": "5.000",
-    "accepted_qty": "4.000",
-    "rejected_qty": "1.000",
-    "uom": "NOS",
-    "unit_price": "500.00",
-    "batch_number": null,
-    "mfg_date": null,
-    "expiry_date": null,
-    "bin_location": "Rack 1, Box 5",
-    "remarks": "1 unit rejected due to gasket defect"
+    "remarks": null,
+    "rejection_reason": null
   }
 ]

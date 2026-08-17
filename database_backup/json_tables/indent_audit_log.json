@@ -54,89 +54,9 @@
     "indent_id": 36,
     "action": "issue",
     "old_status": "Submitted",
-    "new_status": "Partially Issued",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-14T06:25:55.901Z"
-  },
-  {
-    "id": 17,
-    "indent_id": 36,
-    "action": "close",
-    "old_status": "Issued",
-    "new_status": "Closed",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-14T06:27:21.520Z"
-  },
-  {
-    "id": 18,
-    "indent_id": 39,
-    "action": "issue",
-    "old_status": "Submitted",
     "new_status": "Issued",
     "user_id": 6,
     "remarks": null,
-    "created_at": "2026-08-15T10:37:48.548Z"
-  },
-  {
-    "id": 19,
-    "indent_id": 42,
-    "action": "issue",
-    "old_status": "Submitted",
-    "new_status": "Issued",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T10:40:46.668Z"
-  },
-  {
-    "id": 20,
-    "indent_id": 44,
-    "action": "issue",
-    "old_status": "Submitted",
-    "new_status": "Issued",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T11:13:24.699Z"
-  },
-  {
-    "id": 21,
-    "indent_id": 38,
-    "action": "issue",
-    "old_status": "Submitted",
-    "new_status": "Issued",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T11:13:50.770Z"
-  },
-  {
-    "id": 22,
-    "indent_id": 46,
-    "action": "issue",
-    "old_status": "Submitted",
-    "new_status": "Issued",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T11:16:11.262Z"
-  },
-  {
-    "id": 23,
-    "indent_id": 44,
-    "action": "close",
-    "old_status": "Closed",
-    "new_status": "Closed",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T11:17:20.072Z"
-  },
-  {
-    "id": 30,
-    "indent_id": 46,
-    "action": "close",
-    "old_status": "Closed",
-    "new_status": "Closed",
-    "user_id": 6,
-    "remarks": null,
-    "created_at": "2026-08-15T11:45:03.083Z"
+    "created_at": "2026-08-15T09:40:37.056Z"
   }
 ]

@@ -243,12 +243,5 @@
     "code": "CHEM",
     "type": "Raw Material",
     "parent_id": null
-  },
-  {
-    "id": 63,
-    "name": "Quality Control",
-    "code": "QC",
-    "type": "Consumable",
-    "parent_id": null
   }
 ]

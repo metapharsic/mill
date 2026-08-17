@@ -1,7 +1,7 @@
 {
-  "exportedAt": "2026-08-15T12:16:18.613Z",
+  "exportedAt": "2026-08-17T05:25:14.048Z",
   "database": "mk_paper_mill",
-  "totalTables": 101,
+  "totalTables": 106,
   "tables": {
     "adjustment_requests": {
       "rowCount": 0,
@@ -36,7 +36,7 @@
       "file": "attendance_regularization.json"
     },
     "audit_log": {
-      "rowCount": 160,
+      "rowCount": 129,
       "file": "audit_log.json"
     },
     "boiler_performance_logs": {
@@ -148,7 +148,7 @@
       "file": "furnish_mix_log.json"
     },
     "gate_passes": {
-      "rowCount": 0,
+      "rowCount": 15,
       "file": "gate_passes.json"
     },
     "grades": {
@@ -156,11 +156,11 @@
       "file": "grades.json"
     },
     "grn": {
-      "rowCount": 9,
+      "rowCount": 16,
       "file": "grn.json"
     },
     "grn_items": {
-      "rowCount": 12,
+      "rowCount": 6,
       "file": "grn_items.json"
     },
     "holidays": {
@@ -168,7 +168,7 @@
       "file": "holidays.json"
     },
     "indent_audit_log": {
-      "rowCount": 14,
+      "rowCount": 6,
       "file": "indent_audit_log.json"
     },
     "indent_comments": {
@@ -176,11 +176,11 @@
       "file": "indent_comments.json"
     },
     "indent_items": {
-      "rowCount": 10,
+      "rowCount": 5,
       "file": "indent_items.json"
     },
     "indents": {
-      "rowCount": 10,
+      "rowCount": 5,
       "file": "indents.json"
     },
     "inspection_round_scans": {
@@ -188,7 +188,7 @@
       "file": "inspection_round_scans.json"
     },
     "installed_assets": {
-      "rowCount": 5,
+      "rowCount": 6,
       "file": "installed_assets.json"
     },
     "lab_samples": {
@@ -204,7 +204,7 @@
       "file": "machine_events.json"
     },
     "machine_positions": {
-      "rowCount": 9,
+      "rowCount": 14,
       "file": "machine_positions.json"
     },
     "machines": {
@@ -220,11 +220,15 @@
       "file": "maintenance_schedule.json"
     },
     "material_categories": {
-      "rowCount": 36,
+      "rowCount": 35,
       "file": "material_categories.json"
     },
+    "material_rejections": {
+      "rowCount": 5,
+      "file": "material_rejections.json"
+    },
     "materials": {
-      "rowCount": 1126,
+      "rowCount": 1095,
       "file": "materials.json"
     },
     "motor_electrical_specs": {
@@ -232,7 +236,7 @@
       "file": "motor_electrical_specs.json"
     },
     "notifications": {
-      "rowCount": 24,
+      "rowCount": 25,
       "file": "notifications.json"
     },
     "onboarding_checklist": {
@@ -268,7 +272,7 @@
       "file": "plant_sections.json"
     },
     "po_items": {
-      "rowCount": 17,
+      "rowCount": 9,
       "file": "po_items.json"
     },
     "production_summary": {
@@ -276,7 +280,7 @@
       "file": "production_summary.json"
     },
     "purchase_orders": {
-      "rowCount": 16,
+      "rowCount": 21,
       "file": "purchase_orders.json"
     },
     "quality_lab_tests": {
@@ -284,7 +288,7 @@
       "file": "quality_lab_tests.json"
     },
     "quality_tests": {
-      "rowCount": 2,
+      "rowCount": 9,
       "file": "quality_tests.json"
     },
     "reels": {
@@ -324,7 +328,7 @@
       "file": "section_equipment.json"
     },
     "section_kpi_snapshots": {
-      "rowCount": 3711,
+      "rowCount": 3932,
       "file": "section_kpi_snapshots.json"
     },
     "section_process_readings": {
@@ -356,7 +360,7 @@
       "file": "shifts.json"
     },
     "stock_ledger": {
-      "rowCount": 1148,
+      "rowCount": 969,
       "file": "stock_ledger.json"
     },
     "store_indent_log": {
@@ -370,6 +374,22 @@
     "store_issues": {
       "rowCount": 0,
       "file": "store_issues.json"
+    },
+    "store_return_items": {
+      "rowCount": 4,
+      "file": "store_return_items.json"
+    },
+    "store_returns": {
+      "rowCount": 4,
+      "file": "store_returns.json"
+    },
+    "store_transfer_items": {
+      "rowCount": 4,
+      "file": "store_transfer_items.json"
+    },
+    "store_transfers": {
+      "rowCount": 4,
+      "file": "store_transfers.json"
     },
     "system_settings": {
       "rowCount": 14,
@@ -392,15 +412,15 @@
       "file": "utility_readings.json"
     },
     "vendor_bills": {
-      "rowCount": 3,
+      "rowCount": 4,
       "file": "vendor_bills.json"
     },
     "vendor_payments": {
-      "rowCount": 3,
+      "rowCount": 0,
       "file": "vendor_payments.json"
     },
     "vendors": {
-      "rowCount": 23,
+      "rowCount": 10,
       "file": "vendors.json"
     },
     "warehouses": {
