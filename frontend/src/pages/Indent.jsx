@@ -652,16 +652,33 @@ export default function Indent() {
     }
   }
 
-  // ── 1-Click PO and DC Conversion Handlers ──────────────────────────────────
-  const openConvertPo = (ind) => {
+  // ── 1-Click PO, DC & Cash Conversion Handlers ─────────────────────────────
+  const openConvertPo = async (indRow) => {
+    let ind = indRow
+    if (!ind.items || !ind.items.length) {
+      const r = await API(`/indent/${indRow.id}`)
+      if (r.success) ind = r.data
+    }
+    const items = (ind.items || []).map(it => ({
+      id: it.id,
+      material_id: it.material_id,
+      materialName: it.materialName || it.material_name || '',
+      materialCode: it.materialCode || it.material_code || '',
+      required_qty: it.required_qty,
+      uom: it.uom || it.matUom || 'NOS',
+      unit_price: it.matPrice || it.unit_price || 0,
+      gst_pct: it.gst_pct != null ? it.gst_pct : 18
+    }))
     setPoModal({
       id: ind.id,
+      indentNumber: ind.indentNumber || ind.indent_number,
       num: ind.indentNumber || ind.indent_number,
       total_value: ind.total_value,
       vendor_id: '',
       payment_terms: 'Net 30 Days',
       delivery_date: (ind.requiredDate || ind.required_date || '').slice(0, 10),
-      remarks: `Direct PO generated from Indent ${ind.indentNumber || ind.indent_number}`
+      remarks: `Direct PO generated from Indent ${ind.indentNumber || ind.indent_number}`,
+      items
     })
   }
 
@@ -675,7 +692,8 @@ export default function Indent() {
         vendor_id: poModal.vendor_id,
         payment_terms: poModal.payment_terms,
         delivery_date: poModal.delivery_date,
-        remarks: poModal.remarks
+        remarks: poModal.remarks,
+        items: poModal.items
       })
     })
     setConverting(false)
@@ -689,9 +707,15 @@ export default function Indent() {
     }
   }
 
-  const openConvertDc = (ind) => {
+  const openConvertDc = async (indRow) => {
+    let ind = indRow
+    if (!ind.items || !ind.items.length) {
+      const r = await API(`/indent/${indRow.id}`)
+      if (r.success) ind = r.data
+    }
     setDcModal({
       id: ind.id,
+      indentNumber: ind.indentNumber || ind.indent_number,
       num: ind.indentNumber || ind.indent_number,
       total_value: ind.total_value,
       dc_type: 'MATERIAL_OUT',
@@ -700,7 +724,16 @@ export default function Indent() {
       driver_name: '',
       to_party: '',
       consignee_vendor_id: '',
-      dc_purpose: `Outward Dispatch for Indent ${ind.indentNumber || ind.indent_number}`
+      dc_purpose: `Outward Dispatch for Indent ${ind.indentNumber || ind.indent_number}`,
+      items: (ind.items || []).map(it => ({
+        id: it.id,
+        material_id: it.material_id,
+        materialName: it.materialName || it.material_name || '',
+        materialCode: it.materialCode || it.material_code || '',
+        component_position: it.component_position || '',
+        required_qty: it.required_qty,
+        uom: it.uom || it.matUom || 'NOS'
+      }))
     })
   }
 
@@ -731,9 +764,15 @@ export default function Indent() {
     }
   }
 
-  const openConvertCash = (ind) => {
+  const openConvertCash = async (indRow) => {
+    let ind = indRow
+    if (!ind.items || !ind.items.length) {
+      const r = await API(`/indent/${indRow.id}`)
+      if (r.success) ind = r.data
+    }
     setCashModal({
       id: ind.id,
+      indentNumber: ind.indentNumber || ind.indent_number,
       num: ind.indentNumber || ind.indent_number,
       total_value: ind.total_value,
       vendor_name: '',
@@ -741,7 +780,8 @@ export default function Indent() {
       invoice_number: '',
       payment_mode: 'Cash',
       payment_ref: '',
-      remarks: `Spot Cash Purchase against Indent ${ind.indentNumber || ind.indent_number}`
+      remarks: `Spot Cash Purchase against Indent ${ind.indentNumber || ind.indent_number}`,
+      items: ind.items || []
     })
   }
 

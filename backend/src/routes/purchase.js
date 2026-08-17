@@ -39,7 +39,8 @@ router.get('/pending-indents', auth, ar(async (req, res) => {
             d.name as "deptName", d.code as "deptCode",
             u.name as "raisedByName", u.employee_code as "raisedByEmpCode",
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
-            (
+            (SELECT COUNT(*) FROM indent_items ii WHERE ii.indent_id = i.id) as "itemCount",
+            COALESCE((
               SELECT json_agg(json_build_object(
                 'id', ii.id,
                 'material_id', ii.material_id,
@@ -57,7 +58,7 @@ router.get('/pending-indents', auth, ar(async (req, res) => {
               FROM indent_items ii
               LEFT JOIN materials m ON m.id = ii.material_id
               WHERE ii.indent_id = i.id
-            ) as items
+            ), '[]'::json) as items
      FROM indents i
      LEFT JOIN departments d ON d.id = i.department_id
      LEFT JOIN users u ON u.id = i.raised_by

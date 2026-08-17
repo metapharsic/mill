@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
-const API=(p,o)=>fetch(p,{headers:{Authorization:`Bearer ${localStorage.getItem('mk_token')}`,'Content-Type':'application/json',...(o?.headers||{})},...o}).then(r=>r.json())
-const STATUS_COLOR={Draft:'#8a8a90',Approved:'#22c55e',Sent:'#6366f1',Partial:'#f97316',Received:'#0ea5e9',Closed:'#64748b',Cancelled:'#ef4444'}
-const fmt=v=>v?`₹${Number(v).toLocaleString('en-IN',{minimumFractionDigits:2})}`:'—'
+const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
+const STATUS_COLOR = { Draft: '#8a8a90', Approved: '#22c55e', Sent: '#6366f1', Partial: '#f97316', Received: '#0ea5e9', Closed: '#64748b', Cancelled: '#ef4444' }
+const fmt = v => v ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'
 
 export const GST_SLABS = [
   { value: 0,  label: '0% (Nil / Exempt)', cgst: 0, sgst: 0, igst: 0 },
@@ -238,7 +238,6 @@ export default function Purchase() {
     const r = await API(`/api/purchase/pending-indents?search=${encodeURIComponent(prSearch)}`)
     if (r.success) {
       setPrList(r.data)
-      setApprovedIndents(r.data)
     }
     setPrLoading(false)
   }, [prSearch])
@@ -253,6 +252,13 @@ export default function Purchase() {
     setCashLoading(false)
   }, [cashPage, cashSearch])
 
+  const loadApprovedIndents = useCallback(async () => {
+    const r = await API('/api/purchase/pending-indents')
+    if (r.success) {
+      setApprovedIndents(r.data)
+    }
+  }, [])
+
   useEffect(() => {
     if (tab === 'pr') loadPendingIndents()
     if (tab === 'orders') load()
@@ -264,11 +270,6 @@ export default function Purchase() {
 
   const [poMatSearch, setPoMatSearch] = useState({})
   const [poMatDropOpen, setPoMatDropOpen] = useState({})
-
-  const loadApprovedIndents = useCallback(async () => {
-    const r = await API('/api/purchase/pending-indents')
-    if (r.success) setApprovedIndents(r.data)
-  }, [])
 
   useEffect(() => {
     API('/api/purchase/vendors').then(r => { if (r.success) setVendors(r.data) })
@@ -293,20 +294,21 @@ export default function Purchase() {
     const items = preselectedIndent?.items?.length
       ? preselectedIndent.items.map(it => ({
           material_id: it.material_id,
-          description: it.materialName || it.material_name || '',
-          qty: String(it.required_qty || 1),
+          description: it.materialName || it.material_name || it.description || '',
+          qty: String(it.required_qty || it.qty || 1),
           uom: it.matUom || it.uom || '',
           unit_price: String(it.matPrice || it.unit_price || 0),
-          gst_pct: 18,
-          _search: it.materialName || ''
+          gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+          _search: it.materialName || it.material_name || ''
         }))
       : [blankItem()]
 
+    setPoMatSearch({})
     setForm({
       vendor_id: '',
       indent_id: preselectedIndent?.id || '',
       po_date: today(),
-      delivery_date: preselectedIndent?.required_date?.slice(0, 10) || '',
+      delivery_date: preselectedIndent?.required_date?.slice(0, 10) || preselectedIndent?.requiredDate?.slice(0, 10) || '',
       delivery_address: '',
       payment_terms: '',
       payment_terms_custom: '',
@@ -400,6 +402,7 @@ export default function Purchase() {
     const r = await API(`/api/indent/${indentId}`)
     if (r.success) {
       const ind = r.data
+      setPoMatSearch({})
       setForm(f => ({
         ...f,
         indent_id: ind.id,
@@ -407,12 +410,12 @@ export default function Purchase() {
         remarks: f.remarks ? f.remarks : `PO raised against PR ${ind.indent_number} (${ind.deptName || ''})`,
         items: (ind.items || []).length ? ind.items.map(it => ({
           material_id: it.material_id,
-          description: it.materialName || '',
-          qty: String(it.required_qty || 1),
+          description: it.materialName || it.material_name || it.description || '',
+          qty: String(it.required_qty || it.qty || 1),
           uom: it.matUom || it.uom || '',
           unit_price: String(it.matPrice || it.unit_price || 0),
-          gst_pct: 18,
-          _search: it.materialName || ''
+          gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+          _search: it.materialName || it.material_name || ''
         })) : [blankItem()]
       }))
       setFormErrors(fe => ({ ...fe, items: undefined }))
@@ -2192,8 +2195,8 @@ export default function Purchase() {
                       {form.items.map((it, i) => {
                         const lt = calcLine(it)
                         const isDup = dupIds.includes(it.material_id)
-                        const selMat = mats.find(m => m.id == it.material_id)
-                        const searchVal = poMatSearch[i] !== undefined ? poMatSearch[i] : (selMat ? `${selMat.name} [${selMat.code}]` : '')
+                        const selMat = mats.find(m => String(m.id) === String(it.material_id))
+                        const searchVal = poMatSearch[i] !== undefined ? poMatSearch[i] : (selMat ? `${selMat.name} [${selMat.code}]` : (it.description || ''))
                         const q = (poMatSearch[i] || '').trim().toLowerCase()
                         const rank = m => {
                           if (!q) return 5
