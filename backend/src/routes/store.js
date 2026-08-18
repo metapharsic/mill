@@ -1362,12 +1362,16 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
     const vendorIdNum = /^\d+$/.test(String(vendor_id)) ? parseInt(vendor_id) : (poVendorId || null);
     const resolvedVendorName = vendor_name || poVendorName || '';
     const gatePassIdNum = /^\d+$/.test(String(gate_pass_id)) ? parseInt(gate_pass_id) : null;
+    const resolvedInvoice = invoice_number || (reference_type === 'INV' ? String(reference_id) : null);
+    const resolvedChallan = challan_number || (reference_type === 'DC' ? String(reference_id) : null);
     const results = [];
 
-    // Unified Single-GRN Intake: Reuse existing active GRN for this PO/GatePass or create 1 new GRN head
+    // Unified Single-GRN Intake: Reuse existing active GRN for this PO/Invoice/Challan/GatePass/grn_number or create 1 new GRN head
     let createdGrnId = null;
     let grnNum = null;
-    if (inward_type === 'grn' || reference_type === 'PO' || gatePassIdNum || grn_id) {
+    if (inward_type === 'grn' || reference_type === 'PO' || reference_type === 'INV' || reference_type === 'DC' || gatePassIdNum || grn_id || req.body.grn_number || req.body.grnNum) {
+      
+      // 1. Check explicit grn_id
       if (grn_id) {
         const { rows: [existG] } = await client.query('SELECT id, grn_number FROM grn WHERE id = $1', [grn_id]);
         if (existG) {
@@ -1376,11 +1380,21 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         }
       }
 
-      // Check if open GRN already created today for this PO
+      // 2. Check explicit grn_number or GRN reference
+      const targetGrnNum = req.body.grn_number || req.body.grnNum || (reference_type === 'GRN' || String(reference_id || '').toUpperCase().startsWith('GRN-') ? String(reference_id).trim() : null);
+      if (!createdGrnId && targetGrnNum) {
+        const { rows: [existGNum] } = await client.query('SELECT id, grn_number FROM grn WHERE grn_number = $1 OR grn_number ILIKE $1', [targetGrnNum]);
+        if (existGNum) {
+          createdGrnId = existGNum.id;
+          grnNum = existGNum.grn_number;
+        }
+      }
+
+      // 3. Check if open GRN already created today for this PO
       if (!createdGrnId && resolvedPoId) {
         const { rows: [samePoGrn] } = await client.query(
           `SELECT id, grn_number FROM grn 
-           WHERE po_id = $1 AND date = CURRENT_DATE AND status IN ('Draft', 'Received') 
+           WHERE po_id = $1 AND date >= CURRENT_DATE - INTERVAL '1 day' AND status IN ('Draft', 'Received') 
            ORDER BY id DESC LIMIT 1`,
           [resolvedPoId]
         );
@@ -1390,11 +1404,11 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         }
       }
 
-      // Check if open GRN already created today for this Gate Pass
+      // 4. Check if open GRN already created today for this Gate Pass
       if (!createdGrnId && gatePassIdNum) {
         const { rows: [sameGpGrn] } = await client.query(
           `SELECT id, grn_number FROM grn 
-           WHERE gate_pass_id = $1 AND date = CURRENT_DATE AND status IN ('Draft', 'Received') 
+           WHERE gate_pass_id = $1 AND date >= CURRENT_DATE - INTERVAL '1 day' AND status IN ('Draft', 'Received') 
            ORDER BY id DESC LIMIT 1`,
           [gatePassIdNum]
         );
@@ -1404,7 +1418,33 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         }
       }
 
-      // If no existing active GRN found, create exactly ONE formal GRN record
+      // 5. Check if open GRN already created today for this Invoice or Challan from same Vendor
+      if (!createdGrnId && (resolvedInvoice || resolvedChallan)) {
+        let matchSql = `SELECT id, grn_number FROM grn WHERE date >= CURRENT_DATE - INTERVAL '1 day' AND status IN ('Draft', 'Received') `;
+        const matchParams = [];
+        if (vendorIdNum) {
+          matchParams.push(vendorIdNum);
+          matchSql += `AND vendor_id = $${matchParams.length} `;
+        }
+        if (resolvedInvoice && resolvedChallan) {
+          matchParams.push(resolvedInvoice, resolvedChallan);
+          matchSql += `AND (invoice_number = $${matchParams.length - 1} OR challan_number = $${matchParams.length}) `;
+        } else if (resolvedInvoice) {
+          matchParams.push(resolvedInvoice);
+          matchSql += `AND invoice_number = $${matchParams.length} `;
+        } else if (resolvedChallan) {
+          matchParams.push(resolvedChallan);
+          matchSql += `AND challan_number = $${matchParams.length} `;
+        }
+        matchSql += `ORDER BY id DESC LIMIT 1`;
+        const { rows: [sameDocGrn] } = await client.query(matchSql, matchParams);
+        if (sameDocGrn) {
+          createdGrnId = sameDocGrn.id;
+          grnNum = sameDocGrn.grn_number;
+        }
+      }
+
+      // 6. If no existing active GRN found, create exactly ONE formal GRN record for the entire item batch
       if (!createdGrnId) {
         const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`grn-${stamp}`]);
@@ -1414,7 +1454,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         const { rows: [grnHead] } = await client.query(
           `INSERT INTO grn (grn_number, date, vendor_id, po_id, gate_pass_id, vehicle_number, challan_number, invoice_number, received_by, status, remarks)
            VALUES ($1, CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, 'Received', $9) RETURNING id`,
-          [grnNum, vendorIdNum, resolvedPoId || null, gatePassIdNum || null, vehicle_number || null, challan_number || null, invoice_number || null, req.user.id, remarks || null]
+          [grnNum, vendorIdNum, resolvedPoId || null, gatePassIdNum || null, vehicle_number || null, resolvedChallan || null, resolvedInvoice || null, req.user.id, remarks || null]
         );
         createdGrnId = grnHead.id;
       }

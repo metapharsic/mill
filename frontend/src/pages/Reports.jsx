@@ -261,7 +261,8 @@ export function generateWhatsAppEodText(data, config = DEFAULT_WA_CONFIG) {
     lines.push(`💎 *3. HIGH-VALUE ITEM ISSUES & CONSUMPTION*`)
     topItemIssues.forEach((it, idx) => {
       const remarksText = it.remarks ? ` — _${it.remarks.slice(0, 45)}_` : ''
-      lines.push(`  ${idx + 1}. *${it.mat_name}* [${it.mat_code}]`)
+      const secTag = it.section_name ? ` [🏭 ${it.section_name}${it.machine_name ? ` › ${it.machine_name}` : ''}]` : ''
+      lines.push(`  ${idx + 1}. *${it.mat_name}* [${it.mat_code}]${secTag}`)
       lines.push(`     ↳ Qty: *${fmtN(it.out_qty, 1)} ${it.uom}* | Value: *${fmtCur(it.value)}* | Dest: *${it.dept_name}*${remarksText}`)
     })
   }
@@ -273,7 +274,8 @@ export function generateWhatsAppEodText(data, config = DEFAULT_WA_CONFIG) {
     lines.push(`🚨 *4. CRITICAL LOW STOCK & SAFETY SHORTAGES*`)
     criticalLowStock.slice(0, 5).forEach(mat => {
       const shortage = Number(mat.reorder_level || 0) - Number(mat.current_stock || 0)
-      lines.push(`• *${mat.name}* [${mat.code}]: Stock: *${fmtN(mat.current_stock, 1)} ${mat.uom}* (Reorder: ${mat.reorder_level} | Shortage: *-${fmtN(shortage, 1)}*) [${mat.store_name || mat.category_name}]`)
+      const secTag = mat.section_name ? ` | 🏭 ${mat.section_name}${mat.machine_name ? ` › ${mat.machine_name}` : ''}` : ''
+      lines.push(`• *${mat.name}* [${mat.code}]: Stock: *${fmtN(mat.current_stock, 1)} ${mat.uom}* (Reorder: ${mat.reorder_level} | Shortage: *-${fmtN(shortage, 1)}*)${secTag} [${mat.store_name || mat.category_name}]`)
     })
   }
 
@@ -313,7 +315,8 @@ export function generateWhatsAppEodText(data, config = DEFAULT_WA_CONFIG) {
     if (inwardGRNs.length > 0) {
       inwardGRNs.slice(0, 6).forEach(grn => {
         const poRef = grn.po_number ? ` [PO: ${grn.po_number}]` : (grn.remarks?.includes('Ref:') ? ` [${grn.remarks.split('|')[1]?.trim() || ''}]` : '')
-        lines.push(`• *${grn.mat_name}* (${fmtN(grn.in_qty, 1)} ${grn.uom}) from *${grn.vendor_name || 'Vendor'}* — *${fmtCur(grn.value)}*${poRef}`)
+        const secTag = grn.section_name ? ` [🏭 ${grn.section_name}${grn.machine_name ? ` › ${grn.machine_name}` : ''}]` : ''
+        lines.push(`• *${grn.mat_name}* (${fmtN(grn.in_qty, 1)} ${grn.uom}) from *${grn.vendor_name || 'Vendor'}*${secTag} — *${fmtCur(grn.value)}*${poRef}`)
       })
       if (inwardGRNs.length > 6) lines.push(`  _...and ${inwardGRNs.length - 6} more inward receipts_`)
     } else {
@@ -328,7 +331,8 @@ export function generateWhatsAppEodText(data, config = DEFAULT_WA_CONFIG) {
     lines.push(`📤 *8. OUTWARD MATERIAL ISSUES (${outwardIssues.length} Items · ${fmtCur(s.stockIssueValue)})*`)
     if (outwardIssues.length > 0) {
       outwardIssues.slice(0, 6).forEach(iss => {
-        lines.push(`• *${iss.mat_name}* (${fmtN(iss.out_qty, 1)} ${iss.uom}) ➔ *${iss.dept_name}* (${fmtCur(iss.value)})`)
+        const secTag = iss.section_name ? ` [🏭 ${iss.section_name}${iss.machine_name ? ` › ${iss.machine_name}` : ''}]` : ''
+        lines.push(`• *${iss.mat_name}* (${fmtN(iss.out_qty, 1)} ${iss.uom}) ➔ *${iss.dept_name}*${secTag} (${fmtCur(iss.value)})`)
       })
       if (outwardIssues.length > 6) lines.push(`  _...and ${outwardIssues.length - 6} more outward items_`)
     } else {

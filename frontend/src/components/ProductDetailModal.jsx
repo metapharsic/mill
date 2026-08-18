@@ -24,6 +24,9 @@ export default function ProductDetailModal({
   const [categories, setCategories] = useState([])
   const [departments, setDepartments] = useState([])
   const [vendors, setVendors] = useState([])
+  const [sections, setSections] = useState([])
+  const [sectionEquipment, setSectionEquipment] = useState([])
+  const [machines, setMachines] = useState([])
   const [toastMsg, setToastMsg] = useState({ text: '', type: '' })
 
   // Specification edit form state
@@ -31,6 +34,9 @@ export default function ProductDetailModal({
     name: '',
     code: '',
     category_id: '',
+    section_id: '',
+    machine_id: '',
+    section_equipment_id: '',
     uom: 'NOS',
     unit_price: '',
     min_stock: '',
@@ -76,11 +82,14 @@ export default function ProductDetailModal({
     if (!materialId || !isOpen) return
     setLoading(true)
     try {
-      const [matRes, catRes, deptRes, venRes] = await Promise.all([
+      const [matRes, catRes, deptRes, venRes, secRes, eqRes, mcnRes] = await Promise.all([
         fetch(`${API}/master/materials/${materialId}`, { headers: h() }).then(r => r.json()),
         fetch(`${API}/master/categories`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`${API}/admin/departments`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${API}/master/vendors`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
+        fetch(`${API}/master/vendors`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
+        fetch(`${API}/master/sections`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
+        fetch(`${API}/master/section-equipment`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
+        fetch(`${API}/master/machines`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
       ])
 
       if (matRes.success && matRes.data) {
@@ -90,6 +99,9 @@ export default function ProductDetailModal({
           name: d.name || '',
           code: d.code || '',
           category_id: String(d.category_id || ''),
+          section_id: String(d.sectionId ?? d.section_id ?? ''),
+          machine_id: String(d.machineId ?? d.machine_id ?? ''),
+          section_equipment_id: String(d.sectionEquipmentId ?? d.section_equipment_id ?? ''),
           uom: d.uom || 'Kgs',
           unit_price: String(d.unit_price ?? ''),
           min_stock: String(d.min_stock ?? ''),
@@ -114,6 +126,9 @@ export default function ProductDetailModal({
       if (catRes.success) setCategories(catRes.data || [])
       if (deptRes.success) setDepartments(deptRes.data || [])
       if (venRes.success) setVendors(venRes.data || [])
+      if (secRes.success) setSections(secRes.data || [])
+      if (eqRes.success) setSectionEquipment(eqRes.data || [])
+      if (mcnRes.success) setMachines(mcnRes.data || [])
     } catch (e) {
       console.error(e)
       showToast('Error loading material product details', 'error')
@@ -134,6 +149,9 @@ export default function ProductDetailModal({
       const payload = {
         ...form,
         category_id: form.category_id ? parseInt(form.category_id) : null,
+        section_id: form.section_id ? parseInt(form.section_id) : null,
+        machine_id: form.machine_id ? parseInt(form.machine_id) : null,
+        section_equipment_id: form.section_equipment_id ? parseInt(form.section_equipment_id) : null,
         unit_price: parseFloat(form.unit_price || 0),
         min_stock: parseFloat(form.min_stock || 0),
         max_stock: parseFloat(form.max_stock || 0),
@@ -503,6 +521,80 @@ export default function ProductDetailModal({
                   onChange={e => setForm({ ...form, oem_supplier: e.target.value })}
                 />
               </label>
+            </div>
+
+            {/* Section & Machine Allocation Panel */}
+            <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: '12px 14px', marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>🏭</span>
+                <span>Plant Section &amp; Machine / Equipment Assignment</span>
+              </div>
+              <div style={S.grid3}>
+                <label style={S.label}>
+                  Plant Section
+                  <select
+                    style={S.input}
+                    value={form.section_id}
+                    onChange={e => setForm({ ...form, section_id: e.target.value, section_equipment_id: '' })}
+                  >
+                    <option value="">— Select Plant Section —</option>
+                    {sections.map(s => (
+                      <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>
+                    ))}
+                  </select>
+                </label>
+                <label style={S.label}>
+                  Target Machine
+                  <select
+                    style={S.input}
+                    value={form.machine_id}
+                    onChange={e => setForm({ ...form, machine_id: e.target.value })}
+                  >
+                    <option value="">— Select Machine —</option>
+                    {machines.map(m => (
+                      <option key={m.id} value={String(m.id)}>{m.name || m.code}</option>
+                    ))}
+                  </select>
+                </label>
+                <label style={S.label}>
+                  Roll / Equipment
+                  <select
+                    style={S.input}
+                    value={form.section_equipment_id}
+                    onChange={e => {
+                      const eqId = e.target.value
+                      const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                      setForm({
+                        ...form,
+                        section_equipment_id: eqId,
+                        section_id: eq?.sectionId ? String(eq.sectionId) : form.section_id,
+                        machine_id: eq?.machineId ? String(eq.machineId) : form.machine_id
+                      })
+                    }}
+                  >
+                    <option value="">— Select Roll / Equipment —</option>
+                    {(form.section_id
+                      ? sectionEquipment.filter(eq => String(eq.sectionId) === String(form.section_id))
+                      : sectionEquipment
+                    ).map(eq => (
+                      <option key={eq.id} value={String(eq.id)}>
+                        {eq.equipmentName} {eq.tagName ? `(${eq.tagName})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {(() => {
+                const selectedEq = sectionEquipment.find(x => String(x.id) === String(form.section_equipment_id))
+                if (!selectedEq || !selectedEq.remarks) return null
+                return (
+                  <div style={{ marginTop: 8, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 6, padding: '6px 10px', fontSize: 12, color: '#166534' }}>
+                    <span style={{ fontWeight: 700 }}>⚙️ Machine Roll Specs: </span>
+                    <span>{selectedEq.remarks}</span>
+                  </div>
+                )
+              })()}
             </div>
 
             <label style={S.label}>

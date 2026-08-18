@@ -2089,9 +2089,10 @@ export default function Store({ onNavigate }) {
 
                 {/* Batch Action Footer if in Batch Mode */}
                 {inwardBatchMode && (
-                  <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e6fffa', padding: '10px 14px', borderRadius: 8, border: '1px solid #99f6e4' }}>
-                    <div style={{ fontSize: 12, color: '#134e4a' }}>
-                      💡 Enter received quantities in the table above and record inward for all lines simultaneously.
+                  <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e6fffa', padding: '10px 14px', borderRadius: 8, border: '1px solid #99f6e4', flexWrap: 'wrap', gap: 8 }}>
+                    <div style={{ fontSize: 12, color: '#134e4a', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 14 }}>🛡️</span>
+                      <span><strong>Unified GRN Guarantee:</strong> All items entered below will be grouped and recorded under the exact <strong>same GRN Number</strong>.</span>
                     </div>
                     <button
                       type="button"
@@ -2099,7 +2100,7 @@ export default function Store({ onNavigate }) {
                       disabled={batchSaving}
                       style={{ ...S.btn, background: '#0f766e', padding: '8px 18px', fontWeight: 700 }}
                     >
-                      {batchSaving ? 'Recording Batch…' : '📦 Record Batch Inward'}
+                      {batchSaving ? 'Recording Batch…' : '📦 Record Batch Inward (Single GRN)'}
                     </button>
                   </div>
                 )}

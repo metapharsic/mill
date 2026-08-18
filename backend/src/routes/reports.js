@@ -214,10 +214,14 @@ async function compileEOD(targetDate) {
     pool.query(`
       SELECT sl.id, sl.date, sl.in_qty, sl.value, sl.batch_number, sl.remarks,
              m.code AS mat_code, m.name AS mat_name, m.uom,
+             ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              v.name AS vendor_name,
              po.po_number, po.id AS po_id
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN vendors v ON sl.vendor_id = v.id
       LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND sl.reference_id = po.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('grn', 'in')
@@ -228,12 +232,16 @@ async function compileEOD(targetDate) {
     pool.query(`
       SELECT sl.id, sl.date, sl.out_qty, sl.value, sl.remarks,
              m.code AS mat_code, m.name AS mat_name, m.uom,
+             ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
                WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
       LEFT JOIN departments d ON si.department_id = d.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('issue', 'out')
@@ -244,12 +252,16 @@ async function compileEOD(targetDate) {
     pool.query(`
       SELECT sl.id, sl.out_qty, sl.value, sl.remarks,
              m.code AS mat_code, m.name AS mat_name, m.uom, m.unit_price,
+             ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
                WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
       LEFT JOIN departments d ON si.department_id = d.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('issue', 'out') AND sl.out_qty > 0
@@ -262,10 +274,14 @@ async function compileEOD(targetDate) {
       SELECT m.id, m.code, m.name, m.uom, m.current_stock, m.reorder_level, m.unit_price,
              (m.current_stock * m.unit_price) AS stock_value,
              mc.name AS category_name,
+             ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(parent.name, mc.name) AS store_name
       FROM materials m
       JOIN material_categories mc ON mc.id = m.category_id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       WHERE m.is_active = true AND m.current_stock <= m.reorder_level
       ORDER BY (m.reorder_level - m.current_stock) DESC, (m.current_stock * m.unit_price) DESC
       LIMIT 8
@@ -452,7 +468,7 @@ router.get('/eod/history', auth, requireLevel(2), ar(async (req, res) => {
 
 // ── 2. STORES & INVENTORY REPORT ─────────────────────────────────────────────
 router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
-  const { store_type, category_id, low_stock, search } = req.query;
+  const { store_type, category_id, section_id, machine_id, low_stock, search } = req.query;
   const conds = ['m.is_active = true'];
   const params = [];
   let p = 1;
@@ -460,6 +476,16 @@ router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
   if (category_id) {
     conds.push(`(m.category_id = $${p} OR mc.parent_id = $${p})`);
     params.push(category_id);
+    p++;
+  }
+  if (section_id) {
+    conds.push(`m.section_id = $${p}`);
+    params.push(parseInt(section_id));
+    p++;
+  }
+  if (machine_id) {
+    conds.push(`(m.machine_id = $${p} OR se.machine_id = $${p})`);
+    params.push(parseInt(machine_id));
     p++;
   }
   if (store_type) {
@@ -471,7 +497,7 @@ router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
     conds.push(`m.current_stock <= m.reorder_level`);
   }
   if (search) {
-    conds.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p} OR m.hsn_code ILIKE $${p})`);
+    conds.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p} OR m.hsn_code ILIKE $${p} OR ps.name ILIKE $${p} OR mac.name ILIKE $${p} OR se.equipment_name ILIKE $${p})`);
     params.push(`%${search}%`);
     p++;
   }
@@ -491,14 +517,23 @@ router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
              m.criticality_class AS "criticalityClass",
              mc.name AS "categoryName",
              mc.code AS "categoryCode",
+             m.section_id AS "sectionId",
+             ps.name AS "sectionName",
+             m.machine_id AS "machineId",
+             mac.name AS "machineName",
+             m.section_equipment_id AS "sectionEquipmentId",
+             se.equipment_name AS "equipmentName",
              COALESCE(parent.name, mc.name) AS "storeName",
              COALESCE((SELECT SUM(sl.in_qty) FROM stock_ledger sl WHERE sl.material_id = m.id), 0) AS received,
              COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id), 0) AS issued
       FROM materials m
       JOIN material_categories mc ON mc.id = m.category_id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       WHERE ${where}
-      ORDER BY parent.name NULLS FIRST, mc.name, m.name
+      ORDER BY ps.name NULLS LAST, parent.name NULLS FIRST, mc.name, m.name
       LIMIT 1000
     `, params),
 
@@ -510,18 +545,21 @@ router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
       FROM materials m
       JOIN material_categories mc ON mc.id = m.category_id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       WHERE ${where}
     `, params)
   ]);
 
   if (req.query.format === 'csv') {
-    const headers = ['Code', 'Item Name', 'Store', 'Subcategory', 'UOM', 'HSN Code', 'Rack/Box', 'Opening Bal', 'Received', 'Issued', 'Current Stock', 'Unit Price', 'Stock Value', 'Criticality'];
+    const headers = ['Code', 'Item Name', 'Section', 'Machine / Equipment', 'Store', 'Subcategory', 'UOM', 'HSN Code', 'Rack/Box', 'Opening Bal', 'Received', 'Issued', 'Current Stock', 'Unit Price', 'Stock Value', 'Criticality'];
     const csvRows = itemsRes.rows.map(r => {
       const rec = Number(r.received || 0);
       const iss = Number(r.issued || 0);
       const cur = Number(r.currentStock || 0);
       const op = cur - rec + iss;
-      return [r.code, r.name, r.storeName, r.categoryName, r.uom, r.hsn_code, r.binLocation, op.toFixed(3), rec.toFixed(3), iss.toFixed(3), cur.toFixed(3), r.unitPrice, r.stockValue, r.criticalityClass || '—'];
+      return [r.code, r.name, r.sectionName || '—', r.equipmentName || r.machineName || '—', r.storeName, r.categoryName, r.uom, r.hsn_code, r.binLocation, op.toFixed(3), rec.toFixed(3), iss.toFixed(3), cur.toFixed(3), r.unitPrice, r.stockValue, r.criticalityClass || '—'];
     });
     return sendCSV(res, `stores_inventory_report.csv`, headers, csvRows);
   }
@@ -537,7 +575,7 @@ router.get('/stores', auth, requireLevel(2), ar(async (req, res) => {
 
 // ── 2A. ITEM-WISE STORE MOVEMENT & VALUATION LEDGER ─────────────────────────
 router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
-  const { from, to, store_type, category_id, criticality, low_stock, search, page = 1, limit = 500 } = req.query;
+  const { from, to, store_type, category_id, section_id, machine_id, criticality, low_stock, search, page = 1, limit = 500 } = req.query;
   const f = from || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
   const t = to || new Date().toISOString().slice(0, 10);
 
@@ -548,6 +586,16 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
   if (category_id) {
     conds.push(`(m.category_id = $${p} OR mc.parent_id = $${p})`);
     params.push(category_id);
+    p++;
+  }
+  if (section_id) {
+    conds.push(`m.section_id = $${p}`);
+    params.push(parseInt(section_id));
+    p++;
+  }
+  if (machine_id) {
+    conds.push(`(m.machine_id = $${p} OR se.machine_id = $${p})`);
+    params.push(parseInt(machine_id));
     p++;
   }
   if (store_type) {
@@ -564,7 +612,7 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
     conds.push(`m.current_stock <= m.reorder_level`);
   }
   if (search) {
-    conds.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p} OR m.hsn_code ILIKE $${p} OR m.bin_location ILIKE $${p})`);
+    conds.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p} OR m.hsn_code ILIKE $${p} OR m.bin_location ILIKE $${p} OR ps.name ILIKE $${p} OR mac.name ILIKE $${p} OR se.equipment_name ILIKE $${p})`);
     params.push(`%${search}%`);
     p++;
   }
@@ -598,6 +646,12 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
              m.criticality_class AS "criticalityClass",
              mc.name AS "categoryName",
              mc.code AS "categoryCode",
+             m.section_id AS "sectionId",
+             ps.name AS "sectionName",
+             m.machine_id AS "machineId",
+             mac.name AS "machineName",
+             m.section_equipment_id AS "sectionEquipmentId",
+             se.equipment_name AS "equipmentName",
              COALESCE(parent.name, mc.name) AS "storeName",
              m.current_stock AS "currentStock",
              (m.current_stock - COALESCE(lia.in_qty, 0) + COALESCE(loa.out_qty, 0)) AS "openingStock",
@@ -617,12 +671,15 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
       FROM materials m
       JOIN material_categories mc ON mc.id = m.category_id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN ledger_in_after lia ON lia.material_id = m.id
       LEFT JOIN ledger_out_after loa ON loa.material_id = m.id
       LEFT JOIN period_in pin ON pin.material_id = m.id
       LEFT JOIN period_out pout ON pout.material_id = m.id
       WHERE ${where}
-      ORDER BY parent.name NULLS FIRST, mc.name, m.name
+      ORDER BY ps.name NULLS LAST, parent.name NULLS FIRST, mc.name, m.name
       LIMIT $${p} OFFSET $${p+1}
     `, [...params, parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]),
 
@@ -636,6 +693,9 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
       FROM materials m
       JOIN material_categories mc ON mc.id = m.category_id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN (
         SELECT material_id, COALESCE(SUM(value), 0) AS period_in_val
         FROM stock_ledger WHERE date BETWEEN $1 AND $2 AND transaction_type IN ('grn', 'in') GROUP BY material_id
@@ -649,10 +709,12 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
   ]);
 
   if (req.query.format === 'csv') {
-    const headers = ['Item Code', 'Item Description', 'Store Type', 'Category', 'UOM', 'HSN Code', 'Bin Location', 'Criticality Class', 'Opening Qty', 'Inward Qty (GRN)', 'Inward Value (₹)', 'Outward Qty (Issues)', 'Outward Value (₹)', 'Closing Qty', 'Closing Value (₹)', 'Unit Rate (₹)', 'Stock Status'];
+    const headers = ['Item Code', 'Item Description', 'Section', 'Machine / Equipment', 'Store Type', 'Category', 'UOM', 'HSN Code', 'Bin Location', 'Criticality Class', 'Opening Qty', 'Inward Qty (GRN)', 'Inward Value (₹)', 'Outward Qty (Issues)', 'Outward Value (₹)', 'Closing Qty', 'Closing Value (₹)', 'Unit Rate (₹)', 'Stock Status'];
     const rows = itemsRes.rows.map(r => [
       r.code,
       r.name,
+      r.sectionName || '—',
+      r.equipmentName || r.machineName || '—',
       r.storeName,
       r.categoryName,
       r.uom,
@@ -669,7 +731,7 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
       Number(r.unitPrice || 0).toFixed(2),
       r.stockStatus
     ]);
-    return sendCSV(res, `item_wise_store_movement_${f}_${t}.csv`, headers, rows);
+    return sendCSV(res, `item_wise_store_movement_report_${f}_to_${t}.csv`, headers, rows);
   }
 
   res.json({

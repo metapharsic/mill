@@ -20,6 +20,9 @@ const emptyForm = {
   code: '',
   name: '',
   category_id: '',
+  section_id: '',
+  machine_id: '',
+  section_equipment_id: '',
   uom: 'NOS',
   hsn_code: '',
   bin_location: '',
@@ -47,10 +50,15 @@ const emptyForm = {
 export default function Materials() {
   const [materials, setMaterials] = useState([])
   const [categories, setCategories] = useState([])
+  const [sections, setSections] = useState([])
+  const [sectionEquipment, setSectionEquipment] = useState([])
+  const [machines, setMachines] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
+  const [filterSection, setFilterSection] = useState('')
+  const [filterMachine, setFilterMachine] = useState('')
   const [filterActive, setFilterActive] = useState('true')
   const [filterAlert, setFilterAlert] = useState(false)
   const [filterCrit, setFilterCrit] = useState('')
@@ -80,6 +88,9 @@ export default function Materials() {
     code: '',
     name: '',
     category_id: '',
+    section_id: '',
+    machine_id: '',
+    section_equipment_id: '',
     criticality_class: '',
     hsn_code: '',
     bin_location: '',
@@ -113,16 +124,24 @@ export default function Materials() {
     const params = new URLSearchParams({ page, limit: LIMIT })
     if (filterActive) params.set('is_active', filterActive)
     if (filterCat) params.set('category_id', filterCat)
+    if (filterSection) params.set('section_id', filterSection)
+    if (filterMachine) params.set('machine_id', filterMachine)
     if (filterCrit) params.set('criticality_class', filterCrit)
     if (search) params.set('search', search)
-    const [m, c] = await Promise.all([
+    const [m, c, s, eq, mcn] = await Promise.all([
       API(`/api/master/materials?${params}`),
       API('/api/master/categories'),
+      API('/api/master/sections').catch(() => ({ data: [] })),
+      API('/api/master/section-equipment').catch(() => ({ data: [] })),
+      API('/api/master/machines').catch(() => ({ data: [] }))
     ])
     if (m.success) { setMaterials(m.data); setTotal(m.total) }
     if (c.success) setCategories(c.data)
+    if (s.success) setSections(s.data)
+    if (eq.success) setSectionEquipment(eq.data)
+    if (mcn.success) setMachines(mcn.data)
     setLoading(false)
-  }, [page, filterActive, filterCat, filterCrit, search])
+  }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search])
 
   useEffect(() => { load() }, [load])
 
@@ -133,6 +152,8 @@ export default function Materials() {
     const params = new URLSearchParams({ page: 1, limit: 100000 })
     if (filterActive) params.set('is_active', filterActive)
     if (filterCat) params.set('category_id', filterCat)
+    if (filterSection) params.set('section_id', filterSection)
+    if (filterMachine) params.set('machine_id', filterMachine)
     if (filterCrit) params.set('criticality_class', filterCrit)
     if (search) params.set('search', search)
     API(`/api/master/materials?${params}`).then(r => {
@@ -148,7 +169,7 @@ export default function Materials() {
       setKpiTotals({ opening, received, issued, valuation, loaded: true })
     })
     return () => { cancelled = true }
-  }, [filterActive, filterCat, filterCrit, search])
+  }, [filterActive, filterCat, filterSection, filterMachine, filterCrit, search])
 
   useEffect(() => {
     if (filterCat && !quickForm.category_id) {
@@ -192,7 +213,9 @@ export default function Materials() {
   const openAdd = () => {
     setForm({
       ...emptyForm,
-      category_id: filterCat || ''
+      category_id: filterCat || '',
+      section_id: filterSection || '',
+      machine_id: filterMachine || ''
     })
     setErr('')
     setEdit(null)
@@ -208,6 +231,9 @@ export default function Materials() {
       code: m.code ?? '',
       name: m.name ?? '',
       category_id: String(m.categoryId ?? m.category_id ?? ''),
+      section_id: String(m.sectionId ?? m.section_id ?? ''),
+      machine_id: String(m.machineId ?? m.machine_id ?? ''),
+      section_equipment_id: String(m.sectionEquipmentId ?? m.section_equipment_id ?? ''),
       uom: m.uom ?? 'NOS',
       hsn_code: m.hsn_code ?? '',
       bin_location: m.binLocation ?? m.bin_location ?? '',
@@ -270,9 +296,26 @@ export default function Materials() {
     }
     setSaving(true)
     setErr('')
+
+    // Derive section context if empty
+    let derivedContext = form.section_context
+    if (!derivedContext) {
+      const matchedSec = sections.find(s => String(s.id) === String(form.section_id))
+      const matchedEq = sectionEquipment.find(eq => String(eq.id) === String(form.section_equipment_id))
+      const matchedMcn = machines.find(mc => String(mc.id) === String(form.machine_id))
+      if (matchedSec && matchedEq) derivedContext = `${matchedSec.name} › ${matchedEq.equipmentName}`
+      else if (matchedSec && matchedMcn) derivedContext = `${matchedSec.name} › ${matchedMcn.name}`
+      else if (matchedSec) derivedContext = matchedSec.name
+      else if (matchedEq) derivedContext = matchedEq.equipmentName
+    }
+
     const payload = {
       ...form,
       category_id: parseInt(form.category_id),
+      section_id: form.section_id ? parseInt(form.section_id) : null,
+      machine_id: form.machine_id ? parseInt(form.machine_id) : null,
+      section_equipment_id: form.section_equipment_id ? parseInt(form.section_equipment_id) : null,
+      section_context: derivedContext || null,
       opening: form.opening === '' ? 0 : Number(form.opening),
       current_stock: form.current_stock === '' ? 0 : Number(form.current_stock),
       balance: form.current_stock === '' ? 0 : Number(form.current_stock),
@@ -312,9 +355,22 @@ export default function Materials() {
     }
     setQuickSaving(true)
     setQuickErr('')
+
+    let derivedContext = ''
+    if (quickForm.section_id) {
+      const matchedSec = sections.find(s => String(s.id) === String(quickForm.section_id))
+      const matchedEq = sectionEquipment.find(eq => String(eq.id) === String(quickForm.section_equipment_id))
+      if (matchedSec && matchedEq) derivedContext = `${matchedSec.name} › ${matchedEq.equipmentName}`
+      else if (matchedSec) derivedContext = matchedSec.name
+    }
+
     const payload = {
       ...quickForm,
       category_id: parseInt(quickForm.category_id),
+      section_id: quickForm.section_id ? parseInt(quickForm.section_id) : null,
+      machine_id: quickForm.machine_id ? parseInt(quickForm.machine_id) : null,
+      section_equipment_id: quickForm.section_equipment_id ? parseInt(quickForm.section_equipment_id) : null,
+      section_context: derivedContext || null,
       opening: quickForm.opening === '' ? 0 : Number(quickForm.opening),
       current_stock: quickForm.current_stock === '' ? 0 : Number(quickForm.current_stock),
       balance: quickForm.current_stock === '' ? 0 : Number(quickForm.current_stock),
@@ -335,6 +391,9 @@ export default function Materials() {
         code: '',
         name: '',
         category_id: filterCat || quickForm.category_id || '',
+        section_id: filterSection || '',
+        machine_id: filterMachine || '',
+        section_equipment_id: '',
         criticality_class: '',
         hsn_code: '',
         bin_location: '',
@@ -514,8 +573,8 @@ export default function Materials() {
       {/* ── Filters & Category Bar ── */}
       <div style={S.filterBar}>
         <input
-          style={{ ...S.input, flex: 1, maxWidth: 280 }}
-          placeholder="🔍 Search code, name, OEM supplier..."
+          style={{ ...S.input, flex: 1, maxWidth: 260 }}
+          placeholder="🔍 Search code, name, section, roll..."
           value={search}
           onChange={e => { setSearch(e.target.value); setPage(1) }}
         />
@@ -530,6 +589,18 @@ export default function Materials() {
               </optgroup>
             ) : <option key={c.id} value={c.id}>{c.name}</option>
           })}
+        </select>
+        <select style={S.select} value={filterSection} onChange={e => { setFilterSection(e.target.value); setPage(1) }}>
+          <option value="">🏭 All Plant Sections</option>
+          {sections.map(s => (
+            <option key={s.id} value={s.id}>{s.name || s.sectionCode}</option>
+          ))}
+        </select>
+        <select style={S.select} value={filterMachine} onChange={e => { setFilterMachine(e.target.value); setPage(1) }}>
+          <option value="">⚙️ All Machines</option>
+          {machines.map(m => (
+            <option key={m.id} value={m.id}>{m.name || m.code}</option>
+          ))}
         </select>
         <select style={S.select} value={filterActive} onChange={e => { setFilterActive(e.target.value); setPage(1) }}>
           <option value="true">Active Only</option>
@@ -588,7 +659,7 @@ export default function Materials() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span>⚡</span>
-                <span>Fast Material Entry Row (Direct Catalog Addition for Any Category)</span>
+                <span>Fast Material Entry Row (Direct Catalog Addition with Section &amp; Machine Linking)</span>
               </div>
               <div style={{ fontSize: 11, color: '#64748b' }}>
                 Formula: <span style={{ fontWeight: 600, color: '#0284c7' }}>Opening</span> ＋ <span style={{ fontWeight: 600, color: '#16a34a' }}>Received</span> － <span style={{ fontWeight: 600, color: '#dc2626' }}>Issue</span> ＝ <span style={{ fontWeight: 700, color: '#0f766e' }}>Balance</span>
@@ -609,7 +680,7 @@ export default function Materials() {
               </div>
 
               {/* Name */}
-              <div style={{ minWidth: 200 }}>
+              <div style={{ minWidth: 180 }}>
                 <span style={S.quickLabel}>Material Name / Specs *</span>
                 <input
                   style={S.quickInput}
@@ -620,8 +691,50 @@ export default function Materials() {
                 />
               </div>
 
+              {/* Plant Section */}
+              <div style={{ minWidth: 140 }}>
+                <span style={S.quickLabel}>Plant Section</span>
+                <select
+                  style={S.quickSelect}
+                  value={String(quickForm.section_id || '')}
+                  onChange={e => setQuickForm(q => ({ ...q, section_id: e.target.value, section_equipment_id: '' }))}
+                >
+                  <option value="">— General / Any —</option>
+                  {sections.map(s => (
+                    <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Machine / Equipment */}
+              <div style={{ minWidth: 150 }}>
+                <span style={S.quickLabel}>Machine / Equipment</span>
+                <select
+                  style={S.quickSelect}
+                  value={String(quickForm.section_equipment_id || '')}
+                  onChange={e => {
+                    const eqId = e.target.value
+                    const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                    setQuickForm(q => ({
+                      ...q,
+                      section_equipment_id: eqId,
+                      section_id: eq?.sectionId ? String(eq.sectionId) : q.section_id,
+                      machine_id: eq?.machineId ? String(eq.machineId) : q.machine_id
+                    }))
+                  }}
+                >
+                  <option value="">— Select Equipment —</option>
+                  {(quickForm.section_id
+                    ? sectionEquipment.filter(eq => String(eq.sectionId) === String(quickForm.section_id))
+                    : sectionEquipment
+                  ).slice(0, 100).map(eq => (
+                    <option key={eq.id} value={String(eq.id)}>{eq.equipmentName}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Category */}
-              <div style={{ minWidth: 160 }}>
+              <div style={{ minWidth: 150 }}>
                 <span style={S.quickLabel}>Category *</span>
                 <select
                   style={S.quickSelect}
@@ -778,13 +891,13 @@ export default function Materials() {
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['', 'Code', 'Material Name', 'Category', 'Crit', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price', 'Stock Value', 'Status', 'Actions'].map(h => (
+                {['', 'Code', 'Material Name', 'Section / Equipment', 'Category', 'Crit', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price', 'Stock Value', 'Status', 'Actions'].map(h => (
                   <th key={h} style={S.th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={15} style={S.empty}>No materials match your filters</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={16} style={S.empty}>No materials match your filters</td></tr>}
               {filtered.map(m => {
                 const cc = m.criticalityClass || m.criticality_class
                 const ccStyle = cc && CRIT_COLORS[cc] ? { ...S.badge, background: CRIT_COLORS[cc].bg, color: CRIT_COLORS[cc].color, border: `1px solid ${CRIT_COLORS[cc].border}` } : S.badge
@@ -794,6 +907,8 @@ export default function Materials() {
                 const cur = Number(m.current_stock || 0)
                 const opBal = cur - rec + iss
                 const reorder = Number(m.reorder_level || 0)
+                const secName = m.sectionName || m.section_name
+                const eqName = m.equipmentName || m.equipment_name || m.machineName || m.machine_name
 
                 return (
                   <React.Fragment key={m.id}>
@@ -812,13 +927,30 @@ export default function Materials() {
                           {m.code}
                         </span>
                       </td>
-                      <td style={{ ...S.td, maxWidth: 240 }}>
+                      <td style={{ ...S.td, maxWidth: 220 }}>
                         <div
                           onClick={() => openEdit(m)}
-                          style={{ ...S.name, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 230, cursor: 'pointer', color: '#0f172a', fontWeight: 600 }}
+                          style={{ ...S.name, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 210, cursor: 'pointer', color: '#0f172a', fontWeight: 600 }}
                           title={`Click to Edit ${m.name}`}
                         >
                           {m.name}
+                        </div>
+                      </td>
+                      <td style={S.td}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          {secName && (
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
+                              🏭 {secName}
+                            </span>
+                          )}
+                          {eqName && (
+                            <span style={{ fontSize: 11, color: '#475569', background: '#f8fafc', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
+                              ⚙️ {eqName}
+                            </span>
+                          )}
+                          {!secName && !eqName && (
+                            <span style={S.muted}>—</span>
+                          )}
                         </div>
                       </td>
                       <td style={S.td}>
@@ -886,10 +1018,11 @@ export default function Materials() {
                     </tr>
                     {isExp && (
                       <tr style={{ background: '#f6f5f0' }}>
-                        <td colSpan={15} style={{ padding: '12px 24px' }}>
+                        <td colSpan={16} style={{ padding: '12px 24px' }}>
                           <div style={S.expandGrid}>
                             <div><span style={S.expandLabel}>Full Specification</span><div style={S.expandVal}>{m.name}</div></div>
-                            <div><span style={S.expandLabel}>Section / Context</span><div style={S.expandVal}>{m.sectionContext || m.section_context || '—'}</div></div>
+                            <div><span style={S.expandLabel}>Plant Section &amp; Roll/Machine</span><div style={S.expandVal}>{secName || '—'} {eqName ? `› ${eqName}` : ''} {m.equipmentTagName ? `(${m.equipmentTagName})` : ''}</div></div>
+                            <div><span style={S.expandLabel}>Technical Remarks / Specs</span><div style={S.expandVal}>{m.equipmentRemarks || m.sectionContext || m.section_context || '—'}</div></div>
                             <div><span style={S.expandLabel}>OEM Supplier</span><div style={S.expandVal}>{m.oemSupplier || m.oem_supplier || '—'}</div></div>
                             <div><span style={S.expandLabel}>Min / Max Stock</span><div style={S.expandVal}>{m.min_stock || 0} / {m.max_stock || 0} {m.uom}</div></div>
                             <div><span style={S.expandLabel}>Reorder Lvl / Buffer</span><div style={S.expandVal}>{m.reorder_level || 0} / {m.reorder_buffer || 0} {m.uom}</div></div>
@@ -1257,6 +1390,83 @@ export default function Materials() {
                 </div>
               </div>
 
+              {/* Section 2: Plant Section & Machine / Equipment Assignment */}
+              <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: '12px 16px', marginBottom: 14 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>🏭</span>
+                  <span>Plant Section &amp; Machine / Equipment Allocation (Section-Wise Provisioning)</span>
+                </div>
+                <div style={S.grid3}>
+                  <label style={S.label}>Plant Section *
+                    <select
+                      style={S.select}
+                      value={String(form.section_id || '')}
+                      onChange={e => {
+                        const secId = e.target.value
+                        setForm(f => ({ ...f, section_id: secId, section_equipment_id: '' }))
+                      }}
+                    >
+                      <option value="">— Select Plant Section —</option>
+                      {sections.map(s => (
+                        <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label style={S.label}>Target Machine / Unit
+                    <select
+                      style={S.select}
+                      value={String(form.machine_id || '')}
+                      onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))}
+                    >
+                      <option value="">— Select Machine / Unit —</option>
+                      {machines.map(m => (
+                        <option key={m.id} value={String(m.id)}>{m.name || m.code}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label style={S.label}>Roll / Section Equipment
+                    <select
+                      style={S.select}
+                      value={String(form.section_equipment_id || '')}
+                      onChange={e => {
+                        const eqId = e.target.value
+                        const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                        setForm(f => ({
+                          ...f,
+                          section_equipment_id: eqId,
+                          section_id: eq?.sectionId ? String(eq.sectionId) : f.section_id,
+                          machine_id: eq?.machineId ? String(eq.machineId) : f.machine_id
+                        }))
+                      }}
+                    >
+                      <option value="">— Select Specific Roll / Equipment —</option>
+                      {(form.section_id
+                        ? sectionEquipment.filter(eq => String(eq.sectionId) === String(form.section_id))
+                        : sectionEquipment
+                      ).map(eq => (
+                        <option key={eq.id} value={String(eq.id)}>
+                          {eq.equipmentName} {eq.tagName ? `(${eq.tagName})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {/* Live Technical Specs Card from Section Equipment */}
+                {(() => {
+                  const selectedEq = sectionEquipment.find(x => String(x.id) === String(form.section_equipment_id))
+                  if (!selectedEq || !selectedEq.remarks) return null
+                  return (
+                    <div style={{ marginTop: 10, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 6, padding: '8px 12px', fontSize: 12, color: '#166534' }}>
+                      <span style={{ fontWeight: 700 }}>⚙️ Machine Roll Specifications: </span>
+                      <span>{selectedEq.remarks}</span>
+                    </div>
+                  )
+                })()}
+              </div>
+
               {/* Thresholds */}
               <div style={S.grid4}>
                 <label style={S.label}>Reorder Level
@@ -1275,11 +1485,11 @@ export default function Materials() {
 
               {/* Plant & Engineering Context */}
               <div style={S.grid2}>
-                <label style={S.label}>Section / Machine Context
-                  <input style={S.input} value={form.section_context} onChange={e => setForm(f => ({ ...f, section_context: e.target.value }))} placeholder="e.g. Pulp Mill, Boiler House" />
+                <label style={S.label}>Custom Section / Context Notes
+                  <input style={S.input} value={form.section_context} onChange={e => setForm(f => ({ ...f, section_context: e.target.value }))} placeholder="e.g. Pulp Mill, Boiler House, Wire Section" />
                 </label>
                 <label style={S.label}>OEM / Authorized Supplier
-                  <input style={S.input} value={form.oem_supplier} onChange={e => setForm(f => ({ ...f, oem_supplier: e.target.value }))} placeholder="e.g. SKF India, Siemens" />
+                  <input style={S.input} value={form.oem_supplier} onChange={e => setForm(f => ({ ...f, oem_supplier: e.target.value }))} placeholder="e.g. SKF India, Siemens, Voith" />
                 </label>
               </div>
 

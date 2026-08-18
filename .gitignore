@@ -51,3 +51,7 @@ checkpoint.json
 # ─── Large Reference Files ─────────────────────────────────────
 Documentation/Paper Mill.pdf
 Documentation/Scanned*.pdf
+
+# ─── Temporary Office & Temp Files ────────────────────────────
+~$*
+*.tmp

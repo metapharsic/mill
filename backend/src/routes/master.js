@@ -159,21 +159,68 @@ router.put('/categories/:id', auth, requireLevel(1), ar(async (req, res) => {
 // parseNum: converts empty-string / null / undefined → null so PostgreSQL
 // does not try to cast '' as numeric (which throws "invalid input syntax").
 const parseNum = v => (v === '' || v === null || v === undefined) ? null : Number(v);
-// Schema: id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active
+
+// ── SECTIONS & SECTION EQUIPMENT MASTER LOOKUPS ──────────────────────────────
+router.get('/sections', auth, ar(async (req, res) => {
+  const { rows } = await pool.query(`
+    SELECT ps.id, ps.section_code AS "sectionCode", ps.name, ps.icon, ps.description, ps.sort_order AS "sortOrder"
+    FROM plant_sections ps
+    WHERE ps.is_active = true
+    ORDER BY ps.sort_order, ps.name
+  `);
+  res.json({ success: true, data: rows });
+}));
+
+router.get('/section-equipment', auth, ar(async (req, res) => {
+  const { section_id, machine_id } = req.query;
+  const w = ['se.is_active = true'];
+  const p = [];
+  let i = 1;
+  if (section_id) { w.push(`se.section_id = $${i++}`); p.push(parseInt(section_id)); }
+  if (machine_id) { w.push(`se.machine_id = $${i++}`); p.push(parseInt(machine_id)); }
+  const { rows } = await pool.query(`
+    SELECT se.id, se.section_id AS "sectionId", se.machine_id AS "machineId",
+           se.tag_name AS "tagName", se.equipment_name AS "equipmentName",
+           se.equipment_type AS "equipmentType", se.remarks,
+           ps.name AS "sectionName", ps.section_code AS "sectionCode",
+           m.name AS "machineName", m.code AS "machineCode"
+    FROM section_equipment se
+    LEFT JOIN plant_sections ps ON ps.id = se.section_id
+    LEFT JOIN machines m ON m.id = se.machine_id
+    WHERE ${w.join(' AND ')}
+    ORDER BY ps.sort_order NULLS LAST, ps.name, se.equipment_name
+  `, p);
+  res.json({ success: true, data: rows });
+}));
+
+// Schema: id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active, section_id, machine_id, section_equipment_id
 router.get('/materials', auth, ar(async (req, res) => {
-  const { category_id, is_active, search, criticality_class, section_context, page = 1, limit = 50 } = req.query;
+  const { category_id, is_active, search, criticality_class, section_context, section_id, machine_id, section_equipment_id, page = 1, limit = 50 } = req.query;
   const w = []; const p = []; let i = 1;
   if (category_id)        { w.push(`m.category_id IN (SELECT id FROM material_categories WHERE id=$${i} OR parent_id=$${i})`); p.push(category_id); i++; }
   if (is_active !== undefined) { w.push(`m.is_active=$${i++}`);     p.push(is_active === 'true'); }
   if (criticality_class)  { w.push(`m.criticality_class=$${i++}`);  p.push(criticality_class.toUpperCase()); }
+  if (section_id)         { w.push(`m.section_id = $${i++}`);      p.push(parseInt(section_id)); }
+  if (machine_id)         { w.push(`m.machine_id = $${i++}`);      p.push(parseInt(machine_id)); }
+  if (section_equipment_id) { w.push(`m.section_equipment_id = $${i++}`); p.push(parseInt(section_equipment_id)); }
   if (section_context)    { w.push(`m.section_context ILIKE $${i++}`); p.push(`%${section_context}%`); }
-  if (search)             { w.push(`(m.name ILIKE $${i} OR m.code ILIKE $${i} OR m.oem_supplier ILIKE $${i})`); p.push(`%${search}%`); i++; }
+  if (search)             { w.push(`(m.name ILIKE $${i} OR m.code ILIKE $${i} OR m.oem_supplier ILIKE $${i} OR ps.name ILIKE $${i} OR mac.name ILIKE $${i} OR se.equipment_name ILIKE $${i})`); p.push(`%${search}%`); i++; }
   const where = w.length ? 'WHERE '+w.join(' AND ') : '';
   const offset = (parseInt(page)-1)*parseInt(limit);
   const { rows } = await pool.query(
     `SELECT m.id, m.code, m.name, m.uom, m.hsn_code,
             m.current_stock, m.reorder_level, m.min_stock, m.max_stock,
             m.reorder_buffer, m.unit_price, m.is_active,
+            m.section_id           as "sectionId",
+            m.machine_id           as "machineId",
+            m.section_equipment_id as "sectionEquipmentId",
+            ps.name                as "sectionName",
+            ps.section_code        as "sectionCode",
+            mac.name               as "machineName",
+            mac.code               as "machineCode",
+            se.equipment_name      as "equipmentName",
+            se.tag_name            as "equipmentTagName",
+            se.remarks             as "equipmentRemarks",
             m.section_context      as "sectionContext",
             m.criticality_class    as "criticalityClass",
             m.procurement_strategy as "procurementStrategy",
@@ -191,10 +238,19 @@ router.get('/materials', auth, ar(async (req, res) => {
             COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type != 'opening'), 0) AS issued
      FROM materials m
      LEFT JOIN material_categories mc ON mc.id=m.category_id
+     LEFT JOIN plant_sections ps ON ps.id = m.section_id
+     LEFT JOIN machines mac ON mac.id = m.machine_id
+     LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
      ${where} ORDER BY m.criticality_class NULLS LAST, m.name
      LIMIT $${i++} OFFSET $${i++}`,
     [...p, parseInt(limit), offset]);
-  const { rows: cnt } = await pool.query(`SELECT COUNT(*) FROM materials m ${where}`, p);
+  const { rows: cnt } = await pool.query(`
+    SELECT COUNT(*)
+    FROM materials m
+    LEFT JOIN plant_sections ps ON ps.id = m.section_id
+    LEFT JOIN machines mac ON mac.id = m.machine_id
+    LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
+    ${where}`, p);
   res.json({ success: true, data: rows, total: parseInt(cnt[0].count) });
 }));
 
@@ -203,6 +259,7 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
           reorder_buffer, section_context, criticality_class, procurement_strategy,
           oem_supplier, last_audit_cycle, calibration_protocol,
           is_serialized, expected_lifespan_days, is_active,
+          section_id, machine_id, section_equipment_id,
           current_stock, balance, received, issued } = req.body;
   if (!code||!name||!category_id||!uom) return res.status(400).json({ success: false, message: 'code,name,category_id,uom required' });
   const stockVal = parseNum(balance) ?? parseNum(current_stock) ?? 0;
@@ -211,6 +268,9 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
   const price = parseNum(unit_price) ?? 0;
   const opQty = parseNum(req.body.opening) ?? parseFloat((stockVal - inQty + outQty).toFixed(3));
   const activeVal = is_active !== undefined ? Boolean(is_active) : true;
+  const secId = parseNum(section_id);
+  const mcnId = parseNum(machine_id);
+  const secEqId = parseNum(section_equipment_id);
 
   const client = await pool.connect();
   try {
@@ -218,14 +278,14 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
     const { rows } = await client.query(
       `INSERT INTO materials (code,name,category_id,uom,hsn_code,reorder_level,min_stock,max_stock,current_stock,unit_price,bin_location,
          reorder_buffer,section_context,criticality_class,procurement_strategy,oem_supplier,last_audit_cycle,calibration_protocol,
-         is_serialized,expected_lifespan_days,is_active)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
+         is_serialized,expected_lifespan_days,is_active,section_id,machine_id,section_equipment_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24) RETURNING *`,
       [code.trim().toUpperCase(), name.trim(), parseInt(category_id), uom.trim(), hsn_code ? hsn_code.trim() : null,
        parseNum(reorder_level)??0, parseNum(min_stock)??0, parseNum(max_stock)??0,
        stockVal, price, bin_location ? bin_location.trim() : null,
        parseNum(reorder_buffer)??0, section_context||null, criticality_class ? criticality_class.trim().toUpperCase() : null,
        procurement_strategy||null, oem_supplier||null, last_audit_cycle||null, calibration_protocol||null,
-       Boolean(is_serialized), parseNum(expected_lifespan_days)??365, activeVal]
+       Boolean(is_serialized), parseNum(expected_lifespan_days)??365, activeVal, secId, mcnId, secEqId]
     );
 
     const matId = rows[0].id;
@@ -272,21 +332,35 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
 // path registered after a `:id` param route is unreachable (the id handler would receive
 // id='excel-template' and blow up casting it to integer).
 router.get('/materials/excel-template', auth, ar(async (req, res) => {
-  const { rows: cats } = await pool.query(`
-    SELECT mc.id, mc.name, mc.code, mc.type, p.name AS parent_name
-    FROM material_categories mc
-    LEFT JOIN material_categories p ON p.id = mc.parent_id
-    ORDER BY p.name NULLS FIRST, mc.name ASC
-  `);
+  const [catsRes, secRes, mcnRes, eqRes] = await Promise.all([
+    pool.query(`
+      SELECT mc.id, mc.name, mc.code, mc.type, p.name AS parent_name
+      FROM material_categories mc
+      LEFT JOIN material_categories p ON p.id = mc.parent_id
+      ORDER BY p.name NULLS FIRST, mc.name ASC
+    `),
+    pool.query(`
+      SELECT id, section_code, name FROM plant_sections WHERE is_active = true ORDER BY sort_order, name
+    `),
+    pool.query(`
+      SELECT id, code, name FROM machines WHERE is_active = true ORDER BY name
+    `),
+    pool.query(`
+      SELECT se.id, ps.name AS section_name, se.equipment_name, se.tag_name, se.remarks
+      FROM section_equipment se
+      LEFT JOIN plant_sections ps ON ps.id = se.section_id
+      WHERE se.is_active = true ORDER BY ps.name, se.equipment_name
+    `)
+  ]);
 
   const wb = xlsx.utils.book_new();
 
   // Sheet 1: Template
   const templateData = [
-    ['S.No', 'Material Code', 'Material Name / Full Specification', 'Category / Subcategory', 'Criticality Class (A/B/C)', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price (INR)', 'Status (Active/Inactive)'],
-    [1, 'MV0002', '0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE', 'Mechanical › Valve', 'A', '4802', 'Rack 2, Box 4', 12.001, 5.000, 0.000, 17.001, 100.00, 'Active'],
-    [2, 'MSSS004', '1 1/2" S.S SOCKET', 'Mechanical › SS/MS Pipe Fitting', 'C', '7307 2900', 'Rack 1, Box 10', 9.000, 0.000, 0.000, 9.000, 150.00, 'Active'],
-    [3, 'QC-001', 'LAB DIGITAL VISCOMETER SPINDLE #4', 'Quality Control', 'B', '9027 8090', 'Lab Cabinet 1', 2.000, 1.000, 0.000, 3.000, 4500.00, 'Active']
+    ['S.No', 'Material Code', 'Material Name / Full Specification', 'Category / Subcategory', 'Section Name', 'Machine / Equipment', 'Criticality Class (A/B/C)', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price (INR)', 'Status (Active/Inactive)'],
+    [1, 'MV0002', '0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE', 'Mechanical › Valve', 'Wire Section', 'Bottom Wire Couch Roll', 'A', '4802', 'Rack 2, Box 4', 12.001, 5.000, 0.000, 17.001, 100.00, 'Active'],
+    [2, 'MSSS004', '1 1/2" S.S SOCKET', 'Mechanical › SS/MS Pipe Fitting', 'Press Section', '1st Press Top Roll', 'C', '7307 2900', 'Rack 1, Box 10', 9.000, 0.000, 0.000, 9.000, 150.00, 'Active'],
+    [3, 'QC-001', 'LAB DIGITAL VISCOMETER SPINDLE #4', 'Quality Control', 'Lab', 'Lab Section', 'B', '9027 8090', 'Lab Cabinet 1', 2.000, 1.000, 0.000, 3.000, 4500.00, 'Active']
   ];
   const wsTemplate = xlsx.utils.aoa_to_sheet(templateData);
   xlsx.utils.book_append_sheet(wb, wsTemplate, 'Store_Material_Template');
@@ -294,10 +368,18 @@ router.get('/materials/excel-template', auth, ar(async (req, res) => {
   // Sheet 2: Categories Reference
   const catRefData = [
     ['Category ID', 'Category Name', 'Category Code', 'Parent Category', 'Type'],
-    ...cats.map(c => [c.id, c.name, c.code || '—', c.parent_name || 'Top-Level', c.type || 'Spare Part'])
+    ...catsRes.rows.map(c => [c.id, c.name, c.code || '—', c.parent_name || 'Top-Level', c.type || 'Spare Part'])
   ];
   const wsCatRef = xlsx.utils.aoa_to_sheet(catRefData);
   xlsx.utils.book_append_sheet(wb, wsCatRef, 'Categories_Reference');
+
+  // Sheet 3: Sections & Equipment Reference
+  const secRefData = [
+    ['Section Code', 'Section Name', 'Equipment / Roll Name', 'Tag Name', 'Specs / Bearing'],
+    ...eqRes.rows.map(e => [e.section_name || '—', e.section_name || '—', e.equipment_name, e.tag_name, e.remarks || '—'])
+  ];
+  const wsSecRef = xlsx.utils.aoa_to_sheet(secRefData);
+  xlsx.utils.book_append_sheet(wb, wsSecRef, 'Sections_Equipment_Reference');
 
   const buf = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -313,10 +395,23 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
            mc.name AS "categoryName",
            mc.code AS category_code,
            mc.type AS category_type,
+           m.section_id AS "sectionId",
+           m.machine_id AS "machineId",
+           m.section_equipment_id AS "sectionEquipmentId",
+           ps.name AS "sectionName",
+           ps.section_code AS "sectionCode",
+           mac.name AS "machineName",
+           mac.code AS "machineCode",
+           se.equipment_name AS "equipmentName",
+           se.tag_name AS "equipmentTagName",
+           se.remarks AS "equipmentRemarks",
            (m.current_stock <= m.min_stock) AS "lowStock",
            (m.current_stock * m.unit_price) AS valuation
     FROM materials m
     LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN plant_sections ps ON ps.id = m.section_id
+    LEFT JOIN machines mac ON mac.id = m.machine_id
+    LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
     WHERE m.id = $1
   `, [req.params.id]);
 
@@ -361,6 +456,7 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
           section_context, criticality_class, procurement_strategy,
           oem_supplier, last_audit_cycle, calibration_protocol,
           is_serialized, expected_lifespan_days,
+          section_id, machine_id, section_equipment_id,
           current_stock, balance, received, issued, opening } = req.body;
 
   const stockVal = parseNum(balance) ?? parseNum(current_stock);
@@ -368,6 +464,9 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
   const outQty = parseNum(issued);
   const opQty = parseNum(opening);
   const price = parseNum(unit_price) ?? 0;
+  const secId = parseNum(section_id);
+  const mcnId = parseNum(machine_id);
+  const secEqId = parseNum(section_equipment_id);
 
   let updateQuery = `
     UPDATE materials SET
@@ -379,7 +478,8 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
        procurement_strategy=$14, oem_supplier=$15,
        last_audit_cycle=$16, calibration_protocol=$17,
        bin_location=$18, is_serialized=$19,
-       expected_lifespan_days=$20
+       expected_lifespan_days=$20,
+       section_id=$21, machine_id=$22, section_equipment_id=$23
   `;
   const params = [
     code ? code.trim().toUpperCase() : null,
@@ -393,7 +493,8 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
     procurement_strategy||null, oem_supplier||null,
     last_audit_cycle||null, calibration_protocol||null,
     bin_location ? bin_location.trim() : null, Boolean(is_serialized),
-    parseNum(expected_lifespan_days)??365
+    parseNum(expected_lifespan_days)??365,
+    secId, mcnId, secEqId
   ];
 
   if (stockVal !== null && stockVal !== undefined) {
@@ -596,6 +697,8 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
           else if (h.includes('particular') || h.includes('name') || h.includes('description') || h.includes('item') || h.includes('spec') || h.includes('size')) {
             if (colMap.name === undefined) colMap.name = colI;
           }
+          else if (h.includes('section')) colMap.section = colI;
+          else if (h.includes('machine') || h.includes('equipment') || h.includes('mcn') || h.includes('roll')) colMap.machine = colI;
           else if (h.includes('cat') || h.includes('group') || h.includes('dept')) colMap.category = colI;
           else if (h.includes('crit') || h.includes('class')) colMap.crit = colI;
           else if (h.includes('hsn') || h.includes('sac')) colMap.hsn = colI;
@@ -620,6 +723,8 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
       let code = colMap.code !== undefined ? String(row[colMap.code] || '').trim().toUpperCase() : '';
       let name = colMap.name !== undefined ? String(row[colMap.name] || '').trim() : '';
       let category = colMap.category !== undefined ? String(row[colMap.category] || '').trim() : '';
+      let section = colMap.section !== undefined ? String(row[colMap.section] || '').trim() : '';
+      let machine = colMap.machine !== undefined ? String(row[colMap.machine] || '').trim() : '';
       let crit = colMap.crit !== undefined ? String(row[colMap.crit] || '').trim().toUpperCase() : '';
       let hsn = colMap.hsn !== undefined ? String(row[colMap.hsn] || '').trim() : '';
       let bin = colMap.bin !== undefined ? String(row[colMap.bin] || '').trim() : '';
@@ -657,6 +762,8 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
         code: code || `GEN-${String(allParsed.length + 1).padStart(4, '0')}`,
         name,
         category,
+        section,
+        machine,
         sheetName,
         crit: ['A', 'B', 'C'].includes(crit) ? crit : null,
         hsn: hsn || null,
@@ -693,9 +800,23 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
       totalVal += (item.balance * item.unit_price);
 
       previewResults.push({
-        ...item,
+        code: item.code,
+        name: item.name,
+        category: item.category,
+        section: item.section || '—',
+        machine: item.machine || '—',
+        uom: item.uom,
+        hsn_code: item.hsn,
+        bin_location: item.bin,
+        opening: item.opening,
+        received: item.received,
+        issued: item.issued,
+        balance: item.balance,
+        unit_price: item.unit_price,
+        stock_value: (item.balance * item.unit_price).toFixed(2),
+        criticality_class: item.crit,
+        status: item.is_active ? 'Active' : 'Inactive',
         isExisting,
-        existingId: isExisting ? exist[0].id : null,
         currentStockInDb: isExisting ? exist[0].current_stock : null,
         action: isExisting ? 'Update' : 'Create'
       });
@@ -750,6 +871,47 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
         catId = catRow.id;
       }
 
+      // Match Section and Machine / Equipment
+      let sectionId = null;
+      let machineId = null;
+      let sectionEquipmentId = null;
+      let sectionContext = null;
+
+      if (item.section) {
+        const { rows: [secRow] } = await client.query(
+          `SELECT id, name FROM plant_sections WHERE name ILIKE $1 OR section_code ILIKE $1 LIMIT 1`,
+          [item.section.trim()]
+        );
+        if (secRow) {
+          sectionId = secRow.id;
+          sectionContext = secRow.name;
+        }
+      }
+
+      if (item.machine) {
+        // Try match section_equipment first
+        const { rows: [eqRow] } = await client.query(
+          `SELECT id, section_id, machine_id, equipment_name FROM section_equipment WHERE equipment_name ILIKE $1 OR tag_name ILIKE $1 LIMIT 1`,
+          [item.machine.trim()]
+        );
+        if (eqRow) {
+          sectionEquipmentId = eqRow.id;
+          if (!sectionId && eqRow.section_id) sectionId = eqRow.section_id;
+          if (eqRow.machine_id) machineId = eqRow.machine_id;
+          sectionContext = sectionContext ? `${sectionContext} › ${eqRow.equipment_name}` : eqRow.equipment_name;
+        } else {
+          // Try match machine
+          const { rows: [mcnRow] } = await client.query(
+            `SELECT id, name FROM machines WHERE name ILIKE $1 OR code ILIKE $1 LIMIT 1`,
+            [item.machine.trim()]
+          );
+          if (mcnRow) {
+            machineId = mcnRow.id;
+            sectionContext = sectionContext ? `${sectionContext} › ${mcnRow.name}` : mcnRow.name;
+          }
+        }
+      }
+
       totalValuation += (item.balance * item.unit_price);
 
       // Check if material exists
@@ -771,9 +933,13 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
              current_stock = $5,
              unit_price = $6,
              criticality_class = COALESCE(NULLIF($7, ''), criticality_class),
-             is_active = $8
-           WHERE id = $9`,
-          [catId, item.hsn, item.bin, item.uom, item.balance, item.unit_price, item.crit, item.is_active, matId]
+             is_active = $8,
+             section_id = COALESCE($9, section_id),
+             machine_id = COALESCE($10, machine_id),
+             section_equipment_id = COALESCE($11, section_equipment_id),
+             section_context = COALESCE(NULLIF($12, ''), section_context)
+           WHERE id = $13`,
+          [catId, item.hsn, item.bin, item.uom, item.balance, item.unit_price, item.crit, item.is_active, sectionId, machineId, sectionEquipmentId, sectionContext, matId]
         );
       } else {
         createdCount++;
