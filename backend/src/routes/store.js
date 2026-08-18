@@ -1849,6 +1849,19 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
       await syncPoReceived(client, poRef, mat.id, delta);
     }
 
+    // Sync grn_items if inward is tied to a GRN
+    if (reference_type === 'GRN' || ledger.reference_type === 'GRN' || reference_type === 'grn' || ledger.reference_type === 'grn') {
+      const targetGrnId = refIdNum || ledger.reference_id;
+      if (targetGrnId) {
+        await client.query(`
+          UPDATE grn_items
+          SET accepted_qty = $1, unit_price = $2, bin_location = COALESCE($3, bin_location)
+          WHERE (grn_id = $4 OR grn_id = (SELECT id FROM grn WHERE grn_number = $5 LIMIT 1))
+            AND material_id = $6
+        `, [newQty, newPrice, bin_location || null, targetGrnId, String(targetGrnId), mat.id]);
+      }
+    }
+
     await auditLog(client, {
       userId: req.user.id,
       action: 'store.inward.update',
