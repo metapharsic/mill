@@ -15,6 +15,21 @@ const seqNum = async (client) => {
   return `PO-${stamp}-${rows[0].seq}`;
 };
 
+async function auditLog(client, { userId, action, module, recordId, oldData, newData, ip }) {
+  try {
+    await client.query(
+      `INSERT INTO audit_logs (user_id, action, module, record_id, old_data, new_data, ip_address)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [userId || null, action, module, recordId ? String(recordId) : null,
+       oldData ? JSON.stringify(oldData) : null,
+       newData ? JSON.stringify(newData) : null,
+       ip || null]
+    );
+  } catch (e) {
+    console.error('auditLog error:', e.message);
+  }
+}
+
 // LIST VENDORS (for purchase order vendor dropdown)
 router.get('/vendors', auth, ar(async (req, res) => {
   const rows = await getVendors({ is_active: true });
@@ -459,112 +474,271 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
   res.json({ success: true, data: { ...rows[0], items } });
 }));
 
-// UPDATE GRN (Price, Quantities, Bin, Batch, Vehicle, Challan, Invoice, Remarks)
+// PUT /api/purchase/grn/:id — Update GRN header, columns, line item quantities, and prices with atomic ledger sync
 router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
-  const grnId = req.params.id;
-  const isNum = /^\d+$/.test(String(grnId));
-  const { vehicle_number, challan_number, invoice_number, remarks, date, items } = req.body;
+  const isNum = /^\d+$/.test(String(req.params.id));
+  const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
+  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+  const { vehicle_number, challan_number, invoice_number, remarks, date, items: updatedItems, items } = req.body;
+  const itemsList = updatedItems || items;
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const { rows: [grn] } = await client.query(
-      isNum ? 'SELECT * FROM grn WHERE id = $1 FOR UPDATE' : 'SELECT * FROM grn WHERE grn_number = $1 FOR UPDATE',
-      [isNum ? parseInt(grnId) : String(grnId)]
+
+    const { rows: [grn] } = await client.query(`SELECT * FROM grn ${where} FOR UPDATE`, [paramVal]);
+    if (!grn) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'GRN not found' });
+    }
+
+    const grnId = grn.id;
+
+    // 1. Update Header columns
+    const { rows: [updatedGrn] } = await client.query(
+      `UPDATE grn
+       SET vehicle_number = COALESCE($1, vehicle_number),
+           challan_number = COALESCE($2, challan_number),
+           invoice_number = COALESCE($3, invoice_number),
+           remarks = COALESCE($4, remarks),
+           date = COALESCE($5::date, date),
+           updated_at = NOW()
+       WHERE id = $6
+       RETURNING *`,
+      [vehicle_number !== undefined ? vehicle_number : null,
+       challan_number !== undefined ? challan_number : null,
+       invoice_number !== undefined ? invoice_number : null,
+       remarks !== undefined ? remarks : null,
+       date || null,
+       grnId]
     );
-    if (!grn) throw new Error('GRN not found');
 
-    // Update GRN header
-    await client.query(`
-      UPDATE grn
-      SET vehicle_number = COALESCE($1, vehicle_number),
-          challan_number = COALESCE($2, challan_number),
-          invoice_number = COALESCE($3, invoice_number),
-          remarks = COALESCE($4, remarks),
-          date = COALESCE($5::date, date)
-      WHERE id = $6
-    `, [vehicle_number || null, challan_number || null, invoice_number || null, remarks || null, date || null, grn.id]);
+    // 2. Update line items if provided
+    if (Array.isArray(itemsList) && itemsList.length > 0) {
+      const { rows: existingItems } = await client.query(
+        `SELECT * FROM grn_items WHERE grn_id = $1 FOR UPDATE`, [grnId]
+      );
 
-    if (Array.isArray(items) && items.length > 0) {
-      for (const it of items) {
-        const itemCond = it.id ? 'gi.id = $1' : 'gi.grn_id = $1 AND gi.material_id = $2';
-        const itemParams = it.id ? [it.id] : [grn.id, it.material_id];
-        const { rows: [existItem] } = await client.query(
-          `SELECT gi.*, m.current_stock FROM grn_items gi JOIN materials m ON m.id = gi.material_id WHERE ${itemCond} FOR UPDATE`,
-          itemParams
+      for (const uItem of itemsList) {
+        const itemMatch = existingItems.find(x =>
+          (uItem.id && String(x.id) === String(uItem.id)) ||
+          (uItem.material_id && String(x.material_id) === String(uItem.material_id))
         );
 
-        if (existItem) {
-          const oldAcc = parseFloat(existItem.accepted_qty || existItem.received_qty || 0);
-          const newRec = it.received_qty !== undefined ? parseFloat(it.received_qty) : parseFloat(existItem.received_qty || 0);
-          const newAcc = it.accepted_qty !== undefined ? parseFloat(it.accepted_qty) : (it.received_qty !== undefined ? parseFloat(it.received_qty) : oldAcc);
-          const newRej = it.rejected_qty !== undefined ? parseFloat(it.rejected_qty) : (newRec - newAcc);
-          const newPrice = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : parseFloat(existItem.unit_price || 0);
-          const newBin = it.bin_location || existItem.bin_location;
-          const newBatch = it.batch_number || existItem.batch_number;
-          const newRemarks = it.remarks || existItem.remarks;
-          const delta = newAcc - oldAcc;
+        if (!itemMatch) continue;
 
-          // 1. Update grn_items row
-          await client.query(`
-            UPDATE grn_items
-            SET received_qty = $1,
-                accepted_qty = $2,
-                rejected_qty = $3,
-                unit_price = $4,
-                bin_location = $5,
-                batch_number = $6,
-                remarks = $7
-            WHERE id = $8
-          `, [newRec, newAcc, newRej, newPrice, newBin || null, newBatch || null, newRemarks || null, existItem.id]);
+        const oldRecQty = parseFloat(itemMatch.received_qty || 0);
+        const oldAccQty = parseFloat(itemMatch.accepted_qty || 0);
+        const oldRejQty = parseFloat(itemMatch.rejected_qty || 0);
+        const oldPrice = parseFloat(itemMatch.unit_price || 0);
 
-          // 2. Update material stock & unit price
-          await client.query(`
-            UPDATE materials
-            SET current_stock = current_stock + $1,
-                unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
-                bin_location = COALESCE($3, bin_location)
-            WHERE id = $4
-          `, [delta, newPrice, newBin || null, existItem.material_id]);
+        const newRecQty = uItem.received_qty !== undefined ? parseFloat(uItem.received_qty) : oldRecQty;
+        const newAccQty = uItem.accepted_qty !== undefined ? parseFloat(uItem.accepted_qty) : oldAccQty;
+        const newRejQty = uItem.rejected_qty !== undefined ? parseFloat(uItem.rejected_qty) : (newRecQty - newAccQty);
+        const newPrice = uItem.unit_price !== undefined && uItem.unit_price !== '' ? parseFloat(uItem.unit_price) : oldPrice;
+        const newBin = uItem.bin_location !== undefined ? uItem.bin_location : itemMatch.bin_location;
+        const newBatch = uItem.batch_number !== undefined ? uItem.batch_number : itemMatch.batch_number;
+        const newLineRemarks = uItem.remarks !== undefined ? uItem.remarks : itemMatch.remarks;
 
-          // 3. Update stock_ledger row
-          const { rows: [ledgerRow] } = await client.query(`
-            SELECT id, in_qty, balance FROM stock_ledger
-            WHERE reference_type = 'GRN' AND reference_id = $1 AND material_id = $2
-            ORDER BY id DESC LIMIT 1
-          `, [grn.id, existItem.material_id]);
+        const deltaAcc = newAccQty - oldAccQty;
+        const deltaRec = newRecQty - oldRecQty;
 
-          if (ledgerRow) {
-            await client.query(`
-              UPDATE stock_ledger
-              SET in_qty = $1,
-                  balance = balance + $2,
-                  unit_price = $3,
-                  value = $4,
-                  bin_location = COALESCE($5, bin_location),
-                  batch_number = COALESCE($6, batch_number),
-                  remarks = COALESCE($7, remarks)
-              WHERE id = $8
-            `, [newAcc, delta, newPrice, newAcc * newPrice, newBin || null, newBatch || null, newRemarks || null, ledgerRow.id]);
-          }
+        // Fetch and lock material
+        const { rows: [mat] } = await client.query(
+          `SELECT id, name, code, uom, current_stock, unit_price FROM materials WHERE id = $1 FOR UPDATE`,
+          [itemMatch.material_id]
+        );
+        if (!mat) throw new Error(`Material #${itemMatch.material_id} not found`);
 
-          // 4. Update po_items received_qty if linked to PO
-          if (grn.po_id && delta !== 0) {
-            await client.query(`
-              UPDATE po_items
-              SET received_qty = GREATEST(0, COALESCE(received_qty, 0) + $1)
-              WHERE po_id = $2 AND material_id = $3
-            `, [delta, grn.po_id, existItem.material_id]);
+        const curStock = parseFloat(mat.current_stock || 0);
+        const newStock = curStock + deltaAcc;
+
+        if (newStock < 0) {
+          throw new Error(`Cannot reduce accepted quantity for '${mat.name}': resulting stock would be negative (${newStock.toFixed(2)} ${mat.uom})`);
+        }
+
+        // Update materials current_stock and unit_price
+        await client.query(
+          `UPDATE materials
+           SET current_stock = $1,
+               unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
+               updated_at = NOW()
+           WHERE id = $3`,
+          [newStock, newPrice, mat.id]
+        );
+
+        // Update grn_items row
+        await client.query(
+          `UPDATE grn_items
+           SET received_qty = $1,
+               accepted_qty = $2,
+               rejected_qty = $3,
+               unit_price = $4,
+               bin_location = $5,
+               batch_number = $6,
+               remarks = $7
+           WHERE id = $8`,
+          [newRecQty, newAccQty, newRejQty, newPrice, newBin, newBatch, newLineRemarks, itemMatch.id]
+        );
+
+        // Update / synchronize stock_ledger
+        const { rows: ledgerRows } = await client.query(
+          `SELECT * FROM stock_ledger 
+           WHERE material_id = $1 
+             AND (reference_id = $2 OR reference_id = $3 OR remarks ILIKE $4)
+           ORDER BY id DESC LIMIT 1 FOR UPDATE`,
+          [mat.id, grn.po_id || -1, grnId, `%${grn.grn_number}%`]
+        );
+
+        if (ledgerRows.length > 0) {
+          const lId = ledgerRows[0].id;
+          await client.query(
+            `UPDATE stock_ledger
+             SET in_qty = $1,
+                 balance = balance + $2,
+                 unit_price = $3,
+                 value = $1::numeric * $3::numeric,
+                 remarks = COALESCE($4, remarks)
+             WHERE id = $5`,
+            [newAccQty, deltaAcc, newPrice, newLineRemarks || `Inward GRN ${grn.grn_number} updated`, lId]
+          );
+        } else if (deltaAcc !== 0) {
+          await client.query(
+            `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by, vendor_id)
+             VALUES ($1, CURRENT_DATE, 'grn', 'PO', $2, $3, 0, $4, $5, $6, $7, $8, $9)`,
+            [mat.id, grn.po_id || grnId, deltaAcc, newStock, newPrice, deltaAcc * newPrice, `GRN ${grn.grn_number} Qty Adjustment`, req.user.id, grn.vendor_id]
+          );
+        }
+
+        // Adjust PO items received count if applicable
+        if (grn.po_id && deltaRec !== 0) {
+          await client.query(
+            `UPDATE po_items
+             SET received_qty = GREATEST(0, COALESCE(received_qty, 0) + $1)
+             WHERE po_id = $2 AND material_id = $3`,
+            [deltaRec, grn.po_id, mat.id]
+          );
+        }
+
+        // Sync material_rejections if rejection qty changed
+        if (newRejQty > 0) {
+          const { rows: rejRows } = await client.query(
+            `SELECT id FROM material_rejections WHERE grn_id = $1 AND material_id = $2 FOR UPDATE`,
+            [grnId, mat.id]
+          );
+          if (rejRows.length > 0) {
+            await client.query(
+              `UPDATE material_rejections
+               SET rejected_qty = $1, unit_price = $2, debit_amount = $1::numeric * $2::numeric, rejection_reason = COALESCE($3, rejection_reason)
+               WHERE id = $4`,
+              [newRejQty, newPrice, newLineRemarks || 'Rejected during PO Receipt', rejRows[0].id]
+            );
           }
         }
       }
     }
 
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'purchase.grn.update',
+      module: 'purchase',
+      recordId: grnId,
+      oldData: { grn_number: grn.grn_number, vehicle_number: grn.vehicle_number, invoice_number: grn.invoice_number },
+      newData: { vehicle_number, invoice_number, itemsCount: itemsList?.length },
+      ip: req.ip
+    });
+
     await client.query('COMMIT');
-    res.json({ success: true, message: 'GRN details and item pricing updated successfully' });
-  } catch (err) {
+
+    // Fetch full updated GRN with items
+    const { rows: fullItems } = await pool.query(
+      `SELECT gi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom"
+       FROM grn_items gi
+       LEFT JOIN materials m ON m.id = gi.material_id
+       WHERE gi.grn_id = $1
+       ORDER BY gi.id ASC`, [grnId]
+    );
+
+    res.json({
+      success: true,
+      message: `GRN ${grn.grn_number} updated successfully with atomic stock ledger sync`,
+      data: { ...updatedGrn, items: fullItems }
+    });
+  } catch (e) {
     await client.query('ROLLBACK');
-    res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/purchase/grn/:id — Void / Delete GRN with atomic stock reversal
+router.delete('/grn/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const isNum = /^\d+$/.test(String(req.params.id));
+  const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
+  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [grn] } = await client.query(`SELECT * FROM grn ${where} FOR UPDATE`, [paramVal]);
+    if (!grn) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'GRN not found' });
+    }
+
+    const grnId = grn.id;
+    const { rows: items } = await client.query(`SELECT * FROM grn_items WHERE grn_id = $1 FOR UPDATE`, [grnId]);
+
+    // Check stock for all items before reverting
+    for (const it of items) {
+      const accQty = parseFloat(it.accepted_qty || 0);
+      if (accQty <= 0) continue;
+
+      const { rows: [mat] } = await client.query(`SELECT id, name, uom, current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+      if (mat) {
+        const curStock = parseFloat(mat.current_stock || 0);
+        const newStock = curStock - accQty;
+        if (newStock < 0) {
+          throw new Error(`Cannot void GRN ${grn.grn_number}: stock for '${mat.name}' already consumed (Remaining: ${curStock} ${mat.uom})`);
+        }
+        await client.query(`UPDATE materials SET current_stock = $1, updated_at = NOW() WHERE id = $2`, [newStock, mat.id]);
+      }
+
+      // Revert PO received count
+      if (grn.po_id) {
+        const recQty = parseFloat(it.received_qty || accQty);
+        await client.query(
+          `UPDATE po_items SET received_qty = GREATEST(0, COALESCE(received_qty, 0) - $1) WHERE po_id = $2 AND material_id = $3`,
+          [recQty, grn.po_id, it.material_id]
+        );
+      }
+    }
+
+    // Clean up rejections and ledger entries
+    await client.query(`DELETE FROM material_rejections WHERE grn_id = $1`, [grnId]);
+    await client.query(`DELETE FROM stock_ledger WHERE (reference_id = $1 AND reference_type IN ('PO', 'GRN', 'grn')) OR remarks ILIKE $2`, [grnId, `%${grn.grn_number}%`]);
+    await client.query(`DELETE FROM grn_items WHERE grn_id = $1`, [grnId]);
+    await client.query(`DELETE FROM grn WHERE id = $1`, [grnId]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'purchase.grn.delete',
+      module: 'purchase',
+      recordId: grnId,
+      oldData: { grn_number: grn.grn_number, po_id: grn.po_id },
+      newData: { voided: true },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `GRN ${grn.grn_number} successfully voided and stock balances reversed` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+>>>>>>> origin/main
   } finally {
     client.release();
   }

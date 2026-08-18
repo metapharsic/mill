@@ -1996,17 +1996,22 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
     }
 
     // Sync linked grn_items if this inward is linked to a GRN
-    if (ledger.reference_type === 'GRN' && ledger.reference_id) {
-      await client.query(`
-        UPDATE grn_items
-        SET unit_price = $1,
-            received_qty = $2,
-            accepted_qty = $2,
-            bin_location = COALESCE($3, bin_location),
-            batch_number = COALESCE($4, batch_number),
-            remarks = COALESCE($5, remarks)
-        WHERE grn_id = $6 AND material_id = $7
-      `, [newPrice, newQty, bin_location || null, batch_number || null, remarkFull || null, ledger.reference_id, mat.id]);
+    if (reference_type === 'GRN' || ledger.reference_type === 'GRN' || reference_type === 'grn' || ledger.reference_type === 'grn') {
+      const targetGrnId = refIdNum || ledger.reference_id;
+      if (targetGrnId) {
+        await client.query(`
+          UPDATE grn_items
+          SET unit_price = $1,
+              received_qty = $2,
+              accepted_qty = $2,
+              bin_location = COALESCE($3, bin_location),
+              batch_number = COALESCE($4, batch_number),
+              remarks = COALESCE($5, remarks)
+          WHERE (grn_id = $6 OR grn_id = (SELECT id FROM grn WHERE grn_number = $7 LIMIT 1))
+            AND material_id = $8
+        `, [newPrice, newQty, bin_location || null, batch_number || null, remarkFull || null, (/^\d+$/.test(String(targetGrnId)) ? parseInt(targetGrnId) : 0), String(targetGrnId), mat.id]);
+      }
+    }
     }
 
     await auditLog(client, {

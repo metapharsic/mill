@@ -76,6 +76,7 @@ export default function Materials() {
   // ── Universal Excel Upload & Preview State ──
   const [excelModal, setExcelModal] = useState(false)
   const [excelFile, setExcelFile] = useState(null)
+  const [excelTargetCat, setExcelTargetCat] = useState('')
   const [excelPreview, setExcelPreview] = useState(null)
   const [excelLoading, setExcelLoading] = useState(false)
   const [excelErr, setExcelErr] = useState('')
@@ -280,12 +281,24 @@ export default function Materials() {
   }
 
   const restore = async m => {
-    const res = await API(`/api/master/materials/${m.id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ is_active: true })
+    if (!window.confirm(`Reactivate / Restore "${m.name}" (${m.code})?`)) return
+    const res = await API(`/api/master/materials/${m.id}/restore`, {
+      method: 'PUT'
     })
-    if (res.success) load()
-    else alert(res.message || 'Restore failed')
+    if (res.success) {
+      load()
+    } else {
+      // Fallback: If role or endpoint requires full update payload
+      const fullRes = await API(`/api/master/materials/${m.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ...m, is_active: true })
+      })
+      if (fullRes.success) {
+        load()
+      } else {
+        alert(res.message || fullRes.message || 'Restore failed')
+      }
+    }
   }
 
   // Save Add/Edit Modal with Optimistic State Reflection
@@ -422,6 +435,7 @@ export default function Materials() {
 
     const formData = new FormData()
     formData.append('file', file)
+    if (excelTargetCat) formData.append('target_category_id', excelTargetCat)
 
     const res = await API('/api/master/materials/upload-excel?preview=true', {
       method: 'POST',
@@ -444,6 +458,7 @@ export default function Materials() {
 
     const formData = new FormData()
     formData.append('file', excelFile)
+    if (excelTargetCat) formData.append('target_category_id', excelTargetCat)
 
     const res = await API('/api/master/materials/upload-excel?preview=false', {
       method: 'POST',
@@ -509,8 +524,8 @@ export default function Materials() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
             style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }}
-            onClick={() => setExcelModal(true)}
-            title="Upload and sync custom store Excel file with live preview"
+            onClick={() => { setExcelTargetCat(filterCat || ''); setExcelErr(''); setExcelSuccess(''); setExcelPreview(null); setExcelFile(null); setExcelModal(true) }}
+            title="Upload and sync custom store Excel file with live preview into selected category"
           >
             📤 Upload Store Excel
           </button>
@@ -1064,6 +1079,35 @@ export default function Materials() {
                 <div style={S.sub}>Upload any store Excel sheet (.xlsx/.xls) to preview and synchronize materials, categories, stock, and prices</div>
               </div>
               <button style={S.close} onClick={() => setExcelModal(false)}>✕</button>
+            </div>
+
+            {/* Target Category Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, background: '#f8fafc', padding: '10px 14px', borderRadius: 8, border: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', minWidth: 120 }}>
+                Target Category:
+              </label>
+              <select
+                style={{ ...S.select, flex: 1, minWidth: 240, background: '#ffffff', fontWeight: 600 }}
+                value={excelTargetCat}
+                onChange={e => {
+                  setExcelTargetCat(e.target.value)
+                  // If preview already loaded, prompt that changing category applies on sync
+                }}
+              >
+                <option value="">✨ Auto-detect from Sheet / Names (Standard Hierarchy)</option>
+                {topCategories.map(c => {
+                  const kids = childrenOf(c.id)
+                  return kids.length > 0 ? (
+                    <optgroup key={c.id} label={c.name}>
+                      <option value={c.id}>{c.name} (All / Top)</option>
+                      {kids.map(k => <option key={k.id} value={k.id}>&nbsp;&nbsp;↳ {k.name}</option>)}
+                    </optgroup>
+                  ) : <option key={c.id} value={c.id}>{c.name}</option>
+                })}
+              </select>
+              <span style={{ fontSize: 11, color: '#64748b' }}>
+                {excelTargetCat ? '⚡ Upload will place items directly in this category' : 'Categorizes into standard mill hierarchy without creating rogue tabs'}
+              </span>
             </div>
 
             {/* Actions Bar */}
