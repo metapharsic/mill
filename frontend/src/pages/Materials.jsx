@@ -254,12 +254,24 @@ export default function Materials() {
   }
 
   const restore = async m => {
-    const res = await API(`/api/master/materials/${m.id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ is_active: true })
+    if (!window.confirm(`Reactivate / Restore "${m.name}" (${m.code})?`)) return
+    const res = await API(`/api/master/materials/${m.id}/restore`, {
+      method: 'PUT'
     })
-    if (res.success) load()
-    else alert(res.message || 'Restore failed')
+    if (res.success) {
+      load()
+    } else {
+      // Fallback: If role or endpoint requires full update payload
+      const fullRes = await API(`/api/master/materials/${m.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ...m, is_active: true })
+      })
+      if (fullRes.success) {
+        load()
+      } else {
+        alert(res.message || fullRes.message || 'Restore failed')
+      }
+    }
   }
 
   // Save Add/Edit Modal with Optimistic State Reflection

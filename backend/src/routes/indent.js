@@ -38,7 +38,7 @@ router.get('/', auth, ar(async (req, res) => {
   if (status) { conds.push(`i.status=$${p++}`); params.push(status); }
   if (dept)   { conds.push(`i.department_id=$${p++}`); params.push(dept); }
   if (search) {
-    conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR i.remarks ILIKE $${p} OR i.cancellation_reason ILIKE $${p} OR u.name ILIKE $${p} OR u.employee_code ILIKE $${p} OR mch.name ILIKE $${p} OR ps.section_code ILIKE $${p} OR ps.name ILIKE $${p} OR po.po_number ILIKE $${p} OR v_po.name ILIKE $${p} OR gp.gp_number ILIKE $${p} OR EXISTS (SELECT 1 FROM indent_items ii JOIN materials m ON m.id=ii.material_id WHERE ii.indent_id=i.id AND (m.name ILIKE $${p} OR m.code ILIKE $${p} OR ii.purpose ILIKE $${p} OR ii.reason_code ILIKE $${p})))`);
+    conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR i.remarks ILIKE $${p} OR i.cancellation_reason ILIKE $${p} OR u.name ILIKE $${p} OR u.employee_code ILIKE $${p} OR mch.name ILIKE $${p} OR ps.section_code ILIKE $${p} OR ps.name ILIKE $${p} OR po.po_number ILIKE $${p} OR po.vendor_name ILIKE $${p} OR gp.gp_number ILIKE $${p} OR EXISTS (SELECT 1 FROM indent_items ii JOIN materials m ON m.id=ii.material_id WHERE ii.indent_id=i.id AND (m.name ILIKE $${p} OR m.code ILIKE $${p} OR ii.purpose ILIKE $${p} OR ii.reason_code ILIKE $${p})))`);
     params.push(`%${search}%`);
     p++;
   }
@@ -57,7 +57,7 @@ router.get('/', auth, ar(async (req, res) => {
             u.name as "raisedBy", u.name as "raisedByName", u.employee_code as "raisedByEmpCode",
             r.name as "raisedByRole", u.email as "raisedByEmail", u.mobile as "raisedByMobile",
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
-            po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
+            po.grand_total as "linkedPoGrandTotal", po.vendor_name as "linkedPoVendorName",
             gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType",
             cp.id as "linkedCpId", cp.voucher_number as "linkedCpNumber", cp.total_amount as "linkedCpTotalAmount", cp.vendor_name as "linkedCpVendorName",
             (SELECT ii.reason_code FROM indent_items ii WHERE ii.indent_id = i.id ORDER BY ii.id ASC LIMIT 1) AS "reasonCode",
@@ -98,6 +98,25 @@ router.get('/', auth, ar(async (req, res) => {
      LEFT JOIN users u ON u.id=i.raised_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
+     LEFT JOIN LATERAL (
+       SELECT po.id, po.po_number, po.status, po.grand_total, v.name as "vendor_name"
+       FROM purchase_orders po
+       LEFT JOIN vendors v ON v.id = po.vendor_id
+       WHERE po.indent_id = i.id
+       ORDER BY po.id DESC LIMIT 1
+     ) po ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT gp.id, gp.gp_number, gp.status, gp.pass_type
+       FROM gate_passes gp
+       WHERE gp.remarks ILIKE '%' || i.indent_number || '%' OR (po.id IS NOT NULL AND gp.po_id = po.id)
+       ORDER BY gp.id DESC LIMIT 1
+     ) gp ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT cp.id, cp.voucher_number, cp.total_amount, cp.vendor_name
+       FROM cash_purchases cp
+       WHERE cp.indent_id = i.id
+       ORDER BY cp.id DESC LIMIT 1
+     ) cp ON TRUE
      ${where}`, params
   );
   res.json({ success:true, data:rows, total:parseInt(cnt[0].count) });
@@ -189,7 +208,7 @@ router.get('/:id', auth, ar(async (req, res) => {
             ps.section_code as "sectionCode", ps.name as "sectionName",
             mch.name as "machineName", mch.code as "machineCode", mch.type as "machineType",
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
-            po.grand_total as "linkedPoGrandTotal", v_po.name as "linkedPoVendorName",
+            po.grand_total as "linkedPoGrandTotal", po.vendor_name as "linkedPoVendorName",
             gp.id as "linkedGpId", gp.gp_number as "linkedGpNumber", gp.status as "linkedGpStatus", gp.pass_type as "linkedGpType",
             cp.id as "linkedCpId", cp.voucher_number as "linkedCpNumber", cp.total_amount as "linkedCpTotalAmount", cp.vendor_name as "linkedCpVendorName"
      FROM indents i
@@ -199,10 +218,25 @@ router.get('/:id', auth, ar(async (req, res) => {
      LEFT JOIN users cu ON cu.id=i.cancelled_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
-     LEFT JOIN purchase_orders po ON po.indent_id=i.id
-     LEFT JOIN vendors v_po ON v_po.id=po.vendor_id
-     LEFT JOIN gate_passes gp ON (gp.remarks ILIKE '%' || i.indent_number || '%' OR (gp.po_id IS NOT NULL AND gp.po_id = po.id))
-     LEFT JOIN cash_purchases cp ON cp.indent_id = i.id
+     LEFT JOIN LATERAL (
+       SELECT po.id, po.po_number, po.status, po.grand_total, v.name as "vendor_name"
+       FROM purchase_orders po
+       LEFT JOIN vendors v ON v.id = po.vendor_id
+       WHERE po.indent_id = i.id
+       ORDER BY po.id DESC LIMIT 1
+     ) po ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT gp.id, gp.gp_number, gp.status, gp.pass_type
+       FROM gate_passes gp
+       WHERE gp.remarks ILIKE '%' || i.indent_number || '%' OR (po.id IS NOT NULL AND gp.po_id = po.id)
+       ORDER BY gp.id DESC LIMIT 1
+     ) gp ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT cp.id, cp.voucher_number, cp.total_amount, cp.vendor_name
+       FROM cash_purchases cp
+       WHERE cp.indent_id = i.id
+       ORDER BY cp.id DESC LIMIT 1
+     ) cp ON TRUE
      WHERE i.id=$1`,
     [req.params.id]
   );
