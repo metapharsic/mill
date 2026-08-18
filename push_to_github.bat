@@ -14,7 +14,7 @@ echo.
 echo [2/2] Pushing all software, logic, data, and database backups to GitHub...
 echo (If prompted, please sign in with your GitHub account in the browser)
 echo.
-git push -f -u origin main
+git push -u origin main
 echo.
 if %ERRORLEVEL% equ 0 (
     color 0a
