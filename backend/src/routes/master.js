@@ -566,12 +566,115 @@ router.post('/materials/sync-all-stores', auth, requireLevel(1), ar(async (req, 
 }));
 
 // ── UNIVERSAL STORE EXCEL UPLOAD & PREVIEW/SYNC ENGINE ───────────────────────
+const CATEGORY_ALIASES = {
+  'ele general': 'ELEC-GEN',
+  'eleg': 'ELEC-GEN',
+  'electrical general': 'ELEC-GEN',
+  'elec-gen': 'ELEC-GEN',
+  'mcb': 'ELEC-MCB',
+  'mcb & fuses': 'ELEC-MCB',
+  'fuses': 'ELEC-MCB',
+  'fuse': 'ELEC-MCB',
+  'elec-mcb': 'ELEC-MCB',
+  'vfd': 'ELEC-VFD',
+  'vfd drive': 'ELEC-VFD',
+  'vfd drives': 'ELEC-VFD',
+  'vfd drive & spares': 'ELEC-VFD',
+  'elec-vfd': 'ELEC-VFD',
+  'contactor': 'ELEC-CNT',
+  'contactors': 'ELEC-CNT',
+  'relay': 'ELEC-RLY',
+  'relays': 'ELEC-RLY',
+  'bearing': 'MECH-BRG',
+  'bearings': 'MECH-BRG',
+  'valve': 'MECH-VLV',
+  'valves': 'MECH-VLV',
+  'oil seal': 'MECH-OSL',
+  'oil seals': 'MECH-OSL',
+  'v-belt': 'MECH-VBT',
+  'v-belts': 'MECH-VBT',
+  'v belt': 'MECH-VBT',
+  'welding rods': 'MECH-WLD',
+  'welding rod': 'MECH-WLD',
+  'pump sleeve': 'MECH-PSL',
+  'pump sleeves': 'MECH-PSL',
+  'tyre coupling': 'MECH-TCP',
+  'tyre coupling & pin bush': 'MECH-TCP',
+  'pipe fitting': 'MECH-PIP',
+  'ss/ms pipe fitting': 'MECH-PIP',
+  'gauges': 'MECH-GUG',
+  'gauge': 'MECH-GUG',
+  'nozzles': 'MECH-NOZ',
+  'nozzle': 'MECH-NOZ',
+  'pulley': 'MECH-PUL',
+  'pulleys': 'MECH-PUL',
+  'bolts & nuts': 'MECH-BNW',
+  'bolts & nuts/washers': 'MECH-BNW',
+  'compressor': 'MECH-CMP',
+  'blade': 'MECH-BLD',
+  'blade/cutting wheel & grinding': 'MECH-BLD',
+  'shaft & impeller': 'MECH-SFT',
+  'shaft': 'MECH-SFT',
+  'impeller': 'MECH-SFT',
+  'lubricants': 'MECH-LUB',
+  'check nut & washer': 'MECH-CNW',
+  'clothing': 'CLOTH',
+  'chemical': 'CHEM',
+  'chemicals': 'CHEM',
+  'waste paper': 'WASTE',
+  'wood pulp': 'PULP',
+  'stationary': 'STAT',
+  'packing': 'PACK',
+  'general': 'GEN',
+  'general store': 'GEN',
+  'hydraulic & pneumatic': 'HYDPNEU',
+  'hydraulic': 'HYDPNEU',
+  'pneumatic': 'HYDPNEU'
+};
+
+async function resolveCategory(clientOrPool, catStr, targetCatId) {
+  if (targetCatId && !isNaN(parseInt(targetCatId))) {
+    const { rows: [tCat] } = await clientOrPool.query('SELECT id FROM material_categories WHERE id=$1', [parseInt(targetCatId)]);
+    if (tCat) return tCat.id;
+  }
+  if (!catStr) {
+    const { rows: [gen] } = await clientOrPool.query("SELECT id FROM material_categories WHERE code='GEN' OR name ILIKE '%general%' ORDER BY id ASC LIMIT 1");
+    return gen?.id || 35;
+  }
+
+  const norm = String(catStr).toLowerCase().trim();
+  const aliasCode = CATEGORY_ALIASES[norm] || CATEGORY_ALIASES[norm.replace(/[_\-]/g, ' ')];
+  if (aliasCode) {
+    const { rows: [byCode] } = await clientOrPool.query('SELECT id FROM material_categories WHERE code = $1 LIMIT 1', [aliasCode]);
+    if (byCode) return byCode.id;
+  }
+
+  const catClean = catStr.replace('›', '/').split('/')[0].trim();
+  const subClean = catStr.includes('›') || catStr.includes('/') ? catStr.split(/[›\/]/).pop().trim() : null;
+
+  const { rows: [catRow] } = await clientOrPool.query(
+    `SELECT id FROM material_categories WHERE name ILIKE $1 OR code ILIKE $1 LIMIT 1`,
+    [subClean || catClean]
+  );
+  if (catRow) return catRow.id;
+
+  const { rows: [fuzzyRow] } = await clientOrPool.query(
+    `SELECT id FROM material_categories WHERE name ILIKE $1 LIMIT 1`,
+    [`%${subClean || catClean}%`]
+  );
+  if (fuzzyRow) return fuzzyRow.id;
+
+  const { rows: [genRow] } = await clientOrPool.query("SELECT id FROM material_categories WHERE code='GEN' OR name ILIKE '%general%' ORDER BY id ASC LIMIT 1");
+  return genRow?.id || 35;
+}
+
 router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('file'), ar(async (req, res) => {
   if (!req.file || !req.file.buffer) {
     return res.status(400).json({ success: false, message: 'No Excel file uploaded. Please provide a .xlsx or .xls file.' });
   }
 
   const isPreview = req.query.preview === 'true' || (req.body && req.body.preview === 'true');
+  const targetCatId = req.body?.target_category_id || req.query?.target_category_id || null;
   const wb = xlsx.read(req.file.buffer, { type: 'buffer' });
 
   // 1. Parse all sheets
@@ -684,6 +787,7 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
     let totalVal = 0;
 
     for (const item of allParsed) {
+      const resolvedCatId = await resolveCategory(pool, item.category, targetCatId);
       const { rows: exist } = await pool.query(
         `SELECT id, code, name, current_stock, unit_price FROM materials WHERE code = $1 OR name = $2 LIMIT 1`,
         [item.code, item.name]
@@ -694,6 +798,7 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
 
       previewResults.push({
         ...item,
+        resolvedCatId,
         isExisting,
         existingId: isExisting ? exist[0].id : null,
         currentStockInDb: isExisting ? exist[0].current_stock : null,
@@ -705,6 +810,7 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
       success: true,
       preview: true,
       filename: req.file.originalname,
+      targetCategoryId: targetCatId,
       totalRows: allParsed.length,
       newItemsCount: newItems,
       updateItemsCount: updateItems,
@@ -725,31 +831,7 @@ router.post('/materials/upload-excel', auth, requireLevel(1), upload.single('fil
     await client.query('BEGIN');
 
     for (const item of allParsed) {
-      // Find or create category
-      let catId = null;
-      const catClean = item.category.replace('›', '/').split('/')[0].trim();
-      const subClean = item.category.includes('›') || item.category.includes('/') ? item.category.split(/[›\/]/).pop().trim() : null;
-
-      let { rows: [catRow] } = await client.query(
-        `SELECT id FROM material_categories WHERE name ILIKE $1 OR code ILIKE $1 LIMIT 1`,
-        [subClean || catClean]
-      );
-      if (!catRow) {
-        let parentId = null;
-        if (subClean) {
-          const { rows: [pRow] } = await client.query(`SELECT id FROM material_categories WHERE name ILIKE $1 LIMIT 1`, [catClean]);
-          if (pRow) parentId = pRow.id;
-        }
-        const { rows: [newCat] } = await client.query(
-          `INSERT INTO material_categories (name, code, type, parent_id)
-           VALUES ($1, $2, 'Spare Part', $3) RETURNING id`,
-          [subClean || catClean, `CAT-${String(Date.now()).slice(-4)}`, parentId]
-        );
-        catId = newCat.id;
-      } else {
-        catId = catRow.id;
-      }
-
+      const catId = await resolveCategory(client, item.category, targetCatId);
       totalValuation += (item.balance * item.unit_price);
 
       // Check if material exists
