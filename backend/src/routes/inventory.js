@@ -571,6 +571,112 @@ router.get('/grn', auth, asyncRoute(async (req, res) => {
   res.json({ success: true, data: rows, total: parseInt(cnt[0].count) });
 }));
 
+// PUT /api/inventory/grn/:id — Update GRN header & line items price/quantities
+router.put('/grn/:id', auth, requireLevel(2), asyncRoute(async (req, res) => {
+  const grnId = req.params.id;
+  const isNum = /^\d+$/.test(String(grnId));
+  const { vehicle_number, challan_number, invoice_number, remarks, date, items } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [grn] } = await client.query(
+      isNum ? 'SELECT * FROM grn WHERE id = $1 FOR UPDATE' : 'SELECT * FROM grn WHERE grn_number = $1 FOR UPDATE',
+      [isNum ? parseInt(grnId) : String(grnId)]
+    );
+    if (!grn) throw new Error('GRN not found');
+
+    await client.query(`
+      UPDATE grn
+      SET vehicle_number = COALESCE($1, vehicle_number),
+          challan_number = COALESCE($2, challan_number),
+          invoice_number = COALESCE($3, invoice_number),
+          remarks = COALESCE($4, remarks),
+          date = COALESCE($5::date, date)
+      WHERE id = $6
+    `, [vehicle_number || null, challan_number || null, invoice_number || null, remarks || null, date || null, grn.id]);
+
+    if (Array.isArray(items) && items.length > 0) {
+      for (const it of items) {
+        const itemCond = it.id ? 'gi.id = $1' : 'gi.grn_id = $1 AND gi.material_id = $2';
+        const itemParams = it.id ? [it.id] : [grn.id, it.material_id];
+        const { rows: [existItem] } = await client.query(
+          `SELECT gi.*, m.current_stock FROM grn_items gi JOIN materials m ON m.id = gi.material_id WHERE ${itemCond} FOR UPDATE`,
+          itemParams
+        );
+
+        if (existItem) {
+          const oldAcc = parseFloat(existItem.accepted_qty || existItem.received_qty || 0);
+          const newRec = it.received_qty !== undefined ? parseFloat(it.received_qty) : parseFloat(existItem.received_qty || 0);
+          const newAcc = it.accepted_qty !== undefined ? parseFloat(it.accepted_qty) : (it.received_qty !== undefined ? parseFloat(it.received_qty) : oldAcc);
+          const newRej = it.rejected_qty !== undefined ? parseFloat(it.rejected_qty) : (newRec - newAcc);
+          const newPrice = it.unit_price !== undefined && it.unit_price !== '' ? parseFloat(it.unit_price) : parseFloat(existItem.unit_price || 0);
+          const newBin = it.bin_location || existItem.bin_location;
+          const newBatch = it.batch_number || existItem.batch_number;
+          const newRemarks = it.remarks || existItem.remarks;
+          const delta = newAcc - oldAcc;
+
+          await client.query(`
+            UPDATE grn_items
+            SET received_qty = $1,
+                accepted_qty = $2,
+                rejected_qty = $3,
+                unit_price = $4,
+                bin_location = $5,
+                batch_number = $6,
+                remarks = $7
+            WHERE id = $8
+          `, [newRec, newAcc, newRej, newPrice, newBin || null, newBatch || null, newRemarks || null, existItem.id]);
+
+          await client.query(`
+            UPDATE materials
+            SET current_stock = current_stock + $1,
+                unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
+                bin_location = COALESCE($3, bin_location)
+            WHERE id = $4
+          `, [delta, newPrice, newBin || null, existItem.material_id]);
+
+          const { rows: [ledgerRow] } = await client.query(`
+            SELECT id, in_qty, balance FROM stock_ledger
+            WHERE reference_type = 'GRN' AND reference_id = $1 AND material_id = $2
+            ORDER BY id DESC LIMIT 1
+          `, [grn.id, existItem.material_id]);
+
+          if (ledgerRow) {
+            await client.query(`
+              UPDATE stock_ledger
+              SET in_qty = $1,
+                  balance = balance + $2,
+                  unit_price = $3,
+                  value = $4,
+                  bin_location = COALESCE($5, bin_location),
+                  batch_number = COALESCE($6, batch_number),
+                  remarks = COALESCE($7, remarks)
+              WHERE id = $8
+            `, [newAcc, delta, newPrice, newAcc * newPrice, newBin || null, newBatch || null, newRemarks || null, ledgerRow.id]);
+          }
+
+          if (grn.po_id && delta !== 0) {
+            await client.query(`
+              UPDATE po_items
+              SET received_qty = GREATEST(0, COALESCE(received_qty, 0) + $1)
+              WHERE po_id = $2 AND material_id = $3
+            `, [delta, grn.po_id, existItem.material_id]);
+          }
+        }
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: 'GRN details and item pricing updated successfully' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    client.release();
+  }
+}));
+
 // PUT /api/inventory/grn/:id/approve
 router.put('/grn/:id/approve', auth, requireLevel(3), asyncRoute(async (req, res) => {
   const client = await pool.connect();
