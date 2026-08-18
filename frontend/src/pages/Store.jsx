@@ -207,66 +207,102 @@ export default function Store({ onNavigate }) {
   const handleUpdateInward = async (e) => {
     e.preventDefault()
     if (!editInwardModal) return
-    const r = await fetch(`${API}/store/inward/${editInwardModal.id}`, {
-      method: 'PUT',
-      headers: json(),
-      body: JSON.stringify(editInwardForm)
-    }).then(res => res.json())
-    if (r.success) {
-      addToast('Inward record updated successfully', 'success')
-      setEditInwardModal(null)
-      loadInward()
-      loadBaseData()
-    } else {
-      addToast(r.message || 'Failed to update inward record', 'error')
+    try {
+      const res = await fetch(`${API}/store/inward/${editInwardModal.id}`, {
+        method: 'PUT',
+        headers: json(),
+        body: JSON.stringify(editInwardForm)
+      })
+      if (res.status === 401) {
+        addToast('Authentication session expired or invalid token. Please log in again.', 'error')
+        return
+      }
+      const r = await res.json()
+      if (r.success) {
+        addToast('Inward record updated successfully', 'success')
+        setEditInwardModal(null)
+        loadInward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to update inward record', 'error')
+      }
+    } catch (err) {
+      addToast('Error updating inward entry: ' + err.message, 'error')
     }
   }
 
   const handleDeleteInward = async (inw) => {
     if (!window.confirm(`Are you sure you want to void / delete GRN receipt for ${inw.materialName} (${inw.in_qty} ${inw.uom})? This will deduct the stock from the store.`)) return
-    const r = await fetch(`${API}/store/inward/${inw.id}`, {
-      method: 'DELETE',
-      headers: h()
-    }).then(res => res.json())
-    if (r.success) {
-      addToast(r.message || 'Inward record removed and stock reversed', 'info')
-      loadInward()
-      loadBaseData()
-    } else {
-      addToast(r.message || 'Failed to delete inward record', 'error')
+    try {
+      const res = await fetch(`${API}/store/inward/${inw.id}`, {
+        method: 'DELETE',
+        headers: h()
+      })
+      if (res.status === 401) {
+        addToast('Authentication session expired or invalid token. Please log in again.', 'error')
+        return
+      }
+      const r = await res.json()
+      if (r.success) {
+        addToast(r.message || 'Inward record removed and stock reversed', 'info')
+        loadInward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to delete inward record', 'error')
+      }
+    } catch (err) {
+      addToast('Error deleting inward record: ' + err.message, 'error')
     }
   }
 
   const handleUpdateOutward = async (e) => {
     e.preventDefault()
     if (!editOutwardModal) return
-    const r = await fetch(`${API}/store/outward/${editOutwardModal.id}`, {
-      method: 'PUT',
-      headers: json(),
-      body: JSON.stringify(editOutwardForm)
-    }).then(res => res.json())
-    if (r.success) {
-      addToast('Outward issue updated successfully', 'success')
-      setEditOutwardModal(null)
-      loadOutward()
-      loadBaseData()
-    } else {
-      addToast(r.message || 'Failed to update outward issue', 'error')
+    try {
+      const res = await fetch(`${API}/store/outward/${editOutwardModal.id}`, {
+        method: 'PUT',
+        headers: json(),
+        body: JSON.stringify(editOutwardForm)
+      })
+      if (res.status === 401) {
+        addToast('Authentication session expired or invalid token. Please log in again.', 'error')
+        return
+      }
+      const r = await res.json()
+      if (r.success) {
+        addToast('Outward issue updated successfully', 'success')
+        setEditOutwardModal(null)
+        loadOutward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to update outward issue', 'error')
+      }
+    } catch (err) {
+      addToast('Error updating outward issue: ' + err.message, 'error')
     }
   }
 
   const handleDeleteOutward = async (outw) => {
     if (!window.confirm(`Are you sure you want to cancel outward issue for ${outw.materialName} (${outw.out_qty} ${outw.uom})? This will restore the stock back to the store.`)) return
-    const r = await fetch(`${API}/store/outward/${outw.id}`, {
-      method: 'DELETE',
-      headers: h()
-    }).then(res => res.json())
-    if (r.success) {
-      addToast(r.message || 'Outward issue cancelled and stock restored to store', 'info')
-      loadOutward()
-      loadBaseData()
-    } else {
-      addToast(r.message || 'Failed to cancel outward issue', 'error')
+    try {
+      const res = await fetch(`${API}/store/outward/${outw.id}`, {
+        method: 'DELETE',
+        headers: h()
+      })
+      if (res.status === 401) {
+        addToast('Authentication session expired or invalid token. Please log in again.', 'error')
+        return
+      }
+      const r = await res.json()
+      if (r.success) {
+        addToast(r.message || 'Outward issue cancelled and stock restored', 'info')
+        loadOutward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to cancel outward issue', 'error')
+      }
+    } catch (err) {
+      addToast('Error cancelling outward issue: ' + err.message, 'error')
     }
   }
 

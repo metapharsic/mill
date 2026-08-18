@@ -52,9 +52,12 @@ const requireLevel = (minLevel) => (req, res, next) => {
 
 const requireStore = (req, res, next) => {
   if (!req.user) return res.status(401).json({ success: false, message: 'Authentication required' });
-  if ((req.user.role_level || 0) >= 4) return next();
-  if (req.user.dept_code === 'STORE' || req.user.department === 'Store Management' || req.user.department === 'Store') return next();
-  return res.status(403).json({ success: false, message: 'Store staff or administrator only' });
+  if ((req.user.role_level || 0) >= 3) return next();
+  const deptCode = (req.user.dept_code || '').toUpperCase();
+  const deptName = (req.user.department || '').toLowerCase();
+  if (['STORE', 'INV', 'RMS', 'PUR', 'ADMIN'].includes(deptCode)) return next();
+  if (deptName.includes('store') || deptName.includes('inventory') || deptName.includes('raw material') || deptName.includes('purchase') || deptName.includes('admin')) return next();
+  return res.status(403).json({ success: false, message: 'Store staff, inventory manager or administrator only' });
 };
 
 module.exports = { auth, requireLevel, requireStore };
