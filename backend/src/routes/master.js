@@ -509,12 +509,34 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
 
   // Sync stock ledger entries (opening, received, issued) if provided
   if (stockVal !== null || inQty !== null || outQty !== null || opQty !== null) {
-    const finalStock = stockVal ?? 0;
-    const finalIn = inQty ?? 0;
-    const finalOut = outQty ?? 0;
-    const finalOp = opQty ?? parseFloat((finalStock - finalIn + finalOut).toFixed(3));
+    const { rows: [sums] } = await pool.query(
+      `SELECT COALESCE(SUM(in_qty), 0) AS received, COALESCE(SUM(out_qty), 0) AS issued
+       FROM stock_ledger WHERE material_id = $1 AND transaction_type != 'opening'`,
+      [req.params.id]
+    );
+    const existingRec = parseFloat(sums?.received || 0);
+    const existingIss = parseFloat(sums?.issued || 0);
 
-    // 1. Opening balance in stock_ledger
+    let finalOp = opQty;
+    let finalStock = stockVal;
+
+    if (finalOp !== null && finalOp !== undefined) {
+      // If opening is explicitly given, closing is opening + existing receipts - existing issues
+      if (finalStock === null || finalStock === undefined) {
+        finalStock = parseFloat((finalOp + existingRec - existingIss).toFixed(3));
+      }
+    } else if (finalStock !== null && finalStock !== undefined) {
+      // If closing is given, opening is closing - receipts + issues
+      finalOp = parseFloat((finalStock - existingRec + existingIss).toFixed(3));
+    } else {
+      finalOp = parseFloat(((stockVal ?? 0) - existingRec + existingIss).toFixed(3));
+      finalStock = stockVal ?? 0;
+    }
+
+    // Update current_stock in materials table to reflect exact closing balance
+    await pool.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [finalStock, req.params.id]);
+
+    // 1. Maintain clean Opening balance in stock_ledger
     const { rows: existOp } = await pool.query(
       `SELECT id FROM stock_ledger WHERE material_id=$1 AND transaction_type='opening'`,
       [req.params.id]
@@ -532,44 +554,22 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
       );
     }
 
-    // 2. Received (non-opening) in stock_ledger
-    const { rows: existIn } = await pool.query(
-      `SELECT id FROM stock_ledger WHERE material_id=$1 AND transaction_type IN ('grn', 'in') LIMIT 1`,
-      [req.params.id]
-    );
-    if (finalIn > 0) {
-      if (existIn.length) {
-        await pool.query(
-          `UPDATE stock_ledger SET in_qty=$1, unit_price=$2, value=$3 WHERE id=$4`,
-          [finalIn, price, finalIn * price, existIn[0].id]
-        );
-      } else {
-        await pool.query(
-          `INSERT INTO stock_ledger (material_id, date, transaction_type, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
-           VALUES ($1, CURRENT_DATE, 'grn', $2, 0, $3, $4, $5, 'Material Receipt / Master Entry', $6)`,
-          [req.params.id, finalIn, finalOp + finalIn, price, finalIn * price, req.user?.id || null]
-        );
-      }
+    // 2. If this material has zero non-opening receipts and an initial received quantity was specified in modal, log initial receipt
+    if (inQty !== null && inQty > 0 && existingRec === 0) {
+      await pool.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
+         VALUES ($1, CURRENT_DATE, 'grn', $2, 0, $3, $4, $5, 'Material Receipt / Master Entry', $6)`,
+        [req.params.id, inQty, finalOp + inQty, price, inQty * price, req.user?.id || null]
+      );
     }
 
-    // 3. Issued (non-opening) in stock_ledger
-    const { rows: existOut } = await pool.query(
-      `SELECT id FROM stock_ledger WHERE material_id=$1 AND transaction_type IN ('issue', 'out') LIMIT 1`,
-      [req.params.id]
-    );
-    if (finalOut > 0) {
-      if (existOut.length) {
-        await pool.query(
-          `UPDATE stock_ledger SET out_qty=$1, unit_price=$2, value=$3 WHERE id=$4`,
-          [finalOut, price, finalOut * price, existOut[0].id]
-        );
-      } else {
-        await pool.query(
-          `INSERT INTO stock_ledger (material_id, date, transaction_type, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
-           VALUES ($1, CURRENT_DATE, 'issue', 0, $2, $3, $4, $5, 'Material Issue / Master Entry', $6)`,
-          [req.params.id, finalOut, finalStock, price, finalOut * price, req.user?.id || null]
-        );
-      }
+    // 3. If this material has zero non-opening issues and an initial issue quantity was specified in modal, log initial issue
+    if (outQty !== null && outQty > 0 && existingIss === 0) {
+      await pool.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, in_qty, out_qty, balance, unit_price, value, remarks, created_by)
+         VALUES ($1, CURRENT_DATE, 'issue', 0, $2, $3, $4, $5, 'Material Issue / Master Entry', $6)`,
+        [req.params.id, outQty, finalStock, price, outQty * price, req.user?.id || null]
+      );
     }
   }
 

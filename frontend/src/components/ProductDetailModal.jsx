@@ -378,6 +378,32 @@ export default function ProductDetailModal({
           </div>
         </div>
 
+        {/* ── Visual Stock Rollover Formula Banner ── */}
+        <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '10px 14px', borderRadius: 8, margin: '0 0 14px 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+              <span style={{ fontWeight: 700, color: '#334155' }}>
+                📦 Opening: <span style={{ color: '#0284c7', fontWeight: 800 }}>{fmtN(Math.max(0, currentStock - (data?.total_received || 0) + (data?.total_issued || 0)), 2)}</span>
+              </span>
+              <span style={{ fontWeight: 800, color: '#16a34a' }}>＋</span>
+              <span style={{ fontWeight: 700, color: '#16a34a' }}>
+                📥 Received: <span style={{ fontWeight: 800 }}>+{fmtN(data?.total_received || 0, 2)}</span>
+              </span>
+              <span style={{ fontWeight: 800, color: '#dc2626' }}>－</span>
+              <span style={{ fontWeight: 700, color: '#dc2626' }}>
+                📤 Issued: <span style={{ fontWeight: 800 }}>-{fmtN(data?.total_issued || 0, 2)}</span>
+              </span>
+              <span style={{ fontWeight: 800, color: '#0f766e' }}>＝</span>
+              <span style={{ fontWeight: 800, color: '#0f766e' }}>
+                💰 Closing Balance: <span style={{ textDecoration: 'underline' }}>{fmtN(currentStock, 2)} {data?.uom}</span>
+              </span>
+            </div>
+            <span style={{ fontSize: 11, background: '#e0f2fe', color: '#0369a1', padding: '1px 7px', borderRadius: 10, fontWeight: 600 }}>
+              🔄 Day-to-Day Rollover Active
+            </span>
+          </div>
+        </div>
+
         {/* ── Tabs Navigation ── */}
         <div style={S.navTabs}>
           {[

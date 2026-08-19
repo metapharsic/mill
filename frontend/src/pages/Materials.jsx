@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import AgentStatusBanner from '../components/AgentStatusBanner'
 
 const API = (path, opts) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, ...(opts?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...(opts?.headers || {}) },
@@ -542,6 +543,9 @@ export default function Materials() {
           <button style={S.btnPrimary} onClick={openAdd}>+ Add Material</button>
         </div>
       </div>
+
+      {/* ── Multi-Agent Orchestration & Status Banner ── */}
+      <AgentStatusBanner currentModule="store" />
 
       {/* ── Summary KPI Stats Cards ── */}
       {(() => {
@@ -1338,22 +1342,35 @@ export default function Materials() {
                 </label>
               </div>
 
-              {/* Visual Formula Invariant Banner */}
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
-                  📦 Opening: <span style={{ color: '#0284c7' }}>{form.opening || '0.000'}</span>
+              {/* Visual Formula Invariant Banner & Daily Rollover Principle */}
+              <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '14px 18px', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
+                      📦 Opening: <span style={{ color: '#0284c7', fontWeight: 800 }}>{Number(form.opening || 0).toFixed(3)}</span>
+                    </span>
+                    <span style={{ fontWeight: 800, color: '#16a34a', fontSize: 14 }}>＋</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#16a34a' }}>
+                      📥 Received: <span style={{ fontWeight: 800 }}>+{Number(form.received || 0).toFixed(3)}</span>
+                    </span>
+                    <span style={{ fontWeight: 800, color: '#dc2626', fontSize: 14 }}>－</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#dc2626' }}>
+                      📤 Issue: <span style={{ fontWeight: 800 }}>-{Number(form.issued || 0).toFixed(3)}</span>
+                    </span>
+                    <span style={{ fontWeight: 800, color: '#0f766e', fontSize: 14 }}>＝</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#0f766e' }}>
+                      💰 Closing Balance: <span style={{ textDecoration: 'underline' }}>{Number(form.current_stock || 0).toFixed(3)} {form.uom}</span>
+                    </span>
+                  </div>
+
+                  <span style={{ fontSize: 11, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: 12, fontWeight: 600 }}>
+                    🔄 Daily Rollover Invariant
+                  </span>
                 </div>
-                <span style={{ fontWeight: 800, color: '#16a34a', fontSize: 14 }}>＋</span>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#16a34a' }}>
-                  📥 Received: <span>{form.received || '0.000'}</span>
-                </div>
-                <span style={{ fontWeight: 800, color: '#dc2626', fontSize: 14 }}>－</span>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#dc2626' }}>
-                  📤 Issue: <span>{form.issued || '0.000'}</span>
-                </div>
-                <span style={{ fontWeight: 800, color: '#0f766e', fontSize: 14 }}>＝</span>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#0f766e' }}>
-                  💰 Balance: <span>{form.current_stock || '0.000'} {form.uom}</span>
+
+                <div style={{ fontSize: 11, color: '#64748b', background: '#f1f5f9', padding: '6px 10px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>ℹ️</span>
+                  <span><strong>Rollover Principle:</strong> The Closing Balance of today (Leftover of Receipts &amp; Issues) becomes the exact Opening Balance of tomorrow.</span>
                 </div>
               </div>
 
@@ -1361,7 +1378,7 @@ export default function Materials() {
               <div style={S.grid4}>
                 <label style={S.label}>Opening Stock
                   <input
-                    style={{ ...S.input, color: '#0284c7', fontWeight: 600 }}
+                    style={{ ...S.input, color: '#0284c7', fontWeight: 700 }}
                     type="number"
                     step="0.001"
                     value={form.opening ?? ''}
@@ -1371,7 +1388,7 @@ export default function Materials() {
                 </label>
                 <label style={S.label}>Received (+)
                   <input
-                    style={{ ...S.input, color: '#16a34a', fontWeight: 600 }}
+                    style={{ ...S.input, color: '#16a34a', fontWeight: 700 }}
                     type="number"
                     step="0.001"
                     value={form.received ?? ''}
@@ -1381,7 +1398,7 @@ export default function Materials() {
                 </label>
                 <label style={S.label}>Issue (-)
                   <input
-                    style={{ ...S.input, color: '#dc2626', fontWeight: 600 }}
+                    style={{ ...S.input, color: '#dc2626', fontWeight: 700 }}
                     type="number"
                     step="0.001"
                     value={form.issued ?? ''}
@@ -1391,7 +1408,7 @@ export default function Materials() {
                 </label>
                 <label style={S.label}>Closing Balance
                   <input
-                    style={{ ...S.input, fontWeight: 700, color: '#0f766e', background: '#f0fdf4' }}
+                    style={{ ...S.input, fontWeight: 800, color: '#0f766e', background: '#f0fdf4', border: '1.5px solid #86efac' }}
                     type="number"
                     step="0.001"
                     value={form.current_stock ?? ''}
