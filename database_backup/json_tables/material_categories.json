@@ -243,33 +243,5 @@
     "code": "CHEM",
     "type": "Raw Material",
     "parent_id": null
-  },
-  {
-    "id": 63,
-    "name": "Quality Control",
-    "code": "QC",
-    "type": "Consumable",
-    "parent_id": null
-  },
-  {
-    "id": 67,
-    "name": "MCB",
-    "code": "CAT-7521",
-    "type": "Spare Part",
-    "parent_id": null
-  },
-  {
-    "id": 68,
-    "name": "ELE GENERAL",
-    "code": "CAT-7571",
-    "type": "Spare Part",
-    "parent_id": null
-  },
-  {
-    "id": 69,
-    "name": "VFD DRIVE",
-    "code": "CAT-7742",
-    "type": "Spare Part",
-    "parent_id": null
   }
 ]

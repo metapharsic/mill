@@ -2,7 +2,7 @@
   {
     "id": 1,
     "return_id": 1,
-    "material_id": 3488,
+    "material_id": 3367,
     "qty": "20.000",
     "uom": "NOS",
     "condition_grade": "Good",
@@ -12,7 +12,7 @@
   {
     "id": 2,
     "return_id": 2,
-    "material_id": 3496,
+    "material_id": 3368,
     "qty": "20.000",
     "uom": "NOS",
     "condition_grade": "Good",
@@ -22,7 +22,7 @@
   {
     "id": 3,
     "return_id": 3,
-    "material_id": 3496,
+    "material_id": 3369,
     "qty": "20.000",
     "uom": "NOS",
     "condition_grade": "Good",
@@ -32,7 +32,7 @@
   {
     "id": 4,
     "return_id": 4,
-    "material_id": 3488,
+    "material_id": 3370,
     "qty": "20.000",
     "uom": "NOS",
     "condition_grade": "Good",
@@ -42,59 +42,9 @@
   {
     "id": 5,
     "return_id": 5,
-    "material_id": 3496,
+    "material_id": 3371,
     "qty": "20.000",
-    "uom": "NOS",
-    "condition_grade": "Good",
-    "action_taken": "Restocked to Store",
-    "remarks": "Unopened bag"
-  },
-  {
-    "id": 6,
-    "return_id": 6,
-    "material_id": 3488,
-    "qty": "20.000",
-    "uom": "NOS",
-    "condition_grade": "Good",
-    "action_taken": "Restocked to Store",
-    "remarks": "Unopened bag"
-  },
-  {
-    "id": 7,
-    "return_id": 7,
-    "material_id": 3496,
-    "qty": "20.000",
-    "uom": "NOS",
-    "condition_grade": "Good",
-    "action_taken": "Restocked to Store",
-    "remarks": "Unopened bag"
-  },
-  {
-    "id": 8,
-    "return_id": 8,
-    "material_id": 3488,
-    "qty": "20.000",
-    "uom": "NOS",
-    "condition_grade": "Good",
-    "action_taken": "Restocked to Store",
-    "remarks": "Unopened bag"
-  },
-  {
-    "id": 9,
-    "return_id": 9,
-    "material_id": 3496,
-    "qty": "20.000",
-    "uom": "NOS",
-    "condition_grade": "Good",
-    "action_taken": "Restocked to Store",
-    "remarks": "Unopened bag"
-  },
-  {
-    "id": 10,
-    "return_id": 10,
-    "material_id": 3488,
-    "qty": "20.000",
-    "uom": "NOS",
+    "uom": "Kg",
     "condition_grade": "Good",
     "action_taken": "Restocked to Store",
     "remarks": "Unopened bag"

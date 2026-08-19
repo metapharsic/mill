@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": 1,
+    "cash_purchase_id": 1,
+    "material_id": 2100,
+    "qty": "2.000",
+    "uom": "NOS",
+    "unit_price": "30.00",
+    "gst_pct": "0.00",
+    "line_taxable": "60.00",
+    "line_total": "60.00"
+  }
+]

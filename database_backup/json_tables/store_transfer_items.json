@@ -2,7 +2,7 @@
   {
     "id": 1,
     "transfer_id": 1,
-    "material_id": 3488,
+    "material_id": 3367,
     "qty": "50.000",
     "uom": "NOS",
     "batch_number": null,
@@ -11,7 +11,7 @@
   {
     "id": 2,
     "transfer_id": 2,
-    "material_id": 3496,
+    "material_id": 3368,
     "qty": "50.000",
     "uom": "NOS",
     "batch_number": null,
@@ -20,7 +20,7 @@
   {
     "id": 3,
     "transfer_id": 3,
-    "material_id": 3496,
+    "material_id": 3369,
     "qty": "50.000",
     "uom": "NOS",
     "batch_number": null,
@@ -29,7 +29,7 @@
   {
     "id": 4,
     "transfer_id": 4,
-    "material_id": 3488,
+    "material_id": 3370,
     "qty": "50.000",
     "uom": "NOS",
     "batch_number": null,
@@ -38,54 +38,9 @@
   {
     "id": 5,
     "transfer_id": 5,
-    "material_id": 3496,
+    "material_id": 3371,
     "qty": "50.000",
-    "uom": "NOS",
-    "batch_number": null,
-    "remarks": null
-  },
-  {
-    "id": 6,
-    "transfer_id": 6,
-    "material_id": 3488,
-    "qty": "50.000",
-    "uom": "NOS",
-    "batch_number": null,
-    "remarks": null
-  },
-  {
-    "id": 7,
-    "transfer_id": 7,
-    "material_id": 3496,
-    "qty": "50.000",
-    "uom": "NOS",
-    "batch_number": null,
-    "remarks": null
-  },
-  {
-    "id": 8,
-    "transfer_id": 8,
-    "material_id": 3488,
-    "qty": "50.000",
-    "uom": "NOS",
-    "batch_number": null,
-    "remarks": null
-  },
-  {
-    "id": 9,
-    "transfer_id": 9,
-    "material_id": 3496,
-    "qty": "50.000",
-    "uom": "NOS",
-    "batch_number": null,
-    "remarks": null
-  },
-  {
-    "id": 10,
-    "transfer_id": 10,
-    "material_id": 3488,
-    "qty": "50.000",
-    "uom": "NOS",
+    "uom": "Kg",
     "batch_number": null,
     "remarks": null
   }

@@ -1,122 +1,62 @@
 [
   {
     "id": 1,
-    "return_number": "SRV-TEST-119573",
+    "return_number": "SRV-TEST-904038",
     "department_id": 1,
     "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
+    "return_date": "2026-08-15T18:30:00.000Z",
     "status": "Restocked",
     "returned_by": 21,
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T04:15:19.574Z"
+    "created_at": "2026-08-16T13:11:44.039Z"
   },
   {
     "id": 2,
-    "return_number": "SRV-TEST-918824",
+    "return_number": "SRV-TEST-302195",
     "department_id": 1,
     "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
+    "return_date": "2026-08-15T18:30:00.000Z",
     "status": "Restocked",
     "returned_by": 21,
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T04:45:18.824Z"
+    "created_at": "2026-08-16T13:18:22.196Z"
   },
   {
     "id": 3,
-    "return_number": "SRV-TEST-416245",
+    "return_number": "SRV-TEST-638448",
     "department_id": 1,
     "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
+    "return_date": "2026-08-15T18:30:00.000Z",
     "status": "Restocked",
     "returned_by": 21,
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:10:16.246Z"
+    "created_at": "2026-08-16T13:40:38.449Z"
   },
   {
     "id": 4,
-    "return_number": "SRV-TEST-452948",
+    "return_number": "SRV-TEST-599721",
     "department_id": 1,
     "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
+    "return_date": "2026-08-15T18:30:00.000Z",
     "status": "Restocked",
     "returned_by": 21,
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:10:52.949Z"
+    "created_at": "2026-08-16T14:13:19.722Z"
   },
   {
     "id": 5,
-    "return_number": "SRV-TEST-397014",
+    "return_number": "SRV-TEST-657243",
     "department_id": 1,
     "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
+    "return_date": "2026-08-18T18:30:00.000Z",
     "status": "Restocked",
     "returned_by": 21,
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:26:37.015Z"
-  },
-  {
-    "id": 6,
-    "return_number": "SRV-TEST-421935",
-    "department_id": 1,
-    "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
-    "status": "Restocked",
-    "returned_by": 21,
-    "inspected_by": null,
-    "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:27:01.936Z"
-  },
-  {
-    "id": 7,
-    "return_number": "SRV-TEST-450349",
-    "department_id": 1,
-    "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
-    "status": "Restocked",
-    "returned_by": 21,
-    "inspected_by": null,
-    "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:44:10.349Z"
-  },
-  {
-    "id": 8,
-    "return_number": "SRV-TEST-483225",
-    "department_id": 1,
-    "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
-    "status": "Restocked",
-    "returned_by": 21,
-    "inspected_by": null,
-    "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T05:44:43.225Z"
-  },
-  {
-    "id": 9,
-    "return_number": "SRV-TEST-727333",
-    "department_id": 1,
-    "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
-    "status": "Restocked",
-    "returned_by": 21,
-    "inspected_by": null,
-    "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T06:05:27.333Z"
-  },
-  {
-    "id": 10,
-    "return_number": "SRV-TEST-285440",
-    "department_id": 1,
-    "indent_id": null,
-    "return_date": "2026-08-16T18:30:00.000Z",
-    "status": "Restocked",
-    "returned_by": 21,
-    "inspected_by": null,
-    "remarks": "Excess chemical from shift run",
-    "created_at": "2026-08-17T06:14:45.441Z"
+    "created_at": "2026-08-19T05:00:57.243Z"
   }
 ]
