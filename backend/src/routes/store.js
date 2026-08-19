@@ -2012,7 +2012,6 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
         `, [newPrice, newQty, bin_location || null, batch_number || null, remarkFull || null, (/^\d+$/.test(String(targetGrnId)) ? parseInt(targetGrnId) : 0), String(targetGrnId), mat.id]);
       }
     }
-    }
 
     await auditLog(client, {
       userId: req.user.id,

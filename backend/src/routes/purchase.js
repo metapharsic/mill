@@ -738,7 +738,6 @@ router.delete('/grn/:id', auth, requireLevel(3), ar(async (req, res) => {
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });
->>>>>>> origin/main
   } finally {
     client.release();
   }
