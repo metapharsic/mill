@@ -488,7 +488,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
         const { rows: [mat] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
         const curStock = parseFloat(mat?.current_stock || 0);
         const newStock = curStock + q;
-        await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`, [newStock, p, it.material_id]);
+        await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END WHERE id = $3`, [newStock, p, it.material_id]);
 
         // Record in stock_ledger
         await client.query(
@@ -1412,7 +1412,7 @@ router.post('/:id/convert-to-cash-purchase', auth, requireLevel(2), ar(async (re
       const { rows: [mat] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
       const curStock = parseFloat(mat?.current_stock || 0);
       const newStock = curStock + q;
-      await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`, [newStock, p, it.material_id]);
+      await client.query(`UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END WHERE id = $3`, [newStock, p, it.material_id]);
 
       // Stock ledger
       await client.query(

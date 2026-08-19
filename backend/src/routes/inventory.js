@@ -659,8 +659,7 @@ router.put('/grn/:id', auth, requireLevel(2), asyncRoute(async (req, res) => {
         await client.query(
           `UPDATE materials
            SET current_stock = $1,
-               unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
-               updated_at = NOW()
+               unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END
            WHERE id = $3`,
           [newStock, newPrice, mat.id]
         );

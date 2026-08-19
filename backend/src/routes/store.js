@@ -1484,7 +1484,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
         UPDATE materials
         SET current_stock = $1,
             bin_location = COALESCE($2, bin_location),
-            unit_price = CASE WHEN $3 > 0 THEN $3 ELSE unit_price END
+            unit_price = CASE WHEN $3::numeric > 0 THEN $3::numeric ELSE unit_price END
         WHERE id = $4
       `, [newStock, finalBin, price, mat.id]);
 
@@ -1880,7 +1880,7 @@ router.put('/grn/:id', requireAuth, requireStore, ar(async (req, res) => {
           await client.query(`
             UPDATE materials
             SET current_stock = current_stock + $1,
-                unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
+                unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END,
                 bin_location = COALESCE($3, bin_location)
             WHERE id = $4
           `, [delta, newPrice, newBin || null, existItem.material_id]);
@@ -1962,7 +1962,7 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
     await client.query(`
       UPDATE materials
       SET current_stock = $1,
-          unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
+          unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END,
           bin_location = COALESCE($3, bin_location)
       WHERE id = $4
     `, [newStock, newPrice, bin_location || null, mat.id]);

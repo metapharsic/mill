@@ -562,8 +562,7 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
         await client.query(
           `UPDATE materials
            SET current_stock = $1,
-               unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END,
-               updated_at = NOW()
+               unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END
            WHERE id = $3`,
           [newStock, newPrice, mat.id]
         );
@@ -704,7 +703,7 @@ router.delete('/grn/:id', auth, requireLevel(3), ar(async (req, res) => {
         if (newStock < 0) {
           throw new Error(`Cannot void GRN ${grn.grn_number}: stock for '${mat.name}' already consumed (Remaining: ${curStock} ${mat.uom})`);
         }
-        await client.query(`UPDATE materials SET current_stock = $1, updated_at = NOW() WHERE id = $2`, [newStock, mat.id]);
+        await client.query(`UPDATE materials SET current_stock = $1 WHERE id = $2`, [newStock, mat.id]);
       }
 
       // Revert PO received count
@@ -827,7 +826,7 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
         const curStock = parseFloat(mat?.current_stock || 0);
         const newStock = curStock + accQty;
         await client.query(
-          `UPDATE materials SET current_stock=$1, unit_price=CASE WHEN $2>0 THEN $2 ELSE unit_price END, updated_at=NOW() WHERE id=$3`,
+          `UPDATE materials SET current_stock=$1, unit_price=CASE WHEN $2::numeric>0 THEN $2::numeric ELSE unit_price END WHERE id=$3`,
           [newStock, uPrice, poIt.material_id]
         );
 
@@ -1343,7 +1342,7 @@ router.post('/cash-purchase', auth, requireLevel(2), ar(async (req, res) => {
       const newStock = curStock + qty;
 
       await client.query(
-        `UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2 > 0 THEN $2 ELSE unit_price END, updated_at = NOW() WHERE id = $3`,
+        `UPDATE materials SET current_stock = $1, unit_price = CASE WHEN $2::numeric > 0 THEN $2::numeric ELSE unit_price END WHERE id = $3`,
         [newStock, unitPrice, it.material_id]
       );
 
