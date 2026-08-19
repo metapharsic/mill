@@ -23,6 +23,8 @@ export default function StoreDeptReports({ onNavigate }) {
   const [binData, setBinData] = useState({ byBin: [], items: [] })
   const [vendorData, setVendorData] = useState({ vendors: [], priceTrend: [] })
   const [movementData, setMovementData] = useState({ items: [], summary: { fast: 0, slow: 0, dead: 0, deadStockValue: 0 } })
+  const [sectionData, setSectionData] = useState({ kpis: {}, sections: [], granularItems: [] })
+  const [selectedSecFilter, setSelectedSecFilter] = useState('')
   const [granularLoading, setGranularLoading] = useState(false)
   const [expandedCategory, setExpandedCategory] = useState(null)
   const [expandedBin, setExpandedBin] = useState(null)
@@ -59,6 +61,12 @@ export default function StoreDeptReports({ onNavigate }) {
         const r = await fetch(`${API}/store/reports/movement-analysis?${params}`, { headers: h() }).then(res => res.json())
         if (r.success) setMovementData(r.data || { items: [], summary: { fast: 0, slow: 0, dead: 0, deadStockValue: 0 } })
         else addToast(r.message || 'Error loading movement report', 'error')
+      } else if (tab === 'section') {
+        const p2 = new URLSearchParams(params)
+        if (selectedSecFilter) p2.append('section_id', selectedSecFilter)
+        const r = await fetch(`${API}/reports/plant-sections/detailed?${p2}`, { headers: h() }).then(res => res.json())
+        if (r.success) setSectionData(r.data || { kpis: {}, sections: [], granularItems: [] })
+        else addToast(r.message || 'Error loading plant section report', 'error')
       }
     } catch (e) {
       console.error(e)
@@ -66,7 +74,7 @@ export default function StoreDeptReports({ onNavigate }) {
     } finally {
       setGranularLoading(false)
     }
-  }, [tab, fromDate, toDate, selectedItemId, expandedVendor, addToast])
+  }, [tab, fromDate, toDate, selectedItemId, expandedVendor, selectedSecFilter, addToast])
 
   useEffect(() => {
     if (tab !== 'dept') loadGranular()
@@ -173,15 +181,132 @@ export default function StoreDeptReports({ onNavigate }) {
       <div style={S.tabBar} className="no-print">
         {[
           { id: 'dept', label: '🏢 Department Summary' },
+          { id: 'section', label: '🏭 Plant Section & Machine Granularity' },
           { id: 'item', label: '📦 Item-Wise Consumption' },
           { id: 'category', label: '🏷️ Category / Subcategory' },
           { id: 'bin', label: '📍 Bin / Rack Location' },
-          { id: 'vendor', label: '🚚 Vendor-Wise Inward' },
+          { id: 'vendor', label: '🚚 Vendor-Wise Inward (GRN)' },
           { id: 'movement', label: '⚡ Fast / Slow / Dead Stock' },
         ].map(t => (
           <button key={t.id} style={{ ...S.tab, ...(tab === t.id ? S.tabActive : {}) }} onClick={() => setTab(t.id)}>{t.label}</button>
         ))}
       </div>
+
+      {tab === 'section' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Section summary pills */}
+          <div style={S.tableWrap}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid #e7e6df', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <b>🏭 Plant Sections Rollup & Valuation</b>
+              {selectedSecFilter && (
+                <button
+                  style={{ ...S.btnGhost, fontSize: 12, padding: '4px 8px' }}
+                  onClick={() => setSelectedSecFilter('')}
+                >
+                  ✕ Clear Section Filter
+                </button>
+              )}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, padding: 14 }}>
+              {(sectionData.sections || []).map(sec => {
+                const isSelected = String(selectedSecFilter) === String(sec.sectionId)
+                return (
+                  <div
+                    key={sec.sectionId}
+                    onClick={() => setSelectedSecFilter(isSelected ? '' : sec.sectionId)}
+                    style={{
+                      padding: 12,
+                      borderRadius: 8,
+                      border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
+                      background: isSelected ? '#eff6ff' : '#f8fafc',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 13 }}>
+                      <span>{sec.sectionIcon}</span>
+                      <span>{sec.sectionName}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                      {sec.materialCount} items · Val: <b>₹{Number(sec.totalValuation || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</b>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Granular Items Table */}
+          <div style={S.tableWrap}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid #e7e6df', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <b>Granular Plant Section & Machine Level Inventory Matrix</b>
+              <button
+                style={{ ...S.btnGhost, fontSize: 12, padding: '4px 10px', background: '#0284c7', color: '#fff' }}
+                onClick={() => {
+                  const p = new URLSearchParams({ format: 'csv', from: fromDate || '', to: toDate || '' })
+                  if (selectedSecFilter) p.set('section_id', selectedSecFilter)
+                  window.open(`/api/reports/plant-sections/detailed?${p}`, '_blank')
+                }}
+              >
+                📥 Export CSV
+              </button>
+            </div>
+            <table style={S.table}>
+              <thead>
+                <tr style={S.thead}>
+                  {['Section', 'Machine / Equipment', 'Material', 'Category & Bin', 'Current Stock', 'Unit Price', 'Stock Valuation', 'Period Consumed', 'Period Inward'].map(hh => (
+                    <th key={hh} style={S.th}>{hh}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {granularLoading ? (
+                  <tr><td colSpan={9} style={S.loading}>Loading plant section report...</td></tr>
+                ) : (sectionData.granularItems || []).length === 0 ? (
+                  <tr><td colSpan={9} style={S.empty}>No plant section items found for selected filter.</td></tr>
+                ) : (
+                  (sectionData.granularItems || []).map(it => (
+                    <tr key={it.materialId} style={S.tr}>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 600 }}>{it.sectionName || 'Unassigned'}</div>
+                        <div style={S.muted}>{it.sectionCode || '—'}</div>
+                      </td>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 600 }}>{it.machineName || '—'}</div>
+                        <div style={S.muted}>{it.equipmentName || '—'}</div>
+                      </td>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 600 }}>{it.materialName}</div>
+                        <div style={S.muted}>{it.materialCode}</div>
+                      </td>
+                      <td style={S.td}>
+                        <div>{it.categoryName || 'General'}</div>
+                        <div style={S.muted}>📍 {it.binLocation || '—'}</div>
+                      </td>
+                      <td style={S.td}>
+                        <span style={{ fontWeight: 700, color: Number(it.currentStock) <= Number(it.minStock) ? '#dc2626' : '#1b1b1d' }}>
+                          {Number(it.currentStock || 0).toFixed(2)} {it.uom}
+                        </span>
+                      </td>
+                      <td style={S.td}>₹{Number(it.unitPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      <td style={{ ...S.td, fontWeight: 700, color: '#16a34a' }}>
+                        ₹{Number(it.stockValuation || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 600, color: '#ea580c' }}>{Number(it.consumedQty || 0).toFixed(2)} {it.uom}</div>
+                        <div style={S.muted}>₹{Number(it.consumedValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                      </td>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 600, color: '#0f766e' }}>{Number(it.inwardQty || 0).toFixed(2)} {it.uom}</div>
+                        <div style={S.muted}>₹{Number(it.inwardValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {tab === 'item' && (
         <div style={S.tableWrap}>

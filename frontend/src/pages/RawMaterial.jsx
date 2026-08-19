@@ -646,7 +646,7 @@ export default function RawMaterial({ onNavigate }) {
                     value={inwardForm.inward_type}
                     onChange={e => setInwardForm(prev => ({ ...prev, inward_type: e.target.value }))}
                   >
-                    <option value="grn">Vendor GRN (Purchase Inward)</option>
+                    <option value="grn">GRN (Purchase Inward)</option>
                     <option value="return">Department Return (Unused Stock)</option>
                     <option value="direct">Direct / Emergency Stock</option>
                   </select>

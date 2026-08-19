@@ -1489,7 +1489,7 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
       `, [newStock, finalBin, price, mat.id]);
 
       const remarkFull = [
-        inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : (grnNum ? `[Vendor GRN ${grnNum}]` : '[Vendor GRN]'),
+        inward_type === 'return' ? (deptName ? `[Dept Return - ${deptName}]` : '[Dept Return]') : (grnNum ? `[GRN ${grnNum}]` : '[GRN]'),
         reference_id ? `Ref: ${reference_id}` : null,
         resolvedVendorName ? `Party: ${resolvedVendorName}` : null,
         itemQC ? `QC: ${itemQC}` : null,

@@ -1137,7 +1137,7 @@ export default function Store({ onNavigate }) {
                     <td style={S.td}><span style={S.code}>{new Date(inw.date).toLocaleDateString('en-IN')}</span></td>
                     <td style={S.td}>
                       <span style={{ ...S.badge, background: inw.transaction_type === 'return' ? '#fef3c7' : '#ccfbf1', color: inw.transaction_type === 'return' ? '#92400e' : '#0f766e' }}>
-                        {inw.transaction_type === 'return' ? 'Dept Return' : 'Vendor GRN'}
+                        {inw.transaction_type === 'return' ? 'Dept Return' : 'GRN'}
                       </span>
                     </td>
                     <td style={S.td}><span style={{ fontWeight: 600 }}>{inw.reference_id || inw.reference_type || '—'}</span></td>
@@ -1927,7 +1927,7 @@ export default function Store({ onNavigate }) {
                 <div>
                   <label style={S.label}>Inward Type *</label>
                   <select style={S.select} value={inwardForm.inward_type} onChange={e => setInwardForm({ ...inwardForm, inward_type: e.target.value })}>
-                    <option value="grn">Vendor GRN (Purchase Inward)</option>
+                    <option value="grn">GRN (Purchase Inward)</option>
                     <option value="return">Department Return (Unused Material)</option>
                     <option value="direct">Direct / Emergency Receipt</option>
                   </select>

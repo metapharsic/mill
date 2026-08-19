@@ -389,6 +389,7 @@ const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 
 
 // Maps frontend granular module ids -> backend reports.js route slugs
 const GRANULAR_ENDPOINTS = {
+  plantSectionsDetailed: 'plant-sections/detailed',
   hrDetailed: 'hr-detailed',
   maintenanceDetailed: 'maintenance-detailed',
   purchaseDetailed: 'purchase-detailed',
@@ -398,6 +399,7 @@ const GRANULAR_ENDPOINTS = {
 
 const REPORT_MODULES = [
   { id: 'eod', label: 'EOD Activity (WhatsApp)', icon: WhatsAppIcon, desc: 'Complete daily activity, indents by dept, store movements & 1-click WhatsApp routing', group: 'Executive / Daily' },
+  { id: 'plantSectionsDetailed', label: 'Plant Section & Granularity', icon: Layers, desc: 'Section & equipment-level inventory, consumption, inward receipts & valuation matrix', group: 'Materials', granular: true },
   { id: 'stores', label: 'Stores & Inventory', icon: Boxes, desc: 'Mechanical, Electrical, Chemicals, stock balances & value', group: 'Materials' },
   { id: 'indents', label: 'Indents & Store Issues', icon: ShoppingCart, desc: 'Department store indents, approvals & fulfillment', group: 'Materials' },
   { id: 'production', label: 'Production & DPR', icon: Factory, desc: 'Reels, machine output, GSM, efficiency & downtime', group: 'Operations' },
@@ -424,14 +426,14 @@ export default function Reports() {
     // 1. Admin (L5) & Plant Head (L4) see all reports
     if (roleLevel >= 4) return REPORT_MODULES
 
-    // 2. Store Management & Inventory & Raw Material Store & Purchase -> EOD, Stores, Indents + Purchase Deep Dive
+    // 2. Store Management & Inventory & Raw Material Store & Purchase -> EOD, Stores, Indents + Purchase Deep Dive + Plant Sections
     if (['Store Management', 'Store', 'Inventory', 'Raw Material Store', 'Purchase'].includes(userDept)) {
-      return REPORT_MODULES.filter(m => ['eod', 'stores', 'indents', 'purchaseDetailed'].includes(m.id))
+      return REPORT_MODULES.filter(m => ['eod', 'plantSectionsDetailed', 'stores', 'indents', 'purchaseDetailed'].includes(m.id))
     }
 
-    // 3. Production -> EOD, Production & Downtime
+    // 3. Production -> EOD, Production & Downtime + Plant Sections
     if (userDept === 'Production') {
-      return REPORT_MODULES.filter(m => ['eod', 'production', 'downtime'].includes(m.id))
+      return REPORT_MODULES.filter(m => ['eod', 'plantSectionsDetailed', 'production', 'downtime'].includes(m.id))
     }
 
     // 4. Quality & Laboratory -> EOD & Quality
@@ -439,14 +441,14 @@ export default function Reports() {
       return REPORT_MODULES.filter(m => ['eod', 'quality'].includes(m.id))
     }
 
-    // 5. Maintenance -> EOD, Downtime, Stores + Maintenance Deep Dive
+    // 5. Maintenance -> EOD, Downtime, Stores + Maintenance Deep Dive + Plant Sections
     if (userDept === 'Maintenance') {
-      return REPORT_MODULES.filter(m => ['eod', 'downtime', 'stores', 'maintenanceDetailed'].includes(m.id))
+      return REPORT_MODULES.filter(m => ['eod', 'plantSectionsDetailed', 'downtime', 'stores', 'maintenanceDetailed'].includes(m.id))
     }
 
-    // 6. Utility -> EOD & Utility
+    // 6. Utility -> EOD & Utility + Plant Sections
     if (userDept === 'Utility') {
-      return REPORT_MODULES.filter(m => ['eod', 'utility'].includes(m.id))
+      return REPORT_MODULES.filter(m => ['eod', 'plantSectionsDetailed', 'utility'].includes(m.id))
     }
 
     // 7. Sales & Dispatch -> EOD, Sales + Finance Deep Dive
@@ -1022,6 +1024,7 @@ export default function Reports() {
               {activeModule === 'quality' && <QualityReportView data={data} search={searchTerm} />}
               {activeModule === 'utility' && <UtilityReportView data={data} search={searchTerm} />}
               {activeModule === 'downtime' && <DowntimeReportView data={data} search={searchTerm} />}
+              {activeModule === 'plantSectionsDetailed' && <PlantSectionsDetailedReportView data={data} search={searchTerm} />}
               {activeModule === 'indents' && <IndentsReportView data={data} search={searchTerm} />}
               {activeModule === 'sales' && <SalesReportView data={data} search={searchTerm} />}
               {activeModule === 'hr' && <HrReportView data={data} search={searchTerm} />}
@@ -2834,3 +2837,248 @@ const S = {
   whatsAppPreviewBox: { background: '#efeae2', borderRadius: 10, padding: 14, maxHeight: 280, overflowY: 'auto', border: '1px solid #d1d7db' },
   whatsAppBubble: { background: '#ffffff', borderRadius: 8, padding: '12px 14px', fontSize: 12, lineHeight: 1.6, color: '#111b21', whiteSpace: 'pre-wrap', fontFamily: 'system-ui, sans-serif', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }
 }
+
+function PlantSectionsDetailedReportView({ data, search }) {
+  const [selectedSec, setSelectedSec] = useState('')
+  const sections = data?.sections || []
+  const kpis = data?.kpis || {}
+  const rawItems = data?.granularItems || []
+
+  const filteredItems = useMemo(() => {
+    return rawItems.filter(it => {
+      if (selectedSec && String(it.sectionId) !== String(selectedSec)) return false
+      if (search) {
+        const s = search.toLowerCase()
+        return (
+          (it.materialName || '').toLowerCase().includes(s) ||
+          (it.materialCode || '').toLowerCase().includes(s) ||
+          (it.sectionName || '').toLowerCase().includes(s) ||
+          (it.equipmentName || '').toLowerCase().includes(s) ||
+          (it.categoryName || '').toLowerCase().includes(s) ||
+          (it.binLocation || '').toLowerCase().includes(s)
+        )
+      }
+      return true
+    })
+  }, [rawItems, selectedSec, search])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* KPI Overview Cards */}
+      <div style={S.kpiGrid}>
+        <KpiCard
+          title="Plant Sections"
+          value={sections.length}
+          sub="Active mill production sections"
+          icon={Layers}
+          color="#0284c7"
+        />
+        <KpiCard
+          title="Section Materials Tracked"
+          value={kpis.totalMaterials || rawItems.length}
+          sub="Granular items provisioned"
+          icon={Boxes}
+          color="#2563eb"
+        />
+        <KpiCard
+          title="Total Stock Valuation"
+          value={`₹${Number(kpis.totalValuation || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          sub="Live computation from stock ledger"
+          icon={TrendingUp}
+          color="#16a34a"
+        />
+        <KpiCard
+          title="Period Consumption"
+          value={`₹${Number(kpis.totalConsumptionValue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          sub={`${kpis.fromDate || ''} to ${kpis.toDate || ''}`}
+          icon={Flame}
+          color="#ea580c"
+        />
+        <KpiCard
+          title="Period Inward Receipts"
+          value={`₹${Number(kpis.totalInwardValue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          sub="GRN Inward additions"
+          icon={ShoppingCart}
+          color="#0f766e"
+        />
+        <KpiCard
+          title="Critical Low Stock"
+          value={kpis.lowStockCount || 0}
+          sub="Stock ≤ Reorder level"
+          icon={AlertTriangle}
+          color="#ef4444"
+        />
+      </div>
+
+      {/* Section Summary Cards */}
+      <div style={S.card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div>
+            <div style={S.cardTitle}>Plant Sections Rollup & Valuation</div>
+            <div style={{ fontSize: 12, color: '#64748b' }}>Click any plant section to filter granular items below</div>
+          </div>
+          {selectedSec && (
+            <button
+              style={{ ...S.btnGhost, padding: '4px 10px', fontSize: 12, color: '#0284c7' }}
+              onClick={() => setSelectedSec('')}
+            >
+              ✕ Clear Section Filter
+            </button>
+          )}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+          {sections.map(sec => {
+            const isSelected = String(selectedSec) === String(sec.sectionId)
+            return (
+              <div
+                key={sec.sectionId}
+                onClick={() => setSelectedSec(isSelected ? '' : sec.sectionId)}
+                style={{
+                  background: isSelected ? '#eff6ff' : '#f8fafc',
+                  border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
+                  borderRadius: 10,
+                  padding: 14,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease-in-out',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                  boxShadow: isSelected ? '0 4px 12px rgba(37,99,235,0.12)' : 'none'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 20 }}>{sec.sectionIcon}</span>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{sec.sectionName}</div>
+                      <div style={{ fontSize: 11, color: '#64748b' }}>{sec.sectionCode} · {sec.departmentName || 'General'}</div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 11, background: '#e2e8f0', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>
+                    {sec.materialCount} items
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, paddingTop: 4, borderTop: '1px dashed #cbd5e1', fontSize: 11 }}>
+                  <div>
+                    <span style={{ color: '#64748b' }}>Stock Valuation:</span>
+                    <div style={{ fontWeight: 700, color: '#16a34a' }}>
+                      ₹{Number(sec.totalValuation || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ color: '#64748b' }}>Consumed Val:</span>
+                    <div style={{ fontWeight: 700, color: '#ea580c' }}>
+                      ₹{Number(sec.periodConsumedVal || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Granular Table */}
+      <div style={S.card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={S.cardTitle}>
+            Granular Equipment & Material Matrix {selectedSec ? `— (Filtered: ${sections.find(s => String(s.sectionId) === String(selectedSec))?.sectionName || ''})` : ''}
+            <span style={{ fontSize: 12, fontWeight: 500, color: '#64748b', marginLeft: 8 }}>({filteredItems.length} records)</span>
+          </div>
+          <button
+            style={S.btnPrimary}
+            onClick={() => {
+              const p = new URLSearchParams({
+                format: 'csv',
+                from: data?.kpis?.fromDate || today,
+                to: data?.kpis?.toDate || today
+              })
+              if (selectedSec) p.set('section_id', selectedSec)
+              window.open(`/api/reports/plant-sections/detailed?${p}`, '_blank')
+            }}
+          >
+            <Download size={14} /> Download Granular CSV
+          </button>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={S.table}>
+            <thead>
+              <tr style={S.thead}>
+                <th style={S.th}>Plant Section</th>
+                <th style={S.th}>Machine / Equipment</th>
+                <th style={S.th}>Material Item</th>
+                <th style={S.th}>Category & Bin</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Unit Price</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Current Stock</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Valuation</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Period Consumed</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Period Inward</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={9} style={S.tdEmpty}>No items match the selected plant section / filter.</td>
+                </tr>
+              ) : (
+                filteredItems.map(it => (
+                  <tr key={it.materialId} style={S.tr}>
+                    <td style={S.td}>
+                      <span style={{ fontWeight: 600, color: '#0f172a' }}>{it.sectionName || 'Unassigned'}</span>
+                      {it.sectionCode && <div style={{ fontSize: 10, color: '#64748b' }}>{it.sectionCode}</div>}
+                    </td>
+                    <td style={S.td}>
+                      <div style={{ fontWeight: 600 }}>{it.machineName || '—'}</div>
+                      <div style={{ fontSize: 11, color: '#64748b' }}>{it.equipmentName || '—'}</div>
+                    </td>
+                    <td style={S.td}>
+                      <div style={{ fontWeight: 600, color: '#1e293b' }}>{it.materialName}</div>
+                      <div style={{ fontSize: 11, color: '#64748b', fontFamily: 'monospace' }}>{it.materialCode}</div>
+                    </td>
+                    <td style={S.td}>
+                      <div>{it.categoryName || 'General'}</div>
+                      <span style={{ fontSize: 10, background: '#f1f5f9', padding: '1px 5px', borderRadius: 3, color: '#475569' }}>
+                        📍 {it.binLocation || '—'}
+                      </span>
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right' }}>
+                      ₹{Number(it.unitPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right' }}>
+                      <span style={{ fontWeight: 700, color: Number(it.currentStock) <= Number(it.minStock) ? '#dc2626' : '#0f172a' }}>
+                        {Number(it.currentStock || 0).toFixed(2)} {it.uom}
+                      </span>
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>
+                      ₹{Number(it.stockValuation || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right' }}>
+                      <div style={{ fontWeight: 600, color: '#ea580c' }}>
+                        {Number(it.consumedQty || 0).toFixed(2)} {it.uom}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#64748b' }}>
+                        ₹{Number(it.consumedValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </div>
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right' }}>
+                      <div style={{ fontWeight: 600, color: '#0f766e' }}>
+                        {Number(it.inwardQty || 0).toFixed(2)} {it.uom}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#64748b' }}>
+                        ₹{Number(it.inwardValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+

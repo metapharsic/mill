@@ -223,7 +223,7 @@ async function compileEOD(targetDate) {
       LEFT JOIN machines mac ON mac.id = m.machine_id
       LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       LEFT JOIN vendors v ON sl.vendor_id = v.id
-      LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND sl.reference_id = po.id
+      LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)
       WHERE sl.date = $1 AND sl.transaction_type IN ('grn', 'in')
       ORDER BY sl.id DESC
     `, [d]),
@@ -235,14 +235,14 @@ async function compileEOD(targetDate) {
              ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
-               WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
+               WHERE (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END) AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
       LEFT JOIN plant_sections ps ON ps.id = m.section_id
       LEFT JOIN machines mac ON mac.id = m.machine_id
       LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
-      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
+      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = si.id ELSE FALSE END)
       LEFT JOIN departments d ON si.department_id = d.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('issue', 'out')
       ORDER BY sl.value DESC, sl.id DESC
@@ -255,14 +255,14 @@ async function compileEOD(targetDate) {
              ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
-               WHERE ind.id = sl.reference_id AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
+               WHERE (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END) AND UPPER(sl.reference_type) = 'INDENT' LIMIT 1
              ), 'General Mill') AS dept_name
       FROM stock_ledger sl
       JOIN materials m ON sl.material_id = m.id
       LEFT JOIN plant_sections ps ON ps.id = m.section_id
       LEFT JOIN machines mac ON mac.id = m.machine_id
       LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
-      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
+      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = si.id ELSE FALSE END)
       LEFT JOIN departments d ON si.department_id = d.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('issue', 'out') AND sl.out_qty > 0
       ORDER BY sl.value DESC
@@ -770,12 +770,12 @@ router.get('/stores/item-ledger/:id', auth, requireLevel(2), ar(async (req, res)
            u.name AS "createdByName"
     FROM stock_ledger sl
     LEFT JOIN vendors v ON sl.vendor_id = v.id
-    LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
-    LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND sl.reference_id = ind.id
+    LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = si.id ELSE FALSE END)
+    LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
     LEFT JOIN departments si_dept ON si.department_id = si_dept.id
     LEFT JOIN departments ind_dept ON ind.department_id = ind_dept.id
-    LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND sl.reference_id = po.id
-    LEFT JOIN grn g ON sl.reference_type = 'GRN' AND sl.reference_id = g.id
+    LEFT JOIN purchase_orders po ON sl.reference_type = 'PO' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)
+    LEFT JOIN grn g ON sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END)
     LEFT JOIN users u ON sl.created_by = u.id
     WHERE sl.material_id = $1
     ORDER BY sl.date DESC, sl.id DESC
@@ -839,8 +839,8 @@ router.get('/stores/consumption-by-item', auth, requireLevel(2), ar(async (req, 
       JOIN materials m ON sl.material_id = m.id
       JOIN material_categories mc ON m.category_id = mc.id
       LEFT JOIN material_categories parent ON parent.id = mc.parent_id
-      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND sl.reference_id = si.id
-      LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND sl.reference_id = ind.id
+      LEFT JOIN store_issues si ON sl.reference_type = 'ISSUE' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = si.id ELSE FALSE END)
+      LEFT JOIN indents ind ON UPPER(sl.reference_type) = 'INDENT' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
       LEFT JOIN departments si_dept ON si.department_id = si_dept.id
       LEFT JOIN departments ind_dept ON ind.department_id = ind_dept.id
       WHERE ${where}
@@ -1876,4 +1876,171 @@ router.get('/p2p-pipeline', auth, ar(async (req, res) => {
   res.json({ success: true, data: rows });
 }));
 
+// ── 15. PLANT SECTION & GRANULAR LEVEL REPORTING (AGENT 4) ────────────────────
+router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res) => {
+  const { section_id, machine_id, category_id, from, to, search, format } = req.query;
+  const f = from || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
+
+  const matConds = [`m.is_active = true`];
+  const matParams = [];
+  let p = 1;
+
+  if (section_id && /^\d+$/.test(String(section_id))) {
+    matConds.push(`m.section_id = $${p}`);
+    matParams.push(parseInt(section_id));
+    p++;
+  }
+  if (machine_id && /^\d+$/.test(String(machine_id))) {
+    matConds.push(`m.machine_id = $${p}`);
+    matParams.push(parseInt(machine_id));
+    p++;
+  }
+  if (category_id && /^\d+$/.test(String(category_id))) {
+    matConds.push(`m.category_id = $${p}`);
+    matParams.push(parseInt(category_id));
+    p++;
+  }
+  if (search && search.trim()) {
+    matConds.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p} OR m.bin_location ILIKE $${p})`);
+    matParams.push(`%${search.trim()}%`);
+    p++;
+  }
+
+  const matWhere = matConds.length ? `WHERE ${matConds.join(' AND ')}` : '';
+
+  // 1. Section Level Aggregates (Valuation, Items, Equipment count, Consumption in date range)
+  const { rows: sectionRollups } = await pool.query(`
+    SELECT 
+      ps.id AS "sectionId",
+      ps.section_code AS "sectionCode",
+      ps.name AS "sectionName",
+      COALESCE(ps.icon, '⚙️') AS "sectionIcon",
+      d.name AS "departmentName",
+      COUNT(DISTINCT m.id)::int AS "materialCount",
+      COALESCE(SUM(m.current_stock * m.unit_price), 0)::numeric(15,2) AS "totalValuation",
+      COUNT(DISTINCT se.id)::int AS "equipmentCount",
+      COALESCE(SUM(moves.consumed_qty), 0)::numeric(12,3) AS "periodConsumedQty",
+      COALESCE(SUM(moves.consumed_val), 0)::numeric(15,2) AS "periodConsumedVal",
+      COALESCE(SUM(moves.inward_qty), 0)::numeric(12,3) AS "periodInwardQty",
+      COALESCE(SUM(moves.inward_val), 0)::numeric(15,2) AS "periodInwardVal"
+    FROM plant_sections ps
+    LEFT JOIN departments d ON ps.department_id = d.id
+    LEFT JOIN section_equipment se ON se.section_id = ps.id
+    LEFT JOIN materials m ON m.section_id = ps.id AND m.is_active = true
+    LEFT JOIN LATERAL (
+      SELECT 
+        COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,
+        COALESCE(SUM(sl.value) FILTER (WHERE sl.out_qty > 0), 0) AS consumed_val,
+        COALESCE(SUM(sl.in_qty), 0) AS inward_qty,
+        COALESCE(SUM(sl.value) FILTER (WHERE sl.in_qty > 0), 0) AS inward_val
+      FROM stock_ledger sl
+      WHERE sl.material_id = m.id AND sl.date BETWEEN '${f}' AND '${t}'
+    ) moves ON true
+    GROUP BY ps.id, ps.section_code, ps.name, ps.icon, d.name, ps.sort_order
+    ORDER BY ps.sort_order ASC, "totalValuation" DESC
+  `);
+
+  // 2. Granular Equipment & Material Level Breakdown
+  const { rows: granularItems } = await pool.query(`
+    SELECT 
+      m.id AS "materialId",
+      m.code AS "materialCode",
+      m.name AS "materialName",
+      m.uom,
+      m.hsn_code AS "hsnCode",
+      m.current_stock::numeric(12,3) AS "currentStock",
+      m.min_stock::numeric(12,3) AS "minStock",
+      m.reorder_level::numeric(12,3) AS "reorderLevel",
+      m.unit_price::numeric(12,2) AS "unitPrice",
+      (m.current_stock * m.unit_price)::numeric(15,2) AS "stockValuation",
+      m.bin_location AS "binLocation",
+      mc.name AS "categoryName",
+      ps.id AS "sectionId",
+      ps.name AS "sectionName",
+      ps.section_code AS "sectionCode",
+      mac.id AS "machineId",
+      mac.name AS "machineName",
+      se.id AS "equipmentId",
+      se.equipment_name AS "equipmentName",
+      se.equipment_type AS "equipmentType",
+      COALESCE(moves.consumed_qty, 0)::numeric(12,3) AS "consumedQty",
+      COALESCE(moves.consumed_val, 0)::numeric(15,2) AS "consumedValue",
+      COALESCE(moves.inward_qty, 0)::numeric(12,3) AS "inwardQty",
+      COALESCE(moves.inward_val, 0)::numeric(15,2) AS "inwardValue",
+      moves.last_txn_date AS "lastTxnDate"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN plant_sections ps ON m.section_id = ps.id
+    LEFT JOIN machines mac ON m.machine_id = mac.id
+    LEFT JOIN section_equipment se ON m.section_equipment_id = se.id
+    LEFT JOIN LATERAL (
+      SELECT 
+        COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,
+        COALESCE(SUM(sl.value) FILTER (WHERE sl.out_qty > 0), 0) AS consumed_val,
+        COALESCE(SUM(sl.in_qty), 0) AS inward_qty,
+        COALESCE(SUM(sl.value) FILTER (WHERE sl.in_qty > 0), 0) AS inward_val,
+        MAX(sl.date) AS last_txn_date
+      FROM stock_ledger sl
+      WHERE sl.material_id = m.id AND sl.date BETWEEN '${f}' AND '${t}'
+    ) moves ON true
+    ${matWhere}
+    ORDER BY ps.name ASC NULLS LAST, mac.name ASC NULLS LAST, (m.current_stock * m.unit_price) DESC
+    LIMIT 2000
+  `, matParams);
+
+  // 3. Overview KPIs
+  const totalValuation = granularItems.reduce((acc, it) => acc + parseFloat(it.stockValuation || 0), 0);
+  const totalConsumptionValue = granularItems.reduce((acc, it) => acc + parseFloat(it.consumedValue || 0), 0);
+  const totalInwardValue = granularItems.reduce((acc, it) => acc + parseFloat(it.inwardValue || 0), 0);
+  const lowStockCount = granularItems.filter(it => parseFloat(it.currentStock || 0) <= parseFloat(it.minStock || 0)).length;
+
+  if (format === 'csv') {
+    const headers = [
+      'Plant Section', 'Machine', 'Equipment', 'Material Code', 'Material Name',
+      'Category', 'UOM', 'Bin Location', 'Unit Price', 'Current Stock',
+      'Stock Valuation', 'Period Consumed Qty', 'Period Consumed Val',
+      'Period Inward Qty', 'Period Inward Val', 'Last Txn Date'
+    ];
+    const csvRows = granularItems.map(r => [
+      r.sectionName || 'Unassigned',
+      r.machineName || '—',
+      r.equipmentName || '—',
+      r.materialCode,
+      r.materialName,
+      r.categoryName || '—',
+      r.uom,
+      r.binLocation || '—',
+      r.unitPrice,
+      r.currentStock,
+      r.stockValuation,
+      r.consumedQty,
+      r.consumedValue,
+      r.inwardQty,
+      r.inwardValue,
+      r.lastTxnDate ? r.lastTxnDate.toISOString().slice(0, 10) : '—'
+    ]);
+    return sendCSV(res, `plant_sections_granular_${f}_${t}.csv`, headers, csvRows);
+  }
+
+  res.json({
+    success: true,
+    data: {
+      kpis: {
+        totalSections: sectionRollups.length,
+        totalMaterials: granularItems.length,
+        totalValuation,
+        totalConsumptionValue,
+        totalInwardValue,
+        lowStockCount,
+        fromDate: f,
+        toDate: t
+      },
+      sections: sectionRollups,
+      granularItems
+    }
+  });
+}));
+
 module.exports = router;
+
