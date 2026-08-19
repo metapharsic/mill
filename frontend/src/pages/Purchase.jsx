@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import TableScrollWrapper from '../components/TableScrollWrapper'
+import ScrollableTabs from '../components/ScrollableTabs'
 const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
 const STATUS_COLOR = { Draft: '#8a8a90', Approved: '#22c55e', Sent: '#6366f1', Partial: '#f97316', Received: '#0ea5e9', Closed: '#64748b', Cancelled: '#ef4444' }
 const fmt = v => v ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'
@@ -1735,33 +1737,36 @@ export default function Purchase() {
       <AgentStatusBanner currentModule="procurement" />
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #e7e6df', overflowX: 'auto' }}>
-        {[
-          ['pr', '📋 Purchase Requisitions (PR / Indents)'],
-          ['orders', '🛒 Purchase Orders (PO)'],
-          ['cash', '💵 Cash Purchases (Spot Procurement)'],
-          ['grn', '📥 Goods Receipt Notes (GRN)'],
-          ['bills', '🧾 Purchase Invoices & Bills (Purchase Entry)'],
-          ['pipeline', '📊 P2P Full Lifecycle Pipeline']
-        ].map(([k, l]) => (
-          <button
-            key={k}
-            style={{
-              background: 'none', border: 'none', color: tab === k ? '#1b1b1d' : '#8a8a90',
-              padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: tab === k ? 700 : 500,
-              borderBottom: tab === k ? '2px solid #1b1b1d' : '2px solid transparent',
-              marginBottom: -1, whiteSpace: 'nowrap'
-            }}
-            onClick={() => setTab(k)}
-          >
-            {l}
-            {k === 'pr' && prList.filter(x => !x.linkedPoId).length > 0 && (
-              <span style={{ marginLeft: 6, background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 999 }}>
-                {prList.filter(x => !x.linkedPoId).length}
-              </span>
-            )}
-          </button>
-        ))}
+      <div style={{ marginBottom: 16 }}>
+        <ScrollableTabs
+          tabs={[
+            { id: 'pr', label: '📋 Purchase Requisitions (PR / Indents)', badge: prList.filter(x => !x.linkedPoId).length || undefined },
+            { id: 'orders', label: '🛒 Purchase Orders (PO)' },
+            { id: 'cash', label: '💵 Cash Purchases (Spot Procurement)' },
+            { id: 'grn', label: '📥 Goods Receipt Notes (GRN)' },
+            { id: 'bills', label: '🧾 Purchase Invoices & Bills (Purchase Entry)' },
+            { id: 'pipeline', label: '📊 P2P Full Lifecycle Pipeline' }
+          ]}
+          activeTab={tab}
+          onSelectTab={setTab}
+          style={{ borderBottom: '2px solid #1b1b1d' }}
+          tabStyle={{
+            padding: '8px 16px',
+            border: 'none',
+            background: 'transparent',
+            color: '#8a8a90',
+            fontWeight: 600,
+            borderRadius: '4px 4px 0 0',
+            marginBottom: -2,
+            borderBottom: '2px solid transparent'
+          }}
+          activeTabStyle={{
+            color: '#1b1b1d',
+            background: '#ffffff',
+            borderBottom: '2px solid #1b1b1d',
+            fontWeight: 700
+          }}
+        />
       </div>
 
       {/* ── TAB 0: PURCHASE REQUISITIONS (PR / INDENTS) ── */}
@@ -1784,7 +1789,7 @@ export default function Purchase() {
             <button style={{ ...S.btnPrimary, marginLeft: 'auto', background: '#0f766e' }} onClick={() => openNew()}>+ Create Direct PO</button>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Purchase Requisitions (PR / Indents)">
             {prLoading ? <div style={S.loading}>Loading Purchase Requisitions...</div> : (
               <table style={S.table}>
                 <thead>
@@ -1901,7 +1906,7 @@ export default function Purchase() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -1916,7 +1921,7 @@ export default function Purchase() {
             <button style={S.btnSecondary} onClick={load}>↻ Refresh</button>
             <button style={{ ...S.btnSecondary, marginLeft: 'auto' }} onClick={exportOrdersToCSV}>📊 Export to CSV</button>
           </div>
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Purchase Orders (PO)">
             {loading?<div style={S.loading}>Loading...</div>:(
               <table style={S.table}><thead><tr style={S.thead}>
                 {['PO No','Date','Vendor','PR Reference','Delivery','Total','Status','Actions'].map(h=><th key={h} style={S.th}>{h}</th>)}
@@ -1963,7 +1968,7 @@ export default function Purchase() {
                 ))}
               </tbody></table>
             )}
-          </div>
+          </TableScrollWrapper>
           <div style={S.pagination}>
             <span style={S.count}>Showing {rows.length} of {total}</span>
             <div style={{display:'flex',gap:6}}>
@@ -1991,7 +1996,7 @@ export default function Purchase() {
             </button>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Cash Purchases (Spot Procurement)">
             {cashLoading ? <div style={S.loading}>Loading Cash Purchases...</div> : (
               <table style={S.table}>
                 <thead>
@@ -2056,7 +2061,7 @@ export default function Purchase() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -2072,7 +2077,7 @@ export default function Purchase() {
             />
             <button style={S.btnSecondary} onClick={loadGRNs}>↻ Refresh GRNs</button>
           </div>
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Goods Receipt Notes (GRN)">
             {grnLoading ? <div style={S.loading}>Loading GRN shipments...</div> : (
               <table style={S.table}>
                 <thead>
@@ -2137,7 +2142,7 @@ export default function Purchase() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -2153,7 +2158,7 @@ export default function Purchase() {
             />
             <button style={S.btnSecondary} onClick={loadBills}>↻ Refresh Bills</button>
           </div>
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Purchase Invoices & Bills">
             {billLoading ? <div style={S.loading}>Loading Purchase Invoices...</div> : (
               <table style={S.table}>
                 <thead>
@@ -2212,7 +2217,7 @@ export default function Purchase() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 

@@ -6,6 +6,8 @@ import { FormField } from '../components/ui/FormField'
 import ProductDetailModal from '../components/ProductDetailModal'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import SortableTh from '../components/SortableTh'
+import TableScrollWrapper from '../components/TableScrollWrapper'
+import ScrollableTabs from '../components/ScrollableTabs'
 import { sortTableData } from '../utils/tableSort'
 import { ExternalLink } from 'lucide-react'
 import { GST_SLABS } from './Purchase'
@@ -1064,14 +1066,29 @@ export default function Store({ onNavigate }) {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 2, borderBottom: '2px solid #1b1b1d', marginBottom: 20 }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '8px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-            background: 'transparent', borderBottom: tab === t.id ? '2px solid #1b1b1d' : '2px solid transparent',
-            color: tab === t.id ? '#1b1b1d' : '#8a8a90', marginBottom: -2,
-          }}>{t.label}</button>
-        ))}
+      <div style={{ marginBottom: 20 }}>
+        <ScrollableTabs
+          tabs={tabs}
+          activeTab={tab}
+          onSelectTab={setTab}
+          style={{ borderBottom: '2px solid #1b1b1d' }}
+          tabStyle={{
+            padding: '8px 18px',
+            border: 'none',
+            background: 'transparent',
+            color: '#8a8a90',
+            fontWeight: 600,
+            borderRadius: '4px 4px 0 0',
+            marginBottom: -2,
+            borderBottom: '2px solid transparent'
+          }}
+          activeTabStyle={{
+            color: '#1b1b1d',
+            background: '#ffffff',
+            borderBottom: '2px solid #1b1b1d',
+            fontWeight: 700
+          }}
+        />
       </div>
 
       {/* ── 1. INWARD DESK TAB ── */}
@@ -1132,7 +1149,7 @@ export default function Store({ onNavigate }) {
           </div>
 
           {/* Inward Register Table */}
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Inward (GRN) Register">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
@@ -1221,7 +1238,7 @@ export default function Store({ onNavigate }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
             <span style={{ fontSize: 11, color: '#8a8a90' }}>
               Showing {inwardList.length ? ((inwardPage - 1) * INWARD_LIMIT + 1) : 0}–{(inwardPage - 1) * INWARD_LIMIT + inwardList.length} of {inwardTotal}
@@ -1291,7 +1308,7 @@ export default function Store({ onNavigate }) {
           </div>
 
           {/* Outward Register Table */}
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Outward (SIV) Register">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
@@ -1362,7 +1379,7 @@ export default function Store({ onNavigate }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
             <span style={{ fontSize: 11, color: '#8a8a90' }}>
               Showing {outwardList.length ? ((outwardPage - 1) * OUTWARD_LIMIT + 1) : 0}–{(outwardPage - 1) * OUTWARD_LIMIT + outwardList.length} of {outwardTotal}
@@ -1408,7 +1425,7 @@ export default function Store({ onNavigate }) {
             </table>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Store Indent Requests">
             <div style={{ padding: 16, borderBottom: '1px solid #e7e6df', display: 'flex', gap: 10, justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                 <input style={{...S.input, maxWidth: 300, background: '#fff'}} placeholder='Search requests/issues...' value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
@@ -1498,13 +1515,13 @@ export default function Store({ onNavigate }) {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
       {/* ── 4. APPROVALS TAB ── */}
       {tab === 'approvals' && (
-        <div style={S.tableWrap}>
+        <TableScrollWrapper title="Store Approvals">
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
@@ -1579,12 +1596,12 @@ export default function Store({ onNavigate }) {
               )}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
       )}
 
       {/* ── 5. ASSETS TAB (DIGITAL TWIN) ── */}
       {tab === 'assets' && (
-        <div style={S.tableWrap}>
+        <TableScrollWrapper title="Installed Assets">
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
@@ -1637,7 +1654,7 @@ export default function Store({ onNavigate }) {
               {!assets.length && <tr><td colSpan={9} style={S.empty}>No installed assets recorded.</td></tr>}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
       )}
 
       {/* ── 6. ROOT CAUSE INVESTIGATOR ── */}
@@ -1728,7 +1745,7 @@ export default function Store({ onNavigate }) {
           </div>
 
           {/* Rejections Table */}
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Rejections & Return to Vendor">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
@@ -1795,7 +1812,7 @@ export default function Store({ onNavigate }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -1812,7 +1829,7 @@ export default function Store({ onNavigate }) {
             </button>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Inter-Store Transfer Orders">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
@@ -1865,7 +1882,7 @@ export default function Store({ onNavigate }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -1882,7 +1899,7 @@ export default function Store({ onNavigate }) {
             </button>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Store Return Vouchers">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
@@ -1941,7 +1958,7 @@ export default function Store({ onNavigate }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 

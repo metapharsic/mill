@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import SortableTh from '../components/SortableTh'
+import TableScrollWrapper from '../components/TableScrollWrapper'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -934,170 +935,184 @@ export default function Materials() {
 
         {/* ── Table Rows ── */}
         {loading ? <div style={S.loading}>Loading materials catalog...</div> : (
-          <table style={S.table}>
-            <thead>
-              <tr style={S.thead}>
-                <th style={{ ...S.th, width: 30 }}></th>
-                <SortableTh label="Code" columnKey="code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={100} />
-                <SortableTh label="Material Name" columnKey="name" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                <SortableTh label="Section / Equipment" columnKey="section" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                <SortableTh label="Category" columnKey="category" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                <SortableTh label="Crit" columnKey="criticality" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={65} align="center" />
-                <SortableTh label="HSN Code" columnKey="hsn_code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} />
-                <SortableTh label="Rack / Box No" columnKey="bin_location" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={110} />
-                <SortableTh label="Opening Stock" columnKey="opening" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Received (+)" columnKey="received" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Issued (-)" columnKey="issued" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Closing Balance" columnKey="current_stock" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Stock Value" columnKey="valuation" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                <SortableTh label="Status" columnKey="is_active" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={75} align="center" />
-                <th style={{ ...S.th, width: 80, textAlign: 'center' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && <tr><td colSpan={16} style={S.empty}>No materials match your filters</td></tr>}
-              {filtered.map(m => {
-                const cc = m.criticalityClass || m.criticality_class
-                const ccStyle = cc && CRIT_COLORS[cc] ? { ...S.badge, background: CRIT_COLORS[cc].bg, color: CRIT_COLORS[cc].color, border: `1px solid ${CRIT_COLORS[cc].border}` } : S.badge
-                const isExp = expandedRow === m.id
-                const rec = Number(m.received || 0)
-                const iss = Number(m.issued || 0)
-                const cur = Number(m.current_stock || 0)
-                const opBal = cur - rec + iss
-                const reorder = Number(m.reorder_level || 0)
-                const secName = m.sectionName || m.section_name
-                const eqName = m.equipmentName || m.equipment_name || m.machineName || m.machine_name
+          <TableScrollWrapper title="Materials Catalog" style={{ marginBottom: 0 }}>
+            <table style={S.table}>
+              <thead>
+                <tr style={S.thead}>
+                  <th style={{ ...S.th, width: 30 }}></th>
+                  <SortableTh label="Code" columnKey="code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={100} />
+                  <SortableTh label="Material Name" columnKey="name" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                  <SortableTh label="Section / Equipment" columnKey="section" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                  <SortableTh label="Category" columnKey="category" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                  <SortableTh label="Crit" columnKey="criticality" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={65} align="center" />
+                  <SortableTh label="HSN Code" columnKey="hsn_code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} />
+                  <SortableTh label="Rack / Box No" columnKey="bin_location" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={110} />
+                  <SortableTh label="Opening Stock" columnKey="opening" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Received (+)" columnKey="received" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Issued (-)" columnKey="issued" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Closing Balance" columnKey="current_stock" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Stock Value" columnKey="valuation" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Status" columnKey="is_active" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={75} align="center" />
+                  <th style={{ ...S.th, width: 80, textAlign: 'center' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 && <tr><td colSpan={16} style={S.empty}>No materials match your filters</td></tr>}
+                {filtered.map(m => {
+                  const cc = m.criticalityClass || m.criticality_class
+                  const ccStyle = cc && CRIT_COLORS[cc] ? { ...S.badge, background: CRIT_COLORS[cc].bg, color: CRIT_COLORS[cc].color, border: `1px solid ${CRIT_COLORS[cc].border}` } : S.badge
+                  const isExp = expandedRow === m.id
+                  const rec = Number(m.received || 0)
+                  const iss = Number(m.issued || 0)
+                  const cur = Number(m.current_stock || 0)
+                  const opBal = cur - rec + iss
+                  const reorder = Number(m.reorder_level || 0)
+                  const secName = m.sectionName || m.section_name
+                  const eqName = m.equipmentName || m.equipment_name || m.machineName || m.machine_name
 
-                return (
-                  <React.Fragment key={m.id}>
-                    <tr style={{ ...S.tr, background: cur === 0 ? '#ef444408' : 'transparent' }}>
-                      <td style={S.td}>
-                        <button style={S.expandBtn} onClick={() => setExpandedRow(isExp ? null : m.id)} title="Expand Full Specifications">
-                          {isExp ? '▾' : '▸'}
-                        </button>
-                      </td>
-                      <td style={S.td}>
-                        <span
-                          onClick={() => openEdit(m)}
-                          style={{ ...S.code, cursor: 'pointer', color: '#0f766e', textDecoration: 'underline' }}
-                          title="Click to Edit Material & Stock Details"
-                        >
-                          {m.code}
-                        </span>
-                      </td>
-                      <td style={{ ...S.td, maxWidth: 220 }}>
-                        <div
-                          onClick={() => openEdit(m)}
-                          style={{ ...S.name, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 210, cursor: 'pointer', color: '#0f172a', fontWeight: 600 }}
-                          title={`Click to Edit ${m.name}`}
-                        >
-                          {m.name}
-                        </div>
-                      </td>
-                      <td style={S.td}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          {secName && (
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
-                              🏭 {secName}
-                            </span>
-                          )}
-                          {eqName && (
-                            <span style={{ fontSize: 11, color: '#475569', background: '#f8fafc', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
-                              ⚙️ {eqName}
-                            </span>
-                          )}
-                          {!secName && !eqName && (
-                            <span style={S.muted}>—</span>
-                          )}
-                        </div>
-                      </td>
-                      <td style={S.td}>
-                        <span style={S.muted}>
-                          {categoryLabel(m.categoryId || m.category_id) || m.categoryName || '—'}
-                        </span>
-                      </td>
-                      <td style={S.td}>
-                        {cc ? <span style={ccStyle}>{cc}</span> : <span style={S.muted}>—</span>}
-                      </td>
-                      <td style={S.td}><span style={S.mono}>{m.hsn_code || '—'}</span></td>
-                      <td style={S.td}><span style={{ ...S.muted, fontSize: 12 }}>{m.binLocation || m.bin_location || '—'}</span></td>
+                  return (
+                    <React.Fragment key={m.id}>
+                      <tr style={{ ...S.tr, background: cur === 0 ? '#ef444408' : 'transparent' }}>
+                        <td style={S.td}>
+                          <button style={S.expandBtn} onClick={() => setExpandedRow(isExp ? null : m.id)} title="Expand Full Specifications">
+                            {isExp ? '▾' : '▸'}
+                          </button>
+                        </td>
+                        <td style={S.td}>
+                          <span
+                            onClick={() => openEdit(m)}
+                            style={{ ...S.code, cursor: 'pointer', color: '#0f766e', textDecoration: 'underline' }}
+                            title="Click to Edit Material & Stock Details"
+                          >
+                            {m.code}
+                          </span>
+                        </td>
+                        <td style={{ ...S.td, maxWidth: 220 }}>
+                          <div
+                            onClick={() => openEdit(m)}
+                            style={{ ...S.name, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 210, cursor: 'pointer', color: '#0f172a', fontWeight: 600 }}
+                            title={`Click to Edit ${m.name}`}
+                          >
+                            {m.name}
+                          </div>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {secName && (
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
+                                🏭 {secName}
+                              </span>
+                            )}
+                            {eqName && (
+                              <span style={{ fontSize: 11, color: '#475569', background: '#f8fafc', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
+                                ⚙️ {eqName}
+                              </span>
+                            )}
+                            {!secName && !eqName && (
+                              <span style={S.muted}>—</span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={S.td}>
+                          <span style={S.muted}>
+                            {categoryLabel(m.categoryId || m.category_id) || m.categoryName || '—'}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          {cc ? <span style={ccStyle}>{cc}</span> : <span style={S.muted}>—</span>}
+                        </td>
+                        <td style={S.td}><span style={S.mono}>{m.hsn_code || '—'}</span></td>
+                        <td style={S.td}><span style={{ ...S.muted, fontSize: 12 }}>{m.binLocation || m.bin_location || '—'}</span></td>
 
-                      {/* Opening Stock */}
-                      <td style={S.td}>
-                        <span style={{ background: '#f1f5f9', color: '#334155', padding: '3px 8px', borderRadius: 4, fontWeight: 600, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
-                          {opBal.toFixed(3)}
-                        </span>
-                      </td>
+                        {/* Opening Stock */}
+                        <td style={S.td}>
+                          <span style={{ background: '#f1f5f9', color: '#334155', padding: '3px 8px', borderRadius: 4, fontWeight: 600, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
+                            {opBal.toFixed(3)}
+                          </span>
+                        </td>
 
-                      {/* Received (+) */}
-                      <td style={S.td}>
-                        <span style={{ background: '#ecfdf5', color: '#059669', padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
-                          +{rec.toFixed(3)}
-                        </span>
-                      </td>
+                        {/* Received (+) */}
+                        <td style={S.td}>
+                          <span style={{ background: '#ecfdf5', color: '#059669', padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
+                            +{rec.toFixed(3)}
+                          </span>
+                        </td>
 
-                      {/* Issued (-) */}
-                      <td style={S.td}>
-                        <span style={{ background: '#fff1f2', color: '#e11d48', padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
-                          -{iss.toFixed(3)}
-                        </span>
-                      </td>
+                        {/* Issued (-) */}
+                        <td style={S.td}>
+                          <span style={{ background: '#fff1f2', color: '#e11d48', padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12 }}>
+                            -{iss.toFixed(3)}
+                          </span>
+                        </td>
 
-                      {/* Closing Balance */}
-                      <td style={S.td}>
-                        <span style={{
-                          background: cur === 0 ? '#fee2e2' : cur <= reorder ? '#fef3c7' : '#f0fdf4',
-                          color: cur === 0 ? '#dc2626' : cur <= reorder ? '#b45309' : '#15803d',
-                          padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12
-                        }}>
-                          {cur.toFixed(3)}
-                        </span>
-                      </td>
+                        {/* Closing Balance */}
+                        <td style={S.td}>
+                          <span style={{
+                            background: cur === 0 ? '#fee2e2' : cur <= reorder ? '#fef3c7' : '#f0fdf4',
+                            color: cur === 0 ? '#dc2626' : cur <= reorder ? '#b45309' : '#15803d',
+                            padding: '3px 8px', borderRadius: 4, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: 12
+                          }}>
+                            {cur.toFixed(3)}
+                          </span>
+                        </td>
 
-                      <td style={S.td}><span style={S.num}>{fmt(m.unit_price)}</span></td>
-                      <td style={S.td}><span style={{ ...S.num, color: '#0f766e', fontWeight: 600 }}>{fmt(cur * Number(m.unit_price || 0))}</span></td>
-                      <td style={S.td}>
-                        <span style={{
-                          ...S.badge,
-                          background: m.is_active ? '#22c55e22' : '#ef444422',
-                          color: m.is_active ? '#15803d' : '#dc2626',
-                          border: `1px solid ${m.is_active ? '#22c55e44' : '#ef444444'}`
-                        }}>
-                          {m.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td style={S.td}>
-                        <button style={S.btnIcon} onClick={() => openEdit(m)} title="Edit Material">✏️</button>
-                        {m.is_active
-                          ? <button style={{ ...S.btnIcon, color: '#ef4444' }} onClick={() => del(m)} title="Deactivate">🗑️</button>
-                          : <button style={{ ...S.btnIcon, color: '#22c55e' }} onClick={() => restore(m)} title="Restore">♻️</button>
-                        }
-                      </td>
-                    </tr>
-                    {isExp && (
-                      <tr style={{ background: '#f6f5f0' }}>
-                        <td colSpan={16} style={{ padding: '12px 24px' }}>
-                          <div style={S.expandGrid}>
-                            <div><span style={S.expandLabel}>Full Specification</span><div style={S.expandVal}>{m.name}</div></div>
-                            <div><span style={S.expandLabel}>Plant Section &amp; Roll/Machine</span><div style={S.expandVal}>{secName || '—'} {eqName ? `› ${eqName}` : ''} {m.equipmentTagName ? `(${m.equipmentTagName})` : ''}</div></div>
-                            <div><span style={S.expandLabel}>Technical Remarks / Specs</span><div style={S.expandVal}>{m.equipmentRemarks || m.sectionContext || m.section_context || '—'}</div></div>
-                            <div><span style={S.expandLabel}>OEM Supplier</span><div style={S.expandVal}>{m.oemSupplier || m.oem_supplier || '—'}</div></div>
-                            <div><span style={S.expandLabel}>Min / Max Stock</span><div style={S.expandVal}>{m.min_stock || 0} / {m.max_stock || 0} {m.uom}</div></div>
-                            <div><span style={S.expandLabel}>Reorder Lvl / Buffer</span><div style={S.expandVal}>{m.reorder_level || 0} / {m.reorder_buffer || 0} {m.uom}</div></div>
-                            <div><span style={S.expandLabel}>Procurement Strategy</span><div style={S.expandVal}>{m.procurementStrategy || m.procurement_strategy || '—'}</div></div>
-                            <div><span style={S.expandLabel}>Last Audit Cycle</span><div style={S.expandVal}>{m.lastAuditCycle || m.last_audit_cycle || '—'}</div></div>
-                            <div><span style={S.expandLabel}>Calibration Protocol</span><div style={S.expandVal}>{m.calibrationProtocol || m.calibration_protocol || '—'}</div></div>
-                            <div><span style={S.expandLabel}>Stock Value</span><div style={S.expandVal}>{fmt((m.current_stock || 0) * (m.unit_price || 0))}</div></div>
+                        {/* Unit Price */}
+                        <td style={S.td}>
+                          <span style={{ ...S.mono, fontSize: 12, color: '#334155', fontWeight: 600 }}>
+                            {fmt(m.unit_price)}
+                          </span>
+                        </td>
+
+                        {/* Total Stock Value */}
+                        <td style={S.td}>
+                          <span style={{ ...S.mono, fontSize: 12, fontWeight: 700, color: '#0f172a' }}>
+                            {fmt(cur * Number(m.unit_price || 0))}
+                          </span>
+                        </td>
+
+                        {/* Status */}
+                        <td style={S.td}>
+                          <span style={{ ...S.badge, background: m.is_active ? '#22c55e22' : '#ef444422', color: m.is_active ? '#22c55e' : '#ef4444' }}>
+                            {m.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+
+                        {/* Actions */}
+                        <td style={S.td}>
+                          <div style={S.actions}>
+                            <button style={S.btnIcon} title="Edit Master Record" onClick={() => openEdit(m)}>✏️</button>
+                            <button style={S.btnIcon} title={m.is_active ? 'Deactivate Material' : 'Activate Material'} onClick={() => toggleActive(m)}>
+                              {m.is_active ? '⏸' : '▶'}
+                            </button>
                           </div>
                         </td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                )
-              })}
-            </tbody>
-          </table>
+
+                      {/* ── Expanded Specifications Panel ── */}
+                      {isExp && (
+                        <tr style={S.expandRow}>
+                          <td colSpan={16} style={S.expandTd}>
+                            <div style={S.expandGrid}>
+                              <div><span style={S.expandLabel}>Procurement Strategy</span><div style={S.expandVal}>{m.procurementStrategy || m.procurement_strategy || '—'}</div></div>
+                              <div><span style={S.expandLabel}>OEM Supplier</span><div style={S.expandVal}>{m.oemSupplier || m.oem_supplier || '—'}</div></div>
+                              <div><span style={S.expandLabel}>Reorder Buffer</span><div style={S.expandVal}>{m.reorderBuffer || m.reorder_buffer || 0} {m.uom}</div></div>
+                              <div><span style={S.expandLabel}>Min Stock Limit</span><div style={S.expandVal}>{m.minStock || m.min_stock || 0} {m.uom}</div></div>
+                              <div><span style={S.expandLabel}>Max Stock Limit</span><div style={S.expandVal}>{m.maxStock || m.max_stock || 0} {m.uom}</div></div>
+                              <div><span style={S.expandLabel}>Expected Lifespan</span><div style={S.expandVal}>{m.expectedLifespanDays || m.expected_lifespan_days || 365} days</div></div>
+                              <div><span style={S.expandLabel}>Last Audit Cycle</span><div style={S.expandVal}>{m.lastAuditCycle || m.last_audit_cycle || '—'}</div></div>
+                              <div><span style={S.expandLabel}>Calibration Protocol</span><div style={S.expandVal}>{m.calibrationProtocol || m.calibration_protocol || '—'}</div></div>
+                              <div><span style={S.expandLabel}>Stock Value</span><div style={S.expandVal}>{fmt((m.current_stock || 0) * (m.unit_price || 0))}</div></div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </tbody>
+            </table>
+          </TableScrollWrapper>
         )}
       </div>
 

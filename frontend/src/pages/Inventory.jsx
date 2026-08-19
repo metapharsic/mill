@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailModal from '../components/ProductDetailModal'
 import SortableTh from '../components/SortableTh'
+import TableScrollWrapper from '../components/TableScrollWrapper'
+import ScrollableTabs from '../components/ScrollableTabs'
 import { sortTableData } from '../utils/tableSort'
 import {
   Boxes, Search, Filter, AlertTriangle, ArrowDownRight, ArrowUpRight,
@@ -410,21 +412,25 @@ export default function Inventory() {
       </div>
 
       {/* Store Scoping Tabs (Mechanical, Electrical, Consumable, All Store) */}
-      <div style={S.tabBar}>
-        {availableTabs.map(t => {
-          const Icon = t.icon
-          const isActive = activeStoreTab === t.id
-          return (
-            <button
-              key={t.id}
-              style={{ ...S.tabBtn, ...(isActive ? S.tabBtnActive : {}) }}
-              onClick={() => setActiveStoreTab(t.id)}
-            >
-              <Icon size={16} />
-              <span>{t.label}</span>
-            </button>
-          )
-        })}
+      <div style={{ marginBottom: 14 }}>
+        <ScrollableTabs
+          tabs={availableTabs}
+          activeTab={activeStoreTab}
+          onSelectTab={setActiveStoreTab}
+          renderTab={(t, isActive) => {
+            const Icon = t.icon
+            return (
+              <button
+                key={t.id}
+                style={{ ...S.tabBtn, ...(isActive ? S.tabBtnActive : {}) }}
+                onClick={() => setActiveStoreTab(t.id)}
+              >
+                <Icon size={16} />
+                <span>{t.label}</span>
+              </button>
+            )
+          }}
+        />
       </div>
 
       {message && (
@@ -449,19 +455,21 @@ export default function Inventory() {
             <span style={S.statLabel}>Low Stock / Reorder</span>
             <AlertTriangle size={18} color={summary?.lowStock > 0 ? '#ef4444' : '#16a34a'} />
           </div>
-          <div style={{ ...S.statValue, color: (summary?.lowStock ?? 0) > 0 ? '#dc2626' : '#16a34a' }}>
-            {summary?.lowStock ?? 0}
+          <div style={{ ...S.statValue, color: (summary?.lowStock ?? 0) > 0 ? '#ef4444' : '#16a34a' }}>
+            {summary?.lowStock?.toLocaleString('en-IN') ?? '0'}
           </div>
-          <div style={S.statSub}>Below reorder buffer point</div>
+          <div style={S.statSub}>Items below safety reorder level</div>
         </div>
 
         <div style={S.statCard}>
           <div style={S.statHeader}>
-            <span style={S.statLabel}>Store Stock Valuation</span>
-            <TrendingUp size={18} color="#2563eb" />
+            <span style={S.statLabel}>Total Store Valuation</span>
+            <TrendingUp size={18} color="#0f766e" />
           </div>
-          <div style={S.statValue}>₹{Number(summary?.stockValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-          <div style={S.statSub}>Live cumulative store balance</div>
+          <div style={{ ...S.statValue, color: '#0f766e' }}>
+            ₹{summary?.totalValuation ? Number(summary.totalValuation).toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '0'}
+          </div>
+          <div style={S.statSub}>Computed live from active stock</div>
         </div>
 
         <div style={S.statCard}>
@@ -566,7 +574,7 @@ export default function Inventory() {
             </div>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Store Items Catalog">
             <table style={S.table}>
               <thead>
                 <tr>
@@ -667,7 +675,7 @@ export default function Inventory() {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 
@@ -721,7 +729,7 @@ export default function Inventory() {
             </div>
           </div>
 
-          <div style={S.tableWrap}>
+          <TableScrollWrapper title="Live Stock Ledger">
             <table style={S.table}>
               <thead>
                 <tr>
@@ -773,28 +781,28 @@ export default function Inventory() {
                           <span style={{
                             ...S.statusBadge,
                             background: isIn ? '#dcfce7' : isOut ? '#fee2e2' : '#f3f4f6',
-                            color: isIn ? '#15803d' : isOut ? '#b91c1c' : '#374151'
+                            color: isIn ? '#15803d' : isOut ? '#dc2626' : '#4b5563'
                           }}>
-                            {entry.transactionType || entry.referenceType || 'Entry'}
+                            {entry.type || entry.transaction_type || (isIn ? 'GRN' : isOut ? 'Issue' : 'Txn')}
                           </span>
                         </td>
-                        <td style={{ ...S.td, textAlign: 'right', fontWeight: isIn ? 700 : 400, color: isIn ? '#166534' : '#9ca3af' }}>
-                          {isIn ? `+${Number(entry.inQty).toLocaleString('en-IN')}` : '—'}
+                        <td style={{ ...S.td, textAlign: 'right', fontWeight: 600, color: '#15803d' }}>
+                          {isIn ? `+${parseFloat(entry.inQty).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}` : '—'}
                         </td>
-                        <td style={{ ...S.td, textAlign: 'right', fontWeight: isOut ? 700 : 400, color: isOut ? '#dc2626' : '#9ca3af' }}>
-                          {isOut ? `-${Number(entry.outQty).toLocaleString('en-IN')}` : '—'}
+                        <td style={{ ...S.td, textAlign: 'right', fontWeight: 600, color: '#dc2626' }}>
+                          {isOut ? `-${parseFloat(entry.outQty).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}` : '—'}
                         </td>
                         <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#1b1b1d' }}>
-                          {Number(entry.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          {entry.balance !== undefined ? parseFloat(entry.balance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 3 }) : '—'}
                         </td>
-                        <td style={{ ...S.td, textAlign: 'right', color: '#4b5563' }}>
-                          ₹{Number(entry.value || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                        <td style={{ ...S.td, textAlign: 'right', color: '#374151', fontWeight: 600 }}>
+                          {entry.value ? `₹${parseFloat(entry.value).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'}
                         </td>
-                        <td style={{ ...S.td, fontSize: 11, color: '#6b7280' }}>
-                          {entry.batchNumber || entry.remarks || '—'}
+                        <td style={{ ...S.td, fontSize: 12, color: '#6b7280' }}>
+                          {entry.batchNumber || entry.batch_number || entry.reference_id || '—'}
                         </td>
-                        <td style={{ ...S.td, fontSize: 11, color: '#4b5563' }}>
-                          {entry.createdByName || 'System'}
+                        <td style={{ ...S.td, fontSize: 12, color: '#6b7280' }}>
+                          {entry.createdByName || entry.user_name || 'System'}
                         </td>
                       </tr>
                     )
@@ -802,7 +810,7 @@ export default function Inventory() {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScrollWrapper>
         </div>
       )}
 

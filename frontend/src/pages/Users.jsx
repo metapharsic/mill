@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import SortableTh from '../components/SortableTh'
+import TableScrollWrapper from '../components/TableScrollWrapper'
 import { sortTableData } from '../utils/tableSort'
 
 const API = (path, opts) => fetch(path, {
@@ -185,8 +186,8 @@ export default function Users() {
       </div>
 
       {/* Table */}
-      <div style={S.tableWrap}>
-        {loading ? <div style={S.loading}>Loading system users...</div> : (
+      {loading ? <div style={S.loading}>Loading system users...</div> : (
+        <TableScrollWrapper title="System Users Directory">
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
@@ -255,8 +256,8 @@ export default function Users() {
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </TableScrollWrapper>
+      )}
       <div style={S.count}>{filtered.length} user{filtered.length !== 1 ? 's' : ''} active in mill directory</div>
 
       {/* Add/Edit Modal */}
