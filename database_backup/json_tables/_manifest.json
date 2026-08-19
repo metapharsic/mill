@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-08-19T14:23:22.998Z",
+  "exportedAt": "2026-08-19T14:37:26.440Z",
   "database": "mk_paper_mill",
   "totalTables": 108,
   "tables": {
@@ -412,7 +412,7 @@
       "file": "training_programs.json"
     },
     "users": {
-      "rowCount": 23,
+      "rowCount": 24,
       "file": "users.json"
     },
     "utility_readings": {

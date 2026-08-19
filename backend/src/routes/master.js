@@ -28,6 +28,26 @@ router.use((req, res, next) => {
   next();
 });
 
+// ── UNITS OF MEASUREMENT (UOM) ───────────────────────────────────────────────
+const { UOM_CATEGORIES, ALL_UOM_CODES } = require('../constants/uom');
+router.get('/uoms', auth, ar(async (req, res) => {
+  // Query any custom UOMs stored in the database materials table
+  const { rows: distinctUoms } = await pool.query(`
+    SELECT DISTINCT uom FROM materials WHERE uom IS NOT NULL AND uom != '' ORDER BY uom ASC
+  `);
+  const dbUomCodes = distinctUoms.map(r => r.uom.trim().toUpperCase());
+  const allCodes = Array.from(new Set([...ALL_UOM_CODES, ...dbUomCodes]));
+
+  res.json({
+    success: true,
+    data: {
+      categories: UOM_CATEGORIES,
+      allCodes,
+      count: allCodes.length
+    }
+  });
+}));
+
 // ── MACHINES ─────────────────────────────────────────────────────────────────
 // Schema: id, name, code, type, capacity_tpd, is_active
 router.get('/machines', auth, ar(async (req, res) => {

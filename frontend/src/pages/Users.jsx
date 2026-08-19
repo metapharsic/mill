@@ -7,12 +7,13 @@ const API = (path, opts) => fetch(path, {
 
 const SHIFTS = ['Day', 'Night', 'General']
 
-const emptyForm = { name: '', email: '', password: '', mobile: '', role_id: '', department_id: '', shift: 'General', employee_code: '', is_active: true }
+const emptyForm = { name: '', email: '', password: '', mobile: '', role_id: '', department_id: '', section_id: '', shift: 'General', employee_code: '', is_active: true }
 
 export default function Users() {
   const [users, setUsers] = useState([])
   const [roles, setRoles] = useState([])
   const [depts, setDepts] = useState([])
+  const [sections, setSections] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState('')
@@ -31,14 +32,16 @@ export default function Users() {
     setLoading(true)
     const params = new URLSearchParams()
     if (filterActive) params.set('is_active', filterActive)
-    const [u, r, d] = await Promise.all([
+    const [u, r, d, s] = await Promise.all([
       API(`/api/users?${params}`),
       API('/api/users/roles'),
       API('/api/users/departments'),
+      API('/api/users/sections'),
     ])
     if (u.success) setUsers(u.data)
     if (r.success) setRoles(r.data)
     if (d.success) setDepts(d.data)
+    if (s?.success) setSections(s.data)
     setLoading(false)
   }, [filterActive])
 
@@ -54,7 +57,18 @@ export default function Users() {
 
   const openAdd = () => { setForm(emptyForm); setFormError(''); setEditUser(null); setModal('add') }
   const openEdit = u => {
-    setForm({ name: u.name, email: u.email, password: '', mobile: u.mobile || '', role_id: u.role_id || '', department_id: u.department_id || '', shift: u.shift || 'General', employee_code: u.employee_code || '', is_active: u.is_active })
+    setForm({
+      name: u.name,
+      email: u.email,
+      password: '',
+      mobile: u.mobile || '',
+      role_id: u.role_id || '',
+      department_id: u.department_id || '',
+      section_id: u.section_id || '',
+      shift: u.shift || 'General',
+      employee_code: u.employee_code || '',
+      is_active: u.is_active
+    })
     setFormError(''); setEditUser(u); setModal('edit')
   }
 
@@ -88,17 +102,47 @@ export default function Users() {
     load()
   }
 
-  const roleColor = level => ({ 5: '#ef4444', 4: '#f97316', 3: '#eab308', 2: '#1b1b1d', 1: '#8a8a90' }[level] || '#8a8a90')
+  const deleteUser = async u => {
+    if (!window.confirm(`Are you sure you want to deactivate and remove access for ${u.name} (${u.email})?`)) return
+    await API(`/api/users/${u.id}`, { method: 'DELETE' })
+    load()
+  }
+
+  const roleColor = level => ({ 5: '#ef4444', 4: '#f97316', 3: '#eab308', 2: '#0284c7', 1: '#64748b' }[level] || '#8a8a90')
 
   return (
     <div style={S.page}>
       {/* Header */}
       <div style={S.header}>
         <div>
-          <div style={S.title}>Users</div>
-          <div style={S.sub}>Manage system users and access levels</div>
+          <div style={S.title}>👥 Users &amp; Plant Role Allocation Master</div>
+          <div style={S.sub}>Manage system users, assigned plant sections, and Store Manager approval hierarchies</div>
         </div>
-        <button style={S.btnPrimary} onClick={openAdd}>+ Add User</button>
+        <button style={S.btnPrimary} onClick={openAdd}>+ Add User / Operator</button>
+      </div>
+
+      {/* Role Hierarchy & Approval Clause Guidance Banner */}
+      <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 10, padding: '14px 18px', marginBottom: 16, borderLeft: '5px solid #0284c7' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>🛡️</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
+                Store Hierarchy &amp; Operator Approval Clause Matrix
+              </div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                <strong>Store Assistant / Operator (L1/L2):</strong> Authorized for Daily Inward Intake, Outward Issues, Stock Counts &amp; Indent Drafting.
+                <span style={{ color: '#ea580c', fontWeight: 600, marginLeft: 6 }}>
+                  ⚠️ Clause: High-value PO GRN confirmations, L1 Indent Approvals &amp; Stock adjustments require Store Manager (L3) sign-off.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, fontSize: 11 }}>
+            <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '3px 8px', borderRadius: 4, fontWeight: 600 }}>✓ Live Store Sync</span>
+            <span style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '3px 8px', borderRadius: 4, fontWeight: 600 }}>✓ Section Allocated</span>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -106,48 +150,66 @@ export default function Users() {
         <input style={S.input} placeholder="Search name / email / code..." value={search} onChange={e => setSearch(e.target.value)} />
         <select style={S.select} value={filterRole} onChange={e => setFilterRole(e.target.value)}>
           <option value="">All Roles</option>
-          {roles.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
+          {roles.map(r => <option key={r.id} value={r.name}>{r.name} (L{r.level})</option>)}
         </select>
         <select style={S.select} value={filterDept} onChange={e => setFilterDept(e.target.value)}>
           <option value="">All Depts</option>
           {depts.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
         </select>
         <select style={S.select} value={filterActive} onChange={e => setFilterActive(e.target.value)}>
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-          <option value="">All</option>
+          <option value="true">Active Only</option>
+          <option value="false">Inactive Only</option>
+          <option value="">All Users</option>
         </select>
-        <button style={S.btnSecondary} onClick={load}>↻</button>
+        <button style={S.btnSecondary} onClick={load} title="Refresh User List">↻ Refresh</button>
       </div>
 
       {/* Table */}
       <div style={S.tableWrap}>
-        {loading ? <div style={S.loading}>Loading...</div> : (
+        {loading ? <div style={S.loading}>Loading system users...</div> : (
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['Code', 'Name', 'Email', 'Role', 'Department', 'Shift', 'Last Login', 'Status', 'Actions'].map(h => (
+                {['Emp Code', 'Name', 'Email / Mobile', 'Role / Level', 'Department', 'Assigned Section', 'Shift', 'Status', 'Actions'].map(h => (
                   <th key={h} style={S.th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
-                <tr><td colSpan={9} style={S.empty}>No users found</td></tr>
+                <tr><td colSpan={9} style={S.empty}>No users matching the filter criteria.</td></tr>
               )}
               {filtered.map(u => (
                 <tr key={u.id} style={S.tr}>
                   <td style={S.td}><span style={S.code}>{u.employee_code || '—'}</span></td>
-                  <td style={S.td}><div style={S.name}>{u.name}</div></td>
-                  <td style={S.td}><span style={S.muted}>{u.email}</span></td>
+                  <td style={S.td}>
+                    <div style={S.name}>{u.name}</div>
+                    {u.role_level <= 2 && (
+                      <span style={{ fontSize: 10, color: '#0284c7', fontWeight: 600 }}>
+                        ↳ Reports to: {u.department || 'Store'} Manager
+                      </span>
+                    )}
+                  </td>
+                  <td style={S.td}>
+                    <div style={S.muted}>{u.email}</div>
+                    {u.mobile && <div style={{ fontSize: 11, color: '#8a8a90' }}>📱 {u.mobile}</div>}
+                  </td>
                   <td style={S.td}>
                     <span style={{ ...S.badge, background: roleColor(u.role_level) + '22', color: roleColor(u.role_level), border: `1px solid ${roleColor(u.role_level)}44` }}>
-                      {u.role}
+                      {u.role} (L{u.role_level})
                     </span>
                   </td>
                   <td style={S.td}><span style={S.muted}>{u.department || '—'}</span></td>
-                  <td style={S.td}><span style={S.muted}>{u.shift || '—'}</span></td>
-                  <td style={S.td}><span style={S.muted}>{u.last_login ? new Date(u.last_login).toLocaleDateString('en-IN') : 'Never'}</span></td>
+                  <td style={S.td}>
+                    {u.section_name ? (
+                      <span style={{ background: '#f1f5f9', color: '#0f172a', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, border: '1px solid #cbd5e1' }}>
+                        🏭 {u.section_name}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#94a3b8', fontSize: 11 }}>— General / All —</span>
+                    )}
+                  </td>
+                  <td style={S.td}><span style={S.muted}>{u.shift || 'General'}</span></td>
                   <td style={S.td}>
                     <span style={{ ...S.badge, background: u.is_active ? '#22c55e22' : '#ef444422', color: u.is_active ? '#22c55e' : '#ef4444', border: `1px solid ${u.is_active ? '#22c55e44' : '#ef444444'}` }}>
                       {u.is_active ? 'Active' : 'Inactive'}
@@ -155,11 +217,12 @@ export default function Users() {
                   </td>
                   <td style={S.td}>
                     <div style={S.actions}>
-                      <button style={S.btnIcon} title="Edit" onClick={() => openEdit(u)}>✏️</button>
+                      <button style={S.btnIcon} title="Edit User & Section" onClick={() => openEdit(u)}>✏️</button>
                       <button style={S.btnIcon} title="Reset Password" onClick={() => { setPwModal(u); setPw({ new_password: '', confirm: '' }); setPwError('') }}>🔑</button>
-                      <button style={{ ...S.btnIcon, opacity: 0.7 }} title={u.is_active ? 'Deactivate' : 'Activate'} onClick={() => toggleActive(u)}>
+                      <button style={{ ...S.btnIcon, opacity: 0.8 }} title={u.is_active ? 'Deactivate User' : 'Activate User'} onClick={() => toggleActive(u)}>
                         {u.is_active ? '🔴' : '🟢'}
                       </button>
+                      <button style={{ ...S.btnIcon, color: '#ef4444' }} title="Remove / Soft Delete" onClick={() => deleteUser(u)}>🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -168,23 +231,23 @@ export default function Users() {
           </table>
         )}
       </div>
-      <div style={S.count}>{filtered.length} user{filtered.length !== 1 ? 's' : ''}</div>
+      <div style={S.count}>{filtered.length} user{filtered.length !== 1 ? 's' : ''} active in mill directory</div>
 
       {/* Add/Edit Modal */}
       {modal && (
         <div style={S.overlay} onClick={() => setModal(null)}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div style={S.modalTitle}>{modal === 'add' ? 'Add New User' : `Edit: ${editUser?.name}`}</div>
+              <div style={S.modalTitle}>{modal === 'add' ? 'Add New User / Store Operator' : `Edit: ${editUser?.name}`}</div>
               <button style={S.close} onClick={() => setModal(null)}>✕</button>
             </div>
             <form onSubmit={saveUser} style={S.form}>
               <div style={S.grid2}>
                 <label style={S.label}>Full Name *
-                  <input style={S.input} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Full name" />
+                  <input style={S.input} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Ramesh Kumar (Store Assistant)" required />
                 </label>
                 <label style={S.label}>Email *
-                  <input style={S.input} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@mkpapermill.com" />
+                  <input style={S.input} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="store.assistant@mkpapermill.com" required />
                 </label>
                 <label style={S.label}>{modal === 'add' ? 'Password *' : 'New Password (blank = no change)'}
                   <input style={S.input} type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="Min 6 chars" />
@@ -192,10 +255,10 @@ export default function Users() {
                 <label style={S.label}>Mobile
                   <input style={S.input} value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value }))} placeholder="10-digit mobile" />
                 </label>
-                <label style={S.label}>Role *
-                  <select style={S.select} value={form.role_id} onChange={e => setForm(f => ({ ...f, role_id: e.target.value }))}>
+                <label style={S.label}>Role &amp; Permission Level *
+                  <select style={S.select} value={form.role_id} onChange={e => setForm(f => ({ ...f, role_id: e.target.value }))} required>
                     <option value="">-- Select Role --</option>
-                    {roles.map(r => <option key={r.id} value={r.id}>{r.name} (L{r.level})</option>)}
+                    {roles.map(r => <option key={r.id} value={r.id}>{r.name} (Level {r.level})</option>)}
                   </select>
                 </label>
                 <label style={S.label}>Department
@@ -204,8 +267,14 @@ export default function Users() {
                     {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
                 </label>
+                <label style={S.label}>Assigned Plant Section
+                  <select style={S.select} value={form.section_id} onChange={e => setForm(f => ({ ...f, section_id: e.target.value }))}>
+                    <option value="">-- General / Plant-Wide --</option>
+                    {sections.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                  </select>
+                </label>
                 <label style={S.label}>Employee Code
-                  <input style={S.input} value={form.employee_code} onChange={e => setForm(f => ({ ...f, employee_code: e.target.value }))} placeholder="EMP-0001" />
+                  <input style={S.input} value={form.employee_code} onChange={e => setForm(f => ({ ...f, employee_code: e.target.value }))} placeholder="STORE-ASST-01" />
                 </label>
                 <label style={S.label}>Default Shift
                   <select style={S.select} value={form.shift} onChange={e => setForm(f => ({ ...f, shift: e.target.value }))}>
@@ -213,16 +282,22 @@ export default function Users() {
                   </select>
                 </label>
               </div>
+
+              {/* Roles & Responsibility Note */}
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#475569' }}>
+                <strong>📌 Roles &amp; Responsibilities:</strong> Basic daily entries (Inward GRN intake, Outward Issue drafting, Indent creation) will be permitted. Final approval clauses remain with the Department / Store Manager.
+              </div>
+
               {modal === 'edit' && (
                 <label style={{ ...S.label, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <input type="checkbox" checked={form.is_active} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} />
-                  <span>Active</span>
+                  <span>Active Account</span>
                 </label>
               )}
-              {formError && <div style={S.error}>{formError}</div>}
+              {formError && <div style={S.error}>⚠️ {formError}</div>}
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setModal(null)}>Cancel</button>
-                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : (modal === 'add' ? 'Create User' : 'Save Changes')}</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : (modal === 'add' ? 'Create User / Operator' : 'Save Changes')}</button>
               </div>
             </form>
           </div>
@@ -239,12 +314,12 @@ export default function Users() {
             </div>
             <form onSubmit={resetPw} style={S.form}>
               <label style={S.label}>New Password
-                <input style={S.input} type="password" value={pw.new_password} onChange={e => setPw(p => ({ ...p, new_password: e.target.value }))} />
+                <input style={S.input} type="password" value={pw.new_password} onChange={e => setPw(p => ({ ...p, new_password: e.target.value }))} placeholder="Min 6 characters" required />
               </label>
               <label style={S.label}>Confirm Password
-                <input style={S.input} type="password" value={pw.confirm} onChange={e => setPw(p => ({ ...p, confirm: e.target.value }))} />
+                <input style={S.input} type="password" value={pw.confirm} onChange={e => setPw(p => ({ ...p, confirm: e.target.value }))} placeholder="Re-enter password" required />
               </label>
-              {pwError && <div style={S.error}>{pwError}</div>}
+              {pwError && <div style={S.error}>⚠️ {pwError}</div>}
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setPwModal(null)}>Cancel</button>
                 <button type="submit" style={S.btnPrimary}>Reset Password</button>

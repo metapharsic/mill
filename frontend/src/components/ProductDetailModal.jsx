@@ -4,6 +4,7 @@ import {
   Save, AlertTriangle, CheckCircle2, Clock, MapPin, Tag,
   Layers, ShieldCheck, DollarSign, History, Printer, ExternalLink
 } from 'lucide-react'
+import { UOM_CATEGORIES, ALL_UOM_CODES } from '../constants/uom'
 
 const API = '/api'
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem('mk_token')}` })
@@ -464,12 +465,21 @@ export default function ProductDetailModal({
                 Unit of Measure (UOM) *
                 <select
                   style={S.input}
-                  value={form.uom}
+                  value={form.uom || 'NOS'}
                   onChange={e => setForm({ ...form, uom: e.target.value })}
                 >
-                  {['NOS', 'KGS', 'MT', 'LTR', 'MTR', 'PKT', 'BOX', 'SET', 'PAIR', 'ROLL', 'DRUM', 'BAG', 'SHT'].map(u => (
-                    <option key={u} value={u}>{u}</option>
+                  {UOM_CATEGORIES.map(cat => (
+                    <optgroup key={cat.category} label={`── ${cat.category} ──`}>
+                      {cat.units.map(u => (
+                        <option key={u.code} value={u.code}>{u.label} — {u.desc}</option>
+                      ))}
+                    </optgroup>
                   ))}
+                  {form.uom && !ALL_UOM_CODES.includes(form.uom.toUpperCase()) && (
+                    <optgroup label="── Custom Unit ──">
+                      <option value={form.uom}>{form.uom} (Custom)</option>
+                    </optgroup>
+                  )}
                 </select>
               </label>
               <label style={S.label}>

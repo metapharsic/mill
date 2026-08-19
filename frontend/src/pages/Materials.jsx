@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, ...(opts?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...(opts?.headers || {}) },
@@ -9,7 +10,6 @@ const API = (path, opts) => fetch(path, {
   catch { return { success: false, message: `Server error (HTTP ${r.status})` } }
 })
 
-const UOM_LIST = ['NOS', 'KGS', 'MT', 'LTR', 'MTR', 'PKT', 'BOX', 'SET', 'PAIR', 'ROLL', 'DRUM', 'BAG', 'SHT']
 const GST_RATES = [0, 5, 12, 18, 28]
 const CRIT_COLORS = {
   A: { bg: '#ef444422', color: '#ef4444', border: '#ef444444', label: '🔴 Class A (Critical)' },
@@ -876,6 +876,20 @@ export default function Materials() {
                 />
               </div>
 
+              {/* UOM */}
+              <div style={{ width: 85 }}>
+                <span style={S.quickLabel}>UOM *</span>
+                <select
+                  style={S.quickSelect}
+                  value={quickForm.uom || 'NOS'}
+                  onChange={e => setQuickForm(q => ({ ...q, uom: e.target.value }))}
+                >
+                  {PRIMARY_UOMS.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Status */}
               <div style={{ width: 80 }}>
                 <span style={S.quickLabel}>Status</span>
@@ -1291,9 +1305,18 @@ export default function Materials() {
                     onChange={e => setForm(f => ({ ...f, uom: e.target.value }))}
                     required
                   >
-                    {Array.from(new Set([...UOM_LIST, form.uom].filter(Boolean))).map(u => (
-                      <option key={u} value={u}>{u}</option>
+                    {UOM_CATEGORIES.map(cat => (
+                      <optgroup key={cat.category} label={`── ${cat.category} ──`}>
+                        {cat.units.map(u => (
+                          <option key={u.code} value={u.code}>{u.label} — {u.desc}</option>
+                        ))}
+                      </optgroup>
                     ))}
+                    {form.uom && !ALL_UOM_CODES.includes(form.uom.toUpperCase()) && (
+                      <optgroup label="── Custom Unit ──">
+                        <option value={form.uom}>{form.uom} (Custom)</option>
+                      </optgroup>
+                    )}
                   </select>
                 </label>
 
