@@ -5,6 +5,8 @@ import { ConfirmModal } from '../components/ui/Modal'
 import { FormField } from '../components/ui/FormField'
 import ProductDetailModal from '../components/ProductDetailModal'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import SortableTh from '../components/SortableTh'
+import { sortTableData } from '../utils/tableSort'
 import { ExternalLink } from 'lucide-react'
 import { GST_SLABS } from './Purchase'
 
@@ -149,6 +151,8 @@ export default function Store({ onNavigate }) {
   const [inwardSearch, setInwardSearch] = useState('')
   const [inwardPage, setInwardPage] = useState(1)
   const [inwardTotal, setInwardTotal] = useState(0)
+  const [inwardSortBy, setInwardSortBy] = useState('date')
+  const [inwardSortOrder, setInwardSortOrder] = useState('desc')
   const INWARD_LIMIT = 20
   const [inwardModal, setInwardModal] = useState(false)
   const [inwardForm, setInwardForm] = useState({
@@ -178,6 +182,16 @@ export default function Store({ onNavigate }) {
   const [outwardSearch, setOutwardSearch] = useState('')
   const [outwardPage, setOutwardPage] = useState(1)
   const [outwardTotal, setOutwardTotal] = useState(0)
+  const [outwardSortBy, setOutwardSortBy] = useState('date')
+  const [outwardSortOrder, setOutwardSortOrder] = useState('desc')
+  const [indentSortBy, setIndentSortBy] = useState('createdAt')
+  const [indentSortOrder, setIndentSortOrder] = useState('desc')
+  const [approvalSortBy, setApprovalSortBy] = useState('priority')
+  const [approvalSortOrder, setApprovalSortOrder] = useState('asc')
+  const [rejectionSortBy, setRejectionSortBy] = useState('rejection_number')
+  const [rejectionSortOrder, setRejectionSortOrder] = useState('desc')
+  const [assetSortBy, setAssetSortBy] = useState('daysInService')
+  const [assetSortOrder, setAssetSortOrder] = useState('desc')
   const OUTWARD_LIMIT = 20
   const [outwardModal, setOutwardModal] = useState(false)
   const [outwardForm, setOutwardForm] = useState({
@@ -1122,9 +1136,20 @@ export default function Store({ onNavigate }) {
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
-                  {['Date', 'Type', 'Ref / PO / Invoice', 'Vendor / Supplier', 'Material', 'Category', 'Inward Qty', 'Unit Price', 'Total Value', 'Batch / Serial', 'Bin / Rack', 'Remarks', 'Received By', 'Voucher'].map(h => (
-                    <th key={h} style={S.th}>{h}</th>
-                  ))}
+                  <SortableTh label="Date" columnKey="date" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={95} />
+                  <SortableTh label="Type" columnKey="transaction_type" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={90} />
+                  <SortableTh label="Ref / PO / Invoice" columnKey="reference_id" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Vendor / Supplier" columnKey="vendorName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Material" columnKey="materialName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Inward Qty" columnKey="in_qty" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Total Value" columnKey="value" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Batch / Serial" columnKey="batch_number" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Bin / Rack" columnKey="bin_location" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Remarks" columnKey="remarks" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <SortableTh label="Received By" columnKey="createdByName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                  <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Voucher</th>
                 </tr>
               </thead>
               <tbody>
@@ -1132,7 +1157,7 @@ export default function Store({ onNavigate }) {
                   <tr><td colSpan={14} style={S.loading}>Loading inward entries...</td></tr>
                 ) : inwardList.length === 0 ? (
                   <tr><td colSpan={14} style={S.empty}>No inward records found. Click "+ Fast Inward Entry" to record receipts.</td></tr>
-                ) : inwardList.map(inw => (
+                ) : sortTableData(inwardList, inwardSortBy, inwardSortOrder).map(inw => (
                   <tr key={inw.id} style={S.tr}>
                     <td style={S.td}><span style={S.code}>{new Date(inw.date).toLocaleDateString('en-IN')}</span></td>
                     <td style={S.td}>
@@ -1270,9 +1295,18 @@ export default function Store({ onNavigate }) {
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
-                  {['Date', 'Type', 'Issue / WO Ref', 'Material', 'Category', 'Issued Qty', 'Balance After', 'Unit Price', 'Total Value', 'Purpose / Dept / To', 'Issued By', 'Voucher'].map(h => (
-                    <th key={h} style={S.th}>{h}</th>
-                  ))}
+                  <SortableTh label="Date" columnKey="date" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} width={95} />
+                  <SortableTh label="Type" columnKey="transaction_type" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} width={90} />
+                  <SortableTh label="Issue / WO Ref" columnKey="reference_id" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Material" columnKey="materialName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Issued Qty" columnKey="out_qty" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Balance After" columnKey="balance" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Total Value" columnKey="value" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
+                  <SortableTh label="Purpose / Dept / To" columnKey="purpose" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Issued By" columnKey="createdByName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Voucher</th>
                 </tr>
               </thead>
               <tbody>
@@ -1280,7 +1314,7 @@ export default function Store({ onNavigate }) {
                   <tr><td colSpan={12} style={S.loading}>Loading outward issues...</td></tr>
                 ) : outwardList.length === 0 ? (
                   <tr><td colSpan={12} style={S.empty}>No outward issues found. Click "+ Fast Outward Issue" to issue materials.</td></tr>
-                ) : outwardList.map(outw => (
+                ) : sortTableData(outwardList, outwardSortBy, outwardSortOrder).map(outw => (
                   <tr key={outw.id} style={S.tr}>
                     <td style={S.td}><span style={S.code}>{new Date(outw.date).toLocaleDateString('en-IN')}</span></td>
                     <td style={S.td}>
@@ -1391,18 +1425,29 @@ export default function Store({ onNavigate }) {
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
-                  {['Issue / Indent No', 'Material', 'Department', 'Quantity', 'Purpose', 'Status', 'Date', 'Actions'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                  <SortableTh label="Issue / Indent No" columnKey="issue_number" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} width={140} />
+                  <SortableTh label="Material" columnKey="materialName" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} />
+                  <SortableTh label="Department" columnKey="departmentName" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} />
+                  <SortableTh label="Quantity" columnKey="quantity" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} align="right" />
+                  <SortableTh label="Purpose" columnKey="purpose" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} />
+                  <SortableTh label="Status" columnKey="status" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} width={100} align="center" />
+                  <SortableTh label="Date" columnKey="createdAt" currentSortKey={indentSortBy} currentSortOrder={indentSortOrder} onSort={(k, o) => { setIndentSortBy(k); setIndentSortOrder(o) }} width={95} />
+                  <th style={{ ...S.th, width: 100, textAlign: 'center' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {issues.filter(i => {
-                  const q = searchTerm.toLowerCase()
-                  const num = (i.issue_number || i.issueNumber || '').toLowerCase()
-                  const mat = (i.materialName || i.material_name || '').toLowerCase()
-                  const matchQ = !q || num.includes(q) || mat.includes(q)
-                  const matchDept = !deptFilter || String(i.department_id) === deptFilter
-                  return matchQ && matchDept
-                }).map(iss => (
+                {sortTableData(
+                  issues.filter(i => {
+                    const q = searchTerm.toLowerCase()
+                    const num = (i.issue_number || i.issueNumber || '').toLowerCase()
+                    const mat = (i.materialName || i.material_name || '').toLowerCase()
+                    const matchQ = !q || num.includes(q) || mat.includes(q)
+                    const matchDept = !deptFilter || String(i.department_id) === deptFilter
+                    return matchQ && matchDept
+                  }),
+                  indentSortBy,
+                  indentSortOrder
+                ).map(iss => (
                   <tr key={iss.id} style={S.tr}>
                     <td style={S.td}><span style={S.code}>{iss.issue_number || iss.issueNumber}</span></td>
                     <td style={S.td}>
@@ -1463,11 +1508,24 @@ export default function Store({ onNavigate }) {
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['Indent / Issue No', 'Material', 'Requested By', 'Department', 'Quantity', 'Justification / Purpose', 'Priority', 'Status', 'Actions'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                <SortableTh label="Indent / Issue No" columnKey="issue_number" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} width={140} />
+                <SortableTh label="Material" columnKey="materialName" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} />
+                <SortableTh label="Requested By" columnKey="requestedByName" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} />
+                <SortableTh label="Department" columnKey="departmentName" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} />
+                <SortableTh label="Quantity" columnKey="quantity" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} align="right" />
+                <SortableTh label="Justification / Purpose" columnKey="purpose" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} />
+                <SortableTh label="Priority" columnKey="priority" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} width={80} align="center" />
+                <SortableTh label="Status" columnKey="status" currentSortKey={approvalSortBy} currentSortOrder={approvalSortOrder} onSort={(k, o) => { setApprovalSortBy(k); setApprovalSortOrder(o) }} width={95} align="center" />
+                <th style={{ ...S.th, width: 120, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {issues.filter(i => ['Pending', 'Submitted', 'L1 Approved', 'Approved', 'Partially Issued'].includes(i.status)).map(iss => (
+              {sortTableData(
+                issues.filter(i => ['Pending', 'Submitted', 'L1 Approved', 'Approved', 'Partially Issued'].includes(i.status)),
+                approvalSortBy,
+                approvalSortOrder,
+                { priority: 'criticality' }
+              ).map(iss => (
                 <tr key={iss.id} style={S.tr}>
                   <td style={S.td}><span style={S.code}>{iss.issue_number || iss.issueNumber}</span></td>
                   <td style={S.td}>
@@ -1530,11 +1588,19 @@ export default function Store({ onNavigate }) {
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['Asset / Serial No', 'Material', 'Machine', 'Position', 'Status', 'Installed Date', 'Operating Life', 'Expected Life', 'Actions'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                <SortableTh label="Asset / Serial No" columnKey="serialNumber" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} width={140} />
+                <SortableTh label="Material" columnKey="materialName" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} />
+                <SortableTh label="Machine" columnKey="machineName" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} />
+                <SortableTh label="Position" columnKey="positionName" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} />
+                <SortableTh label="Status" columnKey="status" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} width={100} align="center" />
+                <SortableTh label="Installed Date" columnKey="installedAt" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} width={110} />
+                <SortableTh label="Operating Life" columnKey="daysInService" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} width={110} align="right" />
+                <SortableTh label="Expected Life" columnKey="expectedLifespanDays" currentSortKey={assetSortBy} currentSortOrder={assetSortOrder} onSort={(k, o) => { setAssetSortBy(k); setAssetSortOrder(o) }} width={110} align="right" />
+                <th style={{ ...S.th, width: 120, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {assets.map(a => {
+              {sortTableData(assets, assetSortBy, assetSortOrder).map(a => {
                 const days = a.daysInService !== undefined ? a.daysInService : Math.floor((new Date() - new Date(a.installedAt)) / (1000*60*60*24))
                 const expDays = a.expectedLifespanDays || 365
                 const isOverdue = days >= expDays
@@ -1666,9 +1732,17 @@ export default function Store({ onNavigate }) {
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
-                  {['Rejection No', 'GRN / PO Ref', 'Material', 'Vendor', 'Rejected Qty', 'Debit Value', 'Reason', 'Action Required', 'Status', 'Outward GP', 'Action'].map(h => (
-                    <th key={h} style={S.th}>{h}</th>
-                  ))}
+                  <SortableTh label="Rejection No" columnKey="rejection_number" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} width={130} />
+                  <SortableTh label="GRN / PO Ref" columnKey="grnNumber" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} />
+                  <SortableTh label="Material" columnKey="materialName" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} />
+                  <SortableTh label="Vendor" columnKey="vendorName" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} />
+                  <SortableTh label="Rejected Qty" columnKey="rejected_qty" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} align="right" />
+                  <SortableTh label="Debit Value" columnKey="debit_amount" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} align="right" />
+                  <SortableTh label="Reason" columnKey="rejection_reason" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} />
+                  <SortableTh label="Action Required" columnKey="action_required" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} />
+                  <SortableTh label="Status" columnKey="status" currentSortKey={rejectionSortBy} currentSortOrder={rejectionSortOrder} onSort={(k, o) => { setRejectionSortBy(k); setRejectionSortOrder(o) }} width={120} align="center" />
+                  <th style={{ ...S.th, width: 100, textAlign: 'center' }}>Outward GP</th>
+                  <th style={{ ...S.th, width: 90, textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1676,7 +1750,7 @@ export default function Store({ onNavigate }) {
                   <tr><td colSpan={11} style={S.loading}>Loading rejections...</td></tr>
                 ) : rejectionsList.length === 0 ? (
                   <tr><td colSpan={11} style={S.empty}>No material rejections recorded. Quality inspection passes are in order.</td></tr>
-                ) : rejectionsList.map(rej => (
+                ) : sortTableData(rejectionsList, rejectionSortBy, rejectionSortOrder).map(rej => (
                   <tr key={rej.id} style={S.tr}>
                     <td style={S.td}><span style={{ ...S.code, color: '#dc2626', fontWeight: 700 }}>{rej.rejection_number}</span></td>
                     <td style={S.td}>

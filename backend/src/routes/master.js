@@ -215,7 +215,7 @@ router.get('/section-equipment', auth, ar(async (req, res) => {
 
 // Schema: id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active, section_id, machine_id, section_equipment_id
 router.get('/materials', auth, ar(async (req, res) => {
-  const { category_id, is_active, search, criticality_class, section_context, section_id, machine_id, section_equipment_id, page = 1, limit = 50 } = req.query;
+  const { category_id, is_active, search, criticality_class, section_context, section_id, machine_id, section_equipment_id, sort_by, sort_order = 'ASC', page = 1, limit = 50 } = req.query;
   const w = []; const p = []; let i = 1;
   if (category_id)        { w.push(`m.category_id IN (SELECT id FROM material_categories WHERE id=$${i} OR parent_id=$${i})`); p.push(category_id); i++; }
   if (is_active !== undefined) { w.push(`m.is_active=$${i++}`);     p.push(is_active === 'true'); }
@@ -227,6 +227,38 @@ router.get('/materials', auth, ar(async (req, res) => {
   if (search)             { w.push(`(m.name ILIKE $${i} OR m.code ILIKE $${i} OR m.oem_supplier ILIKE $${i} OR ps.name ILIKE $${i} OR mac.name ILIKE $${i} OR se.equipment_name ILIKE $${i})`); p.push(`%${search}%`); i++; }
   const where = w.length ? 'WHERE '+w.join(' AND ') : '';
   const offset = (parseInt(page)-1)*parseInt(limit);
+
+  // Dynamic Whitelisted Sorting
+  const sortMap = {
+    code: 'm.code',
+    name: 'm.name',
+    category: 'mc.name',
+    categoryName: 'mc.name',
+    section: 'ps.name',
+    sectionName: 'ps.name',
+    machine: 'mac.name',
+    machineName: 'mac.name',
+    criticality: 'm.criticality_class',
+    criticalityClass: 'm.criticality_class',
+    current_stock: 'm.current_stock',
+    stock: 'm.current_stock',
+    unit_price: 'm.unit_price',
+    price: 'm.unit_price',
+    valuation: '(m.current_stock * m.unit_price)',
+    reorder_level: 'm.reorder_level',
+    min_stock: 'm.min_stock',
+    max_stock: 'm.max_stock',
+    hsn_code: 'm.hsn_code',
+    bin_location: 'm.bin_location',
+    is_active: 'm.is_active',
+    received: 'received',
+    issued: 'issued'
+  };
+  const direction = String(sort_order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+  const orderExpr = sort_by && sortMap[sort_by]
+    ? `${sortMap[sort_by]} ${direction} NULLS LAST, m.name ASC`
+    : `m.criticality_class NULLS LAST, m.name ASC`;
+
   const { rows } = await pool.query(
     `SELECT m.id, m.code, m.name, m.uom, m.hsn_code,
             m.current_stock, m.reorder_level, m.min_stock, m.max_stock,
@@ -261,7 +293,7 @@ router.get('/materials', auth, ar(async (req, res) => {
      LEFT JOIN plant_sections ps ON ps.id = m.section_id
      LEFT JOIN machines mac ON mac.id = m.machine_id
      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
-     ${where} ORDER BY m.criticality_class NULLS LAST, m.name
+     ${where} ORDER BY ${orderExpr}
      LIMIT $${i++} OFFSET $${i++}`,
     [...p, parseInt(limit), offset]);
   const { rows: cnt } = await pool.query(`

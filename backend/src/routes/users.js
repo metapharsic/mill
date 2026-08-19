@@ -9,7 +9,7 @@ const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch
 // GET /api/users
 router.get('/', auth, requireLevel(3), async (req, res) => {
   try {
-    const { is_active, department_id } = req.query;
+    const { is_active, department_id, sort_by, sort_order = 'ASC' } = req.query;
     const params = [];
     const where = [];
 
@@ -32,6 +32,26 @@ router.get('/', auth, requireLevel(3), async (req, res) => {
 
     const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
+    const sortMap = {
+      code: 'u.employee_code',
+      employee_code: 'u.employee_code',
+      name: 'u.name',
+      email: 'u.email',
+      role: 'r.level',
+      role_level: 'r.level',
+      department: 'd.name',
+      section: 's.name',
+      section_name: 's.name',
+      shift: 'u.shift',
+      is_active: 'u.is_active',
+      last_login: 'u.last_login',
+      created_at: 'u.created_at'
+    };
+    const direction = String(sort_order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    const orderExpr = sort_by && sortMap[sort_by]
+      ? `${sortMap[sort_by]} ${direction} NULLS LAST, u.name ASC`
+      : `r.level DESC, u.name ASC`;
+
     const { rows } = await pool.query(
       `SELECT u.id, u.employee_code, u.name, u.email, u.mobile, u.shift,
               u.is_active, u.last_login, u.created_at, u.role_id, u.department_id, u.section_id,
@@ -43,7 +63,7 @@ router.get('/', auth, requireLevel(3), async (req, res) => {
        LEFT JOIN departments d ON u.department_id = d.id
        LEFT JOIN sections s ON u.section_id = s.id
        ${whereClause}
-       ORDER BY r.level DESC, u.name ASC`,
+       ORDER BY ${orderExpr}`,
       params
     );
     res.json({ success: true, data: rows });

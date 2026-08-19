@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import SortableTh from '../components/SortableTh'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -65,6 +66,8 @@ export default function Materials() {
   const [filterCrit, setFilterCrit] = useState('')
   const [expandedRow, setExpandedRow] = useState(null)
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState('criticality')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [modal, setModal] = useState(false)
   const [catModal, setCatModal] = useState(false)
   const [edit, setEdit] = useState(null)
@@ -130,6 +133,10 @@ export default function Materials() {
     if (filterMachine) params.set('machine_id', filterMachine)
     if (filterCrit) params.set('criticality_class', filterCrit)
     if (search) params.set('search', search)
+    if (sortBy) {
+      params.set('sort_by', sortBy)
+      params.set('sort_order', sortOrder)
+    }
     const [m, c, s, eq, mcn] = await Promise.all([
       API(`/api/master/materials?${params}`),
       API('/api/master/categories'),
@@ -143,7 +150,13 @@ export default function Materials() {
     if (eq.success) setSectionEquipment(eq.data)
     if (mcn.success) setMachines(mcn.data)
     setLoading(false)
-  }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search])
+  }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search, sortBy, sortOrder])
+
+  const handleSort = (key, order) => {
+    setSortBy(key)
+    setSortOrder(order)
+    setPage(1)
+  }
 
   useEffect(() => { load() }, [load])
 
@@ -924,9 +937,22 @@ export default function Materials() {
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['', 'Code', 'Material Name', 'Section / Equipment', 'Category', 'Crit', 'HSN Code', 'Rack / Box No', 'Opening Stock', 'Received (+)', 'Issued (-)', 'Closing Balance', 'Unit Price', 'Stock Value', 'Status', 'Actions'].map(h => (
-                  <th key={h} style={S.th}>{h}</th>
-                ))}
+                <th style={{ ...S.th, width: 30 }}></th>
+                <SortableTh label="Code" columnKey="code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={100} />
+                <SortableTh label="Material Name" columnKey="name" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Section / Equipment" columnKey="section" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Category" columnKey="category" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Crit" columnKey="criticality" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={65} align="center" />
+                <SortableTh label="HSN Code" columnKey="hsn_code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} />
+                <SortableTh label="Rack / Box No" columnKey="bin_location" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={110} />
+                <SortableTh label="Opening Stock" columnKey="opening" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Received (+)" columnKey="received" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Issued (-)" columnKey="issued" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Closing Balance" columnKey="current_stock" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Stock Value" columnKey="valuation" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                <SortableTh label="Status" columnKey="is_active" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={75} align="center" />
+                <th style={{ ...S.th, width: 80, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

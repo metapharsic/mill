@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import SortableTh from '../components/SortableTh'
+import { sortTableData } from '../utils/tableSort'
 
 const API = (path, opts) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(opts?.headers || {}) },
@@ -19,6 +21,8 @@ export default function Users() {
   const [filterRole, setFilterRole] = useState('')
   const [filterDept, setFilterDept] = useState('')
   const [filterActive, setFilterActive] = useState('true')
+  const [sortBy, setSortBy] = useState('role_level')
+  const [sortOrder, setSortOrder] = useState('desc')
   const [modal, setModal] = useState(null) // null | 'add' | 'edit'
   const [editUser, setEditUser] = useState(null)
   const [form, setForm] = useState(emptyForm)
@@ -27,6 +31,11 @@ export default function Users() {
   const [pwModal, setPwModal] = useState(null)
   const [pw, setPw] = useState({ new_password: '', confirm: '' })
   const [pwError, setPwError] = useState('')
+
+  const handleSort = (key, order) => {
+    setSortBy(key)
+    setSortOrder(order)
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -47,13 +56,17 @@ export default function Users() {
 
   useEffect(() => { load() }, [load])
 
-  const filtered = users.filter(u => {
-    const q = search.toLowerCase()
-    const matchSearch = !q || u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.employee_code?.toLowerCase().includes(q)
-    const matchRole = !filterRole || String(u.role_level) === filterRole || u.role === filterRole
-    const matchDept = !filterDept || u.department === filterDept
-    return matchSearch && matchRole && matchDept
-  })
+  const filtered = sortTableData(
+    users.filter(u => {
+      const q = search.toLowerCase()
+      const matchSearch = !q || u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.employee_code?.toLowerCase().includes(q)
+      const matchRole = !filterRole || String(u.role_level) === filterRole || u.role === filterRole
+      const matchDept = !filterDept || u.department === filterDept
+      return matchSearch && matchRole && matchDept
+    }),
+    sortBy,
+    sortOrder
+  )
 
   const openAdd = () => { setForm(emptyForm); setFormError(''); setEditUser(null); setModal('add') }
   const openEdit = u => {
@@ -118,14 +131,21 @@ export default function Users() {
           <div style={S.title}>👥 Users &amp; Plant Role Allocation Master</div>
           <div style={S.sub}>Manage system users, assigned plant sections, and Store Manager approval hierarchies</div>
         </div>
-        <button style={S.btnPrimary} onClick={openAdd}>+ Add User / Operator</button>
+        <button style={S.btnPrimary} onClick={openAdd}>＋ Add Operator / User</button>
       </div>
 
-      {/* Role Hierarchy & Approval Clause Guidance Banner */}
-      <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 10, padding: '14px 18px', marginBottom: 16, borderLeft: '5px solid #0284c7' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>🛡️</span>
+      {/* Store Hierarchy & Approval Guidance Banner */}
+      <div style={{
+        background: '#fff',
+        border: '1px solid #e2e8f0',
+        borderRadius: 8,
+        padding: '12px 16px',
+        marginBottom: 16,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 24 }}>🛡️</span>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
                 Store Hierarchy &amp; Operator Approval Clause Matrix
@@ -170,9 +190,15 @@ export default function Users() {
           <table style={S.table}>
             <thead>
               <tr style={S.thead}>
-                {['Emp Code', 'Name', 'Email / Mobile', 'Role / Level', 'Department', 'Assigned Section', 'Shift', 'Status', 'Actions'].map(h => (
-                  <th key={h} style={S.th}>{h}</th>
-                ))}
+                <SortableTh label="Emp Code" columnKey="employee_code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={110} />
+                <SortableTh label="Name" columnKey="name" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Email / Mobile" columnKey="email" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Role / Level" columnKey="role_level" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={130} />
+                <SortableTh label="Department" columnKey="department" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Assigned Section" columnKey="section_name" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                <SortableTh label="Shift" columnKey="shift" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} />
+                <SortableTh label="Status" columnKey="is_active" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} align="center" />
+                <th style={{ ...S.th, width: 100, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

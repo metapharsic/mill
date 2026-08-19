@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailModal from '../components/ProductDetailModal'
+import SortableTh from '../components/SortableTh'
+import { sortTableData } from '../utils/tableSort'
 import {
   Boxes, Search, Filter, AlertTriangle, ArrowDownRight, ArrowUpRight,
   TrendingUp, RefreshCw, Layers, CheckCircle2, ShieldCheck, Zap,
@@ -50,6 +52,8 @@ export default function Inventory() {
   const [matCategory, setMatCategory] = useState('')
   const [lowStockOnly, setLowStockOnly] = useState(false)
   const [matLoading, setMatLoading] = useState(false)
+  const [matSortBy, setMatSortBy] = useState('current_stock')
+  const [matSortOrder, setMatSortOrder] = useState('desc')
 
   // Categories & Vendors
   const [categories, setCategories] = useState([])
@@ -62,6 +66,8 @@ export default function Inventory() {
   const [ledgerSearch, setLedgerSearch] = useState('')
   const [ledgerTxnType, setLedgerTxnType] = useState('')
   const [ledgerLoading, setLedgerLoading] = useState(false)
+  const [ledgerSortBy, setLedgerSortBy] = useState('date')
+  const [ledgerSortOrder, setLedgerSortOrder] = useState('desc')
 
   // Shift summary state
   const [shiftSummary, setShiftSummary] = useState(null)
@@ -564,15 +570,15 @@ export default function Inventory() {
             <table style={S.table}>
               <thead>
                 <tr>
-                  <th style={S.th}>Code</th>
-                  <th style={S.th}>Material Name / Specs</th>
-                  <th style={S.th}>Category</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Current Stock</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Reorder Level</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Unit Price (₹)</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Total Value (₹)</th>
-                  <th style={S.th}>Stock Status</th>
-                  <th style={S.th}>Actions</th>
+                  <SortableTh label="Code" columnKey="code" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} width={100} />
+                  <SortableTh label="Material Name / Specs" columnKey="name" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} />
+                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} />
+                  <SortableTh label="Current Stock" columnKey="currentStock" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
+                  <SortableTh label="Reorder Level" columnKey="reorderLevel" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
+                  <SortableTh label="Unit Price (₹)" columnKey="unitPrice" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
+                  <SortableTh label="Total Value (₹)" columnKey="totalValue" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
+                  <SortableTh label="Stock Status" columnKey="isLow" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="center" width={100} />
+                  <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -581,7 +587,19 @@ export default function Inventory() {
                 ) : materials.length === 0 ? (
                   <tr><td colSpan={9} style={S.empty}>No materials matching filter in {activeTabMeta.label}</td></tr>
                 ) : (
-                  materials.map(m => {
+                  sortTableData(
+                    materials,
+                    matSortBy,
+                    matSortOrder,
+                    {
+                      totalValue: (m) => parseFloat(m.currentStock || m.current_stock || 0) * parseFloat(m.unitPrice || m.unit_price || 0),
+                      isLow: (m) => {
+                        const s = parseFloat(m.currentStock || m.current_stock || 0)
+                        const r = parseFloat(m.reorderLevel || 0)
+                        return s <= 0 ? 0 : s <= r ? 1 : 2
+                      }
+                    }
+                  ).map(m => {
                     const stock = parseFloat(m.currentStock || m.current_stock || 0)
                     const reorder = parseFloat(m.reorderLevel || 0)
                     const price = parseFloat(m.unitPrice || m.unit_price || 0)
@@ -707,16 +725,16 @@ export default function Inventory() {
             <table style={S.table}>
               <thead>
                 <tr>
-                  <th style={S.th}>Date</th>
-                  <th style={S.th}>Material Code & Name</th>
-                  <th style={S.th}>Category</th>
-                  <th style={S.th}>Txn Type</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>In Qty</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Out Qty</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Balance</th>
-                  <th style={{ ...S.th, textAlign: 'right' }}>Value (₹)</th>
-                  <th style={S.th}>Batch / Ref</th>
-                  <th style={S.th}>Logged By</th>
+                  <SortableTh label="Date" columnKey="date" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} width={100} />
+                  <SortableTh label="Material Code & Name" columnKey="materialName" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} />
+                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} />
+                  <SortableTh label="Txn Type" columnKey="type" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} width={90} />
+                  <SortableTh label="In Qty" columnKey="inQty" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} align="right" />
+                  <SortableTh label="Out Qty" columnKey="outQty" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} align="right" />
+                  <SortableTh label="Balance" columnKey="balance" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} align="right" />
+                  <SortableTh label="Value (₹)" columnKey="value" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} align="right" />
+                  <SortableTh label="Batch / Ref" columnKey="batchNumber" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} />
+                  <SortableTh label="Logged By" columnKey="createdByName" currentSortKey={ledgerSortBy} currentSortOrder={ledgerSortOrder} onSort={(k, o) => { setLedgerSortBy(k); setLedgerSortOrder(o) }} />
                 </tr>
               </thead>
               <tbody>
@@ -725,7 +743,7 @@ export default function Inventory() {
                 ) : ledger.length === 0 ? (
                   <tr><td colSpan={10} style={S.empty}>No transaction records found for {activeTabMeta.label}</td></tr>
                 ) : (
-                  ledger.map(entry => {
+                  sortTableData(ledger, ledgerSortBy, ledgerSortOrder).map(entry => {
                     const isIn = parseFloat(entry.inQty || 0) > 0
                     const isOut = parseFloat(entry.outQty || 0) > 0
                     return (
