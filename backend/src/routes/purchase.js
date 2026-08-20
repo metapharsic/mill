@@ -149,11 +149,13 @@ router.get('/po/:id', auth, ar(async (req, res) => {
   const poId = rows[0].id;
   const { rows: items } = await pool.query(
     `SELECT pi.*, m.name as "materialName", m.code as "materialCode", m.uom,
-            m.hsn_code as "hsnCode", m.current_stock as "currentStock", m.bin_location as "binLocation"
+            m.hsn_code as "hsnCode", m.current_stock as "currentStock", m.bin_location as "binLocation",
+            ii.required_qty as "indentRequiredQty"
      FROM po_items pi
      LEFT JOIN materials m ON m.id=pi.material_id
+     LEFT JOIN indent_items ii ON ii.indent_id=$2 AND ii.material_id=pi.material_id
      WHERE pi.po_id=$1
-     ORDER BY pi.id ASC`, [poId]
+     ORDER BY pi.id ASC`, [poId, rows[0].indent_id]
   );
   res.json({ success:true, data:{ ...rows[0], items } });
 }));
@@ -194,6 +196,25 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    // Guard against raising a PO from an indent that isn't ready, or that already has a live
+    // (non-Cancelled) PO linked — without this, the same indent could be silently converted
+    // into two different POs. Lock the indent row so a concurrent double-submit can't race past
+    // this check either.
+    let indentStatusBefore = null;
+    if (indent_id) {
+      const { rows: [indLock] } = await client.query(`SELECT status FROM indents WHERE id=$1 FOR UPDATE`, [indent_id]);
+      if (!indLock) { await client.query('ROLLBACK'); return res.json({ success:false, message:'Linked indent not found' }); }
+      if (indLock.status !== 'Approved') {
+        await client.query('ROLLBACK');
+        return res.json({ success:false, message:`Cannot raise PO — indent status is '${indLock.status}', expected 'Approved'` });
+      }
+      const { rows: existingPo } = await client.query(`SELECT id, po_number FROM purchase_orders WHERE indent_id=$1 AND status != 'Cancelled'`, [indent_id]);
+      if (existingPo.length) {
+        await client.query('ROLLBACK');
+        return res.json({ success:false, message:`Indent already linked to PO ${existingPo[0].po_number}` });
+      }
+      indentStatusBefore = indLock.status;
+    }
     const num = await seqNum(client);
     let total=0, gst=0;
     for (const it of items) {
@@ -218,19 +239,18 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
       );
     }
     if (indent_id) {
-      const { rows: [ind] } = await client.query(`SELECT status FROM indents WHERE id=$1`, [indent_id]);
       await client.query(`UPDATE indents SET status='PO Created' WHERE id=$1`, [indent_id]);
       await client.query(
         `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
          VALUES ($1, 'PO Created', $2, 'PO Created', $3, $4)`,
-        [indent_id, ind?.status || null, req.user.id, `PO ${num} Created`]
+        [indent_id, indentStatusBefore, req.user.id, `PO ${num} Created`]
       );
       // GAP-4 FIX: Always write store_indent_log for ALL indent types (removed incorrect store_indents table guard)
       await client.query(
         `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
          VALUES ($1,'PO Created',$2,'PO Created',$3,$4,$5,$6)
          ON CONFLICT DO NOTHING`,
-        [indent_id, ind?.status||null, req.user.id, req.user.name||'System', req.user.role||'Procurement', `PO ${num} Created`]
+        [indent_id, indentStatusBefore, req.user.id, req.user.name||'System', req.user.role||'Procurement', `PO ${num} Created`]
       );
     }
     await client.query('COMMIT');
@@ -239,14 +259,18 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
   finally { client.release(); }
 }));
 
-// EDIT PO — only Draft status, only by creator or level 4+
+// EDIT PO — Draft, Pending, or Approved prior to goods receipt
 router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
-  const { delivery_date, payment_terms, remarks, items } = req.body;
+  const { vendor_id, vendorId, delivery_date, payment_terms, remarks, items } = req.body;
   const { rows: [po] } = await pool.query(`SELECT * FROM purchase_orders WHERE id=$1`, [req.params.id]);
   if (!po) return res.json({ success: false, message: 'Not found' });
-  if (po.status !== 'Draft') return res.status(400).json({ success: false, message: 'Only Draft POs can be edited' });
-  if (po.created_by !== req.user.id && req.user.role_level < 4)
-    return res.status(403).json({ success: false, message: 'Only the creator or admin can edit this PO' });
+  if (['Received', 'Closed', 'Cancelled'].includes(po.status)) {
+    return res.status(400).json({ success: false, message: `Cannot edit PO with status '${po.status}'` });
+  }
+
+  const isStoreOrPurchase = req.user.dept_code === 'STORE' || req.user.dept_code === 'PURCHASE' || ['Store Management', 'Purchase', 'Store'].includes(req.user.department);
+  if (po.created_by !== req.user.id && !isStoreOrPurchase && req.user.role_level < 3)
+    return res.status(403).json({ success: false, message: 'Only the creator, store/purchase manager, or admin can edit this PO' });
 
   if (items && items.length) {
     const seen = new Set();
@@ -266,6 +290,8 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
     }
   }
   if (delivery_date && po.date && new Date(delivery_date) < new Date(po.date)) return res.json({ success:false, message:'Delivery date cannot be before PO date' });
+
+  const targetVendorId = vendor_id || vendorId || po.vendor_id;
 
   const client = await pool.connect();
   try {
@@ -298,13 +324,19 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
       }
     }
     const { rows } = await client.query(
-      `UPDATE purchase_orders SET delivery_date=COALESCE($1,delivery_date), payment_terms=COALESCE($2,payment_terms),
-         remarks=COALESCE($3,remarks), total_value=$4, gst_value=$5, grand_total=$6
-       WHERE id=$7 RETURNING *`,
-      [delivery_date||null, payment_terms||null, remarks||null, total, gst, total+gst, req.params.id]
+      `UPDATE purchase_orders SET
+         vendor_id = COALESCE($1, vendor_id),
+         delivery_date = COALESCE($2, delivery_date),
+         payment_terms = COALESCE($3, payment_terms),
+         remarks = COALESCE($4, remarks),
+         total_value = $5,
+         gst_value = $6,
+         grand_total = $7
+       WHERE id = $8 RETURNING *`,
+      [targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null, total, gst, total + gst, req.params.id]
     );
     await client.query('COMMIT');
-    res.json({ success: true, data: rows[0] });
+    res.json({ success: true, data: rows[0], message: 'Purchase Order updated successfully' });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
 }));
@@ -334,11 +366,39 @@ router.put('/po/:id/approve', auth, requireLevel(3), ar(async (req, res) => {
 
 // CANCEL PO
 router.put('/po/:id/cancel', auth, requireLevel(3), ar(async (req, res) => {
-  const { rows } = await pool.query(
-    `UPDATE purchase_orders SET status='Cancelled' WHERE id=$1 AND status IN ('Draft','Approved') RETURNING *`,
-    [req.params.id]
-  );
-  res.json({ success:!!rows.length, data:rows[0] });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query(
+      `UPDATE purchase_orders SET status='Cancelled' WHERE id=$1 AND status IN ('Draft','Approved') RETURNING *`,
+      [req.params.id]
+    );
+    // If linked to an indent, roll back indent status to Approved (same as DELETE PO below) so
+    // it isn't left stuck at 'PO Created' forever with no live PO — that would silently block
+    // both /po (indent_id guard) and /indent/:id/convert-to-po from ever re-raising a PO for it.
+    if (rows.length && rows[0].indent_id) {
+      const { rows: [ind] } = await client.query(`SELECT status FROM indents WHERE id=$1`, [rows[0].indent_id]);
+      if (ind && ind.status === 'PO Created') {
+        await client.query(`UPDATE indents SET status = 'Approved' WHERE id = $1`, [rows[0].indent_id]);
+        await client.query(
+          `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+           VALUES ($1, 'PO Cancelled', 'PO Created', 'Approved', $2, $3)`,
+          [rows[0].indent_id, req.user.id, `PO ${rows[0].po_number} Cancelled — Reverted to Approved`]
+        );
+        const { rows: storeInd } = await client.query('SELECT 1 FROM store_indents WHERE id = $1', [rows[0].indent_id]);
+        if (storeInd.length) {
+          await client.query(
+            `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+             VALUES ($1,'PO Cancelled','PO Created','Approved',$2,$3,$4,$5)`,
+            [rows[0].indent_id, req.user.id, req.user.name, req.user.role, `PO ${rows[0].po_number} Cancelled — Reverted to Approved`]
+          );
+        }
+      }
+    }
+    await client.query('COMMIT');
+    res.json({ success:!!rows.length, data:rows[0] });
+  } catch(e) { await client.query('ROLLBACK'); throw e; }
+  finally { client.release(); }
 }));
 
 // DELETE PO — Hard delete for Draft or Cancelled POs (and roll back linked PR to Approved)
@@ -939,8 +999,8 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
 router.post('/po/:id/bill', auth, requireLevel(2), ar(async (req, res) => {
   const poId = req.params.id;
   const { grn_id, vendor_invoice_number, invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount, igst_amount, roundoff=0, remarks } = req.body;
-  if (!vendor_invoice_number || !invoice_date) {
-    return res.status(400).json({ success: false, message: 'Vendor Invoice Number and Invoice Date are required' });
+  if (!vendor_invoice_number || !invoice_date || taxable_amount === undefined) {
+    return res.status(400).json({ success: false, message: 'Vendor Invoice Number, Invoice Date, and Taxable Amount are required' });
   }
 
   const client = await pool.connect();
@@ -949,7 +1009,23 @@ router.post('/po/:id/bill', auth, requireLevel(2), ar(async (req, res) => {
     const { rows: [po] } = await client.query(`SELECT po_number, vendor_id, grand_total, total_value, gst_value FROM purchase_orders WHERE id=$1`, [poId]);
     if (!po) throw new Error('Purchase order not found');
 
-    const taxAmount = Number(taxable_amount ?? po.total_value ?? 0);
+    // Guard: a bill must be payable against what was actually ACCEPTED at GRN/QC, not the
+    // PO's ordered qty — otherwise the mill ends up paying for goods that were rejected or
+    // never received. Reject bills whose taxable amount materially exceeds the GRN's accepted
+    // value (small tolerance for freight/rounding differences already reflected in remarks).
+    if (grn_id) {
+      const { rows: [grnVal] } = await client.query(
+        `SELECT COALESCE(SUM(gi.accepted_qty * COALESCE(gi.unit_price, 0)), 0) as accepted_value
+         FROM grn_items gi WHERE gi.grn_id = $1`,
+        [grn_id]
+      );
+      const acceptedValue = Number(grnVal?.accepted_value || 0);
+      if (acceptedValue > 0 && Number(taxable_amount) > acceptedValue * 1.02) {
+        throw new Error(`Bill taxable amount (₹${Number(taxable_amount).toFixed(2)}) exceeds the GRN's accepted (post-QC) goods value (₹${acceptedValue.toFixed(2)}). Bills must be booked against ACCEPTED quantity, not ordered quantity.`);
+      }
+    }
+
+    const taxAmount = Number(taxable_amount);
     const cgst = Number(cgst_amount ?? 0);
     const sgst = Number(sgst_amount ?? 0);
     const igst = Number(igst_amount ?? 0);

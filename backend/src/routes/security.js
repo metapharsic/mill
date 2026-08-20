@@ -76,6 +76,19 @@ router.post('/passes', requireAuth, requireGuard, ar(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Purpose is required' })
   }
 
+  // Data-integrity fix: a gate pass linked to a PO must reference a real, non-cancelled PO.
+  // The UI dropdown already filters to Approved/Partial POs, but the API itself accepted any
+  // po_id (including a Cancelled or nonexistent one) when called directly.
+  if (poId) {
+    const { rows: [po] } = await pool.query('SELECT id, status FROM purchase_orders WHERE id = $1', [poId])
+    if (!po) {
+      return res.status(400).json({ success: false, message: `Purchase Order ${poId} not found` })
+    }
+    if (po.status === 'Cancelled') {
+      return res.status(400).json({ success: false, message: `Purchase Order is Cancelled and cannot be linked to a Gate Pass` })
+    }
+  }
+
   const d = new Date()
   const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`
   const client = await pool.connect()
@@ -148,6 +161,34 @@ router.post('/rtv-pass', requireAuth, requireGuard, ar(async (req, res) => {
   } catch (e) { await client.query('ROLLBACK'); throw e }
   finally { client.release() }
 }))
+
+// Edit gate pass details (vehicle number, driver, destination, remarks)
+// Guarded the same as create/close: previously this only required requireAuth, so any
+// authenticated user in any department could edit gate pass details.
+router.put('/passes/:id', requireAuth, requireGuard, ar(async (req, res) => {
+  const { vehicle_number, driver_name, to_party, from_party, purpose, material_description, remarks, expected_return_date, status } = req.body;
+  const { rows: [gp] } = await pool.query('SELECT * FROM gate_passes WHERE id = $1', [req.params.id]);
+  if (!gp) return res.status(404).json({ success: false, message: 'Gate pass not found' });
+  if (gp.status === 'Closed' && (req.user?.role_level || 1) < 4) {
+    return res.status(400).json({ success: false, message: 'Cannot edit a closed gate pass' });
+  }
+
+  const { rows: [updated] } = await pool.query(`
+    UPDATE gate_passes SET
+      vehicle_number = COALESCE($1, vehicle_number),
+      driver_name = COALESCE($2, driver_name),
+      to_party = COALESCE($3, to_party),
+      from_party = COALESCE($4, from_party),
+      purpose = COALESCE($5, purpose),
+      material_description = COALESCE($6, material_description),
+      remarks = COALESCE($7, remarks),
+      expected_return_date = COALESCE($8, expected_return_date),
+      status = COALESCE($9, status)
+    WHERE id = $10 RETURNING *
+  `, [vehicle_number || null, driver_name || null, to_party || null, from_party || null, purpose || null, material_description || null, remarks || null, expected_return_date || null, status || null, req.params.id]);
+
+  res.json({ success: true, data: updated, message: 'Gate pass updated successfully' });
+}));
 
 // Close gate pass (vehicle out)
 router.put('/passes/:id/out', requireAuth, requireGuard, ar(async (req, res) => {

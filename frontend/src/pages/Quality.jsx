@@ -75,6 +75,7 @@ export default function Quality() {
     const r = await API(`/api/purchase/grn/${grn.id}`)
     if (r.success && r.data?.items?.length) {
       setInspectItems(r.data.items.map(it => ({
+        grnItemId: it.id,
         materialId: it.material_id,
         materialName: it.materialName,
         receivedQty: Number(it.received_qty || 0),
@@ -83,20 +84,12 @@ export default function Quality() {
         rejectionReason: it.remarks || '',
         actionRequired: 'Return to Vendor'
       })))
+      setGrnInspectModal(true)
     } else {
-      const matRes = await API(`/api/inventory/materials?limit=50`)
-      const matList = matRes.data || []
-      setInspectItems([{
-        materialId: matList[0]?.id || 1,
-        materialName: matList[0]?.name || 'Raw Material / Chemical',
-        receivedQty: 100,
-        acceptedQty: 100,
-        rejectedQty: 0,
-        rejectionReason: '',
-        actionRequired: 'Return to Vendor'
-      }])
+      // No real grn_items to inspect — don't fabricate a fake line against an unrelated
+      // material, that would post an accept/reject decision onto the wrong stock record.
+      alert(r.message || 'Could not load GRN line items for inspection — this GRN has no items on record.')
     }
-    setGrnInspectModal(true)
   }
 
   const submitGrnInspection = async (e) => {
@@ -108,6 +101,7 @@ export default function Quality() {
       overallResult: inspectResult,
       remarks: inspectRemarks,
       items: inspectItems.map(it => ({
+        grnItemId: it.grnItemId,
         materialId: it.materialId,
         acceptedQty: parseFloat(it.acceptedQty || 0),
         rejectedQty: parseFloat(it.rejectedQty || 0),

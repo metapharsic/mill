@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import InventoryExportModal from '../components/InventoryExportModal'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
+import SearchableSelect from '../components/SearchableSelect'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -71,6 +73,7 @@ export default function Materials() {
   const [sortOrder, setSortOrder] = useState('asc')
   const [modal, setModal] = useState(false)
   const [catModal, setCatModal] = useState(false)
+  const [exportModal, setExportModal] = useState(false)
   const [edit, setEdit] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [catForm, setCatForm] = useState({ name: '', code: '', type: 'Raw Material', parent_id: '' })
@@ -538,6 +541,13 @@ export default function Materials() {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
+            style={{ ...S.btnSecondary, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
+            onClick={() => setExportModal(true)}
+            title="Download Comprehensive Multi-Sheet Excel Master with Categories & Reorder Alerts"
+          >
+            📊 Export Excel
+          </button>
+          <button
             style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }}
             onClick={() => { setExcelTargetCat(filterCat || ''); setExcelErr(''); setExcelSuccess(''); setExcelPreview(null); setExcelFile(null); setExcelModal(true) }}
             title="Upload and sync custom store Excel file with live preview into selected category"
@@ -611,24 +621,30 @@ export default function Materials() {
           value={search}
           onChange={e => { setSearch(e.target.value); setPage(1) }}
         />
-        <select style={S.select} value={filterCat} onChange={e => { setFilterCat(e.target.value); setPage(1) }}>
-          <option value="">All Categories</option>
-          {topCategories.map(c => {
+        <SearchableSelect
+          value={filterCat}
+          onChange={val => { setFilterCat(val); setPage(1) }}
+          placeholder="All Categories"
+          searchPlaceholder="Type category name..."
+          style={{ width: 200 }}
+          options={topCategories.flatMap(c => {
             const kids = childrenOf(c.id)
-            return kids.length > 0 ? (
-              <optgroup key={c.id} label={c.name}>
-                <option value={c.id}>{c.name} (All)</option>
-                {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-              </optgroup>
-            ) : <option key={c.id} value={c.id}>{c.name}</option>
+            return kids.length > 0
+              ? [
+                  { value: String(c.id), label: `${c.name} (All)` },
+                  ...kids.map(k => ({ value: String(k.id), label: k.name, group: c.name }))
+                ]
+              : [{ value: String(c.id), label: c.name }]
           })}
-        </select>
-        <select style={S.select} value={filterSection} onChange={e => { setFilterSection(e.target.value); setPage(1) }}>
-          <option value="">🏭 All Plant Sections</option>
-          {sections.map(s => (
-            <option key={s.id} value={s.id}>{s.name || s.sectionCode}</option>
-          ))}
-        </select>
+        />
+        <SearchableSelect
+          value={filterSection}
+          onChange={val => { setFilterSection(val); setPage(1) }}
+          placeholder="🏭 All Plant Sections"
+          searchPlaceholder="Type section name..."
+          style={{ width: 190 }}
+          options={sections.map(s => ({ value: String(s.id), label: s.name || s.sectionCode }))}
+        />
         <select style={S.select} value={filterMachine} onChange={e => { setFilterMachine(e.target.value); setPage(1) }}>
           <option value="">⚙️ All Machines</option>
           {machines.map(m => (
@@ -640,12 +656,18 @@ export default function Materials() {
           <option value="false">Inactive Only</option>
           <option value="">All Status</option>
         </select>
-        <select style={S.select} value={filterCrit} onChange={e => { setFilterCrit(e.target.value); setPage(1) }}>
-          <option value="">All Criticality</option>
-          <option value="A">🔴 Class A (Critical)</option>
-          <option value="B">🟡 Class B (Important)</option>
-          <option value="C">🟢 Class C (General)</option>
-        </select>
+        <SearchableSelect
+          value={filterCrit}
+          onChange={val => { setFilterCrit(val); setPage(1) }}
+          placeholder="All Criticality"
+          searchPlaceholder="Type A, B, or C..."
+          style={{ width: 180 }}
+          options={[
+            { value: 'A', label: '🔴 Class A (Critical)' },
+            { value: 'B', label: '🟡 Class B (Important)' },
+            { value: 'C', label: '🟢 Class C (General)' }
+          ]}
+        />
         <button
           style={{
             ...S.btnSecondary,
@@ -1320,58 +1342,57 @@ export default function Materials() {
 
               <div style={S.grid3}>
                 <label style={S.label}>Category &amp; Subcategory *
-                  <select
-                    style={S.select}
+                  <SearchableSelect
                     value={String(form.category_id || '')}
-                    onChange={e => setForm(f => ({ ...f, category_id: e.target.value }))}
+                    onChange={val => setForm(f => ({ ...f, category_id: val }))}
+                    placeholder="-- Select Category --"
+                    searchPlaceholder="Type category name..."
                     required
-                  >
-                    <option value="">-- Select Category --</option>
-                    {topCategories.map(c => {
+                    options={topCategories.flatMap(c => {
                       const kids = childrenOf(c.id)
-                      return kids.length > 0 ? (
-                        <optgroup key={c.id} label={c.name}>
-                          <option value={String(c.id)}>{c.name} (General)</option>
-                          {kids.map(k => <option key={k.id} value={String(k.id)}>{k.name}</option>)}
-                        </optgroup>
-                      ) : <option key={c.id} value={String(c.id)}>{c.name}</option>
+                      return kids.length > 0
+                        ? [
+                            { value: String(c.id), label: `${c.name} (General)` },
+                            ...kids.map(k => ({ value: String(k.id), label: k.name, group: c.name }))
+                          ]
+                        : [{ value: String(c.id), label: c.name }]
                     })}
-                  </select>
+                  />
                 </label>
 
                 <label style={S.label}>Unit of Measure (UOM) *
-                  <select
-                    style={S.select}
+                  <SearchableSelect
                     value={form.uom || 'NOS'}
-                    onChange={e => setForm(f => ({ ...f, uom: e.target.value }))}
+                    onChange={val => setForm(f => ({ ...f, uom: val }))}
+                    placeholder="-- Select UOM --"
+                    searchPlaceholder="Type unit code or name..."
                     required
-                  >
-                    {UOM_CATEGORIES.map(cat => (
-                      <optgroup key={cat.category} label={`── ${cat.category} ──`}>
-                        {cat.units.map(u => (
-                          <option key={u.code} value={u.code}>{u.label} — {u.desc}</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                    {form.uom && !ALL_UOM_CODES.includes(form.uom.toUpperCase()) && (
-                      <optgroup label="── Custom Unit ──">
-                        <option value={form.uom}>{form.uom} (Custom)</option>
-                      </optgroup>
-                    )}
-                  </select>
+                    options={[
+                      ...UOM_CATEGORIES.flatMap(cat => cat.units.map(u => ({
+                        value: u.code,
+                        label: u.label,
+                        subtext: u.desc,
+                        group: cat.category
+                      }))),
+                      ...(form.uom && !ALL_UOM_CODES.includes(form.uom.toUpperCase())
+                        ? [{ value: form.uom, label: `${form.uom} (Custom)` }]
+                        : [])
+                    ]}
+                  />
                 </label>
 
                 <label style={S.label}>Criticality Class
-                  <select
-                    style={S.select}
+                  <SearchableSelect
                     value={form.criticality_class}
-                    onChange={e => setForm(f => ({ ...f, criticality_class: e.target.value }))}
-                  >
-                    <option value="">— General / Not Classified —</option>
-                    <option value="A">🔴 A — Critical (Plant Stop)</option>
-                    <option value="B">🟡 B — Important (Sub-system)</option>
-                    <option value="C">🟢 C — General Stock</option>
-                  </select>
+                    onChange={val => setForm(f => ({ ...f, criticality_class: val }))}
+                    placeholder="— General / Not Classified —"
+                    searchPlaceholder="Type A, B, or C..."
+                    options={[
+                      { value: 'A', label: '🔴 A — Critical (Plant Stop)' },
+                      { value: 'B', label: '🟡 B — Important (Sub-system)' },
+                      { value: 'C', label: '🟢 C — General Stock' }
+                    ]}
+                  />
                 </label>
               </div>
 
@@ -1523,19 +1544,15 @@ export default function Materials() {
                 </div>
                 <div style={S.grid3}>
                   <label style={S.label}>Plant Section *
-                    <select
-                      style={S.select}
+                    <SearchableSelect
                       value={String(form.section_id || '')}
-                      onChange={e => {
-                        const secId = e.target.value
-                        setForm(f => ({ ...f, section_id: secId, section_equipment_id: '' }))
+                      onChange={val => {
+                        setForm(f => ({ ...f, section_id: val, section_equipment_id: '' }))
                       }}
-                    >
-                      <option value="">— Select Plant Section —</option>
-                      {sections.map(s => (
-                        <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>
-                      ))}
-                    </select>
+                      placeholder="— Select Plant Section —"
+                      searchPlaceholder="Type section name..."
+                      options={sections.map(s => ({ value: String(s.id), label: s.name || s.sectionCode }))}
+                    />
                   </label>
 
                   <label style={S.label}>Target Machine / Unit
@@ -1678,6 +1695,15 @@ export default function Materials() {
           </div>
         </div>
       )}
+
+      {/* ── ENTERPRISE INVENTORY EXCEL EXPORTER MODAL ── */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
+        initialCategoryId={filterCat}
+        categories={categories}
+        sections={sections}
+      />
     </div>
   )
 }

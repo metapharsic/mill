@@ -261,8 +261,11 @@ router.get('/:id', auth, ar(async (req, res) => {
 router.post('/', auth, requireLevel(1), ar(async (req, res) => {
   const { department_id, required_date, priority='Normal', remarks, items=[], section, machine_id,
           fulfillment_mode = 'pr', vendor_id, payment_terms, delivery_date,
-          dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type, driver_name, to_party, consignee_vendor_id, dc_purpose } = req.body;
+          dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type, driver_name, to_party, consignee_vendor_id, dc_purpose,
+          expected_return_date } = req.body;
   if (!department_id || !items.length) return res.json({ success:false, message:'Department and items are required' });
+  if (!required_date) return res.json({ success:false, message:'Required By Date is required' });
+  if (!section) return res.json({ success:false, message:'Plant Section / Area is required' });
 
   const client = await pool.connect();
   try {
@@ -384,11 +387,12 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
 
       const { rows: [gp] } = await client.query(`
         INSERT INTO gate_passes (gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
-          material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open') RETURNING *
+          material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status, expected_return_date)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open', $12) RETURNING *
       `, [gpNum, dc_type || 'MATERIAL_OUT', vehicle_type || 'Truck', vehicle_number || null, driver_name || null,
           dc_purpose || remarks || 'Indent Delivery Challan / Material Dispatch',
-          matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan generated from Indent ${num}`, consignee_vendor_id || null]);
+          matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan generated from Indent ${num}`, consignee_vendor_id || null,
+          dc_type === 'RETURNABLE' ? (expected_return_date || null) : null]);
       createdGp = gp;
 
       await client.query(
@@ -402,7 +406,11 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
     else if (fulfillment_mode === 'issue') {
       for (const it of insertedItems) {
         const qty = parseFloat(it.required_qty || 0);
-        const avail = parseFloat(it.current_stock || 0);
+        // Lock the material row and re-check stock at issue time (not the pre-transaction
+        // snapshot captured when the item was inserted) — prevents two concurrent SIV submissions
+        // from both passing a stale availability check and driving current_stock negative.
+        const { rows: [matLocked] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+        const avail = parseFloat(matLocked?.current_stock || 0);
         if (avail < qty) {
           throw new Error(`Insufficient stock for material ID ${it.material_id} (Available: ${avail}, Requested: ${qty})`);
         }
@@ -504,6 +512,26 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
          VALUES ($1, 'cash_purchase', 'Submitted', 'Cash Purchased', $2, $3)`,
         [id, req.user.id, `Direct Cash Purchase ${cpNum} generated and stock incremented`]
       );
+
+      // Auto-record paid vendor bill for Finance synchronization (mirrors /convert-to-cash-purchase)
+      try {
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`bill-${stamp}`]);
+        const { rows: seqRowsBill } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM vendor_bills WHERE bill_number LIKE $1`, [`BILL-${stamp}-%`]);
+        const billNum = `BILL-${stamp}-${seqRowsBill[0].seq}`;
+
+        await client.query(
+          `INSERT INTO vendor_bills (
+             bill_number, vendor_id, po_id, grn_id, vendor_invoice_number,
+             invoice_date, due_date, taxable_amount, cgst_amount, sgst_amount,
+             igst_amount, total_tax, roundoff, total_amount, paid_amount,
+             balance_amount, status, remarks, created_by
+           ) VALUES ($1, NULL, NULL, NULL, $2, CURRENT_DATE, CURRENT_DATE, $3, $4, $5, 0, $6, 0, $7, $7, 0, 'Paid', $8, $9)`,
+          [
+            billNum, req.body.invoice_number || cpNum, cpTaxable, cpTax / 2, cpTax / 2,
+            cpTax, cpGrandTotal, `Cash Purchase ${cpNum} for Indent ${num}`, req.user.id
+          ]
+        );
+      } catch(err) { /* non-blocking */ }
     }
 
     await client.query('COMMIT');
@@ -545,9 +573,9 @@ router.put('/:id', auth, ar(async (req, res) => {
     await client.query('BEGIN');
     const { rows: [ind] } = await client.query(`SELECT * FROM indents WHERE id=$1 FOR UPDATE`, [req.params.id]);
     if (!ind) { await client.query('ROLLBACK'); return res.status(404).json({ success:false, message:'Indent not found' }); }
-    if (ind.status === 'Issued' || ind.status === 'Closed') {
+    if (['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(ind.status)) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success:false, message:'Cannot edit an already issued or closed indent' });
+      return res.status(400).json({ success:false, message:'Cannot edit an already issued, closed, rejected or cancelled indent' });
     }
 
     const isStore = req.user.dept_code === 'STORE' || ['Store Management', 'Store'].includes(req.user.department);
@@ -621,9 +649,9 @@ router.post('/:id/items', auth, ar(async (req, res) => {
     await client.query('BEGIN');
     const { rows: [ind] } = await client.query('SELECT * FROM indents WHERE id=$1 FOR UPDATE', [req.params.id]);
     if (!ind) { await client.query('ROLLBACK'); return res.status(404).json({ success: false, message: 'Indent not found' }); }
-    if (ind.status === 'Issued' || ind.status === 'Closed') {
+    if (['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(ind.status)) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: 'Cannot append items to an already issued or closed indent' });
+      return res.status(400).json({ success: false, message: 'Cannot append items to an already issued, closed, rejected or cancelled indent' });
     }
 
     const { rows: mat } = await client.query('SELECT current_stock, unit_price, uom FROM materials WHERE id=$1', [material_id]);
@@ -661,9 +689,9 @@ router.delete('/:id/items/:itemId', auth, ar(async (req, res) => {
     await client.query('BEGIN');
     const { rows: [ind] } = await client.query('SELECT * FROM indents WHERE id=$1 FOR UPDATE', [req.params.id]);
     if (!ind) { await client.query('ROLLBACK'); return res.status(404).json({ success: false, message: 'Indent not found' }); }
-    if (ind.status === 'Issued' || ind.status === 'Closed') {
+    if (['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(ind.status)) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: 'Cannot remove items from an issued or closed indent' });
+      return res.status(400).json({ success: false, message: 'Cannot remove items from an issued, closed, rejected or cancelled indent' });
     }
 
     await client.query('DELETE FROM indent_items WHERE id=$1 AND indent_id=$2', [req.params.itemId, req.params.id]);
@@ -1296,7 +1324,7 @@ router.post('/:id/convert-to-po', auth, requireLevel(2), ar(async (req, res) => 
 
 // CONVERT EXISTING INDENT TO DELIVERY CHALLAN (DC / GATE PASS)
 router.post('/:id/convert-to-dc', auth, requireLevel(2), ar(async (req, res) => {
-  const { dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type = 'Truck', driver_name, to_party, consignee_vendor_id, dc_purpose } = req.body;
+  const { dc_type = 'MATERIAL_OUT', vehicle_number, vehicle_type = 'Truck', driver_name, to_party, consignee_vendor_id, dc_purpose, expected_return_date } = req.body;
 
   const client = await pool.connect();
   try {
@@ -1322,11 +1350,12 @@ router.post('/:id/convert-to-dc', auth, requireLevel(2), ar(async (req, res) => 
 
     const { rows: [gp] } = await client.query(`
       INSERT INTO gate_passes (gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
-        material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open') RETURNING *
+        material_description, from_party, to_party, security_guard_id, remarks, vendor_id, status, expected_return_date)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'SRI M.K. PAPER MILLS', $8, $9, $10, $11, 'Open', $12) RETURNING *
     `, [gpNum, dc_type, vehicle_type, vehicle_number || null, driver_name || null,
         dc_purpose || `Outward Dispatch for Indent ${ind.indent_number}`,
-        matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan for Indent ${ind.indent_number}`, consignee_vendor_id || null]);
+        matDesc, to_party || 'Outward Consignee', req.user.id, `Delivery Challan for Indent ${ind.indent_number}`, consignee_vendor_id || null,
+        dc_type === 'RETURNABLE' ? (expected_return_date || null) : null]);
 
     await client.query(`UPDATE indents SET status = 'DC Generated' WHERE id = $1`, [ind.id]);
     await client.query(

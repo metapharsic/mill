@@ -2,6 +2,7 @@ const router = require('express').Router();
 const pool = require('../db/pool');
 const { auth, requireLevel, requireStore } = require('../middleware/auth');
 const { publish, TOPICS } = require('../kafka');
+const { generateInventoryExcel } = require('../services/inventoryExcelExporter');
 
 const asyncRoute = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -144,6 +145,35 @@ router.get('/materials', auth, asyncRoute(async (req, res) => {
     ${where}
   `, params);
   res.json({ success: true, data: rows, total: parseInt(count.rows[0].total) });
+}));
+
+// GET /api/inventory/export/excel — Comprehensive multi-sheet up-to-date inventory Excel export
+router.get('/export/excel', auth, asyncRoute(async (req, res) => {
+  const options = {
+    store_type: req.query.store_type || 'all',
+    category_id: req.query.category_id,
+    stock_status: req.query.stock_status || 'all',
+    criticality: req.query.criticality || 'all',
+    section_id: req.query.section_id,
+    machine_id: req.query.machine_id,
+    search: req.query.search,
+    include_category_sheets: req.query.include_category_sheets !== 'false',
+    include_summary_sheet: req.query.include_summary_sheet !== 'false',
+    include_reorder_sheet: req.query.include_reorder_sheet !== 'false',
+    include_pricing: req.query.include_pricing !== 'false',
+    include_technical: req.query.include_technical !== 'false',
+    include_movement: req.query.include_movement !== 'false',
+    target_date: req.query.target_date,
+    user_name: req.user?.name || req.user?.email || 'Store Manager'
+  };
+
+  const result = await generateInventoryExcel(options);
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+  res.setHeader('X-Meta-Total-SKUs', String(result.meta.totalSKUs));
+  res.setHeader('X-Meta-Total-Valuation', String(result.meta.totalValuation));
+  res.send(result.buffer);
 }));
 
 router.get('/summary', auth, asyncRoute(async (req, res) => {

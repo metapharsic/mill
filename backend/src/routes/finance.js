@@ -38,19 +38,34 @@ router.get('/ar', auth, requireLevel(3), ar(async (req, res) => {
   res.json({ success:true, data:{ customers:rows, totalOutstanding, totalBilled }});
 }));// AP OVERVIEW — payables to vendors (computed live from active vendor bills & POs)
 router.get('/ap', auth, requireLevel(2), ar(async (req, res) => {
+  // NOTE: bills and POs are both one-to-many off vendors, so joining them directly in one
+  // query fans out (N bills x M POs rows per vendor) and multiplies every SUM(). Aggregate
+  // each side independently via LATERAL first (same fix pattern already used for the
+  // p2p-pipeline GRN/bill/payment fan-out in purchase.js) before combining per vendor.
   const { rows } = await pool.query(
     `SELECT v.id, v.code, v.name, v.credit_days as "creditDays",
-            COUNT(DISTINCT vb.id)::int as total_bills,
-            COALESCE(SUM(vb.total_amount), 0) as total_billed,
-            COALESCE(SUM(vb.paid_amount), 0) as total_paid,
-            COALESCE(SUM(vb.balance_amount), 0) as outstanding,
-            COUNT(DISTINCT po.id)::int as total_pos,
-            COALESCE(SUM(CASE WHEN po.status IN ('Approved', 'Partial') THEN po.grand_total ELSE 0 END), 0) as open_po_value
+            COALESCE(bills.total_bills, 0)::int as total_bills,
+            COALESCE(bills.total_billed, 0) as total_billed,
+            COALESCE(bills.total_paid, 0) as total_paid,
+            COALESCE(bills.outstanding, 0) as outstanding,
+            COALESCE(pos.total_pos, 0)::int as total_pos,
+            COALESCE(pos.open_po_value, 0) as open_po_value
      FROM vendors v
-     LEFT JOIN vendor_bills vb ON vb.vendor_id = v.id AND vb.status != 'Cancelled'
-     LEFT JOIN purchase_orders po ON po.vendor_id = v.id AND po.date >= NOW() - INTERVAL '1 year'
+     LEFT JOIN LATERAL (
+       SELECT COUNT(*)::int as total_bills,
+              COALESCE(SUM(vb.total_amount), 0) as total_billed,
+              COALESCE(SUM(vb.paid_amount), 0) as total_paid,
+              COALESCE(SUM(vb.balance_amount), 0) as outstanding
+       FROM vendor_bills vb
+       WHERE vb.vendor_id = v.id AND vb.status != 'Cancelled'
+     ) bills ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT COUNT(*)::int as total_pos,
+              COALESCE(SUM(CASE WHEN po.status IN ('Approved', 'Partial') THEN po.grand_total ELSE 0 END), 0) as open_po_value
+       FROM purchase_orders po
+       WHERE po.vendor_id = v.id AND po.date >= NOW() - INTERVAL '1 year'
+     ) pos ON TRUE
      WHERE v.is_active = true
-     GROUP BY v.id, v.code, v.name, v.credit_days
      ORDER BY outstanding DESC, total_billed DESC`
   );
   const totalOutstanding = rows.reduce((s, r) => s + parseFloat(r.outstanding || 0), 0);
@@ -224,6 +239,23 @@ router.post('/bills', auth, requireLevel(2), ar(async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    // Guard: a bill must be payable against what was actually ACCEPTED at GRN/QC, not the
+    // PO's ordered qty — otherwise the mill ends up paying for goods that were rejected or
+    // never received. Reject bills whose taxable amount materially exceeds the GRN's accepted
+    // value (small tolerance for freight/rounding differences already reflected in remarks).
+    if (grn_id) {
+      const { rows: [grnVal] } = await client.query(
+        `SELECT COALESCE(SUM(gi.accepted_qty * COALESCE(gi.unit_price, 0)), 0) as accepted_value
+         FROM grn_items gi WHERE gi.grn_id = $1`,
+        [grn_id]
+      );
+      const acceptedValue = Number(grnVal?.accepted_value || 0);
+      if (acceptedValue > 0 && taxAmount > acceptedValue * 1.02) {
+        throw new Error(`Bill taxable amount (₹${taxAmount.toFixed(2)}) exceeds the GRN's accepted (post-QC) goods value (₹${acceptedValue.toFixed(2)}). Bills must be booked against ACCEPTED quantity, not ordered quantity.`);
+      }
+    }
+
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`bill-${stamp}`]);
     const { rows: seqRows } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM vendor_bills WHERE bill_number LIKE $1`, [`BILL-${stamp}-%`]);
@@ -244,7 +276,7 @@ router.post('/bills', auth, requireLevel(2), ar(async (req, res) => {
     res.status(201).json({ success: true, data: bill, message: `Vendor Bill ${billNum} booked successfully` });
   } catch (e) {
     await client.query('ROLLBACK');
-    throw e;
+    return res.status(400).json({ success: false, message: e.message });
   } finally {
     client.release();
   }
@@ -306,9 +338,17 @@ router.get('/payments/vendor', auth, requireLevel(2), ar(async (req, res) => {
      LEFT JOIN vendor_bills vb ON vb.id = vp.bill_id
      ${where}`, params
   );
-  const totalAmount = rows.reduce((s, r) => s + parseFloat(r.amount || 0), 0);
+  // Must be a full-set SQL aggregate, not a reduce() over `rows` — `rows` is only the current
+  // page (LIMIT/OFFSET), so summing it undercounts totalAmount once results exceed one page.
+  const { rows: [sumRow] } = await pool.query(
+    `SELECT COALESCE(SUM(vp.amount), 0) as "totalAmount"
+     FROM vendor_payments vp
+     LEFT JOIN vendors v ON v.id = vp.vendor_id
+     LEFT JOIN vendor_bills vb ON vb.id = vp.bill_id
+     ${where}`, params
+  );
 
-  res.json({ success: true, data: rows, total: parseInt(cnt[0].count), totalAmount });
+  res.json({ success: true, data: rows, total: parseInt(cnt[0].count), totalAmount: parseFloat(sumRow?.totalAmount || 0) });
 }));
 
 // POST /api/finance/payments/vendor — record vendor payment disbursal

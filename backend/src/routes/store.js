@@ -581,7 +581,7 @@ router.put('/issues/:id/approve', requireAuth, requireLevel(2), ar(async (req, r
             INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, out_qty, balance, unit_price, value, batch_number, remarks, created_by)
             VALUES ($1, CURRENT_DATE, 'issue', 'indent', $2, $3, $4, $5, $6, $7, $8, $9)
           `, [
-            item.material_id, ind.id, issQty, mat.current_stock, unitPrice,
+            item.material_id, ind.id, issQty, newBal, unitPrice,
             issQty * unitPrice, batch_number || serial_number || null,
             `Store Issue for Indent ${ind.indent_number}`, req.user.id
           ]);
@@ -1223,7 +1223,10 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
            COALESCE(v.name, po_v.name, g_v.name) AS "vendorName",
            COALESCE(v.code, po_v.code, g_v.code) AS "vendorCode",
            COALESCE(v.gstin, po_v.gstin, g_v.gstin) AS "vendorGstin",
-           COALESCE(v.state, po_v.state, g_v.state) AS "vendorState"
+           COALESCE(v.state, po_v.state, g_v.state) AS "vendorState",
+           g.id AS "grnId", g.grn_number AS "grnNumber", g.status AS "grnStatus",
+           g.vehicle_number AS "grnVehicleNumber", g.challan_number AS "grnChallanNumber",
+           g.invoice_number AS "grnInvoiceNumber"
     FROM stock_ledger sl
     JOIN materials m ON sl.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
@@ -1834,6 +1837,12 @@ router.put('/grn/:id', requireAuth, requireStore, ar(async (req, res) => {
       [isNum ? parseInt(grnId) : String(grnId)]
     );
     if (!grn) throw new Error('GRN not found');
+    // GRN is normally 'Received' the moment it is created — that is the working state, not a
+    // lock. Only a hard-terminal status (set once finance closes/cancels the receipt) blocks
+    // further correction, mirroring the PO editable-unless-terminal pattern.
+    if (['Cancelled', 'Closed'].includes(grn.status) && (req.user?.role_level || 1) < 4) {
+      throw new Error(`Cannot edit a ${grn.status.toLowerCase()} GRN. It has been finalized.`);
+    }
 
     await client.query(`
       UPDATE grn
@@ -2797,6 +2806,34 @@ router.post('/rejections/:id/dispatch-rtv', requireAuth, requireStore, ar(async 
   }
 }));
 
+// PUT /api/store/gate-passes/:id — Edit Gate Pass details (vehicle, driver, party, purpose, return date, remarks)
+router.put('/gate-passes/:id', requireAuth, ar(async (req, res) => {
+  const { id } = req.params;
+  const { vehicle_number, driver_name, to_party, from_party, purpose, material_description, remarks, expected_return_date, status } = req.body;
+
+  const { rows: [gp] } = await pool.query('SELECT * FROM gate_passes WHERE id = $1', [id]);
+  if (!gp) return res.status(404).json({ success: false, message: 'Gate pass not found' });
+  if (gp.status === 'Closed' && (req.user?.role_level || 1) < 4) {
+    return res.status(400).json({ success: false, message: 'Cannot edit a closed gate pass' });
+  }
+
+  const { rows: [updated] } = await pool.query(`
+    UPDATE gate_passes SET
+      vehicle_number = COALESCE($1, vehicle_number),
+      driver_name = COALESCE($2, driver_name),
+      to_party = COALESCE($3, to_party),
+      from_party = COALESCE($4, from_party),
+      purpose = COALESCE($5, purpose),
+      material_description = COALESCE($6, material_description),
+      remarks = COALESCE($7, remarks),
+      expected_return_date = COALESCE($8, expected_return_date),
+      status = COALESCE($9, status)
+    WHERE id = $10 RETURNING *
+  `, [vehicle_number || null, driver_name || null, to_party || null, from_party || null, purpose || null, material_description || null, remarks || null, expected_return_date || null, status || null, id]);
+
+  res.json({ success: true, data: updated, message: 'Gate pass updated successfully' });
+}));
+
 // ============================================================================
 // INTER-STORE TRANSFERS (STO) ENDPOINTS
 // ============================================================================
@@ -2907,10 +2944,13 @@ router.put('/transfers/:id/dispatch', requireAuth, requireStore, ar(async (req, 
         throw new Error(`Insufficient stock for item ID ${item.material_id}. Available: ${mat.current_stock}`);
       }
 
+      const newStock = parseFloat(mat.current_stock) - parseFloat(item.qty);
+      await client.query(`UPDATE materials SET current_stock = $1 WHERE id = $2`, [newStock, item.material_id]);
+
       await client.query(`
         INSERT INTO stock_ledger (material_id, transaction_type, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
         VALUES ($1, 'transfer', $2, $3, $4, $5, CURRENT_DATE, 'store_transfer', $6, $7, $8)
-      `, [item.material_id, item.qty, parseFloat(mat.current_stock) - parseFloat(item.qty), mat.unit_price,
+      `, [item.material_id, item.qty, newStock, mat.unit_price,
           parseFloat(item.qty) * parseFloat(mat.unit_price), transfer.id,
           `STO Dispatch: #${transfer.transfer_number}`, req.user.id]);
     }
@@ -2943,10 +2983,13 @@ router.put('/transfers/:id/receive', requireAuth, requireStore, ar(async (req, r
     const { rows: items } = await client.query(`SELECT * FROM store_transfer_items WHERE transfer_id = $1`, [transfer.id]);
     for (const item of items) {
       const { rows: [mat] } = await client.query(`SELECT id, current_stock, unit_price FROM materials WHERE id = $1 FOR UPDATE`, [item.material_id]);
+      const newStock = parseFloat(mat.current_stock || 0) + parseFloat(item.qty);
+      await client.query(`UPDATE materials SET current_stock = $1 WHERE id = $2`, [newStock, item.material_id]);
+
       await client.query(`
         INSERT INTO stock_ledger (material_id, transaction_type, in_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
         VALUES ($1, 'transfer', $2, $3, $4, $5, CURRENT_DATE, 'store_transfer', $6, $7, $8)
-      `, [item.material_id, item.qty, parseFloat(mat.current_stock), mat.unit_price,
+      `, [item.material_id, item.qty, newStock, mat.unit_price,
           parseFloat(item.qty) * parseFloat(mat.unit_price), transfer.id,
           `STO Received: #${transfer.transfer_number}`, req.user.id]);
     }
@@ -3029,7 +3072,29 @@ router.post('/returns', requireAuth, ar(async (req, res) => {
 
     for (const item of items) {
       if (!item.materialId || !item.qty) continue;
-      const { rows: [mat] } = await client.query(`SELECT uom FROM materials WHERE id = $1`, [item.materialId]);
+      const { rows: [mat] } = await client.query(`SELECT uom, name FROM materials WHERE id = $1`, [item.materialId]);
+
+      // Guard: when this return references an original Indent, don't let cumulative
+      // returns for that indent+material exceed what was ever requested on it —
+      // prevents a department over-returning more than it was issued.
+      if (indentId) {
+        const { rows: [reqRow] } = await client.query(
+          `SELECT COALESCE(SUM(required_qty), 0) AS req FROM indent_items WHERE indent_id = $1 AND material_id = $2`,
+          [indentId, item.materialId]
+        );
+        const { rows: [retRow] } = await client.query(
+          `SELECT COALESCE(SUM(sri.qty), 0) AS returned
+           FROM store_return_items sri JOIN store_returns sr ON sr.id = sri.return_id
+           WHERE sr.indent_id = $1 AND sri.material_id = $2 AND sr.status != 'Rejected'`,
+          [indentId, item.materialId]
+        );
+        const requested = Number(reqRow?.req || 0);
+        const alreadyReturned = Number(retRow?.returned || 0);
+        if (requested > 0 && alreadyReturned + Number(item.qty) > requested) {
+          throw new Error(`Cannot return ${item.qty} of ${mat?.name || 'material'} against this indent — only ${(requested - alreadyReturned).toFixed(3)} remains returnable (requested ${requested}, already returned ${alreadyReturned}).`);
+        }
+      }
+
       await client.query(`
         INSERT INTO store_return_items (return_id, material_id, qty, uom, condition_grade, action_taken, remarks)
         VALUES ($1, $2, $3, $4, $5, $6, $7)

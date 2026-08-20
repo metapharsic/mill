@@ -1027,7 +1027,9 @@ router.get('/indents', auth, requireLevel(2), ar(async (req, res) => {
              mch.name AS "machineName", mch.code AS "machineCode",
              (SELECT STRING_AGG(ii.purpose, ' | ') FROM indent_items ii WHERE ii.indent_id = i.id) AS "technicalPurposes",
              (SELECT STRING_AGG(DISTINCT ii.reason_code, ', ') FROM indent_items ii WHERE ii.indent_id = i.id) AS "reasonCodes",
-             (SELECT COUNT(*) FROM indent_items ii WHERE ii.indent_id = i.id)::int AS "itemCount"
+             (SELECT COUNT(*) FROM indent_items ii WHERE ii.indent_id = i.id)::int AS "itemCount",
+             (SELECT STRING_AGG(DISTINCT v.name, ', ') FROM purchase_orders po JOIN vendors v ON v.id = po.vendor_id WHERE po.indent_id = i.id) AS "vendorNames",
+             (SELECT STRING_AGG(DISTINCT po.po_number, ', ') FROM purchase_orders po WHERE po.indent_id = i.id) AS "poNumbers"
       FROM indents i
       LEFT JOIN departments d ON d.id = i.department_id
       LEFT JOIN users u ON u.id = i.raised_by
@@ -1046,7 +1048,8 @@ router.get('/indents', auth, requireLevel(2), ar(async (req, res) => {
       'Indent No', 'Date', 'Department', 'Plant Section', 'Machine / Equipment',
       'Raised By (Indentor)', 'Indentor Employee Code', 'Designation / Role',
       'Reason Codes', 'Technical Justification / Purpose',
-      'Status', 'Cancellation Reason', 'Total Value (INR)', 'Work Order / Remarks'
+      'Status', 'Cancellation Reason', 'Total Value (INR)', 'Work Order / Remarks',
+      'Vendor Name (if Purchased)', 'PO Number(s)'
     ];
     const rows = indentsRes.rows.map(r => [
       r.indentNumber,
@@ -1062,7 +1065,9 @@ router.get('/indents', auth, requireLevel(2), ar(async (req, res) => {
       r.status,
       r.cancellationReason || '—',
       r.totalValue,
-      r.remarks || '—'
+      r.remarks || '—',
+      r.vendorNames || '—',
+      r.poNumbers || '—'
     ]);
     return sendCSV(res, `indents_report_${f}_${t}.csv`, headers, rows);
   }

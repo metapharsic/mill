@@ -4,13 +4,14 @@ import { useToast } from '../context/ToastContext'
 import { ConfirmModal } from '../components/ui/Modal'
 import { FormField } from '../components/ui/FormField'
 import ProductDetailModal from '../components/ProductDetailModal'
+import InventoryExportModal from '../components/InventoryExportModal'
+import SearchableSelect from '../components/SearchableSelect'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
 import { sortTableData } from '../utils/tableSort'
 import { ExternalLink } from 'lucide-react'
-import { GST_SLABS } from './Purchase'
 
 const API = '/api'
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem('mk_token')}` })
@@ -82,6 +83,7 @@ export default function Store({ onNavigate }) {
   const { user } = useAuth()
   const { addToast } = useToast()
   const [tab, setTab] = useState('inward')
+  const [exportModal, setExportModal] = useState(false)
   const [mats, setMats] = useState([])
   const [depts, setDepts] = useState([])
   const [machines, setMachines] = useState([])
@@ -224,24 +226,49 @@ export default function Store({ onNavigate }) {
     e.preventDefault()
     if (!editInwardModal) return
     try {
+      const { grn_vehicle_number, grn_challan_number, grn_invoice_number, ...ledgerForm } = editInwardForm
       const res = await fetch(`${API}/store/inward/${editInwardModal.id}`, {
         method: 'PUT',
         headers: json(),
-        body: JSON.stringify(editInwardForm)
+        body: JSON.stringify(ledgerForm)
       })
       if (res.status === 401) {
         addToast('Authentication session expired or invalid token. Please log in again.', 'error')
         return
       }
       const r = await res.json()
-      if (r.success) {
-        addToast('Inward record updated successfully', 'success')
-        setEditInwardModal(null)
-        loadInward()
-        loadBaseData()
-      } else {
+      if (!r.success) {
         addToast(r.message || 'Failed to update inward record', 'error')
+        return
       }
+
+      // If this receipt is linked to a formal GRN header, sync the vehicle/challan/invoice
+      // fields on the GRN itself too (separate atomic PUT — GRN is blocked server-side once
+      // it is Cancelled/Closed, so this can fail independently of the line-item update above).
+      if (editInwardModal.grnId) {
+        const grnRes = await fetch(`${API}/store/grn/${editInwardModal.grnId}`, {
+          method: 'PUT',
+          headers: json(),
+          body: JSON.stringify({
+            vehicle_number: grn_vehicle_number || null,
+            challan_number: grn_challan_number || null,
+            invoice_number: grn_invoice_number || null
+          })
+        })
+        const gr = await grnRes.json()
+        if (!gr.success) {
+          addToast('Inward quantity/price saved, but GRN header update failed: ' + (gr.message || ''), 'error')
+          setEditInwardModal(null)
+          loadInward()
+          loadBaseData()
+          return
+        }
+      }
+
+      addToast('Inward record updated successfully', 'success')
+      setEditInwardModal(null)
+      loadInward()
+      loadBaseData()
     } catch (err) {
       addToast('Error updating inward entry: ' + err.message, 'error')
     }
@@ -1046,6 +1073,13 @@ export default function Store({ onNavigate }) {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <button
+            style={{ ...S.btn, background: '#f0fdfa', border: '1px solid #0f766e', color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+            onClick={() => setExportModal(true)}
+            title="Download Comprehensive Multi-Sheet Excel Master with Categories & Reorder Alerts"
+          >
+            📊 Excel Master Export
+          </button>
+          <button
             style={{ ...S.btn, background: '#0f172a', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
             onClick={() => onNavigate ? onNavigate('store-dashboard') : (window.location.href = '/store-dashboard')}
             title="Open Exclusive Store Management Realtime Dashboard"
@@ -1227,7 +1261,10 @@ export default function Store({ onNavigate }) {
                             bin_location: inw.bin_location || '',
                             batch_number: inw.batch_number || '',
                             remarks: inw.remarks || '',
-                            date: inw.date ? inw.date.slice(0, 10) : ''
+                            date: inw.date ? inw.date.slice(0, 10) : '',
+                            grn_vehicle_number: inw.grnVehicleNumber || '',
+                            grn_challan_number: inw.grnChallanNumber || '',
+                            grn_invoice_number: inw.grnInvoiceNumber || ''
                           })
                           setEditInwardModal(inw)
                         }}>✏️</button>
@@ -1997,18 +2034,18 @@ export default function Store({ onNavigate }) {
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#1e40af', textTransform: 'uppercase', marginBottom: 4 }}>
                   🚛 1-Click Import from Security Inward Gate Pass
                 </div>
-                <select
-                  style={{ ...S.select, background: '#fff', borderColor: '#3b82f6', fontWeight: 600 }}
+                <SearchableSelect
                   value={inwardForm.gate_pass_id || ''}
-                  onChange={e => handleSelectGatePassForInward(e.target.value)}
-                >
-                  <option value="">-- Select Gate Pass to Auto-Fill Truck, Weighbridge & PO --</option>
-                  {openGatePasses.map(gp => (
-                    <option key={gp.id} value={gp.id}>
-                      {gp.gpNumber} — {gp.vehicleNumber} ({gp.vendorName || gp.materialDescription || 'Material'}) · In: {gp.weightIn ? `${gp.weightIn}T` : 'No Wt'} {gp.poNumber ? `· PO #${gp.poNumber}` : ''}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleSelectGatePassForInward(val)}
+                  placeholder="-- Select Gate Pass to Auto-Fill Truck, Weighbridge & PO --"
+                  searchPlaceholder="Type gate pass number, vehicle or vendor..."
+                  options={openGatePasses.map(gp => ({
+                    value: gp.id,
+                    label: gp.gpNumber,
+                    subtext: `${gp.vehicleNumber} (${gp.vendorName || gp.materialDescription || 'Material'}) · In: ${gp.weightIn ? `${gp.weightIn}T` : 'No Wt'} ${gp.poNumber ? `· PO #${gp.poNumber}` : ''}`
+                  }))}
+                  selectStyle={{ background: '#fff', borderColor: '#3b82f6', fontWeight: 600 }}
+                />
               </div>
             )}
 
@@ -2017,38 +2054,50 @@ export default function Store({ onNavigate }) {
               <div style={S.grid2}>
                 <div>
                   <label style={S.label}>Inward Type *</label>
-                  <select style={S.select} value={inwardForm.inward_type} onChange={e => setInwardForm({ ...inwardForm, inward_type: e.target.value })}>
-                    <option value="grn">GRN (Purchase Inward)</option>
-                    <option value="return">Department Return (Unused Material)</option>
-                    <option value="direct">Direct / Emergency Receipt</option>
-                  </select>
+                  <SearchableSelect
+                    value={inwardForm.inward_type || 'grn'}
+                    onChange={v => setInwardForm({ ...inwardForm, inward_type: v })}
+                    placeholder="Select inward type..."
+                    searchPlaceholder="Type or press G/D..."
+                    options={[
+                      { value: 'grn', label: 'GRN (Purchase Inward)', subtext: 'Standard purchase goods receipt' },
+                      { value: 'return', label: 'Department Return (Unused Material)', subtext: 'Material returned from plant' },
+                      { value: 'direct', label: 'Direct / Emergency Receipt', subtext: 'Immediate receipt without PO' }
+                    ]}
+                  />
                 </div>
                 <div>
                   <label style={S.label}>Ref Document *</label>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <select style={{ ...S.select, width: 90 }} value={inwardForm.reference_type} onChange={e => setInwardForm({ ...inwardForm, reference_type: e.target.value })}>
-                      <option value="PO">PO #</option>
-                      <option value="INV">Invoice</option>
-                      <option value="DC">DC #</option>
-                      <option value="GP">Gate Pass</option>
-                    </select>
+                    <SearchableSelect
+                      value={inwardForm.reference_type || 'PO'}
+                      onChange={v => setInwardForm({ ...inwardForm, reference_type: v })}
+                      placeholder="Doc type"
+                      options={[
+                        { value: 'PO', label: 'PO #' },
+                        { value: 'INV', label: 'Invoice' },
+                        { value: 'DC', label: 'DC #' },
+                        { value: 'GP', label: 'Gate Pass' }
+                      ]}
+                      style={{ width: 110, flexShrink: 0 }}
+                    />
                     {inwardForm.reference_type === 'PO' ? (
-                      <select
-                        style={{ ...S.select, flex: 1, borderColor: '#0f766e', fontWeight: 600 }}
-                        value={inwardForm.reference_id}
-                        onChange={e => {
-                          const poNum = e.target.value
+                      <SearchableSelect
+                        value={inwardForm.reference_id || ''}
+                        onChange={poNum => {
                           setInwardForm(prev => ({ ...prev, reference_id: poNum }))
                           handleSelectPOForInward(poNum)
                         }}
-                      >
-                        <option value="">-- Select Approved / Active PO --</option>
-                        {purchaseOrders.map(po => (
-                          <option key={po.id} value={po.po_number || po.poNumber}>
-                            {po.po_number || po.poNumber} — {po.vendorName} ({po.status})
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="-- Select Approved / Active PO --"
+                        searchPlaceholder="Type PO number or vendor name..."
+                        options={purchaseOrders.map(po => ({
+                          value: po.po_number || po.poNumber,
+                          label: po.po_number || po.poNumber,
+                          subtext: `${po.vendorName} · ${po.status}`,
+                          badge: po.status
+                        }))}
+                        selectStyle={{ flex: 1, borderColor: '#0f766e', fontWeight: 600 }}
+                      />
                     ) : (
                       <input style={S.input} placeholder="Ref Number (e.g. INV-8902)" value={inwardForm.reference_id} onChange={e => setInwardForm({ ...inwardForm, reference_id: e.target.value })} required />
                     )}
@@ -2317,39 +2366,42 @@ export default function Store({ onNavigate }) {
                     {inwardForm.inward_type === 'return' ? (
                       <>
                         <label style={S.label}>Returning Department *</label>
-                        <select
-                          style={S.select}
-                          value={inwardForm.department_id || ''}
-                          onChange={e => setInwardForm({ ...inwardForm, department_id: e.target.value })}
-                          required
-                        >
-                          <option value="">-- Select Returning Department --</option>
-                          {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                        </select>
+                        <SearchableSelect
+                          value={String(inwardForm.department_id || '')}
+                          onChange={v => setInwardForm({ ...inwardForm, department_id: v })}
+                          placeholder="-- Select Returning Department --"
+                          searchPlaceholder="Type department name..."
+                          options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                        />
                       </>
                     ) : (
                       <>
                         <label style={S.label}>Vendor / Supplier Name</label>
-                        <select style={S.input}
-                          value={vendorPickMode === 'other' ? '__other__' : inwardForm.vendor_id}
-                          onChange={e => {
-                            if (e.target.value === '__other__') {
+                        <SearchableSelect
+                          value={vendorPickMode === 'other' ? '__other__' : String(inwardForm.vendor_id || '')}
+                          onChange={id => {
+                            if (id === '__other__') {
                               setVendorPickMode('other')
                               setInwardForm({ ...inwardForm, vendor_id: '', vendor_name: '' })
                             } else {
-                              const v = vendors.find(vv => String(vv.id) === e.target.value)
+                              const v = vendors.find(vv => String(vv.id) === id)
                               setVendorPickMode('list')
-                              setInwardForm({ ...inwardForm, vendor_id: e.target.value, vendor_name: v ? v.name : '' })
+                              setInwardForm({ ...inwardForm, vendor_id: id, vendor_name: v ? v.name : '' })
                             }
-                          }}>
-                          <option value="">-- Select registered vendor --</option>
-                          {vendors.map(v => (
-                            <option key={v.id} value={v.id}>
-                              {v.name} ({v.poCount || v.po_count || 0} POs)
-                            </option>
-                          ))}
-                          <option value="__other__">Other / Direct-OEM (type name below)</option>
-                        </select>
+                          }}
+                          placeholder="-- Select registered vendor --"
+                          searchPlaceholder="Type vendor name or GSTIN..."
+                          options={[
+                            ...vendors.map(v => ({
+                              value: String(v.id),
+                              label: v.name,
+                              code: v.code,
+                              subtext: v.gstin ? `GST: ${v.gstin}` : undefined,
+                              badge: `${v.poCount || v.po_count || 0} POs`
+                            })),
+                            { value: '__other__', label: 'Other / Direct-OEM (type name below)' }
+                          ]}
+                        />
                         {vendorPickMode === 'other' && (
                           <input style={{ ...S.input, marginTop: 6 }} placeholder="e.g. SKF India / Voith / Shell (not in master vendor list)"
                             value={inwardForm.vendor_name} onChange={e => setInwardForm({ ...inwardForm, vendor_name: e.target.value })} />
@@ -2371,11 +2423,16 @@ export default function Store({ onNavigate }) {
                   </div>
                   <div>
                     <label style={S.label}>QC Inspection Status</label>
-                    <select style={S.select} value={inwardForm.quality_status} onChange={e => setInwardForm({ ...inwardForm, quality_status: e.target.value })}>
-                      <option value="Accepted">Accepted (Passed Inspection)</option>
-                      <option value="Conditionally Accepted">Conditionally Accepted</option>
-                      <option value="Under QC Inspection">Under QC Inspection</option>
-                    </select>
+                    <SearchableSelect
+                      value={inwardForm.quality_status || 'Accepted'}
+                      onChange={v => setInwardForm({ ...inwardForm, quality_status: v })}
+                      placeholder="Select QC status..."
+                      options={[
+                        { value: 'Accepted', label: 'Accepted (Passed Inspection)', badge: '✅' },
+                        { value: 'Conditionally Accepted', label: 'Conditionally Accepted', badge: '⚠️' },
+                        { value: 'Under QC Inspection', label: 'Under QC Inspection', badge: '⏳' }
+                      ]}
+                    />
                   </div>
                 </div>
 
@@ -2411,11 +2468,17 @@ export default function Store({ onNavigate }) {
               <div style={S.grid2}>
                 <div>
                   <label style={S.label}>Outward Type *</label>
-                  <select style={S.select} value={outwardForm.outward_type} onChange={e => setOutwardForm({ ...outwardForm, outward_type: e.target.value })}>
-                    <option value="issue">Department Issue (Production / Maintenance)</option>
-                    <option value="return_to_vendor">Return to Vendor (RTV)</option>
-                    <option value="transfer">Inter-Store Transfer</option>
-                  </select>
+                  <SearchableSelect
+                    value={outwardForm.outward_type || 'issue'}
+                    onChange={v => setOutwardForm({ ...outwardForm, outward_type: v })}
+                    placeholder="Select outward type..."
+                    searchPlaceholder="Type or press D/R/T..."
+                    options={[
+                      { value: 'issue', label: 'Department Issue (Production / Maintenance)', subtext: 'Internal plant consumption' },
+                      { value: 'return_to_vendor', label: 'Return to Vendor (RTV)', subtext: 'Defective / excess material return' },
+                      { value: 'transfer', label: 'Inter-Store Transfer', subtext: 'Move stock to another store' }
+                    ]}
+                  />
                 </div>
                 <div>
                   <label style={S.label}>Work Order / Ref #</label>
@@ -2425,14 +2488,21 @@ export default function Store({ onNavigate }) {
 
               <div>
                 <label style={S.label}>Select Material *</label>
-                <select style={S.select} value={outwardForm.material_id} onChange={e => setOutwardForm({ ...outwardForm, material_id: e.target.value })} required>
-                  <option value="">-- Choose Material --</option>
-                  {mats.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.name} [{m.code}] { (m.poCount || m.po_count) ? `[${m.poCount || m.po_count} POs]` : '' } — Available Stock: {m.current_stock || m.currentStock || 0} {m.uom}
-                    </option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  value={String(outwardForm.material_id || '')}
+                  onChange={v => setOutwardForm({ ...outwardForm, material_id: v })}
+                  placeholder="-- Choose Material --"
+                  searchPlaceholder="Type material name, code, category, bin..."
+                  required
+                  options={mats.map(m => ({
+                    value: String(m.id),
+                    label: m.name,
+                    code: m.code,
+                    subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Bin: ${m.bin_location || m.binLocation || 'Store'}`,
+                    badge: Number(m.current_stock || m.currentStock || 0) <= 0 ? '❌ Out' : undefined,
+                    group: m.categoryName
+                  }))}
+                />
               </div>
 
               {selectedOutwardMat && (
@@ -2448,20 +2518,28 @@ export default function Store({ onNavigate }) {
                 </div>
                 <div>
                   <label style={S.label}>Plant Department *</label>
-                  <select style={S.select} value={outwardForm.department_id} onChange={e => setOutwardForm({ ...outwardForm, department_id: e.target.value })} required>
-                    <option value="">-- Select Receiving Dept --</option>
-                    {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={String(outwardForm.department_id || '')}
+                    onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
+                    placeholder="-- Select Receiving Dept --"
+                    searchPlaceholder="Type department name..."
+                    required
+                    options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                  />
                 </div>
               </div>
 
               <div style={S.grid2}>
                 <div>
                   <label style={S.label}>Machine / Section Context</label>
-                  <select style={S.select} value={outwardForm.machine_id} onChange={e => setOutwardForm({ ...outwardForm, machine_id: e.target.value })}>
-                    <option value="">-- Select Machine (Optional) --</option>
-                    {machines.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={String(outwardForm.machine_id || '')}
+                    onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
+                    placeholder="-- Select Machine (Optional) --"
+                    searchPlaceholder="Type machine name or code..."
+                    allowClear={true}
+                    options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
+                  />
                 </div>
                 <div>
                   <label style={S.label}>Issued To (Person Name) *</label>
@@ -2823,6 +2901,31 @@ export default function Store({ onNavigate }) {
                 <label style={S.label}>Remarks / Party Info</label>
                 <textarea style={S.input} rows={2} value={editInwardForm.remarks} onChange={e => setEditInwardForm({ ...editInwardForm, remarks: e.target.value })} />
               </div>
+
+              {editInwardModal.grnId && (
+                <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', textTransform: 'uppercase', marginBottom: 8 }}>
+                    GRN {editInwardModal.grnNumber} — Header Details
+                    {editInwardModal.grnStatus && (editInwardModal.grnStatus === 'Cancelled' || editInwardModal.grnStatus === 'Closed') && (
+                      <span style={{ marginLeft: 8, color: '#dc2626', fontWeight: 600 }}>({editInwardModal.grnStatus} — needs elevated access to edit)</span>
+                    )}
+                  </div>
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Vehicle Number</label>
+                      <input style={S.input} value={editInwardForm.grn_vehicle_number} onChange={e => setEditInwardForm({ ...editInwardForm, grn_vehicle_number: e.target.value })} />
+                    </div>
+                    <div>
+                      <label style={S.label}>Challan Number</label>
+                      <input style={S.input} value={editInwardForm.grn_challan_number} onChange={e => setEditInwardForm({ ...editInwardForm, grn_challan_number: e.target.value })} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={S.label}>Invoice Number</label>
+                    <input style={S.input} value={editInwardForm.grn_invoice_number} onChange={e => setEditInwardForm({ ...editInwardForm, grn_invoice_number: e.target.value })} />
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
                 <button type="button" style={S.btnGhost} onClick={() => setEditInwardModal(null)}>Cancel</button>
@@ -3354,6 +3457,12 @@ export default function Store({ onNavigate }) {
         isOpen={!!selectedProductModalId}
         onClose={() => setSelectedProductModalId(null)}
         onUpdated={loadBaseData}
+      />
+
+      {/* ── ENTERPRISE INVENTORY EXCEL EXPORTER MODAL ── */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
       />
     </div>
   )

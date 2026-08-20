@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import SearchableSelect from '../components/SearchableSelect'
 
 const API = async (path, opts = {}) => {
   try {
@@ -204,6 +205,7 @@ export default function Indent() {
     to_party: '',
     consignee_vendor_id: '',
     dc_purpose: '',
+    expected_return_date: '',
     items: [{ material_id: '', required_qty: '', uom: '', unit_price: '', gst_pct: 18, purpose: '', component_position: '', reason_code: 'Routine Replacement' }]
   })
   const [form, setForm] = useState(blankForm())
@@ -404,7 +406,8 @@ export default function Indent() {
     const headers = [
       'Indent Number', 'Date & Time Raised', 'Department', 'Plant Section Code', 'Plant Section Name',
       'Machine Context', 'Raised By (Indentor)', 'Indentor Employee Code', 'Designation / Role',
-      'Reason Code', 'Technical Justification / Purpose', 'Work Order / Remarks', 'Status', 'Cancellation Reason', 'Total Value (INR)'
+      'Reason Code', 'Technical Justification / Purpose', 'Work Order / Remarks', 'Status', 'Cancellation Reason',
+      'Vendor Name (PO/Cash Purchase)', 'PO Number', 'Total Value (INR)'
     ]
     const csvRows = [headers.join(',')]
     rows.forEach(r => {
@@ -423,6 +426,8 @@ export default function Indent() {
         `"${(r.remarks || '').replace(/"/g, '""')}"`,
         `"${r.status || ''}"`,
         `"${(r.cancellationReason || '—').replace(/"/g, '""')}"`,
+        `"${r.linkedPoVendorName || r.linkedCpVendorName || ''}"`,
+        `"${r.linkedPoNumber || ''}"`,
         Number(r.total_value || 0).toFixed(2)
       ].join(','))
     })
@@ -736,6 +741,7 @@ export default function Indent() {
       to_party: '',
       consignee_vendor_id: '',
       dc_purpose: `Outward Dispatch for Indent ${ind.indentNumber || ind.indent_number}`,
+      expected_return_date: '',
       items: (ind.items || []).map(it => ({
         id: it.id,
         material_id: it.material_id,
@@ -761,7 +767,8 @@ export default function Indent() {
         driver_name: dcModal.driver_name,
         to_party: dcModal.to_party,
         consignee_vendor_id: dcModal.consignee_vendor_id || null,
-        dc_purpose: dcModal.dc_purpose
+        dc_purpose: dcModal.dc_purpose,
+        expected_return_date: dcModal.expected_return_date || null
       })
     })
     setConverting(false)
@@ -827,6 +834,7 @@ export default function Indent() {
     const errs = {}
     if (!form.department_id) errs.department_id = 'Select department'
     if (!form.required_date) errs.required_date = 'Pick required date'
+    if (!form.section) errs.section = 'Select plant section / area'
     if (form.fulfillment_mode === 'po' && !form.vendor_id) {
       errs.vendor_id = 'Select a vendor for direct PO creation'
     }
@@ -1269,7 +1277,7 @@ export default function Indent() {
                               )}
 
                               {/* Edit available for unissued/uncancelled indents */}
-                              {r.status !== 'Issued' && r.status !== 'Closed' && r.status !== 'Cancelled' && (
+                              {!['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(r.status) && (
                                 <button style={S.btnSm('#2563eb')} onClick={() => openEdit(r.id)} title="Edit Indent Items & Details">
                                   ✏️ Edit
                                 </button>
@@ -1521,35 +1529,35 @@ export default function Indent() {
                   <span>🛒</span> Direct Purchase Order (PO) Details &amp; Commercial Terms
                 </div>
                 <div style={S.grid3}>
-                  <label style={S.lbl}>Assign Vendor / Supplier *
-                    <select
-                      style={{ ...S.sel, ...(formErrors.vendor_id ? { border: '1px solid #ef4444' } : {}) }}
-                      value={form.vendor_id}
-                      onChange={e => setForm(f => ({ ...f, vendor_id: e.target.value }))}
-                    >
-                      <option value="">-- Select Vendor / Supplier --</option>
-                      {vendors.map(v => (
-                        <option key={v.id} value={v.id}>
-                          {v.name} {v.gstin ? `[GSTIN: ${v.gstin}]` : ''} ({v.city || 'Vendor'})
-                        </option>
-                      ))}
-                    </select>
+                  <label style={S.lbl}>Assign Vendor / Supplier *</label>
+                    <SearchableSelect
+                      value={String(form.vendor_id || '')}
+                      onChange={v => setForm(f => ({ ...f, vendor_id: v }))}
+                      placeholder="-- Select Vendor / Supplier --"
+                      searchPlaceholder="Type vendor name, GSTIN, city..."
+                      selectStyle={formErrors.vendor_id ? { border: '1px solid #ef4444' } : {}}
+                      options={vendors.map(v => ({
+                        value: String(v.id),
+                        label: v.name,
+                        code: v.code,
+                        subtext: [v.gstin ? `GST: ${v.gstin}` : '', v.city || ''].filter(Boolean).join(' · ')
+                      }))}
+                    />
                     {formErrors.vendor_id && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.vendor_id}</span>}
-                  </label>
-                  <label style={S.lbl}>Payment Terms
-                    <select
-                      style={S.sel}
-                      value={form.payment_terms}
-                      onChange={e => setForm(f => ({ ...f, payment_terms: e.target.value }))}
-                    >
-                      <option value="Net 30 Days">Net 30 Days</option>
-                      <option value="Net 15 Days">Net 15 Days</option>
-                      <option value="Net 45 Days">Net 45 Days</option>
-                      <option value="Immediate / COD">Immediate / COD</option>
-                      <option value="100% Advance">100% Advance</option>
-                      <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
-                    </select>
-                  </label>
+                  <label style={S.lbl}>Payment Terms</label>
+                    <SearchableSelect
+                      value={form.payment_terms || 'Net 30 Days'}
+                      onChange={v => setForm(f => ({ ...f, payment_terms: v }))}
+                      placeholder="Select payment terms..."
+                      options={[
+                        { value: 'Net 30 Days', label: 'Net 30 Days' },
+                        { value: 'Net 15 Days', label: 'Net 15 Days' },
+                        { value: 'Net 45 Days', label: 'Net 45 Days' },
+                        { value: 'Immediate / COD', label: 'Immediate / COD' },
+                        { value: '100% Advance', label: '100% Advance' },
+                        { value: '50% Advance, 50% on Delivery', label: '50% Advance, 50% on Delivery' }
+                      ]}
+                    />
                   <label style={S.lbl}>Expected Delivery Date
                     <input
                       type="date"
@@ -1596,19 +1604,19 @@ export default function Indent() {
                   </label>
                 </div>
                 <div style={{ ...S.grid3, marginTop: 8 }}>
-                  <label style={S.lbl}>Payment Mode
-                    <select
-                      style={S.sel}
-                      value={form.payment_mode}
-                      onChange={e => setForm(f => ({ ...f, payment_mode: e.target.value }))}
-                    >
-                      <option value="Cash">Cash</option>
-                      <option value="Petty Cash">Petty Cash</option>
-                      <option value="UPI / GPay / PhonePe">UPI / GPay / PhonePe</option>
-                      <option value="Company Debit Card">Company Debit Card</option>
-                      <option value="Bank Transfer (IMPS)">Bank Transfer (IMPS)</option>
-                    </select>
-                  </label>
+                  <label style={S.lbl}>Payment Mode</label>
+                    <SearchableSelect
+                      value={form.payment_mode || 'Cash'}
+                      onChange={v => setForm(f => ({ ...f, payment_mode: v }))}
+                      placeholder="Select payment mode..."
+                      options={[
+                        { value: 'Cash', label: 'Cash' },
+                        { value: 'Petty Cash', label: 'Petty Cash' },
+                        { value: 'UPI / GPay / PhonePe', label: 'UPI / GPay / PhonePe' },
+                        { value: 'Company Debit Card', label: 'Company Debit Card' },
+                        { value: 'Bank Transfer (IMPS)', label: 'Bank Transfer (IMPS)' }
+                      ]}
+                    />
                   <label style={S.lbl}>Payment Ref / Voucher No
                     <input
                       style={S.inp}
@@ -1631,17 +1639,17 @@ export default function Indent() {
                   <span>🚛</span> Delivery Challan (DC / Gate Pass) Dispatch Details
                 </div>
                 <div style={S.grid3}>
-                  <label style={S.lbl}>Gate Pass / DC Type *
-                    <select
-                      style={S.sel}
-                      value={form.dc_type}
-                      onChange={e => setForm(f => ({ ...f, dc_type: e.target.value }))}
-                    >
-                      <option value="MATERIAL_OUT">Material Outward DC (Non-Returnable)</option>
-                      <option value="RETURNABLE">Returnable Gate Pass (Job Work / Repair)</option>
-                      <option value="OUT">Outward Vehicle &amp; Goods Dispatch</option>
-                    </select>
-                  </label>
+                  <label style={S.lbl}>Gate Pass / DC Type *</label>
+                    <SearchableSelect
+                      value={form.dc_type || 'MATERIAL_OUT'}
+                      onChange={v => setForm(f => ({ ...f, dc_type: v }))}
+                      placeholder="Select DC type..."
+                      options={[
+                        { value: 'MATERIAL_OUT', label: 'Material Outward DC (Non-Returnable)' },
+                        { value: 'RETURNABLE', label: 'Returnable Gate Pass (Job Work / Repair)' },
+                        { value: 'OUT', label: 'Outward Vehicle & Goods Dispatch' }
+                      ]}
+                    />
                   <label style={S.lbl}>Consignee / Destination Party Name *
                     <input
                       style={{ ...S.inp, ...(formErrors.to_party ? { border: '1px solid #ef4444' } : {}) }}
@@ -1661,19 +1669,19 @@ export default function Indent() {
                   </label>
                 </div>
                 <div style={{ ...S.grid3, marginTop: 8 }}>
-                  <label style={S.lbl}>Vehicle Type
-                    <select
-                      style={S.sel}
-                      value={form.vehicle_type}
-                      onChange={e => setForm(f => ({ ...f, vehicle_type: e.target.value }))}
-                    >
-                      <option value="Truck">Truck / Lorry</option>
-                      <option value="Tempo">Tempo / Mini Truck</option>
-                      <option value="Pickup">Pickup Van</option>
-                      <option value="Tractor">Tractor</option>
-                      <option value="Hand Carry">Hand Carry / Courier</option>
-                    </select>
-                  </label>
+                  <label style={S.lbl}>Vehicle Type</label>
+                    <SearchableSelect
+                      value={form.vehicle_type || 'Truck'}
+                      onChange={v => setForm(f => ({ ...f, vehicle_type: v }))}
+                      placeholder="Select vehicle type..."
+                      options={[
+                        { value: 'Truck', label: 'Truck / Lorry' },
+                        { value: 'Tempo', label: 'Tempo / Mini Truck' },
+                        { value: 'Pickup', label: 'Pickup Van' },
+                        { value: 'Tractor', label: 'Tractor' },
+                        { value: 'Hand Carry', label: 'Hand Carry / Courier' }
+                      ]}
+                    />
                   <label style={S.lbl}>Driver / Handover Person
                     <input
                       style={S.inp}
@@ -1691,6 +1699,21 @@ export default function Indent() {
                     />
                   </label>
                 </div>
+                {form.dc_type === 'RETURNABLE' && (
+                  <div style={{ ...S.grid3, marginTop: 8 }}>
+                    <label style={S.lbl}>Expected Return Date
+                      <input
+                        type="date"
+                        style={S.inp}
+                        value={form.expected_return_date}
+                        onChange={e => setForm(f => ({ ...f, expected_return_date: e.target.value }))}
+                      />
+                    </label>
+                    <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', padding: '10px', background: '#fef3c7', borderRadius: 6, fontSize: 11, color: '#92400e' }}>
+                      ⚠ Returnable Gate Pass — track this date to flag overdue job-work / repair returns.
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1707,20 +1730,18 @@ export default function Indent() {
             )}
 
             <div style={S.grid3}>
-              <label style={S.lbl}>Department *
-                <select
+              <label style={S.lbl}>Department *</label>
+                <SearchableSelect
                   id="raise-dept"
-                  style={{ ...S.sel, ...(formErrors.department_id ? { border: '1px solid #ef4444' } : {}) }}
-                  value={form.department_id}
-                  onChange={e => setForm(f => ({ ...f, department_id: e.target.value }))}
-                  required
+                  value={String(form.department_id || '')}
+                  onChange={v => setForm(f => ({ ...f, department_id: v }))}
+                  placeholder="-- Select Department --"
+                  searchPlaceholder="Type department name or code..."
+                  selectStyle={formErrors.department_id ? { border: '1px solid #ef4444' } : {}}
                   disabled={user?.role_level < 4 && user?.dept_code !== 'STORE'}
-                >
-                  <option value="">-- Select Department --</option>
-                  {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                </select>
+                  options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                />
                 {formErrors.department_id && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.department_id}</span>}
-              </label>
 
               <label style={S.lbl}>Required By Date *
                 <input
@@ -1734,38 +1755,40 @@ export default function Indent() {
                 {formErrors.required_date && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.required_date}</span>}
               </label>
 
-              <label style={S.lbl}>Plant Section / Area *
-                <select
+              <label style={S.lbl}>Plant Section / Area *</label>
+                <SearchableSelect
                   id="raise-section"
-                  style={S.sel}
                   value={String(form.section || '')}
-                  onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
-                >
-                  <option value="">-- Select Plant Section --</option>
-                  {sections.map(s => (
-                    <option key={s.id} value={s.id}>
-                      [{s.sectionCode || s.code}] {s.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  onChange={v => setForm(f => ({ ...f, section: v }))}
+                  placeholder="-- Select Plant Section --"
+                  searchPlaceholder="Type section name or code..."
+                  allowClear={true}
+                  selectStyle={formErrors.section ? { border: '1px solid #ef4444' } : {}}
+                  options={sections.map(s => ({
+                    value: String(s.id),
+                    label: s.name,
+                    code: s.sectionCode || s.code
+                  }))}
+                />
+                {formErrors.section && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.section}</span>}
             </div>
 
             <div style={{ ...S.grid2, marginTop: 12 }}>
               <label style={S.lbl}>Machine / Equipment Selection &amp; Context
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <select
-                    style={{ ...S.sel, flex: 1 }}
+                  <SearchableSelect
                     value={String(form.machine_id || '')}
-                    onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))}
-                  >
-                    <option value="">-- Select Registered Machine --</option>
-                    {machines.map(m => (
-                      <option key={m.id} value={m.id}>
-                        [{m.code}] {m.name} ({m.type || 'Machine'})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={v => setForm(f => ({ ...f, machine_id: v }))}
+                    placeholder="-- Select Registered Machine --"
+                    searchPlaceholder="Type machine name or code..."
+                    allowClear={true}
+                    options={machines.map(m => ({
+                      value: String(m.id),
+                      label: m.name,
+                      code: m.code,
+                      subtext: m.type || 'Machine'
+                    }))}
+                  />
                 </div>
               </label>
 
@@ -1874,15 +1897,14 @@ export default function Indent() {
                     </div>
 
                     {/* Reason Code */}
-                    <label style={S.lbl}>Reason Code
-                      <select
-                        style={S.sel}
+                    <label style={S.lbl}>Reason Code</label>
+                      <SearchableSelect
                         value={it.reason_code || 'Routine Replacement'}
-                        onChange={e => setItem(i, 'reason_code', e.target.value)}
-                      >
-                        {REASON_CODES.map(r => <option key={r} value={r}>{r}</option>)}
-                      </select>
-                    </label>
+                        onChange={v => setItem(i, 'reason_code', v)}
+                        placeholder="Select reason code..."
+                        searchPlaceholder="Type reason (Emergency, PM, etc.)"
+                        options={REASON_CODES.map(r => ({ value: r, label: r }))}
+                      />
                   </div>
 
                   <div style={{ ...S.grid3, marginTop: 8 }}>
@@ -1898,19 +1920,20 @@ export default function Indent() {
                     </label>
 
                     {form.fulfillment_mode === 'po' && (
-                      <label style={S.lbl}>GST Rate (%)
-                        <select
-                          style={S.sel}
-                          value={it.gst_pct ?? 18}
-                          onChange={e => setItem(i, 'gst_pct', Number(e.target.value))}
-                        >
-                          <option value="0">0% (Nil / Exempted)</option>
-                          <option value="5">5% GST (2.5% CGST + 2.5% SGST)</option>
-                          <option value="12">12% GST (6% CGST + 6% SGST)</option>
-                          <option value="18">18% GST (9% CGST + 9% SGST)</option>
-                          <option value="28">28% GST (14% CGST + 14% SGST)</option>
-                        </select>
-                      </label>
+                      <label style={S.lbl}>GST Rate (%)</label>
+                    )}{form.fulfillment_mode === 'po' && (
+                        <SearchableSelect
+                          value={String(it.gst_pct != null ? it.gst_pct : 18)}
+                          onChange={v => setItem(i, 'gst_pct', Number(v))}
+                          placeholder="Select GST slab..."
+                          options={[
+                            { value: '0', label: '0% (Nil / Exempted)' },
+                            { value: '5', label: '5% GST (2.5% CGST + 2.5% SGST)' },
+                            { value: '12', label: '12% GST (6% CGST + 6% SGST)' },
+                            { value: '18', label: '18% GST (9% CGST + 9% SGST)' },
+                            { value: '28', label: '28% GST (14% CGST + 14% SGST)' }
+                          ]}
+                        />
                     )}
 
                     <label style={S.lbl}>Position / Mechanical Fitment Location
@@ -2088,7 +2111,7 @@ export default function Indent() {
                             >
                               👁 View
                             </button>
-                            {r.status !== 'Issued' && r.status !== 'Closed' && r.status !== 'Cancelled' && (
+                            {!['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(r.status) && (
                               <button
                                 type="button"
                                 style={{ ...S.btnSm('#2563eb'), padding: '3px 6px', fontSize: 11 }}
@@ -3242,6 +3265,17 @@ export default function Indent() {
                   onChange={e => setDcModal(m => ({ ...m, dc_purpose: e.target.value }))}
                 />
               </label>
+
+              {dcModal.dc_type === 'RETURNABLE' && (
+                <label style={{ ...S.lbl, marginTop: 12 }}>Expected Return Date
+                  <input
+                    type="date"
+                    style={S.inp}
+                    value={dcModal.expected_return_date}
+                    onChange={e => setDcModal(m => ({ ...m, expected_return_date: e.target.value }))}
+                  />
+                </label>
+              )}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
                 <button type="button" style={S.btnSecondary} onClick={() => setDcModal(null)}>Cancel</button>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
+import SearchableSelect from '../components/SearchableSelect'
 const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
 const STATUS_COLOR = { Draft: '#8a8a90', Approved: '#22c55e', Sent: '#6366f1', Partial: '#f97316', Received: '#0ea5e9', Closed: '#64748b', Cancelled: '#ef4444' }
 const fmt = v => v ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'
@@ -2381,53 +2382,55 @@ export default function Purchase() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
 
                       <div>
-                        <label style={S.label}>Vendor *
-                          <select style={{ ...S.select, borderColor: formErrors.vendor_id ? '#ef4444' : undefined }}
-                            value={form.vendor_id}
-                            onChange={e => {
-                              const id = e.target.value
-                              const v = vendors.find(x => x.id == id)
-                              const vpt = v?.payment_terms
-                              const presetMatch = vpt && PAYMENT_PRESETS.includes(vpt)
-                              setForm(f => ({
-                                ...f,
-                                vendor_id: id,
-                                payment_terms: vpt ? (presetMatch ? vpt : 'Custom') : f.payment_terms,
-                                payment_terms_custom: vpt && !presetMatch ? vpt : f.payment_terms_custom
-                              }))
-                              setFormErrors(fe => ({ ...fe, vendor_id: undefined }))
-                            }}>
-                            <option value="">Select vendor...</option>
-                            {vendors.map(v => (
-                              <option key={v.id} value={v.id}>
-                                {v.name} ({v.poCount || v.po_count || 0} POs) {v.gstin ? `[GST: ${v.gstin}]` : ''}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                        <label style={S.label}>Vendor *</label>
+                        <SearchableSelect
+                          value={String(form.vendor_id || '')}
+                          onChange={id => {
+                            const v = vendors.find(x => String(x.id) === String(id))
+                            const vpt = v?.payment_terms
+                            const presetMatch = vpt && PAYMENT_PRESETS.includes(vpt)
+                            setForm(f => ({
+                              ...f,
+                              vendor_id: id,
+                              payment_terms: vpt ? (presetMatch ? vpt : 'Custom') : f.payment_terms,
+                              payment_terms_custom: vpt && !presetMatch ? vpt : f.payment_terms_custom
+                            }))
+                            setFormErrors(fe => ({ ...fe, vendor_id: undefined }))
+                          }}
+                          placeholder="Search vendor by name or GSTIN..."
+                          searchPlaceholder="Type vendor name, GSTIN, city..."
+                          options={vendors.map(v => ({
+                            value: String(v.id),
+                            label: v.name,
+                            code: v.code || v.vendor_code,
+                            subtext: [v.gstin ? `GST: ${v.gstin}` : '', v.city || ''].filter(Boolean).join(' · '),
+                            badge: `${v.poCount || v.po_count || 0} POs`
+                          }))}
+                          selectStyle={{ borderColor: formErrors.vendor_id ? '#ef4444' : undefined }}
+                        />
                         {vObj?.gstin && <div style={SS.hint}>GST: {vObj.gstin} {isInterstate ? '(Inter-State IGST)' : '(Intra-State CGST+SGST)'}</div>}
                         {formErrors.vendor_id && <div style={SS.fieldErr}>{formErrors.vendor_id}</div>}
                       </div>
 
                       <div>
-                        <label style={S.label}>Link Purchase Request (Indent / PR)
-                          <select
-                            style={{
-                              ...S.select,
-                              background: form.indent_id ? '#f0fdf4' : '#f6f5f0',
-                              borderColor: form.indent_id ? '#86efac' : undefined
-                            }}
-                            value={form.indent_id || ''}
-                            onChange={e => handleSelectIndent(e.target.value)}
-                          >
-                            <option value="">-- Direct PO (No PR Linked) --</option>
-                            {approvedIndents.map(ind => (
-                              <option key={ind.id} value={ind.id}>
-                                {ind.indentNumber || ind.indent_number} — {ind.deptName || 'Dept'} ({ind.itemCount || 0} items)
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                        <label style={S.label}>Link Purchase Request (Indent / PR)</label>
+                        <SearchableSelect
+                          value={String(form.indent_id || '')}
+                          onChange={id => handleSelectIndent(id)}
+                          placeholder="-- Direct PO (No PR Linked) --"
+                          searchPlaceholder="Type indent number or department..."
+                          allowClear={true}
+                          options={[
+                            { value: '', label: '-- Direct PO (No PR Linked) --' },
+                            ...approvedIndents.map(ind => ({
+                              value: String(ind.id),
+                              label: ind.indentNumber || ind.indent_number,
+                              subtext: `${ind.deptName || 'Dept'} · ${ind.itemCount || 0} items · ${ind.priority || 'Normal'}`,
+                              badge: ind.priority
+                            }))
+                          ]}
+                          selectStyle={{ background: form.indent_id ? '#f0fdf4' : undefined, borderColor: form.indent_id ? '#86efac' : undefined }}
+                        />
                         {form.indent_id ? (
                           <div style={{ fontSize: 11, color: '#16a34a', marginTop: 3, fontWeight: 600 }}>
                             ✓ Items auto-populated from approved PR
@@ -2447,13 +2450,14 @@ export default function Purchase() {
                       </div>
 
                       <div>
-                        <label style={S.label}>Payment Terms
-                          <select style={S.select} value={form.payment_terms}
-                            onChange={e => setForm(f => ({ ...f, payment_terms: e.target.value, payment_terms_custom: '' }))}>
-                            <option value="">Select terms...</option>
-                            {PAYMENT_PRESETS.map(p => <option key={p}>{p}</option>)}
-                          </select>
-                        </label>
+                        <label style={S.label}>Payment Terms</label>
+                        <SearchableSelect
+                          value={form.payment_terms || ''}
+                          onChange={v => setForm(f => ({ ...f, payment_terms: v, payment_terms_custom: '' }))}
+                          placeholder="Select payment terms..."
+                          searchPlaceholder="Type or press first letter..."
+                          options={PAYMENT_PRESETS.map(p => ({ value: p, label: p }))}
+                        />
                         {form.payment_terms === 'Custom' && (
                           <input style={{ ...S.input, marginTop: 6, fontSize: 12 }} placeholder="Describe custom terms…"
                             value={form.payment_terms_custom}
@@ -2462,12 +2466,14 @@ export default function Purchase() {
                       </div>
 
                       <div>
-                        <label style={S.label}>Delivery Warehouse
-                          <select style={S.select} value={form.delivery_address} onChange={e => setForm(f => ({ ...f, delivery_address: e.target.value }))}>
-                            <option value="">Select warehouse...</option>
-                            {warehouses.map(w => <option key={w.id} value={w.name}>{w.name}</option>)}
-                          </select>
-                        </label>
+                        <label style={S.label}>Delivery Warehouse</label>
+                        <SearchableSelect
+                          value={form.delivery_address || ''}
+                          onChange={v => setForm(f => ({ ...f, delivery_address: v }))}
+                          placeholder="Select warehouse..."
+                          searchPlaceholder="Type warehouse name..."
+                          options={warehouses.map(w => ({ value: w.name, label: w.name, code: w.code }))}
+                        />
                       </div>
 
                       <div>
@@ -2801,12 +2807,13 @@ export default function Purchase() {
                 >
                   📥 Export CSV
                 </button>
-                {detail.status === 'Draft' && (
+                {!['Received', 'Closed', 'Cancelled'].includes(detail.status) && (
                   <button
                     style={{ ...S.btnSecondary, padding: '5px 12px', fontSize: 12, color: '#d97706' }}
                     onClick={() => { setDetail(null); openEdit(detail) }}
+                    title={detail.status === 'Draft' ? 'Edit this draft PO' : 'Modify raised PO items and terms'}
                   >
-                    ✏️ Edit
+                    ✏️ {detail.status === 'Draft' ? 'Edit Draft' : 'Modify PO'}
                   </button>
                 )}
                 {detail.status === 'Draft' && (

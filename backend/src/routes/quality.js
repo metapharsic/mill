@@ -342,20 +342,40 @@ router.post('/grn-inspect', auth, requireLevel(2), ar(async (req, res) => {
     const rejectionsCreated = [];
 
     // 3. Process each inspected item
+    //
+    // IMPORTANT: by the time a GRN reaches this route, GRN intake (purchase.js's
+    // POST /po/:id/grn, or store.js's fast-inward path) has ALREADY split the receipt into
+    // accepted/rejected qty and ALREADY applied it — accepted qty is already added to
+    // materials.current_stock, and any rejected qty already has a material_rejections row.
+    // So this handler must apply only the DELTA between what's already on grn_items and this
+    // inspection's decision, not the full qty again — otherwise every inspection double-credits
+    // stock and duplicates the rejection/debit note for the same GRN line.
     for (const item of items) {
       const { grnItemId, materialId, acceptedQty = 0, rejectedQty = 0, rejectionReason, actionRequired = 'Return to Vendor' } = item;
       const accQty = parseFloat(acceptedQty) || 0;
       const rejQty = parseFloat(rejectedQty) || 0;
 
-      // Update grn_items
+      // Read the pre-inspection split (if this item is tied to a real grn_items row) before
+      // overwriting it, so we know how much of it is already reflected in stock/rejections.
+      let oldAccQty = 0, oldRejQty = 0;
       if (grnItemId) {
+        const { rows: [oldItem] } = await client.query(
+          `SELECT accepted_qty, rejected_qty FROM grn_items WHERE id = $1 FOR UPDATE`,
+          [grnItemId]
+        );
+        if (oldItem) {
+          oldAccQty = parseFloat(oldItem.accepted_qty || 0);
+          oldRejQty = parseFloat(oldItem.rejected_qty || 0);
+        }
         await client.query(
-          `UPDATE grn_items 
+          `UPDATE grn_items
            SET accepted_qty = $1, rejected_qty = $2, remarks = COALESCE($3, remarks)
            WHERE id = $4`,
           [accQty, rejQty, rejectionReason || null, grnItemId]
         );
       }
+      const deltaAcc = accQty - oldAccQty;
+      const deltaRej = rejQty - oldRejQty;
 
       // Fetch material details
       const { rows: [mat] } = await client.query(
@@ -366,54 +386,88 @@ router.post('/grn-inspect', auth, requireLevel(2), ar(async (req, res) => {
 
       const unitPrice = parseFloat(mat.unit_price || 0);
 
-      // A. Credit Accepted Stock
-      if (accQty > 0) {
+      // A. Reconcile stock to the change in accepted qty only. Positive delta credits stock
+      // (e.g. an item held for inspection with nothing pre-accepted); negative delta reverses
+      // stock already credited at intake for qty QC now finds defective.
+      if (deltaAcc !== 0) {
+        const curStock = parseFloat(mat.current_stock || 0);
+        const newBal = curStock + deltaAcc;
+        if (newBal < 0) {
+          throw new Error(`QC decision would drop '${mat.name}' stock below zero (already-issued qty exceeds the revised accepted qty)`);
+        }
         await client.query(
-          `UPDATE materials SET current_stock = current_stock + $1 WHERE id = $2`,
-          [accQty, materialId]
+          `UPDATE materials SET current_stock = $1 WHERE id = $2`,
+          [newBal, materialId]
         );
 
-        const { rows: [balRow] } = await client.query(`SELECT current_stock FROM materials WHERE id = $1`, [materialId]);
-        const newBal = parseFloat(balRow.current_stock);
-
         await client.query(
-          `INSERT INTO stock_ledger 
+          `INSERT INTO stock_ledger
              (material_id, transaction_type, in_qty, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by, vendor_id)
-           VALUES ($1, 'grn', $2, 0, $3, $4, $5, CURRENT_DATE, 'grn', $6, $7, $8, $9)`,
-          [materialId, accQty, newBal, unitPrice, accQty * unitPrice, grnId,
-           `QC Accepted | GRN #${grn.grn_number} | PO #${grn.po_number || 'Direct'}`, req.user.id, grn.vendor_id]
+           VALUES ($1, 'grn', $2, $3, $4, $5, $6, CURRENT_DATE, 'grn', $7, $8, $9, $10)`,
+          [materialId, deltaAcc > 0 ? deltaAcc : 0, deltaAcc < 0 ? -deltaAcc : 0, newBal, unitPrice, deltaAcc * unitPrice, grnId,
+           `QC ${deltaAcc > 0 ? 'Accepted (adj)' : 'Reversal'} | GRN #${grn.grn_number} | PO #${grn.po_number || 'Direct'}`, req.user.id, grn.vendor_id]
         );
 
-        // Update PO items received qty if PO exists
+        // Update PO items received qty if PO exists (mirrors the accepted-qty delta)
         if (grn.po_id) {
           await client.query(
-            `UPDATE po_items SET received_qty = COALESCE(received_qty, 0) + $1 
+            `UPDATE po_items SET received_qty = GREATEST(0, COALESCE(received_qty, 0) + $1)
              WHERE po_id = $2 AND material_id = $3`,
-            [accQty, grn.po_id, materialId]
+            [deltaAcc, grn.po_id, materialId]
           );
         }
       }
 
-      // B. Create Rejection Note for Rejected Stock
-      if (rejQty > 0) {
-        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`rej-${stamp}`]);
-        const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM material_rejections WHERE created_at::date = CURRENT_DATE`);
-        const rejNum = `REJ-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
-        const debitAmt = rejQty * unitPrice;
-
-        const { rows: [rej] } = await client.query(
-          `INSERT INTO material_rejections
-             (rejection_number, grn_id, po_id, vendor_id, material_id, qc_test_id,
-              rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, created_by)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending RTV', $13)
-           RETURNING *`,
-          [rejNum, grnId, grn.po_id || null, grn.vendor_id || null, materialId, qt.id,
-           rejQty, mat.uom || 'Nos', unitPrice, debitAmt,
-           rejectionReason || 'Quality parameters failed', actionRequired, req.user.id]
+      // B. Rejection note — sync the rejection row GRN intake may already have created for
+      // this grn/material instead of inserting a second one for the same line.
+      let rejRowForNotify = null;
+      if (rejQty > 0 || oldRejQty > 0) {
+        const { rows: [existingRej] } = await client.query(
+          `SELECT id, status, rejected_qty FROM material_rejections WHERE grn_id = $1 AND material_id = $2 FOR UPDATE`,
+          [grnId, materialId]
         );
 
-        rejectionsCreated.push(rej);
+        if (existingRej && existingRej.status === 'Pending RTV') {
+          if (rejQty > 0 && parseFloat(existingRej.rejected_qty) !== rejQty) {
+            const debitAmt = rejQty * unitPrice;
+            const { rows: [rej] } = await client.query(
+              `UPDATE material_rejections
+                 SET rejected_qty = $1, unit_price = $2, debit_amount = $3,
+                     rejection_reason = COALESCE($4, rejection_reason),
+                     action_required = COALESCE($5, action_required), qc_test_id = $6
+               WHERE id = $7 RETURNING *`,
+              [rejQty, unitPrice, debitAmt, rejectionReason || null, actionRequired || null, qt.id, existingRej.id]
+            );
+            rejectionsCreated.push(rej);
+            rejRowForNotify = rej;
+          }
+          // rejQty === 0 against an existing Pending RTV row is left untouched — reducing it
+          // to zero here shouldn't silently cancel an RTV that's already in flight.
+        } else if (!existingRej && rejQty > 0) {
+          await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`rej-${stamp}`]);
+          const seqRes = await client.query(`SELECT COUNT(*)+1 AS n FROM material_rejections WHERE created_at::date = CURRENT_DATE`);
+          const rejNum = `REJ-${stamp}-${String(seqRes.rows[0].n).padStart(4, '0')}`;
+          const debitAmt = rejQty * unitPrice;
 
+          const { rows: [rej] } = await client.query(
+            `INSERT INTO material_rejections
+               (rejection_number, grn_id, po_id, vendor_id, material_id, qc_test_id,
+                rejected_qty, uom, unit_price, debit_amount, rejection_reason, action_required, status, created_by)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending RTV', $13)
+             RETURNING *`,
+            [rejNum, grnId, grn.po_id || null, grn.vendor_id || null, materialId, qt.id,
+             rejQty, mat.uom || 'Nos', unitPrice, debitAmt,
+             rejectionReason || 'Quality parameters failed', actionRequired, req.user.id]
+          );
+
+          rejectionsCreated.push(rej);
+          rejRowForNotify = rej;
+        }
+        // existingRej past 'Pending RTV' (already dispatched to vendor / debited / closed) is
+        // left untouched — it's already moving through the RTV/finance flow.
+      }
+
+      if (rejRowForNotify) {
         // Notify Finance of Debit Note requirement
         // users has no role_level column — the level lives on roles.level. Referencing
         // role_level directly threw 42703 and aborted the whole grn-inspect transaction
@@ -425,7 +479,7 @@ router.post('/grn-inspect', auth, requireLevel(2), ar(async (req, res) => {
            WHERE u.is_active = true
              AND (r.level >= 4
                   OR (r.level >= 3 AND u.department_id = (SELECT id FROM departments WHERE name ILIKE '%Finance%' LIMIT 1)))`,
-          [rejNum, debitAmt.toFixed(2), grn.vendor_name || 'Vendor']
+          [rejRowForNotify.rejection_number, parseFloat(rejRowForNotify.debit_amount).toFixed(2), grn.vendor_name || 'Vendor']
         );
       }
     }

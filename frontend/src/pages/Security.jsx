@@ -8,6 +8,8 @@ export default function Security() {
   const [summary, setSummary] = useState({})
   const [modal, setModal] = useState(false)
   const [outModal, setOutModal] = useState(null)
+  const [editModal, setEditModal] = useState(null)
+  const [editForm, setEditForm] = useState({})
   const [filter, setFilter] = useState({ passType: '', status: '' })
   const [purchaseOrders, setPurchaseOrders] = useState([])
   const [vendors, setVendors] = useState([])
@@ -102,6 +104,32 @@ export default function Security() {
     load()
   }
 
+  function openEdit(p) {
+    setEditForm({
+      vehicle_number: p.vehicle_number || '',
+      driver_name: p.driver_name || '',
+      from_party: p.from_party || '',
+      to_party: p.to_party || '',
+      purpose: p.purpose || '',
+      material_description: p.material_description || '',
+      remarks: p.remarks || ''
+    })
+    setEditModal(p)
+  }
+
+  async function saveEdit() {
+    const r = await fetch(`${API}/security/passes/${editModal.id}`, {
+      method: 'PUT',
+      headers: { ...h(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(editForm)
+    })
+    const d = await r.json()
+    if (d.success) {
+      setEditModal(null)
+      load()
+    } else setMsg(d.message)
+  }
+
   return (
     <div style={S.page}>
       <div style={S.hdr}>
@@ -162,7 +190,12 @@ export default function Security() {
                 <td style={S.td}>{p.out_time ? new Date(p.out_time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—'}</td>
                 <td style={S.td}>{p.net_weight ? `${p.net_weight} T` : p.weight_in ? `In: ${p.weight_in} T` : '—'}</td>
                 <td style={S.td}><span style={{ ...S.badge, background: p.status==='Open'?'#fef9c3':'#dcfce7', color: p.status==='Open'?'#854d0e':'#15803d' }}>{p.status}</span></td>
-                <td style={S.td}>{p.status==='Open' && <button style={S.btnSm} onClick={() => { setOutModal(p); setWeightOut('') }}>Record OUT</button>}</td>
+                <td style={S.td}>
+                  <div style={{ display:'flex', gap:6 }}>
+                    {p.status==='Open' && <button style={S.btnSm} onClick={() => { setOutModal(p); setWeightOut('') }}>Record OUT</button>}
+                    <button style={S.btnGhostSm} onClick={() => openEdit(p)}>Edit</button>
+                  </div>
+                </td>
               </tr>
             ))}
             {passes.length === 0 && <tr><td colSpan={12} style={{ textAlign:'center', padding:32, color:'#a0a0a6' }}>No gate passes found</td></tr>}
@@ -282,6 +315,52 @@ export default function Security() {
           </div>
         </div>
       )}
+
+      {editModal && (
+        <div style={S.overlay}>
+          <div style={{ ...S.modal, width: 480 }}>
+            <div style={S.modalHdr}><b>Edit Gate Pass — {editModal.gp_number}</b><button style={S.x} onClick={() => setEditModal(null)}>✕</button></div>
+            {msg && <div style={S.err}>{msg}</div>}
+
+            <div style={S.row2}>
+              <div>
+                <label style={S.lbl}>Vehicle Number</label>
+                <input style={S.input} value={editForm.vehicle_number} onChange={e => setEditForm({...editForm, vehicle_number: e.target.value})} />
+              </div>
+              <div>
+                <label style={S.lbl}>Driver Name</label>
+                <input style={S.input} value={editForm.driver_name} onChange={e => setEditForm({...editForm, driver_name: e.target.value})} />
+              </div>
+            </div>
+
+            <div style={S.row2}>
+              <div>
+                <label style={S.lbl}>From Party / Supplier</label>
+                <input style={S.input} value={editForm.from_party} onChange={e => setEditForm({...editForm, from_party: e.target.value})} />
+              </div>
+              <div>
+                <label style={S.lbl}>To Party</label>
+                <input style={S.input} value={editForm.to_party} onChange={e => setEditForm({...editForm, to_party: e.target.value})} />
+              </div>
+            </div>
+
+            <div>
+              <label style={S.lbl}>Purpose</label>
+              <input style={S.input} value={editForm.purpose} onChange={e => setEditForm({...editForm, purpose: e.target.value})} />
+            </div>
+            <div>
+              <label style={S.lbl}>Material Description</label>
+              <input style={S.input} value={editForm.material_description} onChange={e => setEditForm({...editForm, material_description: e.target.value})} />
+            </div>
+            <textarea style={{ ...S.input, height: 50 }} placeholder='Remarks' value={editForm.remarks} onChange={e => setEditForm({...editForm, remarks: e.target.value})} />
+
+            <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
+              <button style={S.btnGhost} onClick={() => setEditModal(null)}>Cancel</button>
+              <button style={S.btn} onClick={saveEdit}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -304,6 +383,7 @@ const S = {
   badge: { fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 600 },
   btn: { background: '#1b1b1d', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
   btnSm: { background: '#0284c7', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 12, fontWeight: 600 },
+  btnGhostSm: { background: 'white', color: '#3a3a3e', border: '1px solid #d8d6cc', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 12, fontWeight: 600 },
   btnGhost: { background: 'white', color: '#3a3a3e', border: '1px solid #d8d6cc', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13 },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
   overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },

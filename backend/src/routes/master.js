@@ -8,7 +8,9 @@ const { auth, requireLevel } = require('../middleware/auth');
 const { publish, TOPICS } = require('../kafka');
 const { runImport: runMechImport, DEFAULT_FILE: DEFAULT_MECH_FILE } = require('../../scripts/import_mechanical_store');
 const { runImport: runElecImport, DEFAULT_FILE: DEFAULT_ELEC_FILE } = require('../../scripts/import_electrical_store');
+const { runImport: runVendorImport, DEFAULT_FILE: DEFAULT_VENDOR_FILE } = require('../../scripts/import_vendors');
 const { getVendors, countVendors } = require('../middleware/helpers');
+const { generateInventoryExcel } = require('../services/inventoryExcelExporter');
 const ar = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // Doc31 #21: master-data mutations wrote no audit trail. Generic router-level logger — covers every
@@ -439,6 +441,35 @@ router.get('/materials/excel-template', auth, ar(async (req, res) => {
   res.send(buf);
 }));
 
+// GET /api/master/materials/export/excel — Comprehensive multi-sheet up-to-date inventory Excel export
+router.get('/materials/export/excel', auth, ar(async (req, res) => {
+  const options = {
+    store_type: req.query.store_type || 'all',
+    category_id: req.query.category_id,
+    stock_status: req.query.stock_status || 'all',
+    criticality: req.query.criticality || 'all',
+    section_id: req.query.section_id,
+    machine_id: req.query.machine_id,
+    search: req.query.search,
+    include_category_sheets: req.query.include_category_sheets !== 'false',
+    include_summary_sheet: req.query.include_summary_sheet !== 'false',
+    include_reorder_sheet: req.query.include_reorder_sheet !== 'false',
+    include_pricing: req.query.include_pricing !== 'false',
+    include_technical: req.query.include_technical !== 'false',
+    include_movement: req.query.include_movement !== 'false',
+    target_date: req.query.target_date,
+    user_name: req.user?.name || req.user?.email || 'Store Manager'
+  };
+
+  const result = await generateInventoryExcel(options);
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+  res.setHeader('X-Meta-Total-SKUs', String(result.meta.totalSKUs));
+  res.setHeader('X-Meta-Total-Valuation', String(result.meta.totalValuation));
+  res.send(result.buffer);
+}));
+
 // GET /api/master/materials/:id — Get comprehensive material product details and stock summary
 router.get('/materials/:id', auth, ar(async (req, res) => {
   const { rows: [mat] } = await pool.query(`
@@ -483,12 +514,19 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
   `, [req.params.id]);
 
   // Aggregate stats
+  // NOTE: must exclude only 'opening' (not whitelist specific type strings) — real write paths
+  // across the app use many transaction_type values beyond 'grn'/'issue' (e.g. 'return',
+  // 'return_to_vendor', 'transfer', 'cash_purchase', 'Adjustment', 'adjustment_plus', 'sale',
+  // 'receipt', and capitalized 'Issue'). A whitelist here silently drops those from
+  // received/issued, which then desyncs opening_stock = current_stock - today_received +
+  // today_issued below. Matches the comprehensive `transaction_type != 'opening'` pattern used
+  // by GET /materials and GET /materials/:id/stock-summary elsewhere in this file.
   const statsRes = await pool.query(`
     SELECT
-      COALESCE(SUM(CASE WHEN transaction_type IN ('grn', 'in') THEN in_qty ELSE 0 END), 0) AS total_received,
-      COALESCE(SUM(CASE WHEN transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS total_issued,
-      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type IN ('grn', 'in') THEN in_qty ELSE 0 END), 0) AS today_received,
-      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS today_issued
+      COALESCE(SUM(CASE WHEN transaction_type != 'opening' THEN in_qty ELSE 0 END), 0) AS total_received,
+      COALESCE(SUM(CASE WHEN transaction_type != 'opening' THEN out_qty ELSE 0 END), 0) AS total_issued,
+      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type != 'opening' THEN in_qty ELSE 0 END), 0) AS today_received,
+      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type != 'opening' THEN out_qty ELSE 0 END), 0) AS today_issued
     FROM stock_ledger
     WHERE material_id = $1
   `, [req.params.id]);
@@ -1230,6 +1268,24 @@ router.put('/vendors/:id', auth, requireLevel(3), ar(async (req, res) => {
     ]
   );
   res.json({ success: true });
+}));
+
+// Sync new vendors from Projects_Requirement/8202026/VENDER NAME.xlsx. The sheet only carries
+// vendor names (no GSTIN/address/bank data), so this only ever INSERTs brand-new vendor rows
+// (matched by normalized name / GSTIN when present) with the same defaults the Add Vendor form
+// uses — it never updates or deletes an existing vendor. dryRun defaults true so a preview is
+// always the safe default; pass { dryRun: false } to actually write.
+router.post('/vendors/sync-excel', auth, requireLevel(3), ar(async (req, res) => {
+  const dryRun = !(req.body && req.body.dryRun === false);
+  try {
+    const result = await runVendorImport(DEFAULT_VENDOR_FILE, dryRun);
+    res.json({ success: true, data: result });
+  } catch (e) {
+    if (e.code === 'FILE_NOT_FOUND') {
+      return res.status(400).json({ success: false, message: `Vendor excel not found at ${DEFAULT_VENDOR_FILE}. Place the updated file there and retry.` });
+    }
+    throw e;
+  }
 }));
 
 // ── CUSTOMERS ────────────────────────────────────────────────────────────────

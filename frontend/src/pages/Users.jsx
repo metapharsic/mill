@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
+import SearchableSelect from '../components/SearchableSelect'
 import { sortTableData } from '../utils/tableSort'
 
 const API = (path, opts) => fetch(path, {
@@ -169,14 +170,22 @@ export default function Users() {
       {/* Filters */}
       <div style={S.filterBar}>
         <input style={S.input} placeholder="Search name / email / code..." value={search} onChange={e => setSearch(e.target.value)} />
-        <select style={S.select} value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-          <option value="">All Roles</option>
-          {roles.map(r => <option key={r.id} value={r.name}>{r.name} (L{r.level})</option>)}
-        </select>
-        <select style={S.select} value={filterDept} onChange={e => setFilterDept(e.target.value)}>
-          <option value="">All Depts</option>
-          {depts.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
-        </select>
+        <SearchableSelect
+          value={filterRole}
+          onChange={val => setFilterRole(val)}
+          placeholder="All Roles"
+          searchPlaceholder="Type role name..."
+          style={{ width: 190 }}
+          options={roles.map(r => ({ value: r.name, label: `${r.name} (L${r.level})` }))}
+        />
+        <SearchableSelect
+          value={filterDept}
+          onChange={val => setFilterDept(val)}
+          placeholder="All Depts"
+          searchPlaceholder="Type department name..."
+          style={{ width: 190 }}
+          options={depts.map(d => ({ value: d.name, label: d.name }))}
+        />
         <select style={S.select} value={filterActive} onChange={e => setFilterActive(e.target.value)}>
           <option value="true">Active Only</option>
           <option value="false">Inactive Only</option>
@@ -283,22 +292,32 @@ export default function Users() {
                   <input style={S.input} value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value }))} placeholder="10-digit mobile" />
                 </label>
                 <label style={S.label}>Role &amp; Permission Level *
-                  <select style={S.select} value={form.role_id} onChange={e => setForm(f => ({ ...f, role_id: e.target.value }))} required>
-                    <option value="">-- Select Role --</option>
-                    {roles.map(r => <option key={r.id} value={r.id}>{r.name} (Level {r.level})</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={String(form.role_id || '')}
+                    onChange={val => setForm(f => ({ ...f, role_id: val }))}
+                    placeholder="-- Select Role --"
+                    searchPlaceholder="Type role name..."
+                    required
+                    options={roles.map(r => ({ value: String(r.id), label: `${r.name} (Level ${r.level})` }))}
+                  />
                 </label>
                 <label style={S.label}>Department
-                  <select style={S.select} value={form.department_id} onChange={e => setForm(f => ({ ...f, department_id: e.target.value }))}>
-                    <option value="">-- Select Dept --</option>
-                    {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={String(form.department_id || '')}
+                    onChange={val => setForm(f => ({ ...f, department_id: val }))}
+                    placeholder="-- Select Dept --"
+                    searchPlaceholder="Type department name..."
+                    options={depts.map(d => ({ value: String(d.id), label: d.name }))}
+                  />
                 </label>
                 <label style={S.label}>Assigned Plant Section
-                  <select style={S.select} value={form.section_id} onChange={e => setForm(f => ({ ...f, section_id: e.target.value }))}>
-                    <option value="">-- General / Plant-Wide --</option>
-                    {sections.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={String(form.section_id || '')}
+                    onChange={val => setForm(f => ({ ...f, section_id: val }))}
+                    placeholder="-- General / Plant-Wide --"
+                    searchPlaceholder="Type section name..."
+                    options={sections.map(s => ({ value: String(s.id), label: `${s.name} (${s.code})` }))}
+                  />
                 </label>
                 <label style={S.label}>Employee Code
                   <input style={S.input} value={form.employee_code} onChange={e => setForm(f => ({ ...f, employee_code: e.target.value }))} placeholder="STORE-ASST-01" />

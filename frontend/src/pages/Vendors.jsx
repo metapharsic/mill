@@ -30,6 +30,7 @@ export default function Vendors() {
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState('')
   const [tab, setTab] = useState('basic')
+  const [syncing, setSyncing] = useState(false)
   const LIMIT = 20
 
   const load = useCallback(async () => {
@@ -76,6 +77,27 @@ export default function Vendors() {
   const del = async v => { if (!window.confirm(`Deactivate "${v.name}"?`)) return; await API(`/api/master/vendors/${v.id}`, { method: 'DELETE' }); load() }
   const restore = async v => { await API(`/api/master/vendors/${v.id}/restore`, { method: 'PUT' }); load() }
 
+  // Sync from Excel: preview (dry-run) first, then only write after explicit confirm.
+  const syncFromExcel = async () => {
+    setSyncing(true)
+    try {
+      const preview = await API('/api/master/vendors/sync-excel', { method: 'POST', body: JSON.stringify({ dryRun: true }) })
+      if (!preview.success) { window.alert(preview.message || 'Vendor excel sync preview failed'); return }
+      const { toInsert = 0, alreadyInDb = 0, duplicatesInFile = 0 } = preview.data.totals
+      if (toInsert === 0) { window.alert(`No new vendors to import. (${alreadyInDb} already in system, ${duplicatesInFile} duplicate rows in file)`); return }
+      const names = preview.data.toInsert.slice(0, 10).map(v => `  • ${v.name}`).join('\n')
+      const more = toInsert > 10 ? `\n  ...and ${toInsert - 10} more` : ''
+      if (!window.confirm(`Import ${toInsert} new vendor(s) from Excel?\n${names}${more}\n\n(${alreadyInDb} already exist and will be skipped)`)) return
+      const res = await API('/api/master/vendors/sync-excel', { method: 'POST', body: JSON.stringify({ dryRun: false }) })
+      if (res.success) { window.alert(`Imported ${res.data.totals.inserted} new vendor(s).`); load() }
+      else window.alert(res.message || 'Vendor excel sync failed')
+    } catch (e) {
+      window.alert('Vendor excel sync failed: ' + e.message)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   const save = async e => {
     e.preventDefault()
     if (!form.name) return setErr('Vendor name required')
@@ -118,7 +140,10 @@ export default function Vendors() {
           <div style={S.title}>Vendor Master Management</div>
           <div style={S.sub}>{total} registered suppliers · Master Records &amp; Bank Routing</div>
         </div>
-        <button style={S.btnPrimary} onClick={openAdd}>+ Add Vendor</button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button style={S.btnSecondary} onClick={syncFromExcel} disabled={syncing}>{syncing ? 'Syncing...' : '⇪ Sync from Excel'}</button>
+          <button style={S.btnPrimary} onClick={openAdd}>+ Add Vendor</button>
+        </div>
       </div>
 
       <div style={S.filterBar}>

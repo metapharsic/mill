@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailModal from '../components/ProductDetailModal'
+import InventoryExportModal from '../components/InventoryExportModal'
+import SearchableSelect from '../components/SearchableSelect'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
@@ -8,7 +10,7 @@ import { sortTableData } from '../utils/tableSort'
 import {
   Boxes, Search, Filter, AlertTriangle, ArrowDownRight, ArrowUpRight,
   TrendingUp, RefreshCw, Layers, CheckCircle2, ShieldCheck, Zap,
-  Factory, Package, FileText, ShoppingCart, Clock, ExternalLink
+  Factory, Package, FileText, ShoppingCart, Clock, ExternalLink, FileSpreadsheet
 } from 'lucide-react'
 
 const API = (path, opts = {}) => fetch(path, {
@@ -41,6 +43,7 @@ export default function Inventory() {
   const [activeStoreTab, setActiveStoreTab] = useState('store')
   const [activeView, setActiveView] = useState('materials') // 'materials' | 'ledger' | 'operations' | 'shifts'
   const [selectedProductModalId, setSelectedProductModalId] = useState(null)
+  const [exportModal, setExportModal] = useState(false)
 
   // Summary state
   const [summary, setSummary] = useState(null)
@@ -405,6 +408,13 @@ export default function Inventory() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <button
+            style={{ ...S.btnRefresh, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
+            onClick={() => setExportModal(true)}
+            title="Download Comprehensive Multi-Sheet Excel Master"
+          >
+            <FileSpreadsheet size={14} /> <span>Excel Master Export</span>
+          </button>
           <button style={S.btnRefresh} onClick={() => { loadSummary(); loadMaterials(); loadLedger() }}>
             <RefreshCw size={14} /> Refresh
           </button>
@@ -530,14 +540,14 @@ export default function Inventory() {
                 />
               </div>
 
-              <select
-                style={S.filterSelect}
-                value={matCategory}
-                onChange={(e) => { setMatCategory(e.target.value); setMatPage(1) }}
-              >
-                <option value="">All Categories ({categories.length})</option>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type || 'Store'})</option>)}
-              </select>
+              <SearchableSelect
+                value={String(matCategory || '')}
+                onChange={(val) => { setMatCategory(val); setMatPage(1) }}
+                placeholder={`All Categories (${categories.length})`}
+                searchPlaceholder="Type category name..."
+                style={{ minWidth: 200 }}
+                options={categories.map(c => ({ value: String(c.id), label: `${c.name} (${c.type || 'Store'})` }))}
+              />
 
               <button
                 style={{
@@ -694,17 +704,19 @@ export default function Inventory() {
                 />
               </div>
 
-              <select
-                style={S.filterSelect}
+              <SearchableSelect
                 value={ledgerTxnType}
-                onChange={(e) => { setLedgerTxnType(e.target.value); setLedgerPage(1) }}
-              >
-                <option value="">All Transactions</option>
-                <option value="Issue">Store Issues (Outward)</option>
-                <option value="GRN">GRN Receipts (Inward)</option>
-                <option value="Opening">Opening Balance</option>
-                <option value="Adjustment">Stock Adjustment</option>
-              </select>
+                onChange={(val) => { setLedgerTxnType(val); setLedgerPage(1) }}
+                placeholder="All Transactions"
+                searchPlaceholder="Type transaction type..."
+                style={{ minWidth: 200 }}
+                options={[
+                  { value: 'Issue', label: 'Store Issues (Outward)' },
+                  { value: 'GRN', label: 'GRN Receipts (Inward)' },
+                  { value: 'Opening', label: 'Opening Balance' },
+                  { value: 'Adjustment', label: 'Stock Adjustment' }
+                ]}
+              />
             </div>
 
             {/* Pagination Controls */}
@@ -833,16 +845,24 @@ export default function Inventory() {
                 <input style={S.input} type="date" value={grnForm.date} onChange={(e) => setGrnForm(f => ({ ...f, date: e.target.value }))} required />
               </label>
               <label style={S.label}>Vendor / Supplier
-                <select style={S.input} value={grnForm.vendorId} onChange={(e) => setGrnForm(f => ({ ...f, vendorId: e.target.value }))} required>
-                  <option value="">-- Select Vendor --</option>
-                  {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
-                </select>
+                <SearchableSelect
+                  value={String(grnForm.vendorId || '')}
+                  onChange={(val) => setGrnForm(f => ({ ...f, vendorId: val }))}
+                  placeholder="-- Select Vendor --"
+                  searchPlaceholder="Type vendor name..."
+                  required
+                  options={vendors.map(v => ({ value: String(v.id), label: v.name }))}
+                />
               </label>
               <label style={S.label}>Store Material
-                <select style={S.input} value={grnForm.materialId} onChange={(e) => setGrnForm(f => ({ ...f, materialId: e.target.value }))} required>
-                  <option value="">-- Select Material ({materials.length} loaded) --</option>
-                  {materials.map(m => <option key={m.id} value={m.id}>[{m.code}] {m.name}</option>)}
-                </select>
+                <SearchableSelect
+                  value={String(grnForm.materialId || '')}
+                  onChange={(val) => setGrnForm(f => ({ ...f, materialId: val }))}
+                  placeholder={`-- Select Material (${materials.length} loaded) --`}
+                  searchPlaceholder="Type material code or name..."
+                  required
+                  options={materials.map(m => ({ value: String(m.id), label: m.name, code: m.code }))}
+                />
               </label>
               <div style={S.twoCol}>
                 <label style={S.label}>Received Qty
@@ -881,10 +901,14 @@ export default function Inventory() {
               </label>
               <label style={S.label}>
                 Store Material
-                <select style={S.input} value={issueForm.materialId} onChange={(e) => setIssueForm(f => ({ ...f, materialId: e.target.value }))} required>
-                  <option value="">-- Select Material --</option>
-                  {materials.map(m => <option key={m.id} value={m.id}>[{m.code}] {m.name} (Stock: {m.currentStock} {m.uom})</option>)}
-                </select>
+                <SearchableSelect
+                  value={String(issueForm.materialId || '')}
+                  onChange={(val) => setIssueForm(f => ({ ...f, materialId: val }))}
+                  placeholder="-- Select Material --"
+                  searchPlaceholder="Type material code or name..."
+                  required
+                  options={materials.map(m => ({ value: String(m.id), label: m.name, code: m.code, subtext: `Stock: ${m.currentStock} ${m.uom || ''}` }))}
+                />
                 {selectedIssueMat && (
                   <span style={{ fontSize: 12, color: Number(selectedIssueMat.currentStock || 0) < Number(issueForm.qty || 0) ? '#dc2626' : '#15803d', fontWeight: 700, marginTop: 4 }}>
                     Live Balance: {selectedIssueMat.currentStock} {selectedIssueMat.uom || 'units'}
@@ -919,11 +943,17 @@ export default function Inventory() {
         <div style={S.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={S.cardTitle}>Shift Movement & High-Transaction Stock Audit</div>
-            <select style={{ ...S.input, width: 140 }} value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
-              <option value="">All Shifts</option>
-              <option value="Day">Day Shift</option>
-              <option value="Night">Night Shift</option>
-            </select>
+            <SearchableSelect
+              value={shiftFilter}
+              onChange={(val) => setShiftFilter(val)}
+              placeholder="All Shifts"
+              searchPlaceholder="Type shift name..."
+              style={{ width: 160 }}
+              options={[
+                { value: 'Day', label: 'Day Shift' },
+                { value: 'Night', label: 'Night Shift' }
+              ]}
+            />
           </div>
 
           <div style={S.statsGrid}>
@@ -1005,6 +1035,14 @@ export default function Inventory() {
           loadSummary()
           loadLedger()
         }}
+      />
+
+      {/* ── ENTERPRISE INVENTORY EXCEL EXPORTER MODAL ── */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
+        initialStoreType={activeStoreTab}
+        categories={categories}
       />
     </div>
   )
