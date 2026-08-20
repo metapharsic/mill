@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **MK Paper Mill** (55945 symbols, 72853 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **mill** (5103 symbols, 9081 relationships, 252 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -24,10 +24,10 @@ This project is indexed by GitNexus as **MK Paper Mill** (55945 symbols, 72853 r
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/MK Paper Mill/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/MK Paper Mill/clusters` | All functional areas |
-| `gitnexus://repo/MK Paper Mill/processes` | All execution flows |
-| `gitnexus://repo/MK Paper Mill/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/mill/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/mill/clusters` | All functional areas |
+| `gitnexus://repo/mill/processes` | All execution flows |
+| `gitnexus://repo/mill/process/{name}` | Step-by-step execution trace |
 
 ## CLI
 
