@@ -576,25 +576,25 @@ export default function Materials() {
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 16 }}>
             <div style={{ background: '#fff', border: '1px solid #e7e6df', borderRadius: 10, padding: '12px 16px', borderLeft: '4px solid #3b82f6' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📦 Total Opening Stock</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📦 Opening Stock (Yesterday)</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#1b1b1d', marginTop: 4 }}>
                 {totalOpening.toLocaleString('en-IN', { minimumFractionDigits: 3 })} <span style={{ fontSize: 11, fontWeight: 500, color: '#8a8a90' }}>Units</span>
               </div>
             </div>
             <div style={{ background: '#fff', border: '1px solid #e7e6df', borderRadius: 10, padding: '12px 16px', borderLeft: '4px solid #16a34a' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📥 Total Received (GRN)</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📥 Received (Today)</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>
                 +{totalReceived.toLocaleString('en-IN', { minimumFractionDigits: 3 })} <span style={{ fontSize: 11, fontWeight: 500, color: '#8a8a90' }}>Units</span>
               </div>
             </div>
             <div style={{ background: '#fff', border: '1px solid #e7e6df', borderRadius: 10, padding: '12px 16px', borderLeft: '4px solid #dc2626' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📤 Total Issued (Plant)</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>📤 Issued (Today)</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#dc2626', marginTop: 4 }}>
                 -{totalIssued.toLocaleString('en-IN', { minimumFractionDigits: 3 })} <span style={{ fontSize: 11, fontWeight: 500, color: '#8a8a90' }}>Units</span>
               </div>
             </div>
             <div style={{ background: '#fff', border: '1px solid #e7e6df', borderRadius: 10, padding: '12px 16px', borderLeft: '4px solid #0f766e' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>💰 Stock Valuation</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>💰 Closing Valuation</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#0f766e', marginTop: 4 }}>
                 ₹{totalValuation.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </div>
@@ -695,7 +695,7 @@ export default function Materials() {
                 <span>Fast Material Entry Row (Direct Catalog Addition with Section &amp; Machine Linking)</span>
               </div>
               <div style={{ fontSize: 11, color: '#64748b' }}>
-                Formula: <span style={{ fontWeight: 600, color: '#0284c7' }}>Opening</span> ＋ <span style={{ fontWeight: 600, color: '#16a34a' }}>Received</span> － <span style={{ fontWeight: 600, color: '#dc2626' }}>Issue</span> ＝ <span style={{ fontWeight: 700, color: '#0f766e' }}>Balance</span>
+                Formula: <span style={{ fontWeight: 600, color: '#0284c7' }}>Opening (Yesterday)</span> ＋ <span style={{ fontWeight: 600, color: '#16a34a' }}>Received (Today)</span> － <span style={{ fontWeight: 600, color: '#dc2626' }}>Issued (Today)</span> ＝ <span style={{ fontWeight: 700, color: '#0f766e' }}>Closing Balance</span>
               </div>
             </div>
 
@@ -947,9 +947,9 @@ export default function Materials() {
                   <SortableTh label="Crit" columnKey="criticality" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={65} align="center" />
                   <SortableTh label="HSN Code" columnKey="hsn_code" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={90} />
                   <SortableTh label="Rack / Box No" columnKey="bin_location" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={110} />
-                  <SortableTh label="Opening Stock" columnKey="opening" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                  <SortableTh label="Received (+)" columnKey="received" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
-                  <SortableTh label="Issued (-)" columnKey="issued" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Opening Stock (Yesterday)" columnKey="opening" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Received (Today)" columnKey="received" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
+                  <SortableTh label="Issued (Today)" columnKey="issued" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
                   <SortableTh label="Closing Balance" columnKey="current_stock" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
                   <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />
                   <SortableTh label="Stock Value" columnKey="valuation" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} align="right" />

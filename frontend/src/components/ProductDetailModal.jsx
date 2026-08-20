@@ -384,15 +384,15 @@ export default function ProductDetailModal({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
               <span style={{ fontWeight: 700, color: '#334155' }}>
-                📦 Opening: <span style={{ color: '#0284c7', fontWeight: 800 }}>{fmtN(Math.max(0, currentStock - (data?.total_received || 0) + (data?.total_issued || 0)), 2)}</span>
+                📦 Opening (Yesterday): <span style={{ color: '#0284c7', fontWeight: 800 }}>{fmtN(data?.opening_stock ?? Math.max(0, currentStock - (data?.today_received || 0) + (data?.today_issued || 0)), 2)}</span>
               </span>
               <span style={{ fontWeight: 800, color: '#16a34a' }}>＋</span>
               <span style={{ fontWeight: 700, color: '#16a34a' }}>
-                📥 Received: <span style={{ fontWeight: 800 }}>+{fmtN(data?.total_received || 0, 2)}</span>
+                📥 Received (Today): <span style={{ fontWeight: 800 }}>+{fmtN(data?.today_received || 0, 2)}</span>
               </span>
               <span style={{ fontWeight: 800, color: '#dc2626' }}>－</span>
               <span style={{ fontWeight: 700, color: '#dc2626' }}>
-                📤 Issued: <span style={{ fontWeight: 800 }}>-{fmtN(data?.total_issued || 0, 2)}</span>
+                📤 Issued (Today): <span style={{ fontWeight: 800 }}>-{fmtN(data?.today_issued || 0, 2)}</span>
               </span>
               <span style={{ fontWeight: 800, color: '#0f766e' }}>＝</span>
               <span style={{ fontWeight: 800, color: '#0f766e' }}>

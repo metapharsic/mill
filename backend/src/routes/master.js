@@ -286,8 +286,8 @@ router.get('/materials', auth, ar(async (req, res) => {
             m.category_id          as "categoryId",
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS "poCount",
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS po_count,
-            COALESCE((SELECT SUM(sl.in_qty)  FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type != 'opening'), 0) AS received,
-            COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type != 'opening'), 0) AS issued
+            COALESCE((SELECT SUM(sl.in_qty)  FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.date = CURRENT_DATE AND sl.transaction_type != 'opening'), 0) AS received,
+            COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.date = CURRENT_DATE AND sl.transaction_type != 'opening'), 0) AS issued
      FROM materials m
      LEFT JOIN material_categories mc ON mc.id=m.category_id
      LEFT JOIN plant_sections ps ON ps.id = m.section_id
@@ -486,10 +486,17 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
   const statsRes = await pool.query(`
     SELECT
       COALESCE(SUM(CASE WHEN transaction_type IN ('grn', 'in') THEN in_qty ELSE 0 END), 0) AS total_received,
-      COALESCE(SUM(CASE WHEN transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS total_issued
+      COALESCE(SUM(CASE WHEN transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS total_issued,
+      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type IN ('grn', 'in') THEN in_qty ELSE 0 END), 0) AS today_received,
+      COALESCE(SUM(CASE WHEN date = CURRENT_DATE AND transaction_type IN ('issue', 'out') THEN out_qty ELSE 0 END), 0) AS today_issued
     FROM stock_ledger
     WHERE material_id = $1
   `, [req.params.id]);
+
+  const todayRec = parseFloat(statsRes.rows[0]?.today_received || 0);
+  const todayIss = parseFloat(statsRes.rows[0]?.today_issued || 0);
+  const curStock = parseFloat(mat.current_stock || 0);
+  const yesterdayClosing = parseFloat((curStock - todayRec + todayIss).toFixed(3));
 
   res.json({
     success: true,
@@ -497,6 +504,9 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
       ...mat,
       total_received: parseFloat(statsRes.rows[0]?.total_received || 0),
       total_issued: parseFloat(statsRes.rows[0]?.total_issued || 0),
+      today_received: todayRec,
+      today_issued: todayIss,
+      opening_stock: yesterdayClosing,
       recent_transactions: ledgerRes.rows || []
     }
   });
@@ -665,9 +675,12 @@ router.delete('/materials/:id', auth, requireLevel(3), ar(async (req, res) => {
 router.get('/materials/:id/stock-summary', auth, ar(async (req, res) => {
   const { rows: [mat] } = await pool.query('SELECT current_stock FROM materials WHERE id=$1', [req.params.id]);
   if (!mat) return res.json({ success: false, message: 'Not found' });
+  const targetDate = req.query.date ? req.query.date : null;
+  const dateClause = targetDate ? 'AND date = $2' : 'AND date = CURRENT_DATE';
+  const queryParams = targetDate ? [req.params.id, targetDate] : [req.params.id];
   const { rows: [sums] } = await pool.query(
     `SELECT COALESCE(SUM(in_qty),0) AS received, COALESCE(SUM(out_qty),0) AS issued
-     FROM stock_ledger WHERE material_id=$1 AND transaction_type != 'opening'`, [req.params.id]
+     FROM stock_ledger WHERE material_id=$1 AND transaction_type != 'opening' ${dateClause}`, queryParams
   );
   const cur = parseFloat(mat.current_stock || 0);
   const rec = parseFloat(sums.received || 0);
