@@ -26,6 +26,8 @@ export default function InventoryExportModal({
   const [includeMaster, setIncludeMaster] = useState(true)
   const [includeCategorySheets, setIncludeCategorySheets] = useState(true)
   const [includeReorderSheet, setIncludeReorderSheet] = useState(true)
+  const [includeHighValueSheet, setIncludeHighValueSheet] = useState(true)
+  const [includeSlowMovingSheet, setIncludeSlowMovingSheet] = useState(false)
   const [includePricing, setIncludePricing] = useState(true)
   const [includeMovement, setIncludeMovement] = useState(true)
   const [includeTechnical, setIncludeTechnical] = useState(true)
@@ -51,6 +53,8 @@ export default function InventoryExportModal({
       setIncludeMaster(true)
       setIncludeCategorySheets(true)
       setIncludeReorderSheet(true)
+      setIncludeHighValueSheet(true)
+      setIncludeSlowMovingSheet(true)
       setIncludePricing(true)
       setIncludeMovement(true)
       setIncludeTechnical(true)
@@ -63,6 +67,8 @@ export default function InventoryExportModal({
       setIncludeMaster(true)
       setIncludeCategorySheets(true)
       setIncludeReorderSheet(true)
+      setIncludeHighValueSheet(false)
+      setIncludeSlowMovingSheet(false)
       setIncludePricing(true)
       setIncludeMovement(true)
       setIncludeTechnical(true)
@@ -75,6 +81,8 @@ export default function InventoryExportModal({
       setIncludeMaster(true)
       setIncludeCategorySheets(true)
       setIncludeReorderSheet(true)
+      setIncludeHighValueSheet(false)
+      setIncludeSlowMovingSheet(false)
       setIncludePricing(true)
       setIncludeMovement(true)
       setIncludeTechnical(true)
@@ -87,6 +95,8 @@ export default function InventoryExportModal({
       setIncludeMaster(true)
       setIncludeCategorySheets(false)
       setIncludeReorderSheet(true)
+      setIncludeHighValueSheet(false)
+      setIncludeSlowMovingSheet(false)
       setIncludePricing(true)
       setIncludeMovement(true)
       setIncludeTechnical(true)
@@ -97,11 +107,27 @@ export default function InventoryExportModal({
       setCriticality('all')
       setIncludeSummary(true)
       setIncludeMaster(true)
-      setIncludeCategorySheets(true)
+      setIncludeCategorySheets(false)
       setIncludeReorderSheet(false)
+      setIncludeHighValueSheet(true)
+      setIncludeSlowMovingSheet(false)
       setIncludePricing(true)
       setIncludeMovement(true)
-      setIncludeTechnical(false)
+      setIncludeTechnical(true)
+    } else if (presetKey === 'dead_stock') {
+      setStoreType('all')
+      setCategoryId('')
+      setStockStatus('all')
+      setCriticality('all')
+      setIncludeSummary(true)
+      setIncludeMaster(false)
+      setIncludeCategorySheets(false)
+      setIncludeReorderSheet(false)
+      setIncludeHighValueSheet(false)
+      setIncludeSlowMovingSheet(true)
+      setIncludePricing(true)
+      setIncludeMovement(false)
+      setIncludeTechnical(true)
     }
   }
 
@@ -121,8 +147,11 @@ export default function InventoryExportModal({
       if (search) query.append('search', search)
 
       query.append('include_summary_sheet', String(includeSummary))
+      query.append('include_master_sheet', String(includeMaster))
       query.append('include_category_sheets', String(includeCategorySheets))
       query.append('include_reorder_sheet', String(includeReorderSheet))
+      query.append('include_high_value_sheet', String(includeHighValueSheet))
+      query.append('include_slow_moving_sheet', String(includeSlowMovingSheet))
       query.append('include_pricing', String(includePricing))
       query.append('include_movement', String(includeMovement))
       query.append('include_technical', String(includeTechnical))
@@ -257,9 +286,21 @@ export default function InventoryExportModal({
               >
                 <div style={S.presetHeader}>
                   <BarChart3 size={16} color={activePreset === 'valuation_audit' ? '#0f766e' : '#64748b'} />
-                  <span style={S.presetTitle}>Valuation &amp; Audit</span>
+                  <span style={S.presetTitle}>Class A Valuation</span>
                 </div>
-                <div style={S.presetDesc}>Live ₹ valuation per category &amp; item with opening / closing balances</div>
+                <div style={S.presetDesc}>Top strategic high-value items representing primary mill working capital</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => applyPreset('dead_stock')}
+                style={{ ...S.presetCard, ...(activePreset === 'dead_stock' ? S.presetCardActive : {}) }}
+              >
+                <div style={S.presetHeader}>
+                  <Clock size={16} color={activePreset === 'dead_stock' ? '#e11d48' : '#64748b'} />
+                  <span style={S.presetTitle}>Slow &amp; Dead Stock</span>
+                </div>
+                <div style={S.presetDesc}>Inactive items (&gt;60 days dormant) with locked capital recovery analysis</div>
               </button>
             </div>
           </div>
@@ -407,6 +448,30 @@ export default function InventoryExportModal({
                 <div>
                   <div style={S.toggleTitle}>⚠️ Reorder &amp; Low Stock Action Sheet</div>
                   <div style={S.toggleDesc}>Shortfall units &amp; estimated replenishment cost for store purchase planning</div>
+                </div>
+              </label>
+
+              <label style={S.toggleItem}>
+                <input
+                  type="checkbox"
+                  checked={includeHighValueSheet}
+                  onChange={e => setIncludeHighValueSheet(e.target.checked)}
+                />
+                <div>
+                  <div style={S.toggleTitle}>💰 Class A Strategic High Value Sheet</div>
+                  <div style={S.toggleDesc}>Ranked strategic portfolio items representing 80% of total mill capital</div>
+                </div>
+              </label>
+
+              <label style={S.toggleItem}>
+                <input
+                  type="checkbox"
+                  checked={includeSlowMovingSheet}
+                  onChange={e => setIncludeSlowMovingSheet(e.target.checked)}
+                />
+                <div>
+                  <div style={S.toggleTitle}>⏳ Slow &amp; Dead Stock Audit Sheet</div>
+                  <div style={S.toggleDesc}>Items inactive for &gt;60 days with locked capital recovery recommendations</div>
                 </div>
               </label>
 

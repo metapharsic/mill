@@ -454,6 +454,8 @@ router.get('/materials/export/excel', auth, ar(async (req, res) => {
     include_category_sheets: req.query.include_category_sheets !== 'false',
     include_summary_sheet: req.query.include_summary_sheet !== 'false',
     include_reorder_sheet: req.query.include_reorder_sheet !== 'false',
+    include_high_value_sheet: req.query.include_high_value_sheet === 'true',
+    include_slow_moving_sheet: req.query.include_slow_moving_sheet === 'true',
     include_pricing: req.query.include_pricing !== 'false',
     include_technical: req.query.include_technical !== 'false',
     include_movement: req.query.include_movement !== 'false',

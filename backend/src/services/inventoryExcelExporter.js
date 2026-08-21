@@ -69,6 +69,8 @@ async function generateInventoryExcel(options = {}) {
     include_category_sheets = true,
     include_summary_sheet = true,
     include_reorder_sheet = true,
+    include_high_value_sheet = false,
+    include_slow_moving_sheet = false,
     include_pricing = true,
     include_technical = true,
     include_movement = true,
@@ -595,6 +597,124 @@ async function generateInventoryExcel(options = {}) {
     wsAlert['!cols'] = autoFitColumns(alertData);
     const alertSheetName = sanitizeSheetName('⚠️ Reorder & Low Stock', existingSheetNames);
     XLSX.utils.book_append_sheet(wb, wsAlert, alertSheetName);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SHEET: 💰 Class A High Value Strategic Inventory
+  // ─────────────────────────────────────────────────────────────────────────────
+  if (include_high_value_sheet) {
+    const highValItems = processedRows
+      .filter(r => r.valuation > 0 || r.criticality_class === 'A')
+      .sort((a, b) => b.valuation - a.valuation);
+
+    const highValData = [
+      ['MK PAPER MILL — STRATEGIC HIGH-VALUATION & CLASS A INVENTORY AUDIT'],
+      [`Generated: ${genTime} | Total Strategic Items: ${highValItems.length} | Combined Valuation: ₹${highValItems.reduce((acc, r) => acc + r.valuation, 0).toLocaleString('en-IN')}`],
+      [''],
+      [
+        'Rank',
+        'Item Code',
+        'Item Description',
+        'Category',
+        'Plant Section',
+        'Machine',
+        'Crit Class',
+        'UOM',
+        'Current Stock',
+        'Unit Price (₹)',
+        'Total Valuation (₹)',
+        '% Portfolio Share',
+        'Rack / Box',
+        'Min Stock',
+        'Reorder Level',
+        'Status',
+        'Last Vendor (PO)'
+      ]
+    ];
+
+    highValItems.forEach((r, idx) => {
+      const share = totalValuation > 0 ? parseFloat(((r.valuation / totalValuation) * 100).toFixed(2)) : 0;
+      highValData.push([
+        idx + 1,
+        r.code,
+        r.name,
+        r.category_name,
+        r.section_name || '-',
+        r.machine_name || '-',
+        r.criticality_class,
+        r.uom,
+        r.current_stock,
+        r.unit_price,
+        r.valuation,
+        `${share}%`,
+        r.bin_location,
+        r.min_stock,
+        r.reorder_level,
+        r.status,
+        r.last_vendor_name || '-'
+      ]);
+    });
+
+    const wsHighVal = XLSX.utils.aoa_to_sheet(highValData);
+    wsHighVal['!cols'] = autoFitColumns(highValData);
+    const highValSheetName = sanitizeSheetName('💰 Class A High Value', existingSheetNames);
+    XLSX.utils.book_append_sheet(wb, wsHighVal, highValSheetName);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SHEET: ⏳ Slow & Dead Stock Capital Recovery
+  // ─────────────────────────────────────────────────────────────────────────────
+  if (include_slow_moving_sheet) {
+    const slowMovingItems = processedRows
+      .filter(r => r.current_stock > 0 && (!r.last_txn_date || (new Date() - new Date(r.last_txn_date)) / (1000 * 60 * 60 * 24) > 60))
+      .sort((a, b) => b.valuation - a.valuation);
+
+    const slowMovingData = [
+      ['MK PAPER MILL — SLOW & DEAD STOCK CAPITAL RECOVERY AUDIT'],
+      [`Generated: ${genTime} | Inactive Items (>60 Days): ${slowMovingItems.length} | Locked Working Capital: ₹${slowMovingItems.reduce((acc, r) => acc + r.valuation, 0).toLocaleString('en-IN')}`],
+      [''],
+      [
+        'Sr No',
+        'Item Code',
+        'Item Description',
+        'Category',
+        'Plant Section',
+        'Rack / Box',
+        'UOM',
+        'Current Stock (Dormant)',
+        'Unit Price (₹)',
+        'Locked Capital (₹)',
+        'Crit Class',
+        'Last Transaction Date',
+        'Days Inactive',
+        'Action Recommendation'
+      ]
+    ];
+
+    slowMovingItems.forEach((r, idx) => {
+      const daysInactive = r.last_txn_date ? Math.floor((new Date() - new Date(r.last_txn_date)) / (1000 * 60 * 60 * 24)) : '>180';
+      slowMovingData.push([
+        idx + 1,
+        r.code,
+        r.name,
+        r.category_name,
+        r.section_name || '-',
+        r.bin_location,
+        r.uom,
+        r.current_stock,
+        r.unit_price,
+        r.valuation,
+        r.criticality_class,
+        r.last_txn_date || 'No Movement Recorded',
+        daysInactive,
+        r.valuation > 50000 ? 'Audit Physical Condition / Review Machine Need' : 'Store Re-allocation / Scrap Consideration'
+      ]);
+    });
+
+    const wsSlow = XLSX.utils.aoa_to_sheet(slowMovingData);
+    wsSlow['!cols'] = autoFitColumns(slowMovingData);
+    const slowSheetName = sanitizeSheetName('⏳ Slow & Dead Stock', existingSheetNames);
+    XLSX.utils.book_append_sheet(wb, wsSlow, slowSheetName);
   }
 
   const fileBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
