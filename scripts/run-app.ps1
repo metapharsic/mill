@@ -62,6 +62,7 @@ if ($backendReady) {
 }
 
 Write-Host " [4/4] Starting Frontend (port 3333)..." -ForegroundColor Cyan
+Remove-Item -Path "$frontend\node_modules\.vite" -Recurse -Force -ErrorAction SilentlyContinue
 $frontCmd = "cd /d `"$frontend`" && npx vite --host 0.0.0.0 --port 3333 > `"$logs\frontend.log`" 2>&1"
 Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', $frontCmd) -WindowStyle Hidden
 
