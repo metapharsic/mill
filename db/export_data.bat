@@ -16,6 +16,7 @@ echo.
 
 where pg_dump >nul 2>&1
 if %errorlevel% NEQ 0 (
+    if exist "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" set "PATH=C:\Program Files\PostgreSQL\18\bin;%PATH%"
     if exist "C:\Program Files\PostgreSQL\17\bin\pg_dump.exe" set "PATH=C:\Program Files\PostgreSQL\17\bin;%PATH%"
     if exist "C:\Program Files\PostgreSQL\16\bin\pg_dump.exe" set "PATH=C:\Program Files\PostgreSQL\16\bin;%PATH%"
     if exist "C:\Program Files\PostgreSQL\15\bin\pg_dump.exe" set "PATH=C:\Program Files\PostgreSQL\15\bin;%PATH%"

@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-08-19T14:37:26.440Z",
+  "exportedAt": "2026-08-21T09:30:27.062Z",
   "database": "mk_paper_mill",
   "totalTables": 108,
   "tables": {
@@ -36,7 +36,7 @@
       "file": "attendance_regularization.json"
     },
     "audit_log": {
-      "rowCount": 132,
+      "rowCount": 140,
       "file": "audit_log.json"
     },
     "boiler_performance_logs": {
@@ -164,11 +164,11 @@
       "file": "grades.json"
     },
     "grn": {
-      "rowCount": 21,
+      "rowCount": 22,
       "file": "grn.json"
     },
     "grn_items": {
-      "rowCount": 7,
+      "rowCount": 8,
       "file": "grn_items.json"
     },
     "holidays": {
@@ -176,7 +176,7 @@
       "file": "holidays.json"
     },
     "indent_audit_log": {
-      "rowCount": 6,
+      "rowCount": 8,
       "file": "indent_audit_log.json"
     },
     "indent_comments": {
@@ -184,11 +184,11 @@
       "file": "indent_comments.json"
     },
     "indent_items": {
-      "rowCount": 6,
+      "rowCount": 7,
       "file": "indent_items.json"
     },
     "indents": {
-      "rowCount": 6,
+      "rowCount": 7,
       "file": "indents.json"
     },
     "inspection_round_scans": {
@@ -196,7 +196,7 @@
       "file": "inspection_round_scans.json"
     },
     "installed_assets": {
-      "rowCount": 7,
+      "rowCount": 17,
       "file": "installed_assets.json"
     },
     "lab_samples": {
@@ -244,7 +244,7 @@
       "file": "motor_electrical_specs.json"
     },
     "notifications": {
-      "rowCount": 31,
+      "rowCount": 37,
       "file": "notifications.json"
     },
     "onboarding_checklist": {
@@ -280,7 +280,7 @@
       "file": "plant_sections.json"
     },
     "po_items": {
-      "rowCount": 9,
+      "rowCount": 0,
       "file": "po_items.json"
     },
     "production_summary": {
@@ -288,7 +288,7 @@
       "file": "production_summary.json"
     },
     "purchase_orders": {
-      "rowCount": 22,
+      "rowCount": 0,
       "file": "purchase_orders.json"
     },
     "quality_lab_tests": {
@@ -336,7 +336,7 @@
       "file": "section_equipment.json"
     },
     "section_kpi_snapshots": {
-      "rowCount": 4738,
+      "rowCount": 5194,
       "file": "section_kpi_snapshots.json"
     },
     "section_process_readings": {
@@ -368,11 +368,11 @@
       "file": "shifts.json"
     },
     "stock_ledger": {
-      "rowCount": 1199,
+      "rowCount": 1206,
       "file": "stock_ledger.json"
     },
     "store_indent_log": {
-      "rowCount": 0,
+      "rowCount": 1,
       "file": "store_indent_log.json"
     },
     "store_indents": {
@@ -428,7 +428,7 @@
       "file": "vendor_payments.json"
     },
     "vendors": {
-      "rowCount": 10,
+      "rowCount": 52,
       "file": "vendors.json"
     },
     "warehouses": {

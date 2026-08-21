@@ -160,5 +160,32 @@
     "photo_url": null,
     "ack_status": "pending",
     "maintenance_log_id": null
+  },
+  {
+    "id": 39,
+    "indent_id": 41,
+    "material_id": 2068,
+    "required_qty": "15.000",
+    "approved_qty": null,
+    "uom": null,
+    "purpose": "Store Section Safety Buffer Stock",
+    "current_stock": null,
+    "component_position": null,
+    "section_id": null,
+    "machine_id": null,
+    "unit_price": "0.00",
+    "line_value": "0.00",
+    "issued_qty": "0.000",
+    "batch_no": null,
+    "reason_code": null,
+    "ack_by": null,
+    "ack_at": null,
+    "fitment_date": null,
+    "observations": null,
+    "kpi_before": null,
+    "kpi_after": null,
+    "photo_url": null,
+    "ack_status": "pending",
+    "maintenance_log_id": null
   }
 ]

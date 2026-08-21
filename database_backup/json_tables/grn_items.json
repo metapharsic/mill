@@ -117,5 +117,22 @@
     "bin_location": null,
     "remarks": "Auto-populated from PO PO-TEST-599636",
     "rejection_reason": null
+  },
+  {
+    "id": 18,
+    "grn_id": 32,
+    "material_id": 4455,
+    "po_qty": "10.000",
+    "received_qty": "10.000",
+    "accepted_qty": "10.000",
+    "rejected_qty": "0.000",
+    "uom": "MT",
+    "unit_price": "54000.00",
+    "batch_number": null,
+    "mfg_date": null,
+    "expiry_date": null,
+    "bin_location": "YARD-PULP-1",
+    "remarks": "Auto-populated from PO PO-20260813-0008",
+    "rejection_reason": null
   }
 ]
