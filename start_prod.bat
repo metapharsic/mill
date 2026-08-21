@@ -17,11 +17,13 @@ if %errorlevel% NEQ 0 (
     pause & exit /b 1
 )
 
-echo  [2/3] Clearing port 5000...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5000 " 2^>nul') do (
-    taskkill /F /PID %%a >nul 2>&1
+echo  [2/3] Building frontend if dist missing...
+if not exist "%ROOT%\frontend\dist\index.html" (
+    echo         Compiling frontend React bundle...
+    cd /d "%ROOT%\frontend"
+    call npm run build
+    cd /d "%ROOT%"
 )
-taskkill /F /FI "WINDOWTITLE eq MK-ERP-Prod" >nul 2>&1
 
 echo  [3/3] Starting MK Paper Mill ERP (Production)...
 start "MK-ERP-Prod" /min cmd /c "cd /d "%BACKEND%" && set NODE_ENV=production && node src/server.js > "%LOGS%\server.log" 2>&1"
