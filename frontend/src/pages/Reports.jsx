@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
+import InventoryExportModal from '../components/InventoryExportModal'
 import {
   FileText, Zap, Factory, Boxes, BadgeCheck, Wrench, ShoppingCart,
   Truck, UsersRound, Calendar, Printer, Download, RefreshCw, Send,
   AlertTriangle, CheckCircle2, Search, Filter, Layers, Clock, ArrowRight,
   TrendingUp, BarChart2, ShieldCheck, Flame, Copy, Check, ExternalLink,
-  MessageSquare, Share2
+  MessageSquare, Share2, FileSpreadsheet
 } from 'lucide-react'
 
 function WhatsAppIcon({ size = 16, color = 'currentColor' }) {
@@ -536,6 +537,7 @@ export default function Reports() {
   const [customDraftText, setCustomDraftText] = useState('')
   const [whatsAppCopied, setWhatsAppCopied] = useState(false)
   const [savedSettingsToast, setSavedSettingsToast] = useState(false)
+  const [exportModal, setExportModal] = useState(false)
 
   // Sync draft text when waConfig changes (if not in direct edit mode)
   useEffect(() => {
@@ -801,6 +803,13 @@ export default function Reports() {
               <Send size={15} /> Archive EOD
             </button>
           )}
+          <button
+            style={{ ...S.btnSecondary, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
+            onClick={() => setExportModal(true)}
+            title="Download Comprehensive Multi-Sheet Excel Master"
+          >
+            <FileSpreadsheet size={15} /> Excel Master Export
+          </button>
           <button style={S.btnSecondary} onClick={handlePrint}>
             <Printer size={15} /> Print / PDF
           </button>
@@ -3078,6 +3087,12 @@ function PlantSectionsDetailedReportView({ data, search }) {
           </table>
         </div>
       </div>
+
+      {/* ── ENTERPRISE INVENTORY EXCEL EXPORTER MODAL ── */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
+      />
     </div>
   )
 }

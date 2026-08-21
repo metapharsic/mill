@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import ProductDetailModal from '../components/ProductDetailModal'
+import InventoryExportModal from '../components/InventoryExportModal'
 import {
   Boxes, TrendingUp, AlertTriangle, ArrowDownRight, ArrowUpRight,
   RefreshCw, Settings, Sliders, CheckCircle2, X, Eye, EyeOff,
   BarChart3, PieChart, Layers, Clock, ShieldCheck, ShoppingCart,
   DollarSign, Package, Factory, Zap, FileText, ChevronRight, ExternalLink,
   Filter, Calendar, Download, Sparkles, Search, ArrowUpDown, ArrowRight,
-  Building2, Check
+  Building2, Check, FileSpreadsheet
 } from 'lucide-react'
 
 const API = '/api'
@@ -62,6 +63,7 @@ export default function StoreDashboard({ onNavigate }) {
 
   // Top moving search
   const [matSearch, setMatSearch] = useState('')
+  const [exportModal, setExportModal] = useState(false)
 
   const [config, setConfig] = useState(() => {
     try {
@@ -250,6 +252,15 @@ export default function StoreDashboard({ onNavigate }) {
               </button>
             ))}
           </div>
+
+          <button
+            style={{ ...S.btnSecondary, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
+            onClick={() => setExportModal(true)}
+            title="Download Comprehensive Multi-Sheet Excel Master"
+          >
+            <FileSpreadsheet size={15} />
+            <span>Excel Master Export</span>
+          </button>
 
           <button
             style={S.btnSecondary}
@@ -1192,6 +1203,12 @@ export default function StoreDashboard({ onNavigate }) {
         isOpen={!!selectedProductModalId}
         onClose={() => setSelectedProductModalId(null)}
         onUpdated={loadAnalytics}
+      />
+
+      {/* ── ENTERPRISE INVENTORY EXCEL EXPORTER MODAL ── */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
       />
     </div>
   )

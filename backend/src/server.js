@@ -94,11 +94,13 @@ app.use('/uploads/hr', express.static(path.join(__dirname, '../uploads/hr')));
 // Serve uploaded maintenance scans/photos
 app.use('/uploads/maintenance', express.static(path.join(__dirname, '../uploads/maintenance')));
 
-// Serve React frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+// Serve React frontend (production or if built dist exists)
+const distPath = path.join(__dirname, '../../frontend/dist');
+if (process.env.NODE_ENV === 'production' || fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
