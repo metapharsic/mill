@@ -156,9 +156,18 @@ export default function InventoryExportModal({
       query.append('include_movement', String(includeMovement))
       query.append('include_technical', String(includeTechnical))
 
-      const token = localStorage.getItem('mk_token')
+      const token = localStorage.getItem('mk_token') || ''
+      if (token) {
+        query.append('token', token)
+      }
+
+      const headers = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`/api/inventory/export/excel?${query.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers
       })
 
       if (!response.ok) {
@@ -168,7 +177,7 @@ export default function InventoryExportModal({
 
       // Extract filename
       const disposition = response.headers.get('Content-Disposition')
-      let filename = 'MK_Mill_Inventory_Export.xlsx'
+      let filename = 'MK_Mill_Inventory_Master_Export.xlsx'
       if (disposition && disposition.includes('filename=')) {
         const match = disposition.match(/filename="?([^"]+)"?/)
         if (match && match[1]) filename = match[1]
@@ -178,14 +187,25 @@ export default function InventoryExportModal({
       const totalValuation = response.headers.get('X-Meta-Total-Valuation')
 
       const blob = await response.blob()
+      if (!blob || blob.size === 0) {
+        throw new Error('Received empty workbook data from server')
+      }
+
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
+      a.style.display = 'none'
       a.href = url
       a.download = filename
       document.body.appendChild(a)
       a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+
+      // Allow browser download manager to begin stream before revoking
+      setTimeout(() => {
+        try {
+          window.URL.revokeObjectURL(url)
+          if (a.parentNode) a.parentNode.removeChild(a)
+        } catch (_) {}
+      }, 3500)
 
       setDownloadSuccess({
         filename,

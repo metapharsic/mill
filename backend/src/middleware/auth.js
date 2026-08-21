@@ -4,7 +4,10 @@ const pool = require('../db/pool');
 const JWT_SECRET = process.env.JWT_SECRET || 'mk_paper_mill_jwt_secret_change_this';
 
 const auth = async (req, res, next) => {
-  const header = req.headers.authorization;
+  let header = req.headers.authorization;
+  if ((!header || !header.startsWith('Bearer ')) && req.query && req.query.token) {
+    header = `Bearer ${req.query.token}`;
+  }
   if (!header || !header.startsWith('Bearer ')) {
     return res.status(401).json({ success: false, message: 'No token provided' });
   }
