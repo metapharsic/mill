@@ -13,8 +13,6 @@ export default function InventoryExportModal({
   categories = [],
   sections = []
 }) {
-  if (!isOpen) return null
-
   // Configuration state
   const [storeType, setStoreType] = useState(initialStoreType)
   const [categoryId, setCategoryId] = useState(initialCategoryId)
@@ -173,6 +171,8 @@ export default function InventoryExportModal({
       setDownloading(false)
     }
   }
+
+  if (!isOpen) return null
 
   return (
     <div style={S.overlay} onClick={onClose}>

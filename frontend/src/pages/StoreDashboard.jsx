@@ -385,6 +385,27 @@ export default function StoreDashboard({ onNavigate }) {
           </div>
         )}
 
+        {config.kpis.outOfStock && (
+          <div
+            style={{ ...S.kpiCard, borderLeft: kpis.outOfStockCount > 0 ? '4px solid #b91c1c' : undefined, cursor: 'pointer' }}
+            onClick={() => handleNav('/store')}
+            title="Click to inspect zero-stock items in Store"
+          >
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Out of Stock</span>
+              <div style={{ ...S.kpiIcon, background: '#fef2f2', color: '#b91c1c' }}>
+                <ShieldCheck size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: kpis.outOfStockCount > 0 ? '#b91c1c' : '#16a34a' }}>
+              {kpis.outOfStockCount || 0} <span style={{ fontSize: 13, fontWeight: 600 }}>Items</span>
+            </div>
+            <div style={S.kpiSub}>
+              Catalog items currently at zero stock · <b>Click to Restock →</b>
+            </div>
+          </div>
+        )}
+
         {config.kpis.todayInward && (
           <div
             style={{ ...S.kpiCard, cursor: 'pointer' }}
@@ -1112,6 +1133,7 @@ export default function StoreDashboard({ onNavigate }) {
                     { key: 'totalValuation', label: '💰 Total Store Valuation' },
                     { key: 'totalQty', label: '📦 Bulk Inventory Weight' },
                     { key: 'lowStock', label: '⚠️ Reorder Risk Alerts' },
+                    { key: 'outOfStock', label: '🚫 Out of Stock Items' },
                     { key: 'todayInward', label: '📥 Today Inward GRNs' },
                     { key: 'todayOutward', label: '📤 Today Department Issues' },
                     { key: 'pendingIndents', label: '📋 Pending Store Indents' },

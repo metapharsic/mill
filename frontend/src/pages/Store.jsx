@@ -13,6 +13,14 @@ import ScrollableTabs from '../components/ScrollableTabs'
 import { sortTableData } from '../utils/tableSort'
 import { ExternalLink } from 'lucide-react'
 
+const GST_SLABS = [
+  { value: 0,  label: '0% (Nil / Exempt)', cgst: 0, sgst: 0, igst: 0 },
+  { value: 5,  label: '5% (CGST 2.5% + SGST 2.5% / IGST 5%)', cgst: 2.5, sgst: 2.5, igst: 5 },
+  { value: 12, label: '12% (CGST 6% + SGST 6% / IGST 12%)', cgst: 6, sgst: 6, igst: 12 },
+  { value: 18, label: '18% (Standard GST — CGST 9% + SGST 9% / IGST 18%)', cgst: 9, sgst: 9, igst: 18 },
+  { value: 28, label: '28% (Higher Slab — CGST 14% + SGST 14% / IGST 28%)', cgst: 14, sgst: 14, igst: 28 },
+]
+
 const API = '/api'
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem('mk_token')}` })
 const json = () => ({ ...h(), 'Content-Type': 'application/json' })
@@ -2514,7 +2522,7 @@ export default function Store({ onNavigate }) {
               <div style={S.grid2}>
                 <div>
                   <label style={S.label}>Issue Quantity *</label>
-                  <input type="number" step="0.001" max={selectedOutwardMat?.current_stock || 999999} style={S.input} placeholder="0.000" value={outwardForm.out_qty} onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })} required />
+                  <input type="number" step="0.001" max={selectedOutwardMat?.current_stock ?? 999999} style={S.input} placeholder="0.000" value={outwardForm.out_qty} onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })} required />
                 </div>
                 <div>
                   <label style={S.label}>Plant Department *</label>

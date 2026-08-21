@@ -388,7 +388,7 @@ async function compileEOD(targetDate) {
 }
 
 // GET /api/reports/eod — Get compiled EOD Mill Digest
-router.get('/eod', auth, requireLevel(2), ar(async (req, res) => {
+router.get('/eod', auth, ar(async (req, res) => {
   const { date } = req.query;
   const targetDate = date || new Date().toISOString().slice(0, 10);
   const data = await compileEOD(targetDate);

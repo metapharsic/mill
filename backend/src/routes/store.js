@@ -107,7 +107,7 @@ router.get('/dashboard-analytics', requireAuth, ar(async (req, res) => {
       COUNT(*) AS count,
       COALESCE(SUM(total_value), 0) AS value
     FROM indents
-    WHERE status IN ('Submitted', 'L1 Approved', 'L2 Approved', 'Pending')
+    WHERE status IN ('Submitted', 'L1 Approved', 'L2 Approved', 'L3 Approved', 'Approved', 'Partially Issued')
   `;
   const { rows: [pendingIndents] } = await pool.query(pendingIndentsQuery);
 
