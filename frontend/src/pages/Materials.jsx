@@ -266,6 +266,7 @@ export default function Materials() {
     setEdit(null)
     setModal(true)
   }
+  const openNew = openAdd
 
   const openEdit = m => {
     const rec = Number(m.received || 0)
