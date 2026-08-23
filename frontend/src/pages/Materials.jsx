@@ -681,15 +681,18 @@ export default function Materials() {
 
       {/* ── Summary KPI Stats Cards ── */}
       {(() => {
-        // Use the unpaginated kpiTotals (whole filtered set) once loaded; fall back
-        // to summing the current page only for the brief instant before it arrives.
-        const totalOpening = kpiTotals.loaded ? kpiTotals.opening : materials.reduce((acc, m) => {
+        const rawOpening = kpiTotals?.loaded ? kpiTotals.opening : (materials || []).reduce((acc, m) => {
           const rec = Number(m.received || 0), iss = Number(m.issued || 0), cur = Number(m.current_stock || 0)
           return acc + (cur - rec + iss)
         }, 0)
-        const totalReceived = kpiTotals.loaded ? kpiTotals.received : materials.reduce((acc, m) => acc + Number(m.received || 0), 0)
-        const totalIssued = kpiTotals.loaded ? kpiTotals.issued : materials.reduce((acc, m) => acc + Number(m.issued || 0), 0)
-        const totalValuation = kpiTotals.loaded ? kpiTotals.valuation : materials.reduce((acc, m) => acc + (Number(m.current_stock || 0) * Number(m.unit_price || 0)), 0)
+        const rawReceived = kpiTotals?.loaded ? kpiTotals.received : (materials || []).reduce((acc, m) => acc + Number(m.received || 0), 0)
+        const rawIssued = kpiTotals?.loaded ? kpiTotals.issued : (materials || []).reduce((acc, m) => acc + Number(m.issued || 0), 0)
+        const rawValuation = kpiTotals?.loaded ? kpiTotals.valuation : (materials || []).reduce((acc, m) => acc + (Number(m.current_stock || 0) * Number(m.unit_price || 0)), 0)
+
+        const totalOpening = Number(rawOpening) || 0
+        const totalReceived = Number(rawReceived) || 0
+        const totalIssued = Number(rawIssued) || 0
+        const totalValuation = Number(rawValuation) || 0
 
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 16 }}>
