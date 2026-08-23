@@ -12,6 +12,7 @@ import {
   TrendingUp, RefreshCw, Layers, CheckCircle2, ShieldCheck, Zap,
   Factory, Package, FileText, ShoppingCart, Clock, ExternalLink, FileSpreadsheet
 } from 'lucide-react'
+import { LOGO_DATA_URI } from '../utils/logo'
 
 const API = (path, opts = {}) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
@@ -291,35 +292,37 @@ export default function Inventory() {
     const total = (Number(grn.acceptedQty || 0) * Number(grn.unitPrice || 0)).toLocaleString('en-IN', { maximumFractionDigits: 2 })
     w.document.write(`<!DOCTYPE html><html><head><title>GRN Inward Invoice ${grn.grnNumber}</title>
     <style>
-      @page { size: A3; margin: 14mm; }
+      @page { size: A4; margin: 14mm; }
       * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
       body { margin: 0; color: #1b1b1d; position: relative; }
-      .watermark { position: fixed; top: 40%; left: 12%; font-size: 90px; font-weight: 800;
-        color: rgba(15,118,110,0.08); transform: rotate(-28deg); z-index: 0; letter-spacing: 6px; white-space: nowrap; }
+      .watermark-img { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; height: 400px; opacity: 0.06; z-index: 0; pointer-events: none; }
       .sheet { position: relative; z-index: 1; }
       .head { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0f766e; padding-bottom: 14px; margin-bottom: 18px; }
-      .logo { font-size: 30px; font-weight: 900; color: #0f766e; letter-spacing: 1px; }
+      .logo { font-size: 22px; font-weight: 900; color: #0f766e; letter-spacing: 0.5px; }
       .logo span { color: #1b1b1d; }
-      .sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
+      .sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
       .doc-title { text-align: right; }
-      .doc-title h2 { margin: 0; color: #0f766e; }
-      .doc-title .num { font-family: monospace; font-weight: 700; font-size: 15px; }
+      .doc-title h2 { margin: 0; color: #0f766e; font-size: 18px; }
+      .doc-title .num { font-family: monospace; font-weight: 700; font-size: 14px; }
       table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-      th, td { border: 1px solid #d1d5db; padding: 10px 12px; font-size: 13px; text-align: left; }
-      th { background: #ecfdf5; color: #0f766e; }
-      .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 40px; margin-top: 10px; font-size: 13px; }
+      th, td { border: 1px solid #d1d5db; padding: 8px 10px; font-size: 12px; text-align: left; }
+      th { background: #ecfdf5; color: #0f766e; font-weight: 700; }
+      .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 40px; margin-top: 10px; font-size: 12px; }
       .meta-grid b { color: #374151; }
-      .totals { text-align: right; margin-top: 16px; font-size: 15px; font-weight: 700; color: #0f766e; }
-      .sign { display: flex; justify-content: space-between; margin-top: 80px; font-size: 12px; }
-      .sign div { border-top: 1px solid #9ca3af; width: 220px; padding-top: 6px; text-align: center; }
-      .footer { margin-top: 40px; font-size: 10px; color: #9ca3af; text-align: center; }
+      .totals { text-align: right; margin-top: 16px; font-size: 14px; font-weight: 700; color: #0f766e; }
+      .sign { display: flex; justify-content: space-between; margin-top: 60px; font-size: 11px; }
+      .sign div { border-top: 1px solid #9ca3af; width: 180px; padding-top: 6px; text-align: center; }
+      .footer { margin-top: 30px; font-size: 10px; color: #9ca3af; text-align: center; }
     </style></head><body>
-    <div class="watermark">MK PAPER MILL</div>
+    <img src="${LOGO_DATA_URI}" class="watermark-img" alt="Watermark" />
     <div class="sheet">
       <div class="head">
-        <div>
-          <div class="logo">MK <span>PAPER MILL</span></div>
-          <div class="sub">Store Department — Goods Received Note (Inward Invoice)</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="${LOGO_DATA_URI}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;border:1px solid #e2e8f0;background:#fff;padding:2px;" />
+          <div>
+            <div class="logo">SRI M.K. <span>PAPER MILLS PVT. LTD.</span></div>
+            <div class="sub">Store Department — Goods Received Note (Inward Invoice)</div>
+          </div>
         </div>
         <div class="doc-title">
           <h2>INWARD GRN INVOICE</h2>

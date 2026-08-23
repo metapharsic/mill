@@ -2,6 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import SearchableSelect from '../components/SearchableSelect'
+import { LOGO_DATA_URI } from '../utils/logo'
+import { ExternalLink } from 'lucide-react'
+import A3InvoicePrintModal from '../components/A3InvoicePrintModal'
+import SequenceEnforcementModal from '../components/SequenceEnforcementModal'
 
 const API = async (path, opts = {}) => {
   try {
@@ -177,6 +181,80 @@ export default function Indent() {
   const [dcModal, setDcModal] = useState(null)
   const [cashModal, setCashModal] = useState(null)
   const [converting, setConverting] = useState(false)
+
+  // Receiver Signature Modal & A3 Print
+  const [a3PrintDoc, setA3PrintDoc] = useState(null)
+  const [receiverSignModal, setReceiverSignModal] = useState(null)
+  const [receiverSignForm, setReceiverSignForm] = useState({
+    receiver_name: user?.name || '',
+    receiver_emp_code: user?.employee_code || '',
+    receiver_signature_note: 'Received and verified in department',
+    fitment_date: new Date().toISOString().slice(0, 10),
+    fitment_location: '',
+    observations: ''
+  })
+  const [receiverSignSaving, setReceiverSignSaving] = useState(false)
+
+  const handleReceiverSign = async (e) => {
+    e.preventDefault()
+    if (!receiverSignModal) return
+    setReceiverSignSaving(true)
+    try {
+      const res = await API(`/indents/${receiverSignModal.id}/receive`, {
+        method: 'PUT',
+        body: JSON.stringify(receiverSignForm)
+      })
+      if (res.success) {
+        setMsg({ ok: true, text: res.message || 'Receiver signature recorded and indent closed successfully!' })
+        setReceiverSignModal(null)
+        load()
+        if (detail?.id === receiverSignModal.id) {
+          openDetail(receiverSignModal.id)
+        }
+      } else {
+        setMsg({ ok: false, text: res.message || 'Failed to sign indent' })
+      }
+    } catch (err) {
+      setMsg({ ok: false, text: err.message })
+    } finally {
+      setReceiverSignSaving(false)
+    }
+  }
+
+  // Sequence Violation Modal State
+  const [sequenceViolation, setSequenceViolation] = useState(null)
+
+  const openA3IndentPrint = async (indOrId) => {
+    let fullDoc = typeof indOrId === 'object' ? indOrId : null
+    if (!fullDoc || !fullDoc.items || fullDoc.items.length === 0) {
+      const id = typeof indOrId === 'object' ? indOrId.id : indOrId
+      const res = await API(`/indent/${id}`)
+      if (res.success && res.data) fullDoc = res.data
+    }
+    if (!fullDoc) return
+    const formattedItems = (fullDoc.items || []).map((it, idx) => ({
+      materialName: it.materialName || it.material_name,
+      materialCode: it.materialCode || it.material_code,
+      uom: it.uom || it.matUom || 'NOS',
+      in_qty: it.issued_qty || it.required_qty || 1,
+      unit_price: it.matPrice || it.unit_price || 0,
+      hsnCode: it.hsnCode || '8439',
+      gst_pct: it.gst_pct || 18,
+      batch_number: it.batch_no || `IND-ITEM-00${idx + 1}`,
+      pack_size: '1*1',
+      mrp: it.matPrice || it.unit_price || 0,
+      trade_price: it.matPrice || it.unit_price || 0
+    }))
+    setA3PrintDoc({
+      ...fullDoc,
+      invoiceNumber: fullDoc.indent_number || fullDoc.indentNumber,
+      grnNumber: fullDoc.indent_number || fullDoc.indentNumber,
+      partyName: fullDoc.deptName || 'Plant Department',
+      partyAddress: fullDoc.sectionName ? `Section: ${fullDoc.sectionName}` : 'MK Paper Mill Floor',
+      items: formattedItems,
+      title: 'STORE INDENT / ISSUE VOUCHER'
+    })
+  }
 
   // Form state for Raise / Edit with Multi-Mode Fulfillment
   const blankForm = () => ({
@@ -440,232 +518,9 @@ export default function Indent() {
     URL.revokeObjectURL(url)
   }
 
-  // ── Company Invoice Model Export & Printing ──────────────────────────────────
+  // ── Company Invoice & Voucher Export & Printing (Unified A3 Landscape) ──────
   const printCompanyInvoice = async (indentId) => {
-    const win = window.open('', '_blank', 'width=1000,height=800')
-    win.document.write('<html><body style="font-family:sans-serif;padding:30px;color:#64748b;"><h2>Loading SRI M.K. Paper Mill Invoice Voucher...</h2></body></html>')
-    try {
-      const r = await API(`/indent/${indentId}`)
-      if (!r.success) return win.document.body.innerHTML = `<h3>Error: ${r.message}</h3>`
-      const d = r.data
-      const totalAmount = d.items?.reduce((acc, it) => acc + (Number(it.line_value) || (Number(it.required_qty) * Number(it.matPrice || 0))), 0) || Number(d.total_value || 0)
-      const words = numberToWords(totalAmount)
-
-      win.document.open()
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>VOUCHER-${d.indent_number} — SRI M.K. PAPER MILLS</title>
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; color: #1e293b; padding: 36px; background: #fff; line-height: 1.4; }
-            .invoice-box { border: 2px solid #0f766e; padding: 24px; border-radius: 8px; position: relative; }
-            
-            /* Company Header */
-            .company-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f766e; padding-bottom: 16px; margin-bottom: 16px; }
-            .company-logo-text { font-size: 24px; font-weight: 800; color: #0f766e; letter-spacing: -0.02em; text-transform: uppercase; }
-            .company-tagline { font-size: 11px; color: #475569; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
-            .company-address { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.5; }
-            .doc-title-badge { background: #0f766e; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
-            
-            /* Metadata Grid */
-            .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; margin-bottom: 18px; }
-            .meta-item { display: flex; flex-direction: column; }
-            .meta-label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
-            .meta-val { font-size: 12px; font-weight: 700; color: #0f172a; margin-top: 2px; }
-            
-            /* Table Specifications */
-            .spec-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 11px; }
-            .spec-table th { background: #0f766e; color: #ffffff; padding: 8px 10px; text-align: left; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em; border: 1px solid #0f766e; }
-            .spec-table td { padding: 8px 10px; border: 1px solid #e2e8f0; vertical-align: top; }
-            .spec-table tr:nth-child(even) { background: #f8fafc; }
-            .code-pill { font-family: monospace; font-weight: 700; color: #0f766e; background: #f0fdfa; padding: 2px 6px; border-radius: 3px; border: 1px solid #ccfbf1; font-size: 10px; display: inline-block; }
-            .reason-pill { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; background: #e0f2fe; color: #0369a1; display: inline-block; }
-            
-            /* Valuation & Words Summary */
-            .summary-wrap { display: flex; justify-content: space-between; align-items: flex-start; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 14px; margin-bottom: 20px; }
-            .words-box { flex: 1; padding-right: 20px; }
-            .amount-box { text-align: right; min-width: 220px; }
-            
-            /* Declaration */
-            .declaration { font-size: 10px; color: #64748b; font-style: italic; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-bottom: 24px; }
-            
-            /* 4 Signatures Grid */
-            .sign-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border-top: 2px solid #0f766e; padding-top: 16px; margin-top: 20px; }
-            .sign-box { text-align: center; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 14px 8px; font-size: 11px; font-weight: 600; color: #334155; }
-            .sign-sub { font-size: 9px; color: #64748b; margin-top: 2px; font-weight: normal; }
-            
-            @media print {
-              body { padding: 10px; }
-              .invoice-box { border-width: 1px; padding: 16px; }
-              @page { size: portrait; margin: 12mm; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-box">
-            <!-- Top Header -->
-            <div class="company-header">
-              <div>
-                <div class="company-logo-text">SRI M.K. PAPER MILLS PVT. LTD.</div>
-                <div class="company-tagline">Kraft Paper &amp; Packaging Board Manufacturing Division</div>
-                <div class="company-address">
-                  Factory: Plot No. 12/A, Industrial Corridor, Paper Mill Road<br>
-                  GSTIN: <strong>33AAACM1234F1Z5</strong> &nbsp;|&nbsp; CIN: <strong>U21012TN2015PTC099881</strong> &nbsp;|&nbsp; State Code: 33
-                </div>
-              </div>
-              <div style="text-align: right;">
-                <div class="doc-title-badge">Material Indent &amp; Issuance Voucher</div>
-                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Voucher No: <strong style="color:#0f766e;">${d.indent_number}</strong></div>
-                <div style="font-size: 10px; color: #94a3b8;">Printed: ${new Date().toLocaleString('en-IN')}</div>
-              </div>
-            </div>
-
-            <!-- Metadata Info Grid -->
-            <div class="meta-grid">
-              <div class="meta-item">
-                <span class="meta-label">Indent / Voucher No</span>
-                <span class="meta-val">${d.indent_number}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Date &amp; Time Raised</span>
-                <span class="meta-val">${d.date?.slice(0, 10) || '—'} ${d.raisedAt ? new Date(d.raisedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Department</span>
-                <span class="meta-val">${d.deptName || '—'}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Voucher Status</span>
-                <span class="meta-val" style="color:#0f766e;">● ${d.status}</span>
-              </div>
-
-              <div class="meta-item">
-                <span class="meta-label">Raised By (Indentor)</span>
-                <span class="meta-val" style="color:#0f766e;">
-                  ${d.raisedByName || d.raisedBy || 'Store Operator'}
-                  <div style="font-size: 10px; color: #475569; font-weight: 600;">
-                    ${d.raisedByEmpCode ? `[${d.raisedByEmpCode}] ` : ''}${d.raisedByRole || 'Technical Staff'}
-                  </div>
-                </span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Plant Section</span>
-                <span class="meta-val">${d.sectionCode ? `[${d.sectionCode}] ${d.sectionName || ''}` : d.sectionName || 'Plant General'}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Machine / Equipment Context</span>
-                <span class="meta-val">${d.machineName ? `[${d.machineCode}] ${d.machineName}` : d.machine_id || 'General Mill Spares'}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Required By Date</span>
-                <span class="meta-val">${d.required_date?.slice(0, 10) || 'Immediate'}</span>
-              </div>
-            </div>
-
-            <!-- Itemized Specifications Table -->
-            <table class="spec-table">
-              <thead>
-                <tr>
-                  <th style="width: 25px;">#</th>
-                  <th style="width: 70px;">Code</th>
-                  <th>Material Name &amp; Full Specification</th>
-                  <th style="width: 80px;">HSN / Rack</th>
-                  <th>Position / Fitment</th>
-                  <th>Reason &amp; Technical Purpose</th>
-                  <th style="text-align: right; width: 65px;">Req Qty</th>
-                  <th style="text-align: right; width: 65px;">Issued</th>
-                  <th style="text-align: right; width: 75px;">Unit Rate</th>
-                  <th style="text-align: right; width: 90px;">Total Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${(d.items || []).map((it, idx) => {
-                  const price = Number(it.matPrice || it.unit_price || 0)
-                  const lineVal = Number(it.lineValue || it.line_value || (Number(it.required_qty) * price))
-                  return `
-                    <tr>
-                      <td style="text-align: center;">${idx + 1}</td>
-                      <td><span class="code-pill">${it.materialCode || '—'}</span></td>
-                      <td>
-                        <strong style="color: #0f172a;">${it.materialName || '—'}</strong>
-                        ${it.categoryName ? `<div style="font-size: 10px; color: #64748b;">${it.categoryName}</div>` : ''}
-                      </td>
-                      <td>
-                        <div style="font-family: monospace; font-size: 10px;">${it.hsnCode || '4802'}</div>
-                        <div style="font-size: 9px; color: #64748b;">${it.binLocation || '—'}</div>
-                      </td>
-                      <td>${it.component_position || '—'}</td>
-                      <td>
-                        <span class="reason-pill">${it.reason_code || 'Routine Replacement'}</span>
-                        ${it.purpose ? `<div style="font-size: 10px; color: #1e293b; margin-top: 3px; font-weight: 500;">${it.purpose}</div>` : ''}
-                      </td>
-                      <td style="text-align: right; font-weight: 600;">${it.required_qty} ${it.uom || it.matUom || ''}</td>
-                      <td style="text-align: right; font-weight: 700; color: #16a34a;">${it.issued_qty != null ? it.issued_qty : 0} ${it.uom || it.matUom || ''}</td>
-                      <td style="text-align: right;">₹${price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                      <td style="text-align: right; font-weight: 700; color: #0f766e;">₹${lineVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    </tr>
-                  `
-                }).join('')}
-              </tbody>
-            </table>
-
-            <!-- Commercial Summary Box -->
-            <div class="summary-wrap">
-              <div class="words-box">
-                <div style="font-size: 10px; font-weight: 700; color: #047857; text-transform: uppercase;">Amount in Words</div>
-                <div style="font-size: 12px; font-weight: 700; color: #065f46; margin-top: 2px;">${words}</div>
-                ${d.remarks ? `
-                  <div style="font-size: 11px; color: #1e293b; margin-top: 8px; background: #ffffff; padding: 8px 12px; border-radius: 4px; border: 1px solid #bbf7d0;">
-                    <strong>Work Order Reference / Technical Justification:</strong><br>${d.remarks}
-                  </div>
-                ` : ''}
-              </div>
-              <div class="amount-box">
-                <div style="font-size: 10px; font-weight: 700; color: #047857; text-transform: uppercase;">Total Indent Valuation</div>
-                <div style="font-size: 18px; font-weight: 800; color: #0f766e; margin-top: 2px;">₹${totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
-              </div>
-            </div>
-
-            <!-- Declaration -->
-            <div class="declaration">
-              Declaration: Certified that the materials/spares indented above are strictly required for mill operations, breakdown repair, or scheduled preventive maintenance. Stock ledger adjustments and fitment tracking will be governed per PIIMAS protocol.
-            </div>
-
-            <!-- 4 Signatures Block -->
-            <div class="sign-grid">
-              <div class="sign-box">
-                <div style="font-weight: 700; color: #0f172a;">${d.raisedByName || d.raisedBy || 'Technical Staff'}</div>
-                <div style="font-size: 10px; color: #0f766e; font-weight: 600;">${d.raisedByEmpCode ? `Emp ID: ${d.raisedByEmpCode}` : 'Indentor'}</div>
-                <div class="sign-sub">${d.raisedByRole || 'Technical Staff'}</div>
-              </div>
-              <div class="sign-box">
-                <div>Authorized Signatory</div>
-                <div>HOD Approval</div>
-                <div class="sign-sub">Department Head</div>
-              </div>
-              <div class="sign-box">
-                <div>Store Incharge</div>
-                <div>Store Officer / Issued By</div>
-                <div class="sign-sub">Store &amp; Inventory</div>
-              </div>
-              <div class="sign-box">
-                <div>Receiver Signature</div>
-                <div>Acknowledged &amp; Fitment</div>
-                <div class="sign-sub">Maintenance Eng.</div>
-              </div>
-            </div>
-          </div>
-        </body>
-        </html>
-      `)
-      win.document.close()
-      win.focus()
-      setTimeout(() => { win.print(); win.close() }, 400)
-    } catch (e) {
-      win.document.body.innerHTML = `<h3>Failed to load Company Invoice: ${e.message}</h3>`
-    }
+    openA3IndentPrint(indentId)
   }
 
   // ── 1-Click PO, DC & Cash Conversion Handlers ─────────────────────────────
@@ -933,13 +788,38 @@ export default function Indent() {
 
   const action = async (id, path, body) => {
     const r = await API(`/indent/${id}/${path}`, { method: 'PUT', body: body ? JSON.stringify(body) : undefined })
-    if (r.success) { load(); flash(true, 'Done'); if (detail?.id === id) openDetail(id) }
-    else flash(false, r.message || 'Failed')
+    if (r.success) {
+      load()
+      flash(true, 'Done')
+      if (detail?.id === id) openDetail(id)
+    } else if (r.sequence_violation) {
+      setSequenceViolation({
+        violationType: r.violationType || 'sm_approval_required',
+        currentStep: r.currentStep || 1,
+        requiredStep: r.requiredStep || 2,
+        indentNumber: r.indentNumber || '',
+        deptName: r.deptName || '',
+        targetId: id
+      })
+    } else {
+      flash(false, r.message || 'Failed')
+    }
   }
 
   const submitIssue = async (e) => {
     e.preventDefault()
     if (!detail) return
+    if (detail.status === 'Submitted') {
+      setSequenceViolation({
+        violationType: 'sm_approval_required',
+        currentStep: 1,
+        requiredStep: 2,
+        indentNumber: detail.indent_number,
+        deptName: detail.deptName,
+        targetId: detail.id
+      })
+      return
+    }
     const selectedItems = issueItems.filter(it => it.selected)
     if (!selectedItems.length) {
       return alert('Please select at least one item using the checkbox to issue')
@@ -961,6 +841,15 @@ export default function Indent() {
       flash(true, `Voucher ${detail.indent_number} issued — stock updated in database (${r.status})`)
       setDetail(null)
       load()
+    } else if (r.sequence_violation) {
+      setSequenceViolation({
+        violationType: r.violationType || 'sm_approval_required',
+        currentStep: r.currentStep || 1,
+        requiredStep: r.requiredStep || 2,
+        indentNumber: detail.indent_number,
+        deptName: detail.deptName,
+        targetId: detail.id
+      })
     } else {
       flash(false, r.message || 'Issuance failed')
     }
@@ -2094,23 +1983,53 @@ export default function Indent() {
                           {r.linkedGpNumber && <div style={{ fontSize: 10, color: '#d97706', fontWeight: 600, marginTop: 2 }}>DC: {r.linkedGpNumber}</div>}
                         </td>
                         <td style={S.td}>
-                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
                             <button
                               type="button"
-                              style={{ ...S.btnSm('#0f766e'), padding: '3px 6px', fontSize: 11 }}
-                              onClick={() => printCompanyInvoice(r.id)}
-                              title="Print Official Voucher"
+                              style={{ ...S.btnSm('#0f766e'), padding: '3px 7px', fontSize: 11, fontWeight: 800 }}
+                              onClick={() => openA3IndentPrint(r)}
+                              title="Print Official A3 GST Commercial Voucher"
                             >
-                              🖨️ Voucher
+                              🖨️ A3
                             </button>
                             <button
                               type="button"
                               style={{ ...S.btnSm('#1e293b'), padding: '3px 6px', fontSize: 11 }}
                               onClick={() => openDetail(r.id)}
-                              title="View Details"
+                              title="View Indent Details & Full Audit Trail"
                             >
                               👁 View
                             </button>
+                            {['Issued', 'Partially Issued', 'Approved'].includes(r.status) && (
+                              <button
+                                type="button"
+                                style={{ ...S.btnSm('#16a34a'), padding: '3px 7px', fontSize: 11, fontWeight: 800 }}
+                                onClick={() => {
+                                  setReceiverSignModal(r)
+                                  setReceiverSignForm({
+                                    receiver_name: user?.name || '',
+                                    receiver_emp_code: user?.employee_code || '',
+                                    receiver_signature_note: 'Received and verified in department',
+                                    fitment_date: new Date().toISOString().slice(0, 10),
+                                    fitment_location: '',
+                                    observations: ''
+                                  })
+                                }}
+                                title="Department Receiver Sign-off & Handover"
+                              >
+                                ✍️ Sign
+                              </button>
+                            )}
+                            {['Submitted', 'L1 Approved'].includes(r.status) && ((user?.role_level || 1) >= 3 || user?.dept_code === 'STORE') && (
+                              <button
+                                type="button"
+                                style={{ ...S.btnSm('#7c3aed'), padding: '3px 7px', fontSize: 11, fontWeight: 800 }}
+                                onClick={() => action(r.id, 'l2_approve')}
+                                title="Store Manager Direct Approval"
+                              >
+                                🛡️ SM Approve
+                              </button>
+                            )}
                             {!['Issued', 'Closed', 'Rejected', 'Cancelled'].includes(r.status) && (
                               <button
                                 type="button"
@@ -2280,12 +2199,18 @@ export default function Indent() {
                   Created on {detail.date?.slice(0, 10)} {detail.raisedAt ? new Date(detail.raisedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : ''} by <strong>{detail.raisedByName || detail.raisedBy || 'Indentor'}</strong>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <button
-                  style={{ ...S.btnPrimary, background: '#0f766e', padding: '6px 12px', fontSize: 12 }}
+                  style={{ ...S.btnPrimary, background: '#0f766e', padding: '6px 14px', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}
+                  onClick={() => openA3IndentPrint(detail)}
+                >
+                  🖨️ Print Official A3 GST Voucher
+                </button>
+                <button
+                  style={{ ...S.btnSecondary, padding: '6px 10px', fontSize: 11 }}
                   onClick={() => printCompanyInvoice(detail.id)}
                 >
-                  🖨️ Print Invoice Model
+                  📄 Slip
                 </button>
                 <button style={S.close} onClick={() => { setDetail(null); setTier(null); setAppendOpen(false) }}>✕</button>
               </div>
@@ -2333,6 +2258,54 @@ export default function Indent() {
                 <span style={S.revLabel}>💰 Total Valuation</span>
                 <div style={{ ...S.revVal, color: '#0f766e', fontSize: 15 }}>{fmt(detail.total_value)}</div>
                 <div style={{ fontSize: 10, color: '#64748b' }}>{detail.items?.length || 0} indented items</div>
+              </div>
+            </div>
+
+            {/* ── 4-Step Full Lifecycle Progress Stepper (Exact Pic 2 Workflow) ── */}
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '12px 14px', marginTop: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>🔄</span> 4-Step Requisition-to-Handover Progress Stepper
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+                {/* Step 1: Dept Requisition */}
+                <div style={{ background: '#ffffff', border: '1px solid #99f6e4', borderRadius: 6, padding: '8px 10px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#0f766e' }}>STEP 1: DEPT REQUEST</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#0f172a', marginTop: 2 }}>{detail.deptName || 'Department'}</div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>By {detail.raisedByName || detail.raisedBy || 'Staff'}</div>
+                </div>
+
+                {/* Step 2: SM Approval */}
+                <div style={{ background: '#ffffff', border: ['L1 Approved', 'L2 Approved', 'Approved', 'Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '1px solid #bbf7d0' : '1px dashed #cbd5e1', borderRadius: 6, padding: '8px 10px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: ['L1 Approved', 'L2 Approved', 'Approved', 'Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '#16a34a' : '#64748b' }}>
+                    STEP 2: SM APPROVAL
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
+                    {['L1 Approved', 'L2 Approved', 'Approved', 'Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '✓ Approved' : 'Pending SM Gate'}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>{detail.l2ApprovedByName || detail.l1ApprovedByName || 'Store Manager'}</div>
+                </div>
+
+                {/* Step 3: Store Keeper Issue */}
+                <div style={{ background: '#ffffff', border: ['Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '1px solid #bbf7d0' : '1px dashed #cbd5e1', borderRadius: 6, padding: '8px 10px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: ['Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '#16a34a' : '#64748b' }}>
+                    STEP 3: STORE ISSUE
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#0f766e', marginTop: 2 }}>
+                    {['Issued', 'Partially Issued', 'Closed'].includes(detail.status) ? '✓ Issued' : 'Ready for Issue'}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>{detail.issuedByName || 'Store Keeper'}</div>
+                </div>
+
+                {/* Step 4: Receiver Sign & Out */}
+                <div style={{ background: '#ffffff', border: detail.status === 'Closed' || detail.receiver_name ? '1px solid #16a34a' : '1px dashed #cbd5e1', borderRadius: 6, padding: '8px 10px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: detail.status === 'Closed' || detail.receiver_name ? '#16a34a' : '#64748b' }}>
+                    STEP 4: RECEIVER SIGN &amp; OUT
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
+                    {detail.status === 'Closed' || detail.receiver_name ? `✓ Signed & Closed` : 'Pending Handover'}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>{detail.receiver_name ? `${detail.receiver_name} (${detail.receiver_emp_code || 'Emp'})` : 'Dept Receiver'}</div>
+                </div>
               </div>
             </div>
 
@@ -2550,7 +2523,45 @@ export default function Indent() {
               </tbody>
             </table>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Official A3 GST Voucher Print */}
+              <button
+                style={{ ...S.btnPrimary, background: '#0f766e', padding: '6px 14px', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}
+                onClick={() => openA3IndentPrint(detail)}
+              >
+                🖨️ Print Official A3 GST Voucher
+              </button>
+
+              {/* SM Approval Action */}
+              {['Submitted', 'L1 Approved'].includes(detail.status) && ((user?.role_level || 1) >= 3 || user?.dept_code === 'STORE') && (
+                <button
+                  style={{ ...S.btnPrimary, background: '#7c3aed', padding: '6px 14px', fontSize: 12, fontWeight: 800 }}
+                  onClick={() => action(detail.id, 'l2_approve')}
+                >
+                  🛡️ Store Manager Approval
+                </button>
+              )}
+
+              {/* Receiver Sign & Handover Action */}
+              {['Issued', 'Partially Issued', 'Approved'].includes(detail.status) && (
+                <button
+                  style={{ ...S.btnPrimary, background: '#16a34a', padding: '6px 14px', fontSize: 12, fontWeight: 800 }}
+                  onClick={() => {
+                    setReceiverSignModal(detail)
+                    setReceiverSignForm({
+                      receiver_name: user?.name || '',
+                      receiver_emp_code: user?.employee_code || '',
+                      receiver_signature_note: 'Received and verified in department',
+                      fitment_date: new Date().toISOString().slice(0, 10),
+                      fitment_location: detail.sectionName || '',
+                      observations: ''
+                    })
+                  }}
+                >
+                  ✍️ Receiver Sign &amp; Close Indent
+                </button>
+              )}
+
               {/* 1-Click Convert to PO */}
               {!detail.linkedPoId && !['Rejected', 'Cancelled'].includes(detail.status) && (
                 <button
@@ -3292,9 +3303,7 @@ export default function Indent() {
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════ */}
-      {/* ── 1-CLICK CONVERT TO CASH PURCHASE MODAL ─────────────────────────── */}
-      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── 1-CLICK CONVERT TO CASH PURCHASE MODAL ── */}
       {cashModal && (
         <div style={S.ovl} onClick={() => setCashModal(null)}>
           <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
@@ -3387,6 +3396,133 @@ export default function Indent() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ── MODAL: DEPARTMENT RECEIVER SIGN & HANDOVER ── */}
+      {receiverSignModal && (
+        <div style={S.ovl} onClick={() => setReceiverSignModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 550 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#0f766e' }}>
+                  ✍️ Department Receiver Sign &amp; Handover
+                </div>
+                <div style={{ fontSize: 11, color: '#64748b' }}>
+                  Indent #{receiverSignModal.indent_number || receiverSignModal.indentNumber} · Dept: {receiverSignModal.deptName}
+                </div>
+              </div>
+              <button style={S.close} onClick={() => setReceiverSignModal(null)}>✕</button>
+            </div>
+            <form onSubmit={handleReceiverSign}>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, marginBottom: 14, fontSize: 12 }}>
+                <div style={{ fontWeight: 800, color: '#166534', marginBottom: 4 }}>
+                  4-Step Workflow Complete Closure:
+                </div>
+                <div style={{ color: '#334155' }}>
+                  Requisition Raised → SM Approved → Store Keeper Issued → <strong>Receiver Digital Sign &amp; Fitment</strong> → Out.
+                </div>
+              </div>
+
+              <div style={S.grid2}>
+                <label style={S.lbl}>Receiver Name *
+                  <input
+                    style={S.inp}
+                    required
+                    value={receiverSignForm.receiver_name}
+                    onChange={e => setReceiverSignForm({ ...receiverSignForm, receiver_name: e.target.value })}
+                  />
+                </label>
+                <label style={S.lbl}>Receiver Employee Code
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. EMP-2041"
+                    value={receiverSignForm.receiver_emp_code}
+                    onChange={e => setReceiverSignForm({ ...receiverSignForm, receiver_emp_code: e.target.value })}
+                  />
+                </label>
+              </div>
+
+              <div style={{ ...S.grid2, marginTop: 10 }}>
+                <label style={S.lbl}>Receipt / Fitment Date
+                  <input
+                    type="date"
+                    style={S.inp}
+                    value={receiverSignForm.fitment_date}
+                    onChange={e => setReceiverSignForm({ ...receiverSignForm, fitment_date: e.target.value })}
+                  />
+                </label>
+                <label style={S.lbl}>Fitment Location / Machine Section
+                  <input
+                    style={S.inp}
+                    placeholder="e.g. PM1 Press Section Roll #2"
+                    value={receiverSignForm.fitment_location}
+                    onChange={e => setReceiverSignForm({ ...receiverSignForm, fitment_location: e.target.value })}
+                  />
+                </label>
+              </div>
+
+              <label style={{ ...S.lbl, marginTop: 10 }}>Receiver Acknowledgment &amp; Signature Note
+                <input
+                  style={S.inp}
+                  value={receiverSignForm.receiver_signature_note}
+                  onChange={e => setReceiverSignForm({ ...receiverSignForm, receiver_signature_note: e.target.value })}
+                />
+              </label>
+
+              <label style={{ ...S.lbl, marginTop: 10 }}>Fitment Observations / Operational Feedback (Optional)
+                <textarea
+                  style={{ ...S.inp, height: 60 }}
+                  placeholder="e.g. Parts verified against manufacturer specs, installed and tested under normal load."
+                  value={receiverSignForm.observations}
+                  onChange={e => setReceiverSignForm({ ...receiverSignForm, observations: e.target.value })}
+                />
+              </label>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+                <button type="button" style={S.btnSecondary} onClick={() => setReceiverSignModal(null)}>Cancel</button>
+                <button
+                  type="submit"
+                  style={{ ...S.btnPrimary, background: '#16a34a' }}
+                  disabled={receiverSignSaving}
+                >
+                  {receiverSignSaving ? 'Signing...' : '✓ Confirm Receiver Signature & Close Indent'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── DEDICATED A3 GST INVOICE & SIV PRINT MODAL (Pic 1 Exact Format) ── */}
+      {a3PrintDoc && (
+        <A3InvoicePrintModal
+          docData={a3PrintDoc}
+          onClose={() => setA3PrintDoc(null)}
+          title={a3PrintDoc.title || 'STORE INDENT / ISSUE VOUCHER'}
+        />
+      )}
+
+      {/* ── SEQUENCE ENFORCEMENT POPUP (Strict 4-Step Maker-Checker Sequence) ── */}
+      {sequenceViolation && (
+        <SequenceEnforcementModal
+          isOpen={!!sequenceViolation}
+          onClose={() => setSequenceViolation(null)}
+          violationType={sequenceViolation.violationType}
+          currentStep={sequenceViolation.currentStep}
+          requiredStep={sequenceViolation.requiredStep}
+          indentNumber={sequenceViolation.indentNumber}
+          deptName={sequenceViolation.deptName}
+          onAction={(targetStep) => {
+            if (targetStep === 2 && sequenceViolation.targetId) {
+              action(sequenceViolation.targetId, 'l2_approve')
+            } else if (targetStep === 3) {
+              setTabKey('issue')
+            } else if (targetStep === 4 && sequenceViolation.targetId) {
+              const ind = rows.find(r => r.id === sequenceViolation.targetId) || detail
+              if (ind) setReceiverSignModal(ind)
+            }
+          }}
+        />
       )}
     </div>
   )

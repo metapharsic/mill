@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   FileSpreadsheet, Download, Filter, Layers, CheckCircle2, AlertTriangle,
   Zap, Factory, Package, ShieldCheck, X, Settings2, Sparkles, Check,
   ChevronRight, RefreshCw, BarChart3, Clock, DollarSign, Database
 } from 'lucide-react'
+import { LOGO_SRC } from '../utils/logo'
 
 export default function InventoryExportModal({
   isOpen,
@@ -13,6 +14,10 @@ export default function InventoryExportModal({
   categories = [],
   sections = []
 }) {
+  // Master lists fetched on open if empty
+  const [catList, setCatList] = useState(categories)
+  const [secList, setSecList] = useState(sections)
+
   // Configuration state
   const [storeType, setStoreType] = useState(initialStoreType)
   const [categoryId, setCategoryId] = useState(initialCategoryId)
@@ -20,6 +25,57 @@ export default function InventoryExportModal({
   const [criticality, setCriticality] = useState('all')
   const [sectionId, setSectionId] = useState('')
   const [search, setSearch] = useState('')
+
+  // Load master data if not passed
+  useEffect(() => {
+    if (!isOpen) return
+    const token = localStorage.getItem('mk_token') || ''
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+    fetch('/api/master/categories', { headers })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && Array.isArray(res.data)) setCatList(res.data)
+      })
+      .catch(() => {})
+
+    fetch('/api/sections', { headers })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && Array.isArray(res.data)) setSecList(res.data)
+      })
+      .catch(() => {})
+  }, [isOpen])
+
+  // Sync prop changes
+  useEffect(() => {
+    if (categories && categories.length) setCatList(categories)
+  }, [categories])
+
+  useEffect(() => {
+    if (sections && sections.length) setSecList(sections)
+  }, [sections])
+
+  // Dynamically filter categories based on active store domain
+  const availableCategories = useMemo(() => {
+    const list = catList.length ? catList : categories
+    return list.filter(c => {
+      if (!storeType || storeType === 'all') return true
+      if (storeType === 'mechanical') return c.type === 'Mechanical' || c.name?.toLowerCase().includes('mech') || c.code?.startsWith('MECH') || [31,36,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55].includes(c.id)
+      if (storeType === 'electrical') return c.type === 'Electrical' || c.name?.toLowerCase().includes('elec') || c.code?.startsWith('ELEC') || [30,56,57,58,59,60].includes(c.id)
+      if (storeType === 'consumable') return c.type === 'Consumable' || [29,33,34,35].includes(c.id)
+      if (storeType === 'chemical') return c.type === 'Raw Material' || c.id === 28 || c.name?.toLowerCase().includes('chem')
+      if (storeType === 'store') return ['Mechanical', 'Electrical', 'Consumable', 'Spare Part'].includes(c.type) || (c.id >= 29 && c.id <= 60)
+      return true
+    })
+  }, [catList, categories, storeType])
+
+  // Reset category if not in available list
+  useEffect(() => {
+    if (categoryId && !availableCategories.some(c => String(c.id) === String(categoryId))) {
+      setCategoryId('')
+    }
+  }, [storeType, availableCategories, categoryId])
 
   // Sheet & Column options
   const [includeSummary, setIncludeSummary] = useState(true)
@@ -228,14 +284,16 @@ export default function InventoryExportModal({
       <div style={S.modal} onClick={e => e.stopPropagation()}>
         {/* Modal Header */}
         <div style={S.header}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={S.headerIcon}>
-              <FileSpreadsheet size={24} color="#0f766e" />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img
+              src={LOGO_SRC}
+              alt="SRI M.K. Paper Mills"
+              style={{ height: 42, width: 'auto', maxWidth: 160, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 8px' }}
+            />
             <div>
               <div style={S.title}>Enterprise Inventory Master Excel Exporter</div>
               <div style={S.subtitle}>
-                Generate live, multi-sheet, category-wise inventory workbooks with daily rollover accounting &amp; reorder analytics.
+                SRI M.K. PAPER MILLS PVT. LTD. · Live multi-sheet audit workbooks with official branding &amp; watermark.
               </div>
             </div>
           </div>
@@ -327,9 +385,14 @@ export default function InventoryExportModal({
 
           {/* Granular Store Manager Filter Options */}
           <div style={S.sectionBox}>
-            <div style={S.sectionLabel}>
-              <Filter size={14} color="#0f766e" />
-              <span>Store Scope &amp; Target Filters</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ ...S.sectionLabel, marginBottom: 0 }}>
+                <Filter size={14} color="#0f766e" />
+                <span>Store Scope &amp; Target Filters</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#0f766e', background: '#ecfdf5', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>
+                {availableCategories.length} Categories in Scope
+              </div>
             </div>
             <div style={S.grid3}>
               <label style={S.label}>
@@ -355,8 +418,8 @@ export default function InventoryExportModal({
                   value={categoryId}
                   onChange={e => { setCategoryId(e.target.value); setActivePreset('custom'); }}
                 >
-                  <option value="">-- All Categories in Selected Domain --</option>
-                  {categories.map(c => (
+                  <option value="">-- All Categories in Selected Domain ({availableCategories.length}) --</option>
+                  {availableCategories.map(c => (
                     <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
                   ))}
                 </select>
@@ -397,8 +460,8 @@ export default function InventoryExportModal({
                   value={sectionId}
                   onChange={e => { setSectionId(e.target.value); setActivePreset('custom'); }}
                 >
-                  <option value="">-- All Plant Sections --</option>
-                  {sections.map(s => (
+                  <option value="">-- All Plant Sections ({(secList.length ? secList : sections).length}) --</option>
+                  {(secList.length ? secList : sections).map(s => (
                     <option key={s.id} value={s.id}>{s.name} ({s.section_code || s.code})</option>
                   ))}
                 </select>

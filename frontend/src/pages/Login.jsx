@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { LOGO_SRC } from '../utils/logo'
 import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 export default function Login() {
@@ -24,15 +25,11 @@ export default function Login() {
       {/* ── Left panel — brand ── */}
       <div style={S.leftPanel}>
         <div style={S.leftContent}>
-          <div style={S.logoMark}>
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-              <rect x="4" y="11" width="32" height="4" rx="2" fill="#f4c84b"/>
-              <rect x="4" y="19" width="32" height="4" rx="2" fill="#f4c84b" fillOpacity=".65"/>
-              <rect x="4" y="27" width="22" height="4" rx="2" fill="#f4c84b" fillOpacity=".35"/>
-            </svg>
+          <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', padding: '10px 18px', borderRadius: 14, marginBottom: 24, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)' }}>
+            <img src={LOGO_SRC} alt="Sri M K Paper Mills" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
           </div>
-          <h1 style={S.leftTitle}>MK Paper Mill</h1>
-          <p style={S.leftSub}>Enterprise Resource Planning</p>
+          <h1 style={S.leftTitle}>Sri M K Paper Mills</h1>
+          <p style={S.leftSub}>Enterprise Resource Planning Platform</p>
 
           <div style={S.statsRow}>
             {[

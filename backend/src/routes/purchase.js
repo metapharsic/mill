@@ -216,26 +216,88 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
       indentStatusBefore = indLock.status;
     }
     const num = await seqNum(client);
-    let total=0, gst=0;
-    for (const it of items) {
-      const lineTotal = (parseFloat(it.qty)||0)*(parseFloat(it.unit_price)||0);
-      total += lineTotal;
-      gst += lineTotal * (parseFloat(it.gst_pct)||18) / 100;
-    }
+    let totalTaxable = 0, totalDiscount = 0, totalOtherCharges = 0;
+    let totalCgst = 0, totalSgst = 0, totalIgst = 0;
+    const globalTaxType = (req.body.tax_type || (vendorRow?.gstin && !vendorRow.gstin.startsWith('29') ? 'inter' : 'intra')).toLowerCase();
+
+    const preparedItems = items.map(it => {
+      const q = parseFloat(it.qty) || 0;
+      const p = parseFloat(it.unit_price) || 0;
+      const gross = q * p;
+      const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct) || 0));
+      const discAmt = gross * (discPct / 100);
+      const discBase = Math.max(0, gross - discAmt);
+      const otherCharges = parseFloat(it.other_charges) || 0;
+      const taxable = Math.max(0, discBase + otherCharges);
+      const taxType = (it.tax_type || globalTaxType).toLowerCase();
+      const gstPct = it.gst_pct !== undefined && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18;
+
+      let cgstPct = 0, sgstPct = 0, igstPct = 0;
+      let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+
+      if (taxType === 'inter' || taxType === 'state' || taxType === 'igst') {
+        igstPct = gstPct;
+        igstAmt = taxable * (igstPct / 100);
+      } else {
+        cgstPct = gstPct / 2;
+        sgstPct = gstPct / 2;
+        cgstAmt = taxable * (cgstPct / 100);
+        sgstAmt = taxable * (sgstPct / 100);
+      }
+      const lineTax = cgstAmt + sgstAmt + igstAmt;
+      const lineTotal = taxable + lineTax;
+
+      totalTaxable += taxable;
+      totalDiscount += discAmt;
+      totalOtherCharges += otherCharges;
+      totalCgst += cgstAmt;
+      totalSgst += sgstAmt;
+      totalIgst += igstAmt;
+
+      return {
+        ...it,
+        qty: q,
+        unit_price: p,
+        discount_pct: discPct,
+        discount_amount: discAmt,
+        other_charges: otherCharges,
+        taxable_amount: taxable,
+        tax_type: taxType,
+        gst_pct: gstPct,
+        cgst_pct: cgstPct,
+        sgst_pct: sgstPct,
+        igst_pct: igstPct,
+        cgst_amount: cgstAmt,
+        sgst_amount: sgstAmt,
+        igst_amount: igstAmt,
+        total: lineTotal
+      };
+    });
+
+    const totalGst = totalCgst + totalSgst + totalIgst;
+    const grandTotal = totalTaxable + totalGst;
+
     const { rows } = await client.query(
       `INSERT INTO purchase_orders (po_number,date,vendor_id,indent_id,delivery_date,payment_terms,
-         status,total_value,gst_value,grand_total,created_by,remarks)
-       VALUES ($1,NOW(),$2,$3,$4,$5,'Draft',$6,$7,$8,$9,$10) RETURNING *`,
+         status,tax_type,total_value,discount_value,other_charges,cgst_value,sgst_value,igst_value,gst_value,grand_total,created_by,remarks)
+       VALUES ($1,NOW(),$2,$3,$4,$5,'Draft',$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
       [num, vendor_id, indent_id||null, delivery_date||null, payment_terms||null,
-       total, gst, total+gst, req.user.id, remarks||null]
+       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.user.id, remarks||null]
     );
     const poId = rows[0].id;
-    for (const it of items) {
-      const lineTotal = (it.qty||0)*(it.unit_price||0);
+    for (const it of preparedItems) {
       await client.query(
-        `INSERT INTO po_items (po_id,material_id,qty,uom,unit_price,gst_pct,total)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-        [poId, it.material_id, it.qty, it.uom||'', it.unit_price||0, it.gst_pct||18, lineTotal]
+        `INSERT INTO po_items (
+           po_id, material_id, qty, uom, unit_price,
+           discount_pct, discount_amount, other_charges, taxable_amount,
+           tax_type, gst_pct, cgst_pct, sgst_pct, igst_pct,
+           cgst_amount, sgst_amount, igst_amount, total
+         )
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+        [poId, it.material_id, it.qty, it.uom||'', it.unit_price||0,
+         it.discount_pct, it.discount_amount, it.other_charges, it.taxable_amount,
+         it.tax_type, it.gst_pct, it.cgst_pct, it.sgst_pct, it.igst_pct,
+         it.cgst_amount, it.sgst_amount, it.igst_amount, it.total]
       );
     }
     if (indent_id) {
@@ -261,7 +323,7 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
 
 // EDIT PO — Draft, Pending, or Approved prior to goods receipt
 router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
-  const { vendor_id, vendorId, delivery_date, payment_terms, remarks, items } = req.body;
+  const { vendor_id, vendorId, delivery_date, payment_terms, remarks, items, tax_type } = req.body;
   const { rows: [po] } = await pool.query(`SELECT * FROM purchase_orders WHERE id=$1`, [req.params.id]);
   if (!po) return res.json({ success: false, message: 'Not found' });
   if (['Received', 'Closed', 'Cancelled'].includes(po.status)) {
@@ -292,48 +354,137 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
   if (delivery_date && po.date && new Date(delivery_date) < new Date(po.date)) return res.json({ success:false, message:'Delivery date cannot be before PO date' });
 
   const targetVendorId = vendor_id || vendorId || po.vendor_id;
+  const globalTaxType = (tax_type || po.tax_type || 'intra').toLowerCase();
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // Recalculate totals
-    let total = 0;
-    let gst = 0;
+    let totalTaxable = 0, totalDiscount = 0, totalOtherCharges = 0;
+    let totalCgst = 0, totalSgst = 0, totalIgst = 0;
+
     if (items && items.length) {
-      for (const it of items) {
-        const lineTotal = (parseFloat(it.qty)||0) * (parseFloat(it.unit_price)||0);
-        total += lineTotal;
-        gst += lineTotal * (parseFloat(it.gst_pct)||18) / 100;
-      }
+      const preparedItems = items.map(it => {
+        const q = parseFloat(it.qty) || 0;
+        const p = parseFloat(it.unit_price) || 0;
+        const gross = q * p;
+        const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct) || 0));
+        const discAmt = gross * (discPct / 100);
+        const discBase = Math.max(0, gross - discAmt);
+        const otherCharges = parseFloat(it.other_charges) || 0;
+        const taxable = Math.max(0, discBase + otherCharges);
+        const itemTaxType = (it.tax_type || globalTaxType).toLowerCase();
+        const gstPct = it.gst_pct !== undefined && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18;
+
+        let cgstPct = 0, sgstPct = 0, igstPct = 0;
+        let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+
+        if (itemTaxType === 'inter' || itemTaxType === 'state' || itemTaxType === 'igst') {
+          igstPct = gstPct;
+          igstAmt = taxable * (igstPct / 100);
+        } else {
+          cgstPct = gstPct / 2;
+          sgstPct = gstPct / 2;
+          cgstAmt = taxable * (cgstPct / 100);
+          sgstAmt = taxable * (sgstPct / 100);
+        }
+        const lineTax = cgstAmt + sgstAmt + igstAmt;
+        const lineTotal = taxable + lineTax;
+
+        totalTaxable += taxable;
+        totalDiscount += discAmt;
+        totalOtherCharges += otherCharges;
+        totalCgst += cgstAmt;
+        totalSgst += sgstAmt;
+        totalIgst += igstAmt;
+
+        return {
+          ...it,
+          qty: q,
+          unit_price: p,
+          discount_pct: discPct,
+          discount_amount: discAmt,
+          other_charges: otherCharges,
+          taxable_amount: taxable,
+          tax_type: itemTaxType,
+          gst_pct: gstPct,
+          cgst_pct: cgstPct,
+          sgst_pct: sgstPct,
+          igst_pct: igstPct,
+          cgst_amount: cgstAmt,
+          sgst_amount: sgstAmt,
+          igst_amount: igstAmt,
+          total: lineTotal
+        };
+      });
+
       // Replace items
       await client.query(`DELETE FROM po_items WHERE po_id=$1`, [req.params.id]);
-      for (const it of items) {
-        const lineTotal = (parseFloat(it.qty)||0) * (parseFloat(it.unit_price)||0);
+      for (const it of preparedItems) {
         await client.query(
-          `INSERT INTO po_items (po_id,material_id,qty,uom,unit_price,gst_pct,total) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-          [req.params.id, it.material_id, it.qty, it.uom||'', it.unit_price||0, it.gst_pct||18, lineTotal]
+          `INSERT INTO po_items (
+             po_id, material_id, qty, uom, unit_price,
+             discount_pct, discount_amount, other_charges, taxable_amount,
+             tax_type, gst_pct, cgst_pct, sgst_pct, igst_pct,
+             cgst_amount, sgst_amount, igst_amount, total
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+          [req.params.id, it.material_id, it.qty, it.uom||'', it.unit_price||0,
+           it.discount_pct, it.discount_amount, it.other_charges, it.taxable_amount,
+           it.tax_type, it.gst_pct, it.cgst_pct, it.sgst_pct, it.igst_pct,
+           it.cgst_amount, it.sgst_amount, it.igst_amount, it.total]
         );
       }
     } else {
       // Keep existing items, recalculate
-      const { rows: existItems } = await client.query(`SELECT qty, unit_price, gst_pct FROM po_items WHERE po_id=$1`, [req.params.id]);
+      const { rows: existItems } = await client.query(`SELECT * FROM po_items WHERE po_id=$1`, [req.params.id]);
       for (const it of existItems) {
-        const lineTotal = parseFloat(it.qty) * parseFloat(it.unit_price);
-        total += lineTotal;
-        gst += lineTotal * parseFloat(it.gst_pct||18) / 100;
+        const q = parseFloat(it.qty) || 0;
+        const p = parseFloat(it.unit_price) || 0;
+        const gross = q * p;
+        const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct) || 0));
+        const discAmt = gross * (discPct / 100);
+        const discBase = Math.max(0, gross - discAmt);
+        const otherCharges = parseFloat(it.other_charges) || 0;
+        const taxable = Math.max(0, discBase + otherCharges);
+        const itemTaxType = (it.tax_type || globalTaxType).toLowerCase();
+        const gstPct = parseFloat(it.gst_pct || 18);
+
+        let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+        if (itemTaxType === 'inter' || itemTaxType === 'state' || itemTaxType === 'igst') {
+          igstAmt = taxable * (gstPct / 100);
+        } else {
+          cgstAmt = taxable * (gstPct / 200);
+          sgstAmt = taxable * (gstPct / 200);
+        }
+        totalTaxable += taxable;
+        totalDiscount += discAmt;
+        totalOtherCharges += otherCharges;
+        totalCgst += cgstAmt;
+        totalSgst += sgstAmt;
+        totalIgst += igstAmt;
       }
     }
+
+    const totalGst = totalCgst + totalSgst + totalIgst;
+    const grandTotal = totalTaxable + totalGst;
+
     const { rows } = await client.query(
       `UPDATE purchase_orders SET
          vendor_id = COALESCE($1, vendor_id),
          delivery_date = COALESCE($2, delivery_date),
          payment_terms = COALESCE($3, payment_terms),
          remarks = COALESCE($4, remarks),
-         total_value = $5,
-         gst_value = $6,
-         grand_total = $7
-       WHERE id = $8 RETURNING *`,
-      [targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null, total, gst, total + gst, req.params.id]
+         tax_type = $5,
+         total_value = $6,
+         discount_value = $7,
+         other_charges = $8,
+         cgst_value = $9,
+         sgst_value = $10,
+         igst_value = $11,
+         gst_value = $12,
+         grand_total = $13
+       WHERE id = $14 RETURNING *`,
+      [targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null,
+       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.params.id]
     );
     await client.query('COMMIT');
     res.json({ success: true, data: rows[0], message: 'Purchase Order updated successfully' });
@@ -523,7 +674,7 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
   const grnId = rows[0].id;
   const { rows: items } = await pool.query(
     `SELECT gi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom", m.hsn_code as "hsnCode",
-            COALESCE(pi.gst_pct, 18) as "gst_pct"
+            COALESCE(gi.gst_pct, pi.gst_pct, 18) as "gst_pct"
      FROM grn_items gi
      LEFT JOIN materials m ON m.id = gi.material_id
      LEFT JOIN grn g ON g.id = gi.grn_id
@@ -534,13 +685,13 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
   res.json({ success: true, data: { ...rows[0], items } });
 }));
 
-// PUT /api/purchase/grn/:id — Update GRN header, columns, line item quantities, and prices with atomic ledger sync
+// PUT /api/purchase/grn/:id — Update GRN header, columns, line item quantities, discounts, charges, and prices with atomic ledger sync
 router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
   const isNum = /^\d+$/.test(String(req.params.id));
   const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
   const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
 
-  const { vehicle_number, challan_number, invoice_number, remarks, date, items: updatedItems, items } = req.body;
+  const { vehicle_number, challan_number, invoice_number, remarks, date, tax_type, items: updatedItems, items } = req.body;
   const itemsList = updatedItems || items;
 
   const client = await pool.connect();
@@ -554,23 +705,25 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
     }
 
     const grnId = grn.id;
+    const globalTaxType = (tax_type || grn.tax_type || 'intra').toLowerCase();
 
     // 1. Update Header columns
-    const { rows: [updatedGrn] } = await client.query(
+    await client.query(
       `UPDATE grn
        SET vehicle_number = COALESCE($1, vehicle_number),
            challan_number = COALESCE($2, challan_number),
            invoice_number = COALESCE($3, invoice_number),
            remarks = COALESCE($4, remarks),
            date = COALESCE($5::date, date),
+           tax_type = COALESCE($6, tax_type),
            updated_at = NOW()
-       WHERE id = $6
-       RETURNING *`,
+       WHERE id = $7`,
       [vehicle_number !== undefined ? vehicle_number : null,
        challan_number !== undefined ? challan_number : null,
        invoice_number !== undefined ? invoice_number : null,
        remarks !== undefined ? remarks : null,
        date || null,
+       globalTaxType,
        grnId]
     );
 
@@ -597,6 +750,31 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
         const newAccQty = uItem.accepted_qty !== undefined ? parseFloat(uItem.accepted_qty) : oldAccQty;
         const newRejQty = uItem.rejected_qty !== undefined ? parseFloat(uItem.rejected_qty) : (newRecQty - newAccQty);
         const newPrice = uItem.unit_price !== undefined && uItem.unit_price !== '' ? parseFloat(uItem.unit_price) : oldPrice;
+        const newDiscPct = uItem.discount_pct !== undefined ? Math.max(0, Math.min(100, parseFloat(uItem.discount_pct))) : parseFloat(itemMatch.discount_pct || 0);
+        const newOtherChg = uItem.other_charges !== undefined ? parseFloat(uItem.other_charges) : parseFloat(itemMatch.other_charges || 0);
+        const newGstPct = uItem.gst_pct !== undefined ? parseFloat(uItem.gst_pct) : parseFloat(itemMatch.gst_pct || 18);
+        const newTaxType = (uItem.tax_type || itemMatch.tax_type || globalTaxType).toLowerCase();
+
+        const grossVal = newAccQty * newPrice;
+        const discAmt = grossVal * (newDiscPct / 100);
+        const discBase = Math.max(0, grossVal - discAmt);
+        const taxableVal = Math.max(0, discBase + newOtherChg);
+
+        let cgstPct = 0, sgstPct = 0, igstPct = 0;
+        let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+
+        if (newTaxType === 'inter' || newTaxType === 'state' || newTaxType === 'igst') {
+          igstPct = newGstPct;
+          igstAmt = taxableVal * (igstPct / 100);
+        } else {
+          cgstPct = newGstPct / 2;
+          sgstPct = newGstPct / 2;
+          cgstAmt = taxableVal * (cgstPct / 100);
+          sgstAmt = taxableVal * (sgstPct / 100);
+        }
+        const lineTax = cgstAmt + sgstAmt + igstAmt;
+        const lineTot = taxableVal + lineTax;
+
         const newBin = uItem.bin_location !== undefined ? uItem.bin_location : itemMatch.bin_location;
         const newBatch = uItem.batch_number !== undefined ? uItem.batch_number : itemMatch.batch_number;
         const newLineRemarks = uItem.remarks !== undefined ? uItem.remarks : itemMatch.remarks;
@@ -627,18 +805,34 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
           [newStock, newPrice, mat.id]
         );
 
-        // Update grn_items row
+        // Update grn_items row with full calculation fields
         await client.query(
           `UPDATE grn_items
            SET received_qty = $1,
                accepted_qty = $2,
                rejected_qty = $3,
                unit_price = $4,
-               bin_location = $5,
-               batch_number = $6,
-               remarks = $7
-           WHERE id = $8`,
-          [newRecQty, newAccQty, newRejQty, newPrice, newBin, newBatch, newLineRemarks, itemMatch.id]
+               discount_pct = $5,
+               discount_amount = $6,
+               other_charges = $7,
+               taxable_amount = $8,
+               gst_pct = $9,
+               tax_type = $10,
+               cgst_pct = $11,
+               sgst_pct = $12,
+               igst_pct = $13,
+               cgst_amount = $14,
+               sgst_amount = $15,
+               igst_amount = $16,
+               total_amount = $17,
+               bin_location = $18,
+               batch_number = $19,
+               remarks = $20
+           WHERE id = $21`,
+          [newRecQty, newAccQty, newRejQty, newPrice,
+           newDiscPct, discAmt, newOtherChg, taxableVal, newGstPct, newTaxType,
+           cgstPct, sgstPct, igstPct, cgstAmt, sgstAmt, igstAmt, lineTot,
+           newBin, newBatch, newLineRemarks, itemMatch.id]
         );
 
         // Update / synchronize stock_ledger
@@ -697,6 +891,21 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
         }
       }
     }
+
+    // Recompute GRN Header Totals
+    await client.query(
+      `UPDATE grn
+       SET total_value = (SELECT COALESCE(SUM(taxable_amount), 0) FROM grn_items WHERE grn_id = $1),
+           discount_value = (SELECT COALESCE(SUM(discount_amount), 0) FROM grn_items WHERE grn_id = $1),
+           other_charges = (SELECT COALESCE(SUM(other_charges), 0) FROM grn_items WHERE grn_id = $1),
+           cgst_value = (SELECT COALESCE(SUM(cgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           sgst_value = (SELECT COALESCE(SUM(sgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           igst_value = (SELECT COALESCE(SUM(igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           gst_value = (SELECT COALESCE(SUM(cgst_amount + sgst_amount + igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           grand_total = (SELECT COALESCE(SUM(total_amount), 0) FROM grn_items WHERE grn_id = $1)
+       WHERE id = $1`,
+      [grnId]
+    );
 
     await auditLog(client, {
       userId: req.user.id,
@@ -835,7 +1044,9 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
 
     // Get unfulfilled PO items
     const { rows: poItems } = await client.query(
-      `SELECT id, material_id, uom, qty, received_qty, unit_price FROM po_items WHERE po_id=$1`, [poId]
+      `SELECT id, material_id, uom, qty, received_qty, unit_price,
+              discount_pct, other_charges, tax_type, gst_pct
+       FROM po_items WHERE po_id=$1`, [poId]
     );
 
     let totalItems = 0;
@@ -849,15 +1060,47 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
       const accQty = userIt ? Number(userIt.accepted_qty ?? recQty) : recQty;
       const rejQty = userIt ? Number(userIt.rejected_qty ?? (recQty - accQty)) : (recQty - accQty);
       const uPrice = userIt ? Number(userIt.unit_price ?? poIt.unit_price) : Number(poIt.unit_price || 0);
+      const discPct = userIt ? Number(userIt.discount_pct ?? poIt.discount_pct ?? 0) : Number(poIt.discount_pct || 0);
+      const otherChg = userIt ? Number(userIt.other_charges ?? poIt.other_charges ?? 0) : Number(poIt.other_charges || 0);
+      const gstPct = userIt ? Number(userIt.gst_pct ?? poIt.gst_pct ?? 18) : Number(poIt.gst_pct || 18);
+      const taxType = (userIt?.tax_type || poIt.tax_type || po.tax_type || 'intra').toLowerCase();
+
+      const grossVal = accQty * uPrice;
+      const discAmt = grossVal * (discPct / 100);
+      const discBase = Math.max(0, grossVal - discAmt);
+      const taxableVal = Math.max(0, discBase + otherChg);
+
+      let cgstPct = 0, sgstPct = 0, igstPct = 0;
+      let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+
+      if (taxType === 'inter' || taxType === 'state' || taxType === 'igst') {
+        igstPct = gstPct;
+        igstAmt = taxableVal * (igstPct / 100);
+      } else {
+        cgstPct = gstPct / 2;
+        sgstPct = gstPct / 2;
+        cgstAmt = taxableVal * (cgstPct / 100);
+        sgstAmt = taxableVal * (sgstPct / 100);
+      }
+      const lineTot = taxableVal + (cgstAmt + sgstAmt + igstAmt);
+
       const binLoc = userIt ? (userIt.bin_location || null) : null;
       const lineRemarks = userIt ? (userIt.remarks || null) : null;
 
       if (recQty <= 0) continue;
 
       await client.query(
-        `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, bin_location, remarks)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-        [grnId, poIt.material_id, remaining, recQty, accQty, rejQty, poIt.uom, uPrice, binLoc, lineRemarks]
+        `INSERT INTO grn_items (
+           grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price,
+           discount_pct, discount_amount, other_charges, taxable_amount, gst_pct, tax_type,
+           cgst_pct, sgst_pct, igst_pct, cgst_amount, sgst_amount, igst_amount, total_amount,
+           bin_location, remarks
+         )
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`,
+        [grnId, poIt.material_id, remaining, recQty, accQty, rejQty, poIt.uom, uPrice,
+         discPct, discAmt, otherChg, taxableVal, gstPct, taxType,
+         cgstPct, sgstPct, igstPct, cgstAmt, sgstAmt, igstAmt, lineTot,
+         binLoc, lineRemarks]
       );
 
       await client.query(
@@ -980,10 +1223,27 @@ router.post('/po/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
         await client.query(
           `INSERT INTO notifications (user_id, type, title, message, ref_table, ref_id)
            VALUES ($1, 'info', $2, $3, 'grn', $4)`,
-          [f.id, `GRN ${grnNum} Received`, `GRN ${grnNum} against PO ${po.po_number} accepted & stock updated. Ready for AP bill processing.`, grnId]
+          [f.id, `GRN Created: ${grnNumber}`, `GRN ${grnNumber} generated for PO ${po.po_number || poId}. Pending vendor bill entry.`, grnId]
         );
       }
-    } catch(err) { /* non-blocking */ }
+    } catch (notifErr) {
+      // Non-critical notification failure
+    }
+
+    // Recompute GRN Header Totals from items
+    await client.query(
+      `UPDATE grn
+       SET total_value = (SELECT COALESCE(SUM(taxable_amount), 0) FROM grn_items WHERE grn_id = $1),
+           discount_value = (SELECT COALESCE(SUM(discount_amount), 0) FROM grn_items WHERE grn_id = $1),
+           other_charges = (SELECT COALESCE(SUM(other_charges), 0) FROM grn_items WHERE grn_id = $1),
+           cgst_value = (SELECT COALESCE(SUM(cgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           sgst_value = (SELECT COALESCE(SUM(sgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           igst_value = (SELECT COALESCE(SUM(igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           gst_value = (SELECT COALESCE(SUM(cgst_amount + sgst_amount + igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+           grand_total = (SELECT COALESCE(SUM(total_amount), 0) FROM grn_items WHERE grn_id = $1)
+       WHERE id = $1`,
+      [grnId]
+    );
 
     await client.query('COMMIT');
     res.json({ success: true, data: { ...head, items_added: totalItems, po_status: newPoStatus } });

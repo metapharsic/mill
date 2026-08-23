@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { filterNav } from '../data/permissions'
+import { LOGO_SRC } from '../utils/logo'
 import {
   LayoutDashboard, Factory, BadgeCheck, Wrench, Zap, FileText, Cog,
   Package, Boxes, FlaskConical, TestTubes, Store as StoreIcon, ClipboardList, Recycle,
@@ -111,18 +112,18 @@ export default function Sidebar({ active, onNavigate, collapsed, onToggle, mobil
       <div style={S.header}>
         {!collapsed && (
           <div style={S.brand}>
-            <div style={S.brandMark}>
-              <span style={{ fontSize: 18, fontWeight: 900, color: '#f4c84b', letterSpacing: '-1px' }}>M</span>
+            <div style={{ ...S.brandMark, overflow: 'hidden', padding: 2, background: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
+              <img src={LOGO_SRC} alt="Sri M K Paper Mills" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={S.brandName}>MK Paper Mill</div>
-              <div style={S.brandSub}>ERP Platform</div>
+              <div style={S.brandName}>Sri M K Paper Mills</div>
+              <div style={S.brandSub}>Enterprise ERP Platform</div>
             </div>
           </div>
         )}
         {collapsed && (
-          <div style={{ ...S.brandMark, margin: '0 auto' }}>
-            <span style={{ fontSize: 18, fontWeight: 900, color: '#f4c84b' }}>M</span>
+          <div style={{ ...S.brandMark, margin: '0 auto', overflow: 'hidden', padding: 2, background: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
+            <img src={LOGO_SRC} alt="Sri M K Paper Mills" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
         )}
         <button onClick={onToggle} style={S.toggleBtn} className="nav-item">

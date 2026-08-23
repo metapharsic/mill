@@ -1,439 +1,114 @@
 {
-  "exportedAt": "2026-08-21T09:30:27.062Z",
-  "database": "mk_paper_mill",
-  "totalTables": 108,
-  "tables": {
-    "adjustment_requests": {
-      "rowCount": 0,
-      "file": "adjustment_requests.json"
-    },
-    "appraisal_competencies": {
-      "rowCount": 0,
-      "file": "appraisal_competencies.json"
-    },
-    "appraisal_cycles": {
-      "rowCount": 0,
-      "file": "appraisal_cycles.json"
-    },
-    "appraisal_goals": {
-      "rowCount": 0,
-      "file": "appraisal_goals.json"
-    },
-    "approval_matrix": {
-      "rowCount": 3,
-      "file": "approval_matrix.json"
-    },
-    "asset_events": {
-      "rowCount": 0,
-      "file": "asset_events.json"
-    },
-    "attendance": {
-      "rowCount": 0,
-      "file": "attendance.json"
-    },
-    "attendance_regularization": {
-      "rowCount": 0,
-      "file": "attendance_regularization.json"
-    },
-    "audit_log": {
-      "rowCount": 140,
-      "file": "audit_log.json"
-    },
-    "boiler_performance_logs": {
-      "rowCount": 1,
-      "file": "boiler_performance_logs.json"
-    },
-    "cash_purchase_items": {
-      "rowCount": 1,
-      "file": "cash_purchase_items.json"
-    },
-    "cash_purchases": {
-      "rowCount": 1,
-      "file": "cash_purchases.json"
-    },
-    "chemical_consumption": {
-      "rowCount": 0,
-      "file": "chemical_consumption.json"
-    },
-    "chemical_limit_alerts": {
-      "rowCount": 0,
-      "file": "chemical_limit_alerts.json"
-    },
-    "clearance_items": {
-      "rowCount": 0,
-      "file": "clearance_items.json"
-    },
-    "customers": {
-      "rowCount": 2,
-      "file": "customers.json"
-    },
-    "daily_production_reports": {
-      "rowCount": 8,
-      "file": "daily_production_reports.json"
-    },
-    "departments": {
-      "rowCount": 20,
-      "file": "departments.json"
-    },
-    "dispatch_items": {
-      "rowCount": 0,
-      "file": "dispatch_items.json"
-    },
-    "dispatch_orders": {
-      "rowCount": 0,
-      "file": "dispatch_orders.json"
-    },
-    "downtime_entries": {
-      "rowCount": 4,
-      "file": "downtime_entries.json"
-    },
-    "downtime_reason_codes": {
-      "rowCount": 10,
-      "file": "downtime_reason_codes.json"
-    },
-    "dpr_chemical_lines": {
-      "rowCount": 0,
-      "file": "dpr_chemical_lines.json"
-    },
-    "dpr_downtime_lines": {
-      "rowCount": 3,
-      "file": "dpr_downtime_lines.json"
-    },
-    "dpr_grade_standards": {
-      "rowCount": 6,
-      "file": "dpr_grade_standards.json"
-    },
-    "dpr_gsm_breakup": {
-      "rowCount": 25,
-      "file": "dpr_gsm_breakup.json"
-    },
-    "ehs_incidents": {
-      "rowCount": 1,
-      "file": "ehs_incidents.json"
-    },
-    "employee_documents": {
-      "rowCount": 0,
-      "file": "employee_documents.json"
-    },
-    "employee_leave_balances": {
-      "rowCount": 5,
-      "file": "employee_leave_balances.json"
-    },
-    "employee_leave_types": {
-      "rowCount": 8,
-      "file": "employee_leave_types.json"
-    },
-    "employee_loans": {
-      "rowCount": 0,
-      "file": "employee_loans.json"
-    },
-    "employee_salary_assignments": {
-      "rowCount": 0,
-      "file": "employee_salary_assignments.json"
-    },
-    "employees": {
-      "rowCount": 1,
-      "file": "employees.json"
-    },
-    "eod_reports": {
-      "rowCount": 1,
-      "file": "eod_reports.json"
-    },
-    "equipment": {
-      "rowCount": 196,
-      "file": "equipment.json"
-    },
-    "equipment_inspection": {
-      "rowCount": 29,
-      "file": "equipment_inspection.json"
-    },
-    "etp_readings": {
-      "rowCount": 0,
-      "file": "etp_readings.json"
-    },
-    "furnish_mix_log": {
-      "rowCount": 4,
-      "file": "furnish_mix_log.json"
-    },
-    "gate_passes": {
-      "rowCount": 17,
-      "file": "gate_passes.json"
-    },
-    "grades": {
-      "rowCount": 5,
-      "file": "grades.json"
-    },
-    "grn": {
-      "rowCount": 22,
-      "file": "grn.json"
-    },
-    "grn_items": {
-      "rowCount": 8,
-      "file": "grn_items.json"
-    },
-    "holidays": {
-      "rowCount": 19,
-      "file": "holidays.json"
-    },
-    "indent_audit_log": {
-      "rowCount": 8,
-      "file": "indent_audit_log.json"
-    },
-    "indent_comments": {
-      "rowCount": 0,
-      "file": "indent_comments.json"
-    },
-    "indent_items": {
-      "rowCount": 7,
-      "file": "indent_items.json"
-    },
-    "indents": {
-      "rowCount": 7,
-      "file": "indents.json"
-    },
-    "inspection_round_scans": {
-      "rowCount": 1,
-      "file": "inspection_round_scans.json"
-    },
-    "installed_assets": {
-      "rowCount": 17,
-      "file": "installed_assets.json"
-    },
-    "lab_samples": {
-      "rowCount": 0,
-      "file": "lab_samples.json"
-    },
-    "leave_applications": {
-      "rowCount": 1,
-      "file": "leave_applications.json"
-    },
-    "machine_events": {
-      "rowCount": 3,
-      "file": "machine_events.json"
-    },
-    "machine_positions": {
-      "rowCount": 14,
-      "file": "machine_positions.json"
-    },
-    "machines": {
-      "rowCount": 26,
-      "file": "machines.json"
-    },
-    "maintenance_logs": {
-      "rowCount": 1,
-      "file": "maintenance_logs.json"
-    },
-    "maintenance_schedule": {
-      "rowCount": 0,
-      "file": "maintenance_schedule.json"
-    },
-    "material_categories": {
-      "rowCount": 35,
-      "file": "material_categories.json"
-    },
-    "material_rejections": {
-      "rowCount": 6,
-      "file": "material_rejections.json"
-    },
-    "materials": {
-      "rowCount": 1160,
-      "file": "materials.json"
-    },
-    "motor_electrical_specs": {
-      "rowCount": 330,
-      "file": "motor_electrical_specs.json"
-    },
-    "notifications": {
-      "rowCount": 37,
-      "file": "notifications.json"
-    },
-    "onboarding_checklist": {
-      "rowCount": 0,
-      "file": "onboarding_checklist.json"
-    },
-    "onboarding_tasks_master": {
-      "rowCount": 40,
-      "file": "onboarding_tasks_master.json"
-    },
-    "packing_records": {
-      "rowCount": 0,
-      "file": "packing_records.json"
-    },
-    "payments": {
-      "rowCount": 2,
-      "file": "payments.json"
-    },
-    "payroll_details": {
-      "rowCount": 0,
-      "file": "payroll_details.json"
-    },
-    "payroll_runs": {
-      "rowCount": 0,
-      "file": "payroll_runs.json"
-    },
-    "payrolls": {
-      "rowCount": 0,
-      "file": "payrolls.json"
-    },
-    "plant_sections": {
-      "rowCount": 24,
-      "file": "plant_sections.json"
-    },
-    "po_items": {
-      "rowCount": 0,
-      "file": "po_items.json"
-    },
-    "production_summary": {
-      "rowCount": 0,
-      "file": "production_summary.json"
-    },
-    "purchase_orders": {
-      "rowCount": 0,
-      "file": "purchase_orders.json"
-    },
-    "quality_lab_tests": {
-      "rowCount": 2,
-      "file": "quality_lab_tests.json"
-    },
-    "quality_tests": {
-      "rowCount": 10,
-      "file": "quality_tests.json"
-    },
-    "reels": {
-      "rowCount": 4,
-      "file": "reels.json"
-    },
-    "roles": {
-      "rowCount": 5,
-      "file": "roles.json"
-    },
-    "salary_structures": {
-      "rowCount": 5,
-      "file": "salary_structures.json"
-    },
-    "sales_orders": {
-      "rowCount": 1,
-      "file": "sales_orders.json"
-    },
-    "schema_migrations": {
-      "rowCount": 40,
-      "file": "schema_migrations.json"
-    },
-    "scrap_records": {
-      "rowCount": 1,
-      "file": "scrap_records.json"
-    },
-    "section_alarms": {
-      "rowCount": 0,
-      "file": "section_alarms.json"
-    },
-    "section_energy_allocations": {
-      "rowCount": 1,
-      "file": "section_energy_allocations.json"
-    },
-    "section_equipment": {
-      "rowCount": 323,
-      "file": "section_equipment.json"
-    },
-    "section_kpi_snapshots": {
-      "rowCount": 5194,
-      "file": "section_kpi_snapshots.json"
-    },
-    "section_process_readings": {
-      "rowCount": 10,
-      "file": "section_process_readings.json"
-    },
-    "section_sops": {
-      "rowCount": 0,
-      "file": "section_sops.json"
-    },
-    "sections": {
-      "rowCount": 21,
-      "file": "sections.json"
-    },
-    "separation_records": {
-      "rowCount": 0,
-      "file": "separation_records.json"
-    },
-    "sessions": {
-      "rowCount": 0,
-      "file": "sessions.json"
-    },
-    "shift_reports": {
-      "rowCount": 0,
-      "file": "shift_reports.json"
-    },
-    "shifts": {
-      "rowCount": 3,
-      "file": "shifts.json"
-    },
-    "stock_ledger": {
-      "rowCount": 1206,
-      "file": "stock_ledger.json"
-    },
-    "store_indent_log": {
-      "rowCount": 1,
-      "file": "store_indent_log.json"
-    },
-    "store_indents": {
-      "rowCount": 0,
-      "file": "store_indents.json"
-    },
-    "store_issues": {
-      "rowCount": 0,
-      "file": "store_issues.json"
-    },
-    "store_return_items": {
-      "rowCount": 5,
-      "file": "store_return_items.json"
-    },
-    "store_returns": {
-      "rowCount": 5,
-      "file": "store_returns.json"
-    },
-    "store_transfer_items": {
-      "rowCount": 5,
-      "file": "store_transfer_items.json"
-    },
-    "store_transfers": {
-      "rowCount": 5,
-      "file": "store_transfers.json"
-    },
-    "system_settings": {
-      "rowCount": 14,
-      "file": "system_settings.json"
-    },
-    "training_attendance": {
-      "rowCount": 0,
-      "file": "training_attendance.json"
-    },
-    "training_programs": {
-      "rowCount": 0,
-      "file": "training_programs.json"
-    },
-    "users": {
-      "rowCount": 24,
-      "file": "users.json"
-    },
-    "utility_readings": {
-      "rowCount": 0,
-      "file": "utility_readings.json"
-    },
-    "vendor_bills": {
-      "rowCount": 6,
-      "file": "vendor_bills.json"
-    },
-    "vendor_payments": {
-      "rowCount": 0,
-      "file": "vendor_payments.json"
-    },
-    "vendors": {
-      "rowCount": 52,
-      "file": "vendors.json"
-    },
-    "warehouses": {
-      "rowCount": 5,
-      "file": "warehouses.json"
-    }
+  "exported_at": "2026-08-23T06:14:30.195Z",
+  "total_tables": 108,
+  "table_counts": {
+    "adjustment_requests": 0,
+    "appraisal_competencies": 0,
+    "appraisal_cycles": 0,
+    "appraisal_goals": 0,
+    "approval_matrix": 3,
+    "asset_events": 0,
+    "attendance": 0,
+    "attendance_regularization": 0,
+    "audit_log": 144,
+    "boiler_performance_logs": 1,
+    "cash_purchase_items": 1,
+    "cash_purchases": 1,
+    "chemical_consumption": 0,
+    "chemical_limit_alerts": 0,
+    "clearance_items": 0,
+    "customers": 2,
+    "daily_production_reports": 8,
+    "departments": 26,
+    "dispatch_items": 0,
+    "dispatch_orders": 0,
+    "downtime_entries": 4,
+    "downtime_reason_codes": 10,
+    "dpr_chemical_lines": 0,
+    "dpr_downtime_lines": 3,
+    "dpr_grade_standards": 6,
+    "dpr_gsm_breakup": 25,
+    "ehs_incidents": 1,
+    "employee_documents": 0,
+    "employee_leave_balances": 5,
+    "employee_leave_types": 8,
+    "employee_loans": 0,
+    "employee_salary_assignments": 0,
+    "employees": 1,
+    "eod_reports": 1,
+    "equipment": 196,
+    "equipment_inspection": 29,
+    "etp_readings": 0,
+    "furnish_mix_log": 4,
+    "gate_passes": 17,
+    "grades": 5,
+    "grn": 25,
+    "grn_items": 14,
+    "holidays": 19,
+    "indent_audit_log": 10,
+    "indent_comments": 0,
+    "indent_items": 15,
+    "indents": 14,
+    "inspection_round_scans": 1,
+    "installed_assets": 19,
+    "lab_samples": 0,
+    "leave_applications": 1,
+    "machine_events": 3,
+    "machine_positions": 14,
+    "machines": 26,
+    "maintenance_logs": 1,
+    "maintenance_schedule": 0,
+    "material_categories": 35,
+    "material_rejections": 6,
+    "materials": 1160,
+    "motor_electrical_specs": 330,
+    "notifications": 43,
+    "onboarding_checklist": 0,
+    "onboarding_tasks_master": 40,
+    "packing_records": 0,
+    "payments": 2,
+    "payroll_details": 0,
+    "payroll_runs": 0,
+    "payrolls": 0,
+    "plant_sections": 24,
+    "po_items": 4,
+    "production_summary": 0,
+    "purchase_orders": 2,
+    "quality_lab_tests": 2,
+    "quality_tests": 10,
+    "reels": 4,
+    "roles": 5,
+    "salary_structures": 5,
+    "sales_orders": 1,
+    "schema_migrations": 40,
+    "scrap_records": 1,
+    "section_alarms": 0,
+    "section_energy_allocations": 1,
+    "section_equipment": 323,
+    "section_kpi_snapshots": 5770,
+    "section_process_readings": 10,
+    "section_sops": 0,
+    "sections": 21,
+    "separation_records": 0,
+    "sessions": 0,
+    "shift_reports": 0,
+    "shifts": 3,
+    "stock_ledger": 1210,
+    "store_indent_log": 17,
+    "store_indents": 0,
+    "store_issues": 2,
+    "store_return_items": 5,
+    "store_returns": 5,
+    "store_transfer_items": 5,
+    "store_transfers": 5,
+    "system_settings": 14,
+    "training_attendance": 0,
+    "training_programs": 0,
+    "users": 24,
+    "utility_readings": 0,
+    "vendor_bills": 6,
+    "vendor_payments": 0,
+    "vendors": 52,
+    "warehouses": 5
   }
 }

@@ -12,6 +12,9 @@ import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
 import { sortTableData } from '../utils/tableSort'
 import { ExternalLink } from 'lucide-react'
+import { LOGO_DATA_URI } from '../utils/logo'
+import A3InvoicePrintModal from '../components/A3InvoicePrintModal'
+import SequenceEnforcementModal from '../components/SequenceEnforcementModal'
 
 const GST_SLABS = [
   { value: 0,  label: '0% (Nil / Exempt)', cgst: 0, sgst: 0, igst: 0 },
@@ -171,6 +174,9 @@ export default function Store({ onNavigate }) {
     material_id: '',
     in_qty: '',
     unit_price: '',
+    discount_pct: 0,
+    other_charges: 0,
+    tax_type: 'intra',
     gst_pct: 18,
     inward_type: 'grn',
     reference_type: 'PO',
@@ -223,6 +229,235 @@ export default function Store({ onNavigate }) {
   })
   const [outwardVoucher, setOutwardVoucher] = useState(null)
   const [syncing, setSyncing] = useState(false)
+
+  // Master GRN Viewer & A3 Print & Receiver Sign states
+  const [masterGrnModal, setMasterGrnModal] = useState(null)
+  const [masterGrnLoading, setMasterGrnLoading] = useState(false)
+  const [a3PrintDoc, setA3PrintDoc] = useState(null)
+  const [sequenceViolation, setSequenceViolation] = useState(null)
+  const [appendGrnModal, setAppendGrnModal] = useState(null)
+  const [appendGrnForm, setAppendGrnForm] = useState({
+    material_id: '',
+    received_qty: '1',
+    unit_price: '',
+    discount_pct: 0,
+    other_charges: 0,
+    tax_type: 'intra',
+    gst_pct: 18,
+    bin_location: '',
+    batch_number: '',
+    mrp: '',
+    trade_price: '',
+    remarks: ''
+  })
+  const [appendGrnSaving, setAppendGrnSaving] = useState(false)
+  const [receiverModal, setReceiverModal] = useState(null)
+  const [receiverForm, setReceiverForm] = useState({
+    receiver_name: user?.name || '',
+    receiver_emp_code: user?.employee_code || '',
+    receiver_signature_note: 'Received and verified in department',
+    fitment_date: new Date().toISOString().slice(0, 10),
+    observations: ''
+  })
+  const [receiverSaving, setReceiverSaving] = useState(false)
+
+  const openMasterGrn = async (grnRef) => {
+    if (!grnRef) return
+    setMasterGrnLoading(true)
+    try {
+      const res = await fetch(`${API}/store/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+      const data = await res.json()
+      if (data.success && data.data) {
+        setMasterGrnModal(data.data)
+      } else {
+        const res2 = await fetch(`${API}/purchase/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+        const data2 = await res2.json()
+        if (data2.success && data2.data) {
+          setMasterGrnModal(data2.data)
+        } else {
+          addToast(data.message || 'Master GRN details not found', 'error')
+        }
+      }
+    } catch {
+      addToast('Failed to load Master GRN details', 'error')
+    } finally {
+      setMasterGrnLoading(false)
+    }
+  }
+
+  const openA3Invoice = async (docOrRef) => {
+    if (!docOrRef) return
+    if (typeof docOrRef === 'object' && docOrRef.items && docOrRef.items.length > 0) {
+      setA3PrintDoc(docOrRef)
+      return
+    }
+    const grnRef = typeof docOrRef === 'object' ? (docOrRef.grnNumber || docOrRef.reference_id || docOrRef.id) : docOrRef
+    try {
+      const res = await fetch(`${API}/store/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+      const data = await res.json()
+      if (data.success && data.data) {
+        setA3PrintDoc(data.data)
+      } else {
+        setA3PrintDoc(typeof docOrRef === 'object' ? docOrRef : { grnNumber: grnRef })
+      }
+    } catch {
+      setA3PrintDoc(typeof docOrRef === 'object' ? docOrRef : { grnNumber: grnRef })
+    }
+  }
+
+  const openA3InwardPrint = (row) => {
+    const isInterState = (row.vendorState && row.vendorState.toLowerCase() !== 'karnataka') || (row.vendorGstin && !row.vendorGstin.startsWith('29'))
+    const gPct = Number(row.gst_pct ?? 18)
+    const p = Number(row.unit_price || 0)
+    const q = Number(row.in_qty || row.received_qty || 1)
+    const taxable = q * p
+    const cgstAmt = isInterState ? 0 : (taxable * (gPct / 2)) / 100
+    const sgstAmt = isInterState ? 0 : (taxable * (gPct / 2)) / 100
+    const igstAmt = isInterState ? (taxable * gPct) / 100 : 0
+    const totalAmount = taxable + cgstAmt + sgstAmt + igstAmt
+
+    setA3PrintDoc({
+      invoiceNumber: row.invoice_number || row.grnNumber || row.reference_id || `GRN-${row.id}`,
+      invoiceDate: row.date || new Date().toISOString(),
+      orderNumber: row.po_number || row.reference_id || '',
+      grnNumber: row.grnNumber || row.reference_id || `GRN-${row.id}`,
+      grnDate: row.date,
+      partyName: row.vendorName || row.partyName || 'Registered Vendor',
+      partyAddress: row.vendorAddress || 'Industrial Area, Plant Supply Hub',
+      partyGstin: row.vendorGstin || '29AAAAA0000A1Z5',
+      partyPan: row.vendorPan || '',
+      items: [{
+        materialName: row.materialName,
+        materialCode: row.materialCode,
+        uom: row.uom || 'NOS',
+        in_qty: q,
+        unit_price: p,
+        hsnCode: row.hsnCode || '8439',
+        gst_pct: gPct,
+        batch_number: row.batch_number || row.batchNo || 'LOT-01',
+        pack_size: '1*1',
+        mrp: p,
+        trade_price: p,
+        taxable_amount: taxable,
+        cgst_amount: cgstAmt,
+        sgst_amount: sgstAmt,
+        igst_amount: igstAmt,
+        total_amount: totalAmount
+      }],
+      title: 'GOODS RECEIPT NOTE (GRN) / COMMERCIAL INWARD'
+    })
+  }
+
+  const openA3OutwardPrint = (row) => {
+    const p = Number(row.unit_price || 0)
+    const q = Number(row.out_qty || row.qty || 1)
+    const taxable = q * p
+    const gPct = 18
+    const cgstAmt = (taxable * 9) / 100
+    const sgstAmt = (taxable * 9) / 100
+    const totalAmount = taxable + cgstAmt + sgstAmt
+
+    setA3PrintDoc({
+      invoiceNumber: row.issue_number || `SIV-${row.id}`,
+      invoiceDate: row.date || new Date().toISOString(),
+      orderNumber: row.reference_id || '',
+      grnNumber: row.issue_number || `SIV-${row.id}`,
+      grnDate: row.date,
+      partyName: row.deptName || 'Plant Department',
+      partyAddress: row.machineName ? `Machine: ${row.machineName}` : 'Mill Operations Floor',
+      items: [{
+        materialName: row.materialName,
+        materialCode: row.materialCode,
+        uom: row.uom || 'NOS',
+        in_qty: q,
+        unit_price: p,
+        hsnCode: row.hsnCode || '8439',
+        gst_pct: gPct,
+        batch_number: row.batch_number || 'SIV-LOT-01',
+        pack_size: '1*1',
+        mrp: p,
+        trade_price: p,
+        taxable_amount: taxable,
+        cgst_amount: cgstAmt,
+        sgst_amount: sgstAmt,
+        igst_amount: 0,
+        total_amount: totalAmount
+      }],
+      title: 'STORE ISSUE VOUCHER (SIV)'
+    })
+  }
+
+  const handleAppendGrnItem = async (e) => {
+    e.preventDefault()
+    if (!appendGrnModal || !appendGrnForm.material_id) {
+      addToast('Please select a material', 'error')
+      return
+    }
+    setAppendGrnSaving(true)
+    try {
+      const res = await fetch(`${API}/store/grn/${appendGrnModal.id}/items`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(appendGrnForm)
+      })
+      const data = await res.json()
+      if (data.success) {
+        addToast('New line item appended to GRN successfully', 'success')
+        setAppendGrnModal(null)
+        setAppendGrnForm({
+          material_id: '',
+          received_qty: '1',
+          unit_price: '',
+          discount_pct: 0,
+          other_charges: 0,
+          tax_type: 'intra',
+          gst_pct: 18,
+          bin_location: '',
+          batch_number: '',
+          mrp: '',
+          trade_price: '',
+          remarks: ''
+        })
+        openMasterGrn(appendGrnModal.id)
+        loadInward()
+        loadBaseData()
+      } else {
+        addToast(data.message || 'Failed to append item', 'error')
+      }
+    } catch (err) {
+      addToast('Error appending item: ' + err.message, 'error')
+    } finally {
+      setAppendGrnSaving(false)
+    }
+  }
+
+  const handleReceiverSignSubmit = async (e) => {
+    e.preventDefault()
+    if (!receiverModal) return
+    setReceiverSaving(true)
+    try {
+      const endpoint = receiverModal.isIndent ? `/store/indents/${receiverModal.id}/receive` : `/store/issues/${receiverModal.id}/receive`
+      const res = await fetch(`${API}${endpoint}`, {
+        method: 'PUT',
+        headers: json(),
+        body: JSON.stringify(receiverForm)
+      })
+      const data = await res.json()
+      if (data.success) {
+        addToast(data.message || 'Receiver signed and acknowledged successfully', 'success')
+        setReceiverModal(null)
+        loadOutward()
+        loadIndents()
+        loadBaseData()
+      } else {
+        addToast(data.message || 'Failed to record signature', 'error')
+      }
+    } catch (err) {
+      addToast('Error recording signature: ' + err.message, 'error')
+    } finally {
+      setReceiverSaving(false)
+    }
+  }
 
   // Inward & Outward DML states
   const [editInwardModal, setEditInwardModal] = useState(null)
@@ -539,6 +774,8 @@ export default function Store({ onNavigate }) {
         const vId = po.vendor_id ? String(po.vendor_id) : ''
         const vName = po.vendorName || ''
         const poNum = po.po_number || po.poNumber || poIdentifier
+        const isInter = (po.tax_type === 'inter' || po.tax_type === 'state' || po.tax_type === 'igst') || Boolean(po.vendorGstin && !po.vendorGstin.startsWith('29'))
+        const poTaxType = isInter ? 'inter' : 'intra'
 
         const updated = {
           ...inwardForm,
@@ -546,6 +783,7 @@ export default function Store({ onNavigate }) {
           reference_id: poNum,
           vendor_id: vId,
           vendor_name: vName,
+          tax_type: poTaxType,
           remarks: `Auto-populated from PO ${poNum}`
         }
 
@@ -556,6 +794,10 @@ export default function Store({ onNavigate }) {
             const rem = Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0))
             batchInit[it.id] = {
               in_qty: rem > 0 ? String(rem) : '',
+              unit_price: it.unit_price ? String(it.unit_price) : '',
+              discount_pct: it.discount_pct !== undefined ? String(it.discount_pct) : '0',
+              other_charges: it.other_charges !== undefined ? String(it.other_charges) : '0',
+              tax_type: it.tax_type || poTaxType,
               batch_number: '',
               bin_location: it.binLocation || ''
             }
@@ -568,6 +810,9 @@ export default function Store({ onNavigate }) {
           updated.material_id = String(firstPending.material_id)
           updated.in_qty = remainingQty > 0 ? remainingQty.toString() : (firstPending.qty ? String(firstPending.qty) : '')
           updated.unit_price = firstPending.unit_price ? firstPending.unit_price.toString() : ''
+          updated.discount_pct = firstPending.discount_pct !== undefined ? Number(firstPending.discount_pct) : 0
+          updated.other_charges = firstPending.other_charges !== undefined ? Number(firstPending.other_charges) : 0
+          updated.tax_type = firstPending.tax_type || poTaxType
           updated.gst_pct = Number(firstPending.gst_pct ?? 18)
           updated.bin_location = firstPending.binLocation || ''
           setSelectedPoLineId(String(firstPending.id))
@@ -588,11 +833,15 @@ export default function Store({ onNavigate }) {
     const item = activePoDetails.items?.find(it => String(it.id) === String(lineItemId))
     if (item) {
       const remainingQty = Math.max(0, parseFloat(item.qty || 0) - parseFloat(item.received_qty || 0))
+      const isInter = (item.tax_type === 'inter' || item.tax_type === 'state' || item.tax_type === 'igst') || Boolean(activePoDetails.vendorGstin && !activePoDetails.vendorGstin.startsWith('29'))
       setInwardForm(prev => ({
         ...prev,
         material_id: String(item.material_id),
         in_qty: remainingQty > 0 ? remainingQty.toString() : (item.qty ? String(item.qty) : ''),
         unit_price: item.unit_price ? item.unit_price.toString() : '',
+        discount_pct: item.discount_pct !== undefined ? Number(item.discount_pct) : 0,
+        other_charges: item.other_charges !== undefined ? Number(item.other_charges) : 0,
+        tax_type: item.tax_type || (isInter ? 'inter' : 'intra'),
         gst_pct: Number(item.gst_pct ?? 18),
         bin_location: item.binLocation || prev.bin_location,
         remarks: `Auto-populated from PO ${activePoDetails.po_number || activePoDetails.poNumber} — ${item.materialName || item.description || ''}`
@@ -606,14 +855,19 @@ export default function Store({ onNavigate }) {
     if (!activePoDetails || !activePoDetails.items?.length) return
     const validLines = []
     for (const it of activePoDetails.items) {
-      const q = parseFloat(batchInwardQtys[it.id]?.in_qty || 0)
+      const bRow = batchInwardQtys[it.id] || {}
+      const q = parseFloat(bRow.in_qty || 0)
       if (q > 0) {
         validLines.push({
           material_id: it.material_id,
           in_qty: q,
-          unit_price: parseFloat(it.unit_price) || 0,
-          bin_location: batchInwardQtys[it.id]?.bin_location || it.binLocation || '',
-          batch_number: batchInwardQtys[it.id]?.batch_number || '',
+          unit_price: parseFloat(bRow.unit_price !== undefined && bRow.unit_price !== '' ? bRow.unit_price : it.unit_price) || 0,
+          discount_pct: parseFloat(bRow.discount_pct !== undefined && bRow.discount_pct !== '' ? bRow.discount_pct : (it.discount_pct || 0)) || 0,
+          other_charges: parseFloat(bRow.other_charges !== undefined && bRow.other_charges !== '' ? bRow.other_charges : (it.other_charges || 0)) || 0,
+          tax_type: bRow.tax_type || it.tax_type || inwardForm.tax_type || 'intra',
+          gst_pct: Number(it.gst_pct ?? 18),
+          bin_location: bRow.bin_location || it.binLocation || '',
+          batch_number: bRow.batch_number || '',
           quality_status: inwardForm.quality_status || 'Accepted',
           remarks: inwardForm.remarks || `Batch PO inward ${activePoDetails.po_number || activePoDetails.poNumber}`
         })
@@ -631,6 +885,7 @@ export default function Store({ onNavigate }) {
         reference_id: activePoDetails.po_number || activePoDetails.poNumber,
         vendor_id: activePoDetails.vendor_id,
         vendor_name: activePoDetails.vendorName,
+        tax_type: inwardForm.tax_type || 'intra',
         quality_status: inwardForm.quality_status || 'Accepted',
         remarks: inwardForm.remarks || `Batch PO Inward`,
         items: validLines
@@ -1224,7 +1479,24 @@ export default function Store({ onNavigate }) {
                         {inw.transaction_type === 'return' ? 'Dept Return' : 'GRN'}
                       </span>
                     </td>
-                    <td style={S.td}><span style={{ fontWeight: 600 }}>{inw.reference_id || inw.reference_type || '—'}</span></td>
+                    <td style={S.td}>
+                      <span
+                        onClick={() => openMasterGrn(inw.grnId || inw.grnNumber || inw.reference_id || inw.id)}
+                        style={{
+                          fontWeight: 700,
+                          color: '#0284c7',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                        title="Click to view complete Master GRN with all items"
+                      >
+                        {inw.grnNumber || inw.reference_id || `GRN-${inw.id}`}
+                        <ExternalLink size={11} color="#0284c7" />
+                      </span>
+                    </td>
                     <td style={S.td}>
                       {inw.vendorName ? (
                         <div>
@@ -1258,8 +1530,15 @@ export default function Store({ onNavigate }) {
                     <td style={{ ...S.td, maxWidth: 200, fontSize: 12 }}>{inw.remarks || '—'}</td>
                     <td style={S.td}><span style={S.muted}>{inw.createdByName || 'Store Keeper'}</span></td>
                     <td style={S.td}>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <button style={S.btnSm} onClick={() => setInwardVoucher(inw)}>📄</button>
+                      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <button
+                          style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '3px 7px', fontSize: 11 }}
+                          onClick={() => openA3Invoice(inw)}
+                          title="Print Official A3 GST Commercial Invoice"
+                        >
+                          🖨️ A3
+                        </button>
+                        <button style={S.btnSm} onClick={() => setInwardVoucher(inw)} title="View Voucher Slip">📄</button>
                         <button style={{ ...S.btnSm, background: '#2563eb' }} onClick={() => {
                           setEditInwardForm({
                             in_qty: inw.in_qty,
@@ -1275,8 +1554,8 @@ export default function Store({ onNavigate }) {
                             grn_invoice_number: inw.grnInvoiceNumber || ''
                           })
                           setEditInwardModal(inw)
-                        }}>✏️</button>
-                        <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)}>🗑️</button>
+                        }} title="Edit Inward Record">✏️</button>
+                        <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)} title="Delete & Reverse Stock">🗑️</button>
                       </div>
                     </td>
                   </tr>
@@ -1384,7 +1663,27 @@ export default function Store({ onNavigate }) {
                         {outw.transaction_type === 'return_to_vendor' ? 'RTV Outward' : 'Store Issue'}
                       </span>
                     </td>
-                    <td style={S.td}><span style={{ fontWeight: 600 }}>{outw.reference_id || outw.reference_type || '—'}</span></td>
+                    <td style={S.td}>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: '#0284c7',
+                          textDecoration: 'underline',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          if (outw.reference_type === 'indent' || outw.reference_id?.startsWith('IND-')) {
+                            // If reference is indent, open receiver sign or detail
+                            setReceiverModal({ id: outw.reference_id || outw.id, isIndent: true, name: outw.materialName, qty: outw.out_qty, uom: outw.uom })
+                          } else {
+                            setOutwardVoucher(outw)
+                          }
+                        }}
+                        title="Click to view issue reference / receiver details"
+                      >
+                        {outw.reference_id || outw.reference_type || `SIV-${outw.id}`}
+                      </span>
+                    </td>
                     <td style={S.td}>
                       <div
                         onClick={() => (outw.material_id || outw.materialId) && setSelectedProductModalId(outw.material_id || outw.materialId)}
@@ -1401,11 +1700,62 @@ export default function Store({ onNavigate }) {
                     <td style={S.td}><span style={{ color: '#1b1b1d', fontWeight: 600 }}>{Number(outw.balance).toFixed(3)} {outw.uom}</span></td>
                     <td style={S.td}>₹{Number(outw.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                     <td style={S.td}><b>₹{Number(outw.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></td>
-                    <td style={{ ...S.td, maxWidth: 240, fontSize: 12 }}>{outw.remarks || '—'}</td>
+                    <td style={{ ...S.td, maxWidth: 240, fontSize: 12 }}>
+                      <div>{outw.remarks || '—'}</div>
+                      {outw.receiver_name && (
+                        <div style={{ fontSize: 10, color: '#16a34a', fontWeight: 700, marginTop: 2 }}>
+                          ✓ Signed: {outw.receiver_name} ({outw.receiver_emp_code || 'Emp'})
+                        </div>
+                      )}
+                    </td>
                     <td style={S.td}><span style={S.muted}>{outw.createdByName || 'Store Keeper'}</span></td>
                     <td style={S.td}>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <button style={{ ...S.btnSm, background: '#d97706' }} onClick={() => setOutwardVoucher(outw)}>📄</button>
+                      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <button
+                          style={{ ...S.btnSm, background: '#16a34a', color: '#fff', fontWeight: 800, padding: '3px 6px', fontSize: 10 }}
+                          onClick={() => {
+                            setReceiverModal({
+                              id: outw.id,
+                              isIndent: false,
+                              name: outw.materialName,
+                              qty: outw.out_qty,
+                              uom: outw.uom,
+                              dept: outw.departmentName || outw.remarks
+                            })
+                            setReceiverForm({
+                              receiver_name: user?.name || '',
+                              receiver_emp_code: user?.employee_code || '',
+                              receiver_signature_note: 'Received in good condition in department',
+                              fitment_date: new Date().toISOString().slice(0, 10),
+                              observations: ''
+                            })
+                          }}
+                          title="Department Receiver Sign & Handover"
+                        >
+                          ✍️ Sign
+                        </button>
+                        <button
+                          style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '3px 6px', fontSize: 10 }}
+                          onClick={() => openA3Invoice({
+                            ...outw,
+                            items: [{
+                              materialName: outw.materialName,
+                              materialCode: outw.materialCode,
+                              uom: outw.uom,
+                              in_qty: outw.out_qty,
+                              unit_price: outw.unit_price,
+                              hsnCode: outw.hsnCode || '8439',
+                              gst_pct: 18,
+                              batch_number: outw.batch_number || 'SIV-BATCH',
+                              mrp: outw.unit_price
+                            }],
+                            title: 'STORE ISSUE VOUCHER (SIV)'
+                          })}
+                          title="Print Official A3 SIV Voucher"
+                        >
+                          🖨️ A3
+                        </button>
+                        <button style={{ ...S.btnSm, background: '#d97706' }} onClick={() => setOutwardVoucher(outw)} title="View SIV Slip">📄</button>
                         <button style={{ ...S.btnSm, background: '#2563eb' }} onClick={() => {
                           setEditOutwardForm({
                             out_qty: outw.out_qty,
@@ -1416,8 +1766,8 @@ export default function Store({ onNavigate }) {
                             date: outw.date ? outw.date.slice(0, 10) : ''
                           })
                           setEditOutwardModal(outw)
-                        }}>✏️</button>
-                        <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteOutward(outw)}>🗑️</button>
+                        }} title="Edit Outward Record">✏️</button>
+                        <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteOutward(outw)} title="Delete & Reverse Outward Issue">🗑️</button>
                       </div>
                     </td>
                   </tr>
@@ -2172,9 +2522,11 @@ export default function Store({ onNavigate }) {
                         <th style={{ padding: '8px 10px', textAlign: 'right' }}>Received</th>
                         <th style={{ padding: '8px 10px', textAlign: 'right' }}>Balance</th>
                         <th style={{ padding: '8px 10px', textAlign: 'right' }}>Unit Rate</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Disc %</th>
+                        <th style={{ padding: '8px 10px', textAlign: 'right' }}>Other Chg</th>
                         <th style={{ padding: '8px 10px', textAlign: 'center' }}>GST%</th>
                         {inwardBatchMode ? (
-                          <th style={{ padding: '8px 10px', width: 140 }}>Inward Qty</th>
+                          <th style={{ padding: '8px 10px', width: 130 }}>Inward Qty</th>
                         ) : (
                           <th style={{ padding: '8px 10px', textAlign: 'center', width: 130 }}>Action</th>
                         )}
@@ -2222,6 +2574,12 @@ export default function Store({ onNavigate }) {
                             </td>
                             <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f766e', fontWeight: 600 }}>
                               ₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', color: it.discount_pct > 0 ? '#b45309' : '#64748b', fontWeight: it.discount_pct > 0 ? 700 : 400 }}>
+                              {it.discount_pct > 0 ? `${it.discount_pct}%` : '0%'}
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', color: it.other_charges > 0 ? '#0369a1' : '#64748b', fontWeight: it.other_charges > 0 ? 700 : 400 }}>
+                              {it.other_charges > 0 ? `₹${parseFloat(it.other_charges).toFixed(2)}` : '—'}
                             </td>
                             <td style={{ padding: '8px 10px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
 
@@ -2276,7 +2634,7 @@ export default function Store({ onNavigate }) {
                   <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e6fffa', padding: '10px 14px', borderRadius: 8, border: '1px solid #99f6e4', flexWrap: 'wrap', gap: 8 }}>
                     <div style={{ fontSize: 12, color: '#134e4a', display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ fontSize: 14 }}>🛡️</span>
-                      <span><strong>Unified GRN Guarantee:</strong> All items entered below will be grouped and recorded under the exact <strong>same GRN Number</strong>.</span>
+                      <span><strong>Unified GRN Guarantee:</strong> All items entered below will be grouped and recorded under the exact <strong>same GRN Number</strong> with line-item discounts &amp; charges.</span>
                     </div>
                     <button
                       type="button"
@@ -2308,6 +2666,35 @@ export default function Store({ onNavigate }) {
                   )
                 })()}
 
+                {/* GST Supply Mode / Tax Type Selector */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>GST Supply Type / Tax Mode:</span>
+                  <div style={{ display: 'flex', gap: 4, background: '#e2e8f0', padding: 2, borderRadius: 6 }}>
+                    <button
+                      type="button"
+                      onClick={() => setInwardForm(f => ({ ...f, tax_type: 'intra' }))}
+                      style={{
+                        padding: '4px 10px', borderRadius: 4, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                        background: inwardForm.tax_type !== 'inter' && inwardForm.tax_type !== 'state' && inwardForm.tax_type !== 'igst' ? '#059669' : 'transparent',
+                        color: inwardForm.tax_type !== 'inter' && inwardForm.tax_type !== 'state' && inwardForm.tax_type !== 'igst' ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      📍 In-State (CGST+SGST)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInwardForm(f => ({ ...f, tax_type: 'inter' }))}
+                      style={{
+                        padding: '4px 10px', borderRadius: 4, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                        background: inwardForm.tax_type === 'inter' || inwardForm.tax_type === 'state' || inwardForm.tax_type === 'igst' ? '#6366f1' : 'transparent',
+                        color: inwardForm.tax_type === 'inter' || inwardForm.tax_type === 'state' || inwardForm.tax_type === 'igst' ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      🌐 State / Inter (IGST)
+                    </button>
+                  </div>
+                </div>
+
                 {/* Material Catalog Selector */}
                 <div>
                   <label style={S.label}>Select Material *</label>
@@ -2329,18 +2716,26 @@ export default function Store({ onNavigate }) {
                   </select>
                 </div>
 
-                {/* Inward Quantity, Unit Price, GST Slab */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.4fr', gap: 12 }}>
+                {/* Inward Quantity, Unit Price, Discount %, Other Charges, GST Slab */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
                   <div>
-                    <label style={S.label}>Inward Quantity *</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <label style={S.label}>Inward Qty *</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       <input type="number" step="0.001" style={S.input} placeholder="0.000" value={inwardForm.in_qty} onChange={e => setInwardForm({ ...inwardForm, in_qty: e.target.value })} required />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#8a8a90' }}>{selectedInwardMat?.uom || 'NOS'}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#8a8a90' }}>{selectedInwardMat?.uom || 'NOS'}</span>
                     </div>
                   </div>
                   <div>
-                    <label style={S.label}>Unit Price (₹)</label>
+                    <label style={S.label}>Unit Rate (₹)</label>
                     <input type="number" step="0.01" style={S.input} placeholder="₹ 0.00" value={inwardForm.unit_price} onChange={e => setInwardForm({ ...inwardForm, unit_price: e.target.value })} />
+                  </div>
+                  <div>
+                    <label style={S.label}>Discount (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" style={{ ...S.input, color: inwardForm.discount_pct > 0 ? '#b45309' : undefined, fontWeight: inwardForm.discount_pct > 0 ? 700 : undefined }} placeholder="0%" value={inwardForm.discount_pct !== undefined ? inwardForm.discount_pct : ''} onChange={e => setInwardForm({ ...inwardForm, discount_pct: e.target.value })} />
+                  </div>
+                  <div>
+                    <label style={S.label}>Other Chg (₹)</label>
+                    <input type="number" step="0.01" min="0" style={{ ...S.input, color: inwardForm.other_charges > 0 ? '#0369a1' : undefined, fontWeight: inwardForm.other_charges > 0 ? 700 : undefined }} placeholder="Transport / P&F" value={inwardForm.other_charges !== undefined ? inwardForm.other_charges : ''} onChange={e => setInwardForm({ ...inwardForm, other_charges: e.target.value })} />
                   </div>
                   <div>
                     <label style={S.label}>GST Slab %</label>
@@ -2352,17 +2747,43 @@ export default function Store({ onNavigate }) {
 
                 {/* Live Tax & Grand Total Computation */}
                 {inwardForm.in_qty && inwardForm.unit_price && (() => {
-                  const taxable = Number(inwardForm.in_qty) * Number(inwardForm.unit_price)
+                  const qty = parseFloat(inwardForm.in_qty) || 0
+                  const price = parseFloat(inwardForm.unit_price) || 0
+                  const gross = Math.round((qty * price + Number.EPSILON) * 100) / 100
+                  const discPct = Math.max(0, Math.min(100, parseFloat(inwardForm.discount_pct || 0) || 0))
+                  const discAmt = Math.round((gross * (discPct / 100) + Number.EPSILON) * 100) / 100
+                  const discBase = Math.max(0, gross - discAmt)
+                  const otherChg = parseFloat(inwardForm.other_charges || 0) || 0
+                  const taxable = Math.round((discBase + otherChg + Number.EPSILON) * 100) / 100
                   const gstPct = Number(inwardForm.gst_pct ?? 18)
-                  const tax = (taxable * gstPct) / 100
-                  const total = taxable + tax
+                  const isInter = inwardForm.tax_type === 'inter' || inwardForm.tax_type === 'state' || inwardForm.tax_type === 'igst'
+
+                  let cgst = 0, sgst = 0, igst = 0
+                  if (isInter) {
+                    igst = Math.round((taxable * (gstPct / 100) + Number.EPSILON) * 100) / 100
+                  } else {
+                    cgst = Math.round((taxable * (gstPct / 200) + Number.EPSILON) * 100) / 100
+                    sgst = Math.round((taxable * (gstPct / 200) + Number.EPSILON) * 100) / 100
+                  }
+                  const tax = cgst + sgst + igst
+                  const total = Math.round((taxable + tax + Number.EPSILON) * 100) / 100
+
                   return (
                     <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 14px', borderRadius: 8, fontSize: 12 }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                        <div><span style={{ color: '#64748b' }}>Taxable Base:</span> <b style={{ display: 'block', marginTop: 2 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                        <div><span style={{ color: '#64748b' }}>CGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                        <div><span style={{ color: '#64748b' }}>SGST ({gstPct / 2}%):</span> <b style={{ display: 'block', marginTop: 2 }}>₹{(tax / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
-                        <div><span style={{ color: '#166534', fontWeight: 700 }}>Grand Total:</span> <b style={{ color: '#0f766e', fontSize: 13, display: 'block', marginTop: 2 }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
+                        <div><span style={{ color: '#64748b' }}>Gross Base:</span> <b style={{ display: 'block', marginTop: 2 }}>₹{gross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        {discAmt > 0 && <div><span style={{ color: '#b45309' }}>Discount (-):</span> <b style={{ color: '#b45309', display: 'block', marginTop: 2 }}>-₹{discAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>}
+                        {otherChg > 0 && <div><span style={{ color: '#0369a1' }}>Other Chg (+):</span> <b style={{ color: '#0369a1', display: 'block', marginTop: 2 }}>+₹{otherChg.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>}
+                        <div><span style={{ color: '#0f172a', fontWeight: 700 }}>Taxable Base:</span> <b style={{ display: 'block', marginTop: 2 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        {!isInter ? (
+                          <>
+                            <div><span style={{ color: '#059669' }}>CGST ({gstPct / 2}%):</span> <b style={{ color: '#059669', display: 'block', marginTop: 2 }}>₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                            <div><span style={{ color: '#059669' }}>SGST ({gstPct / 2}%):</span> <b style={{ color: '#059669', display: 'block', marginTop: 2 }}>₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                          </>
+                        ) : (
+                          <div><span style={{ color: '#6366f1' }}>IGST ({gstPct}%):</span> <b style={{ color: '#6366f1', display: 'block', marginTop: 2 }}>₹{igst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
+                        )}
+                        <div><span style={{ color: '#166534', fontWeight: 800 }}>Grand Total:</span> <b style={{ color: '#0f766e', fontSize: 14, fontWeight: 900, display: 'block', marginTop: 2 }}>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></div>
                       </div>
                     </div>
                   )
@@ -2634,19 +3055,22 @@ export default function Store({ onNavigate }) {
               </div>
 
               {/* Document Paper Container */}
-              <div id="print-document" style={{ border: '1px solid #cbd5e1', borderRadius: 8, padding: '24px 28px', background: '#fff' }}>
+              <div id="print-document" className="print-watermark-container" style={{ border: '1px solid #cbd5e1', borderRadius: 8, padding: '24px 28px', background: '#fff', position: 'relative', overflow: 'hidden' }}>
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
-                  <div>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
-                    <div style={{ fontSize: 11, color: '#475569', marginTop: 2, fontWeight: 600 }}>
-                      Manufacturers of High-Strength Kraft Paper & Multi-Layer Packaging Board
-                    </div>
-                    <div style={{ fontSize: 11, color: '#475569' }}>
-                      Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka, India
-                    </div>
-                    <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 4 }}>
-                      GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: U21012KA2015PTC081234
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16, position: 'relative', zIndex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain', borderRadius: 6, border: '1px solid #cbd5e1', background: '#fff', padding: '2px 6px' }} />
+                    <div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
+                      <div style={{ fontSize: 11, color: '#475569', marginTop: 2, fontWeight: 600 }}>
+                        Manufacturers of High-Strength Kraft Paper & Multi-Layer Packaging Board
+                      </div>
+                      <div style={{ fontSize: 11, color: '#475569' }}>
+                        Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka, India
+                      </div>
+                      <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 4 }}>
+                        GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: U21012KA2015PTC081234
+                      </div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
@@ -2837,11 +3261,14 @@ export default function Store({ onNavigate }) {
       {/* ── MODAL: PRINTABLE OUTWARD VOUCHER ── */}
       {outwardVoucher && (
         <div style={S.overlay}>
-          <div style={{ ...S.modal, maxWidth: 550, background: '#fff' }}>
-            <div style={{ textAlign: 'center', borderBottom: '2px dashed #e7e6df', paddingBottom: 12, marginBottom: 14 }}>
-              <div style={{ fontSize: 18, fontWeight: 700 }}>SRI M.K. PAPER MILLS PVT LTD</div>
-              <div style={{ fontSize: 13, color: '#8a8a90' }}>STORE ISSUE VOUCHER (SIV)</div>
-              <div style={{ fontSize: 12, marginTop: 4 }}>Date: {new Date(outwardVoucher.date).toLocaleDateString('en-IN')} | Ref: {outwardVoucher.reference_id || 'SIV-'+outwardVoucher.id}</div>
+          <div className="print-watermark-container" style={{ ...S.modal, maxWidth: 550, background: '#fff', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, borderBottom: '2px dashed #e7e6df', paddingBottom: 12, marginBottom: 14, position: 'relative', zIndex: 1 }}>
+              <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 38, width: 'auto', maxWidth: 120, objectFit: 'contain', borderRadius: 4, background: '#fff', padding: 2 }} />
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#0f766e' }}>SRI M.K. PAPER MILLS PVT LTD</div>
+                <div style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>STORE ISSUE VOUCHER (SIV SLIP)</div>
+                <div style={{ fontSize: 11, color: '#64748b' }}>Date: {new Date(outwardVoucher.date).toLocaleDateString('en-IN')} | Ref: {outwardVoucher.reference_id || 'SIV-'+outwardVoucher.id}</div>
+              </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
               <div><b>Material:</b> {outwardVoucher.materialName} ({outwardVoucher.materialCode})</div>
@@ -3472,6 +3899,387 @@ export default function Store({ onNavigate }) {
         isOpen={exportModal}
         onClose={() => setExportModal(false)}
       />
+
+      {/* ── MODAL: MASTER CONSOLIDATED MULTI-ITEM GRN VIEWER ── */}
+      {masterGrnModal && (
+        <div style={S.overlay} onClick={() => setMasterGrnModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 1000, background: '#ffffff', color: '#0f172a', padding: 24 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 12, marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 24 }}>📥</span>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#0f766e' }}>
+                    Master Goods Receipt Note (GRN) — #{masterGrnModal.grnNumber || masterGrnModal.grn_number || `GRN-${masterGrnModal.id}`}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>
+                    Consolidated Receipt · All line items under single receipt voucher
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => openA3Invoice(masterGrnModal)}
+                  style={{ background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  🖨️ Print Official A3 GST Invoice
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAppendGrnModal(masterGrnModal)
+                    setAppendGrnForm({
+                      material_id: '',
+                      received_qty: '1',
+                      unit_price: '',
+                      discount_pct: 0,
+                      other_charges: 0,
+                      tax_type: 'intra',
+                      gst_pct: 18,
+                      bin_location: '',
+                      batch_number: '',
+                      mrp: '',
+                      trade_price: '',
+                      remarks: ''
+                    })
+                  }}
+                  style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                >
+                  ＋ Append Line Item
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMasterGrnModal(null)}
+                  style={{ background: '#e2e8f0', color: '#334155', border: 'none', borderRadius: 6, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                >
+                  ✕ Close
+                </button>
+              </div>
+            </div>
+
+            {/* GRN Header Meta */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12, marginBottom: 14 }}>
+              <div>
+                <span style={{ color: '#64748b' }}>Receipt Date:</span><br />
+                <strong>{masterGrnModal.date ? new Date(masterGrnModal.date).toLocaleDateString('en-IN') : '—'}</strong>
+              </div>
+              <div>
+                <span style={{ color: '#64748b' }}>Vendor / Supplier:</span><br />
+                <strong>{masterGrnModal.vendorName || 'Registered Vendor'}</strong>
+                {masterGrnModal.vendorGstin && <div style={{ fontSize: 10, color: '#0f766e' }}>GSTIN: {masterGrnModal.vendorGstin}</div>}
+              </div>
+              <div>
+                <span style={{ color: '#64748b' }}>PO / Challan / Inv Ref:</span><br />
+                <strong>{masterGrnModal.poNumber || masterGrnModal.invoice_number || masterGrnModal.challan_number || 'Direct Inward'}</strong>
+              </div>
+              <div>
+                <span style={{ color: '#64748b' }}>Vehicle / Gate Pass:</span><br />
+                <strong>{masterGrnModal.vehicle_number || masterGrnModal.gatePassNumber || 'Mill Gate Entry'}</strong>
+              </div>
+            </div>
+
+            {/* Complete Line Items Table */}
+            <div style={{ fontWeight: 800, fontSize: 12, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase' }}>
+              Consolidated Received Items ({(masterGrnModal.items || []).length})
+            </div>
+            <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, overflow: 'hidden', marginBottom: 14 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                <thead>
+                  <tr style={{ background: '#f1f5f9', borderBottom: '2px solid #0f766e', color: '#0f766e', fontWeight: 800, textAlign: 'left' }}>
+                    <th style={{ padding: '7px 6px', width: 30, textAlign: 'center' }}>#</th>
+                    <th style={{ padding: '7px 6px' }}>Material Description</th>
+                    <th style={{ padding: '7px 6px', width: 70 }}>HSN Code</th>
+                    <th style={{ padding: '7px 6px', width: 45, textAlign: 'center' }}>UOM</th>
+                    <th style={{ padding: '7px 6px', width: 65, textAlign: 'right' }}>Recv Qty</th>
+                    <th style={{ padding: '7px 6px', width: 75, textAlign: 'right' }}>Unit Rate</th>
+                    <th style={{ padding: '7px 6px', width: 55, textAlign: 'center' }}>GST%</th>
+                    <th style={{ padding: '7px 6px', width: 80, textAlign: 'right' }}>Taxable Val</th>
+                    <th style={{ padding: '7px 6px', width: 85, textAlign: 'right' }}>Line Total (₹)</th>
+                    <th style={{ padding: '7px 6px', width: 80 }}>Batch / Bin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(masterGrnModal.items || []).map((it, idx) => {
+                    const q = parseFloat(it.received_qty || it.in_qty || it.qty || 0)
+                    const p = parseFloat(it.unit_price || it.trade_price || 0)
+                    const taxVal = it.taxable_amount ? parseFloat(it.taxable_amount) : (q * p)
+                    const lineTot = it.total_amount ? parseFloat(it.total_amount) : (taxVal * (1 + (parseFloat(it.gst_pct || 18) / 100)))
+                    return (
+                      <tr key={it.id || idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '7px 6px', textAlign: 'center', color: '#64748b' }}>{idx + 1}</td>
+                        <td style={{ padding: '7px 6px' }}>
+                          <strong style={{ color: '#0f172a' }}>{it.materialName}</strong>
+                          <div style={{ fontSize: 10, color: '#64748b' }}>Code: {it.materialCode}</div>
+                        </td>
+                        <td style={{ padding: '7px 6px', fontFamily: 'monospace' }}>{it.hsnCode || it.hsn_code || '8439'}</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'center' }}>{it.matUom || it.uom}</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'right', fontWeight: 800, color: '#16a34a' }}>{q.toFixed(2)}</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'right' }}>₹{p.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'right', fontWeight: 700 }}>₹{taxVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '7px 6px', textAlign: 'right', fontWeight: 900, color: '#0f766e' }}>₹{lineTot.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '7px 6px', fontSize: 10 }}>
+                          <div><code>{it.batch_number || 'LOT-AUTO'}</code></div>
+                          <div style={{ color: '#64748b' }}>{it.bin_location || 'Rack 1'}</div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {(!masterGrnModal.items || masterGrnModal.items.length === 0) && (
+                    <tr><td colSpan={10} style={{ padding: 20, textAlign: 'center', color: '#64748b' }}>No line items attached to this GRN header.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => openA3Invoice(masterGrnModal)}
+                style={{ background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                🖨️ Open Full A3 Print Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: APPEND LINE ITEM TO ACTIVE GRN ── */}
+      {appendGrnModal && (
+        <div style={S.overlay} onClick={() => setAppendGrnModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 650 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHdr}>
+              <b>＋ Append New Line Item to GRN #{appendGrnModal.grnNumber || appendGrnModal.grn_number}</b>
+              <button style={S.x} onClick={() => setAppendGrnModal(null)}>✕</button>
+            </div>
+            <form onSubmit={handleAppendGrnItem} style={S.form}>
+              <div>
+                <label style={S.label}>Select Material / Item *</label>
+                <select
+                  style={S.select}
+                  value={appendGrnForm.material_id}
+                  onChange={e => {
+                    const selMat = mats.find(m => String(m.id) === String(e.target.value))
+                    setAppendGrnForm({
+                      ...appendGrnForm,
+                      material_id: e.target.value,
+                      unit_price: selMat?.unit_price || appendGrnForm.unit_price,
+                      bin_location: selMat?.bin_location || appendGrnForm.bin_location
+                    })
+                  }}
+                  required
+                >
+                  <option value="">-- Choose Material to Receive --</option>
+                  {mats.map(m => (
+                    <option key={m.id} value={m.id}>{m.name} [{m.code}] (Stock: {m.current_stock} {m.uom})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Received Qty *</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0.001"
+                    style={S.input}
+                    value={appendGrnForm.received_qty}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, received_qty: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>Unit Rate / Trade Price (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    style={S.input}
+                    value={appendGrnForm.unit_price}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, unit_price: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>GST Slab</label>
+                  <select
+                    style={S.select}
+                    value={appendGrnForm.gst_pct}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, gst_pct: Number(e.target.value) })}
+                  >
+                    {GST_SLABS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={S.label}>Discount %</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    style={S.input}
+                    value={appendGrnForm.discount_pct}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, discount_pct: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Batch / Lot Number</label>
+                  <input
+                    style={S.input}
+                    placeholder="e.g. OPB-ITM-001"
+                    value={appendGrnForm.batch_number}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, batch_number: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>Storage Bin / Rack Location</label>
+                  <input
+                    style={S.input}
+                    placeholder="e.g. Rack A-12"
+                    value={appendGrnForm.bin_location}
+                    onChange={e => setAppendGrnForm({ ...appendGrnForm, bin_location: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={S.label}>Item Remarks / Inspection Note</label>
+                <input
+                  style={S.input}
+                  placeholder="Remarks..."
+                  value={appendGrnForm.remarks}
+                  onChange={e => setAppendGrnForm({ ...appendGrnForm, remarks: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
+                <button type="button" style={S.btnGhost} onClick={() => setAppendGrnModal(null)}>Cancel</button>
+                <button type="submit" style={{ ...S.btn, background: '#0f766e' }} disabled={appendGrnSaving}>
+                  {appendGrnSaving ? 'Appending...' : 'Confirm & Append to GRN'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: DEPARTMENT RECEIVER SIGN & HANDOVER ── */}
+      {receiverModal && (
+        <div style={S.overlay} onClick={() => setReceiverModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 550, color: '#0f172a' }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHdr}>
+              <div>
+                <b>✍️ Department Receiver Signature &amp; Handover</b>
+                <div style={S.muted}>
+                  {receiverModal.name} · {receiverModal.qty} {receiverModal.uom}
+                </div>
+              </div>
+              <button style={S.x} onClick={() => setReceiverModal(null)}>✕</button>
+            </div>
+            <form onSubmit={handleReceiverSignSubmit} style={S.form}>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 12 }}>
+                <div style={{ fontWeight: 800, color: '#166534', marginBottom: 4 }}>
+                  4-Step Lifecycle Step 4: Receiver Sign-off
+                </div>
+                <div style={{ color: '#334155' }}>
+                  Dept Request → Approval SM → Store Keeper Issue → <strong>Receiver Sign &amp; Fitment</strong> → Closed.
+                </div>
+              </div>
+
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Receiver Name *</label>
+                  <input
+                    style={S.input}
+                    required
+                    value={receiverForm.receiver_name}
+                    onChange={e => setReceiverForm({ ...receiverForm, receiver_name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>Receiver Employee Code</label>
+                  <input
+                    style={S.input}
+                    placeholder="e.g. EMP-1042"
+                    value={receiverForm.receiver_emp_code}
+                    onChange={e => setReceiverForm({ ...receiverForm, receiver_emp_code: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={S.grid2}>
+                <div>
+                  <label style={S.label}>Fitment / Receipt Date</label>
+                  <input
+                    type="date"
+                    style={S.input}
+                    value={receiverForm.fitment_date}
+                    onChange={e => setReceiverForm({ ...receiverForm, fitment_date: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>Receiver Acknowledgment Note</label>
+                  <input
+                    style={S.input}
+                    value={receiverForm.receiver_signature_note}
+                    onChange={e => setReceiverForm({ ...receiverForm, receiver_signature_note: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={S.label}>Fitment Observations &amp; Machine Position (Optional)</label>
+                <textarea
+                  style={{ ...S.input, height: 60 }}
+                  placeholder="e.g. Mounted on PM1 Rewinder shaft, running smoothly without vibration."
+                  value={receiverForm.observations}
+                  onChange={e => setReceiverForm({ ...receiverForm, observations: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="button" style={S.btnGhost} onClick={() => setReceiverModal(null)}>Cancel</button>
+                <button type="submit" style={{ ...S.btn, background: '#16a34a' }} disabled={receiverSaving}>
+                  {receiverSaving ? 'Signing...' : '✓ Confirm Receiver Signature & Close'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: DEDICATED A3 GST COMMERCIAL INVOICE PRINT MODAL (Pic 1 Exact Layout) ── */}
+      {a3PrintDoc && (
+        <A3InvoicePrintModal
+          docData={a3PrintDoc}
+          onClose={() => setA3PrintDoc(null)}
+          title={a3PrintDoc.title || 'GST INVOICE'}
+        />
+      )}
+
+      {/* ── MODAL: SEQUENCE ENFORCEMENT POPUP ── */}
+      {sequenceViolation && (
+        <SequenceEnforcementModal
+          isOpen={!!sequenceViolation}
+          onClose={() => setSequenceViolation(null)}
+          violationType={sequenceViolation.violationType}
+          currentStep={sequenceViolation.currentStep}
+          requiredStep={sequenceViolation.requiredStep}
+          indentNumber={sequenceViolation.indentNumber}
+          deptName={sequenceViolation.deptName}
+          onAction={(targetStep) => {
+            if (targetStep === 3) {
+              setTab('outward')
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

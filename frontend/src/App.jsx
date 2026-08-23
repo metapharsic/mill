@@ -365,7 +365,7 @@ function AppShell() {
             <button style={styles.iconBtn} title="Logout" onClick={logout}><LogOut size={16} strokeWidth={1.8} /></button>
           </div>
         </header>
-        <div style={styles.content} className="sb-scroll">
+        <div style={styles.content} className="sb-scroll app-watermark-bg">
           <div key={active} className="page-enter" onAnimationEnd={e => { e.currentTarget.classList.remove('page-enter') }}>
             {renderPage()}
           </div>

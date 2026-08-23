@@ -197,14 +197,19 @@ router.get('/my-acks', auth, ar(async (req, res) => {
 }));
 
 // GET ONE WITH FULL DETAILS & ITEMS
+// GET ONE WITH FULL DETAILS & ITEMS & TIMELINE
 router.get('/:id', auth, ar(async (req, res) => {
   const { rows } = await pool.query(
     `SELECT i.*, i.created_at as "raisedAt",
             i.cancellation_reason as "cancellationReason", i.cancelled_at as "cancelledAt",
             cu.name as "cancelledByName", cu.employee_code as "cancelledByEmpCode",
-            d.name as "deptName", d.code as "deptCode",
+            d.name as "deptName", d.code as "deptCode", d.category as "deptCategory",
             u.name as "raisedByName", u.name as "raisedBy", u.employee_code as "raisedByEmpCode",
             r.name as "raisedByRole", u.email as "raisedByEmail", u.mobile as "raisedByMobile",
+            l1_u.name as "l1ApprovedByName", l1_u.employee_code as "l1ApprovedByEmpCode",
+            l2_u.name as "l2ApprovedByName", l2_u.employee_code as "l2ApprovedByEmpCode",
+            iss_u.name as "issuedByName", iss_u.employee_code as "issuedByEmpCode",
+            rec_u.name as "receiverSignedByName", rec_u.employee_code as "receiverSignedByEmpCode",
             ps.section_code as "sectionCode", ps.name as "sectionName",
             mch.name as "machineName", mch.code as "machineCode", mch.type as "machineType",
             po.id as "linkedPoId", po.po_number as "linkedPoNumber", po.status as "linkedPoStatus",
@@ -216,6 +221,10 @@ router.get('/:id', auth, ar(async (req, res) => {
      LEFT JOIN users u ON u.id=i.raised_by
      LEFT JOIN roles r ON r.id=u.role_id
      LEFT JOIN users cu ON cu.id=i.cancelled_by
+     LEFT JOIN users l1_u ON l1_u.id=i.l1_approved_by
+     LEFT JOIN users l2_u ON l2_u.id=i.l2_approved_by
+     LEFT JOIN users iss_u ON iss_u.id=i.issued_by
+     LEFT JOIN users rec_u ON rec_u.id=i.receiver_signed_by
      LEFT JOIN plant_sections ps ON ps.id=i.section_id
      LEFT JOIN machines mch ON mch.id=i.machine_id
      LEFT JOIN LATERAL (
@@ -254,7 +263,18 @@ router.get('/:id', auth, ar(async (req, res) => {
      ORDER BY ii.id ASC`,
     [req.params.id]
   );
-  res.json({ success:true, data:{ ...rows[0], items } });
+
+  const { rows: timeline } = await pool.query(
+    `SELECT id, action, from_status AS "fromStatus", to_status AS "toStatus",
+            actor_id AS "actorId", actor_name AS "actorName", actor_role AS "actorRole",
+            qty_issued AS "qtyIssued", note, created_at AS "createdAt"
+     FROM store_indent_log
+     WHERE indent_id = $1
+     ORDER BY created_at ASC`,
+    [req.params.id]
+  );
+
+  res.json({ success:true, data:{ ...rows[0], items, timeline } });
 }));
 
 // CREATE INDENT (Supports Multi-Mode Fulfillment: PR, Direct PO, Direct DC / Gate Pass, Immediate Store Issuance)
@@ -914,11 +934,39 @@ const issueHandler = ar(async (req, res) => {
   try {
     await client.query('BEGIN');
     const { rows: [ind] } = await client.query(
-      `SELECT * FROM indents WHERE id=$1 AND status IN ('Submitted','L1 Approved','L2 Approved','Approved','Partially Issued') FOR UPDATE`, [req.params.id]
+      `SELECT * FROM indents WHERE id=$1 FOR UPDATE`, [req.params.id]
     );
     if (!ind) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: 'Indent must be Submitted, Approved or Partially Issued' });
+      return res.status(404).json({ success: false, message: 'Indent not found' });
+    }
+
+    // Sequence Guard 1: Must not be in Submitted state without SM approval
+    if (ind.status === 'Submitted') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        sequence_violation: true,
+        violationType: 'sm_approval_required',
+        currentStep: 1,
+        requiredStep: 2,
+        indentNumber: ind.indent_number,
+        deptName: ind.department_id,
+        message: 'Store Manager (SM) approval gate is required before Store Keeper can physically issue stock.'
+      });
+    }
+
+    if (!['L1 Approved', 'L2 Approved', 'Approved', 'Partially Issued'].includes(ind.status)) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        sequence_violation: true,
+        violationType: 'custom',
+        currentStep: 1,
+        requiredStep: 2,
+        indentNumber: ind.indent_number,
+        message: `Indent is in '${ind.status}' state and cannot be issued.`
+      });
     }
 
     for (const it of items) {
@@ -1062,6 +1110,133 @@ router.put('/items/:itemId/acknowledge', auth, ar(async (req, res) => {
 
   res.json({ success:true, data:item, autoClosed: parseInt(chk.pending)===0 });
 }));
+
+// RECEIVER SIGN & HANDOVER — Department receiver signs & acknowledges physical receipt of entire indent
+const receiverSignHandler = ar(async (req, res) => {
+  const { receiver_name, receiver_emp_code, receiver_signature_note, fitment_date, fitment_location, observations } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query(
+      `SELECT * FROM indents WHERE id = $1 FOR UPDATE`,
+      [req.params.id]
+    );
+    if (!ind) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Indent not found' });
+    }
+
+    if (['Draft', 'Submitted'].includes(ind.status)) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        sequence_violation: true,
+        violationType: 'sm_approval_required',
+        currentStep: 1,
+        requiredStep: 2,
+        indentNumber: ind.indent_number,
+        message: 'Indent must be approved by Store Manager and physically issued by Store Keeper before Receiver sign-off.'
+      });
+    }
+
+    if (ind.status === 'Approved') {
+      const { rows: [issuedCheck] } = await client.query(
+        `SELECT COALESCE(SUM(issued_qty), 0) as total_issued FROM indent_items WHERE indent_id = $1`,
+        [ind.id]
+      );
+      if (parseFloat(issuedCheck?.total_issued || 0) <= 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          success: false,
+          sequence_violation: true,
+          violationType: 'stock_issue_required',
+          currentStep: 2,
+          requiredStep: 3,
+          indentNumber: ind.indent_number,
+          message: 'Materials must be physically issued by Store Keeper before Department Receiver can sign handover.'
+        });
+      }
+    }
+
+    if (!['Issued', 'Partially Issued', 'Approved'].includes(ind.status)) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        sequence_violation: true,
+        violationType: 'custom',
+        currentStep: 3,
+        requiredStep: 4,
+        indentNumber: ind.indent_number,
+        message: `Indent is currently in '${ind.status}' state and cannot be signed.`
+      });
+    }
+
+    const recName = receiver_name || req.user.name;
+    const recEmpCode = receiver_emp_code || req.user.employee_code || null;
+    const note = receiver_signature_note || observations || 'Received and verified in department';
+
+    // Update master indent
+    const { rows: [updatedInd] } = await client.query(
+      `UPDATE indents
+       SET receiver_name = $1,
+           receiver_emp_code = $2,
+           receiver_signature_note = $3,
+           receiver_signed_at = NOW(),
+           receiver_signed_by = $4,
+           fitment_date = $5,
+           fitment_location = $6,
+           observations = $7,
+           status = 'Closed',
+           closed_at = NOW()
+       WHERE id = $8 RETURNING *`,
+      [recName, recEmpCode, note, req.user.id, fitment_date || null, fitment_location || null, observations || null, ind.id]
+    );
+
+    // Update all items under this indent
+    await client.query(
+      `UPDATE indent_items
+       SET ack_by = $1,
+           ack_at = NOW(),
+           ack_status = 'done',
+           receiver_name = $2,
+           receiver_emp_code = $3,
+           receiver_signed_at = NOW(),
+           fitment_date = $4,
+           observations = $5
+       WHERE indent_id = $6`,
+      [req.user.id, recName, recEmpCode, fitment_date || null, observations || null, ind.id]
+    );
+
+    await logStoreIndent(client, ind.id, 'Receiver Signed & Closed', ind.status, 'Closed', req.user.id, recName, req.user.role || 'Receiver', note);
+    await client.query(
+      `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+       VALUES ($1, 'receiver_sign_close', $2, 'Closed', $3, $4)`,
+      [ind.id, ind.status, req.user.id, `Receiver signed by ${recName} (${recEmpCode || 'Emp'}): ${note}`]
+    );
+
+    await client.query('COMMIT');
+
+    publish('mkpm.indent.events', String(ind.id), {
+      event: 'indent.closed',
+      id: ind.id,
+      indentNumber: ind.indent_number,
+      status: 'Closed',
+      receiverName: recName,
+      userId: req.user.id,
+      timestamp: new Date()
+    });
+
+    res.json({ success: true, message: `Indent ${ind.indent_number} signed by receiver & closed successfully`, data: updatedInd });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+});
+
+router.put('/:id/receive', auth, receiverSignHandler);
+router.put('/:id/sign', auth, receiverSignHandler);
 
 // CLOSE — manual close by admin
 router.put('/:id/close', auth, requireLevel(3), ar(async (req, res) => {

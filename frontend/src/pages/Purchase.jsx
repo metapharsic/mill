@@ -3,6 +3,7 @@ import AgentStatusBanner from '../components/AgentStatusBanner'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
 import SearchableSelect from '../components/SearchableSelect'
+import { LOGO_DATA_URI, LOGO_SRC } from '../utils/logo'
 const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
 const STATUS_COLOR = { Draft: '#8a8a90', Approved: '#22c55e', Sent: '#6366f1', Partial: '#f97316', Received: '#0ea5e9', Closed: '#64748b', Cancelled: '#ef4444' }
 const fmt = v => v ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'
@@ -74,6 +75,25 @@ const PRINT_STYLE = `
   .no-print { display: none !important; }
   @page { margin: 12mm; size: A4 portrait; }
 }
+#print-document {
+  position: relative !important;
+}
+#print-document::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 180px;
+  background-image: url('${LOGO_DATA_URI}');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.065;
+  pointer-events: none;
+  z-index: 0;
+}
 `
 
 function injectPrintStyle() {
@@ -96,10 +116,10 @@ function PrintFrame({ content, onClose }) {
       {/* Top Floating Control Bar (Hidden on print) */}
       <div className="no-print" style={{ background: '#1e293b', color: '#fff', padding: '10px 20px', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: 900, marginBottom: 16, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 18 }}>🖨</span>
+          <img src={LOGO_SRC} alt="Logo" style={{ width: 26, height: 26, objectFit: 'contain', borderRadius: 4, background: '#fff' }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14 }}>Purchase Order Document Preview</div>
-            <div style={{ fontSize: 11, color: '#94a3b8' }}>A4 Official Mill Format · Ready for direct printing &amp; PDF export</div>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>Official Mill Document Preview</div>
+            <div style={{ fontSize: 11, color: '#94a3b8' }}>SRI M.K. PAPER MILLS PVT. LTD. · A4 Official Letterhead with Watermark</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -291,7 +311,18 @@ export default function Purchase() {
   }, [loadApprovedIndents])
 
   const today = () => new Date().toISOString().slice(0, 10)
-  const blankItem = () => ({ material_id: '', description: '', qty: '', uom: '', unit_price: '', gst_pct: 18, _search: '' })
+  const blankItem = () => ({
+    material_id: '',
+    description: '',
+    qty: '',
+    uom: '',
+    unit_price: '',
+    discount_pct: 0,
+    other_charges: 0,
+    tax_type: 'intra',
+    gst_pct: 18,
+    _search: ''
+  })
 
   const openNew = (preselectedIndent = null) => {
     const items = preselectedIndent?.items?.length
@@ -303,6 +334,9 @@ export default function Purchase() {
             qty: String(it.required_qty || it.qty || 1),
             uom: m?.uom || it.matUom || it.uom || 'NOS',
             unit_price: String(it.matPrice || it.unit_price || m?.unit_price || 0),
+            discount_pct: 0,
+            other_charges: 0,
+            tax_type: 'intra',
             gst_pct: it.gst_pct != null ? it.gst_pct : 18,
             _search: it.materialName || it.material_name || m?.name || ''
           }
@@ -318,6 +352,7 @@ export default function Purchase() {
       delivery_address: '',
       payment_terms: '',
       payment_terms_custom: '',
+      tax_type: 'intra',
       remarks: preselectedIndent
         ? `PO raised against PR ${preselectedIndent.indentNumber || preselectedIndent.indent_number} (${preselectedIndent.deptName || 'Dept'})`
         : '',
@@ -607,7 +642,10 @@ export default function Purchase() {
         qty: it.qty !== undefined && it.qty !== null ? String(it.qty) : '',
         uom: it.uom || matUom(it.material_id) || '',
         unit_price: it.unit_price !== undefined && it.unit_price !== null ? String(it.unit_price) : '',
+        discount_pct: it.discount_pct !== undefined && it.discount_pct !== null ? Number(it.discount_pct) : 0,
+        other_charges: it.other_charges !== undefined && it.other_charges !== null ? Number(it.other_charges) : 0,
         gst_pct: Number(it.gst_pct ?? 18),
+        tax_type: it.tax_type || d.tax_type || 'intra',
         _search: it.materialName || ''
       }
     })
@@ -622,6 +660,7 @@ export default function Purchase() {
       po_date: d.date?.slice(0, 10) || '',
       delivery_date: d.delivery_date?.slice(0, 10) || '',
       payment_terms: d.payment_terms || '',
+      tax_type: d.tax_type || (d.vendorGstin && !d.vendorGstin.startsWith('29') ? 'inter' : 'intra'),
       remarks: d.remarks || '',
       items: items.length ? items : [blankItem()]
     })
@@ -702,77 +741,163 @@ export default function Purchase() {
     }
   }
 
-  // GRN
-  const openGRN=async(poRow)=>{
-    const r=await API(`/api/purchase/po/${poRow.id}`)
-    if(!r.success) return
-    const po=r.data
+  // GRN Receipt
+  const openGRN = async (poRow) => {
+    const r = await API(`/api/purchase/po/${poRow.id}`)
+    if (!r.success) return
+    const po = r.data
     setGrnModal(po)
     setGrnErr('')
     setGrnForm({
-      challan_number:'',vehicle_number:'',invoice_number:'',remarks:'',
-      items:(po.items||[]).map(it=>{
+      challan_number: '',
+      vehicle_number: '',
+      invoice_number: '',
+      remarks: '',
+      tax_type: po.tax_type || (po.vendorGstin && !po.vendorGstin.startsWith('29') ? 'inter' : 'intra'),
+      items: (po.items || []).map(it => {
         const remaining = Math.max(0, parseFloat(it.qty || 0) - parseFloat(it.received_qty || 0))
         return {
-          material_id:it.material_id, material_name:it.materialName, uom:it.uom,
-          po_qty:it.qty, received_qty:remaining, accepted_qty:remaining, rejected_qty:0,
-          unit_price:it.unit_price, gst_pct:it.gst_pct, batch_number:'',
+          material_id: it.material_id,
+          material_name: it.materialName || it.name,
+          uom: it.uom,
+          po_qty: it.qty,
+          received_qty: remaining,
+          accepted_qty: remaining,
+          rejected_qty: 0,
+          unit_price: it.unit_price || 0,
+          discount_pct: it.discount_pct || 0,
+          other_charges: it.other_charges || 0,
+          tax_type: it.tax_type || po.tax_type || 'intra',
+          gst_pct: it.gst_pct ?? 18,
+          batch_number: '',
+          bin_location: it.binLocation || it.bin_location || '',
+          remarks: ''
         }
       })
     })
   }
 
-  const saveGRN=async e=>{
+  const saveGRN = async e => {
     e.preventDefault()
-    if(!grnModal) return
+    if (!grnModal) return
     for (const [idx, it] of grnForm.items.entries()) {
-      const rq = parseFloat(it.received_qty)||0, aq = parseFloat(it.accepted_qty)||0
-      if (rq <= 0) { setGrnErr(`Item ${idx+1} (${it.material_name}): received qty must be greater than 0`); return }
-      if (aq > rq) { setGrnErr(`Item ${idx+1} (${it.material_name}): accepted qty (${aq}) cannot exceed received qty (${rq})`); return }
-      if (aq < 0) { setGrnErr(`Item ${idx+1} (${it.material_name}): accepted qty cannot be negative`); return }
+      const rq = parseFloat(it.received_qty) || 0, aq = parseFloat(it.accepted_qty) || 0
+      if (rq <= 0) { setGrnErr(`Item ${idx + 1} (${it.material_name}): received qty must be greater than 0`); return }
+      if (aq > rq) { setGrnErr(`Item ${idx + 1} (${it.material_name}): accepted qty (${aq}) cannot exceed received qty (${rq})`); return }
+      if (aq < 0) { setGrnErr(`Item ${idx + 1} (${it.material_name}): accepted qty cannot be negative`); return }
     }
-    setGrnSaving(true);setGrnErr('')
-    const payload={
-      date:today(), vendorId:grnModal.vendor_id, poId:grnModal.id,
-      challanNumber:grnForm.challan_number, vehicleNumber:grnForm.vehicle_number,
-      invoiceNumber:grnForm.invoice_number, remarks:grnForm.remarks,
-      items:grnForm.items.map(it=>({
-        materialId:it.material_id, poQty:parseFloat(it.po_qty)||0, receivedQty:parseFloat(it.received_qty)||0,
-        acceptedQty:parseFloat(it.accepted_qty)||0, rejectedQty:parseFloat(it.rejected_qty)||0,
-        unitPrice:parseFloat(it.unit_price)||0,
-        uom:it.uom, batchNumber:it.batch_number||'',
+    setGrnSaving(true); setGrnErr('')
+    const payload = {
+      date: today(),
+      vendor_id: grnModal.vendor_id,
+      po_id: grnModal.id,
+      challan_number: grnForm.challan_number,
+      vehicle_number: grnForm.vehicle_number,
+      invoice_number: grnForm.invoice_number,
+      tax_type: grnForm.tax_type,
+      remarks: grnForm.remarks,
+      items: grnForm.items.map(it => ({
+        material_id: it.material_id,
+        po_qty: parseFloat(it.po_qty) || 0,
+        received_qty: parseFloat(it.received_qty) || 0,
+        accepted_qty: parseFloat(it.accepted_qty) || 0,
+        rejected_qty: parseFloat(it.rejected_qty) || 0,
+        unit_price: parseFloat(it.unit_price) || 0,
+        discount_pct: parseFloat(it.discount_pct) || 0,
+        other_charges: parseFloat(it.other_charges) || 0,
+        tax_type: it.tax_type || grnForm.tax_type,
+        gst_pct: parseFloat(it.gst_pct) || 18,
+        uom: it.uom,
+        batch_number: it.batch_number || '',
+        bin_location: it.bin_location || '',
+        remarks: it.remarks || ''
       }))
     }
-    const r=await API('/api/inventory/grn',{method:'POST',body:JSON.stringify(payload)})
+    const r = await API(`/api/purchase/po/${grnModal.id}/grn`, { method: 'POST', body: JSON.stringify(payload) })
     setGrnSaving(false)
-    if(r.success){
-      // Show GRN receipt
-      const receiptContent = (
-        <div>
-          <div style={{display:'flex',justifyContent:'space-between',marginBottom:16}}>
-            <div><h2 style={{margin:0}}>Goods Receipt Note</h2><div style={{color:'#555',fontSize:13}}>MK Paper Mill ERP</div></div>
-            <div style={{textAlign:'right',fontSize:13}}><div>PO: {grnModal.po_number}</div><div>Date: {new Date().toLocaleDateString('en-IN')}</div><div>Vendor: {grnModal.vendorName}</div></div>
-          </div>
-          <table>
-            <thead><tr><th>Material</th><th>UOM</th><th>PO Qty</th><th>Received</th><th>Accepted</th><th>Rejected</th><th>Unit Price</th><th>Batch/Lot</th></tr></thead>
-            <tbody>
-              {grnForm.items.map((it,i)=>(
-                <tr key={i}><td>{it.material_name}</td><td>{it.uom}</td><td>{it.po_qty}</td><td>{it.received_qty}</td><td>{it.accepted_qty}</td><td>{it.rejected_qty}</td><td>{fmt(it.unit_price)}</td><td>{it.batch_number||'—'}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          {grnForm.challan_number&&<div style={{marginTop:12,fontSize:13}}>Challan: {grnForm.challan_number} | Vehicle: {grnForm.vehicle_number||'—'} | Invoice: {grnForm.invoice_number||'—'}</div>}
-          <div style={{marginTop:24,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:32}}>
-            <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Received By</div>
-            <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Store Incharge</div>
-            <div style={{borderTop:'1px solid #000',paddingTop:8,textAlign:'center',fontSize:12}}>Vendor Signature</div>
-          </div>
-        </div>
-      )
+    if (r.success) {
       setGrnModal(null)
       load()
-      setPrintContent(receiptContent)
-    }else setGrnErr(r.message||'GRN failed')
+      loadGRNs()
+      if (r.data?.id) {
+        printGRNDocument(r.data)
+      }
+    } else {
+      setGrnErr(r.message || 'GRN failed')
+    }
+  }
+
+  // ── Dedicated Edit GRN Modal State & Handlers ──
+  const [editGrnModal, setEditGrnModal] = useState(null)
+  const [editGrnForm, setEditGrnForm] = useState({
+    vehicle_number: '',
+    challan_number: '',
+    invoice_number: '',
+    remarks: '',
+    date: '',
+    tax_type: 'intra',
+    items: []
+  })
+  const [editGrnErr, setEditGrnErr] = useState('')
+  const [editGrnSaving, setEditGrnSaving] = useState(false)
+
+  const openEditGrn = async (grnRow) => {
+    const r = await API(`/api/purchase/grn/${grnRow.id}`)
+    if (!r.success) return alert(r.message || 'Failed to load GRN details')
+    const g = r.data
+    setEditGrnForm({
+      vehicle_number: g.vehicleNumber || g.vehicle_number || '',
+      challan_number: g.challanNumber || g.challan_number || '',
+      invoice_number: g.invoiceNumber || g.invoice_number || '',
+      remarks: g.remarks || '',
+      date: g.date ? g.date.slice(0, 10) : today(),
+      tax_type: g.tax_type || (g.vendorGstin && !g.vendorGstin.startsWith('29') ? 'inter' : 'intra'),
+      items: (g.items || []).map(it => ({
+        id: it.id,
+        material_id: it.material_id,
+        materialName: it.materialName || it.material_name,
+        materialCode: it.materialCode,
+        uom: it.uom || it.matUom || 'NOS',
+        po_qty: it.po_qty,
+        received_qty: it.received_qty,
+        accepted_qty: it.accepted_qty,
+        rejected_qty: it.rejected_qty || 0,
+        unit_price: it.unit_price,
+        discount_pct: it.discount_pct || 0,
+        other_charges: it.other_charges || 0,
+        tax_type: it.tax_type || g.tax_type || 'intra',
+        gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+        bin_location: it.bin_location || it.binLocation || '',
+        batch_number: it.batch_number || '',
+        remarks: it.remarks || ''
+      }))
+    })
+    setEditGrnErr('')
+    setEditGrnModal(g)
+  }
+
+  const setEditGrnItem = (i, k, v) => setEditGrnForm(f => ({
+    ...f,
+    items: f.items.map((it, j) => j === i ? { ...it, [k]: v } : it)
+  }))
+
+  const saveEditGrn = async (e) => {
+    e.preventDefault()
+    if (!editGrnModal) return
+    setEditGrnSaving(true)
+    setEditGrnErr('')
+    const r = await API(`/api/purchase/grn/${editGrnModal.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(editGrnForm)
+    })
+    setEditGrnSaving(false)
+    if (r.success) {
+      setEditGrnModal(null)
+      loadGRNs()
+      load()
+    } else {
+      setEditGrnErr(r.message || 'Failed to update GRN')
+    }
   }
 
   const printGRNDocument = async (grnRow) => {
@@ -780,10 +905,11 @@ export default function Purchase() {
     if (!r.success) return alert(r.message || 'Failed to load GRN details')
     const g = r.data
 
-    const vendorState = (g.vendorState || '').toLowerCase()
-    const vendorGstin = g.vendorGstin || ''
-    const isInterState = (vendorState && vendorState !== 'karnataka') || (vendorGstin && !vendorGstin.startsWith('29'))
+    const isInterState = g.tax_type === 'inter' || (g.vendorGstin && !g.vendorGstin.startsWith('29'))
 
+    let totalGross = 0
+    let totalDiscount = 0
+    let totalOtherCharges = 0
     let totalTaxable = 0
     let totalCgst = 0
     let totalSgst = 0
@@ -792,7 +918,12 @@ export default function Purchase() {
     const itemsCalculated = (g.items || []).map(it => {
       const uPrice = Number(it.unit_price || 0)
       const accQty = Number(it.accepted_qty || 0)
-      const lineTaxable = accQty * uPrice
+      const gross = accQty * uPrice
+      const discPct = Number(it.discount_pct || 0)
+      const discAmt = gross * (discPct / 100)
+      const discBase = Math.max(0, gross - discAmt)
+      const otherCharges = Number(it.other_charges || 0)
+      const lineTaxable = discBase + otherCharges
       const gstPct = Number(it.gst_pct ?? 18)
 
       const cgstPct = isInterState ? 0 : gstPct / 2
@@ -804,6 +935,9 @@ export default function Purchase() {
       const igstAmt = (lineTaxable * igstPct) / 100
       const lineTotal = lineTaxable + cgstAmt + sgstAmt + igstAmt
 
+      totalGross += gross
+      totalDiscount += discAmt
+      totalOtherCharges += otherCharges
       totalTaxable += lineTaxable
       totalCgst += cgstAmt
       totalSgst += sgstAmt
@@ -813,6 +947,10 @@ export default function Purchase() {
         ...it,
         uPrice,
         accQty,
+        gross,
+        discPct,
+        discAmt,
+        otherCharges,
         lineTaxable,
         gstPct,
         cgstPct,
@@ -832,18 +970,21 @@ export default function Purchase() {
       <div>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
-              SRI M.K. PAPER MILLS PRIVATE LIMITED
-            </div>
-            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
-              Store Department — Goods Receipt Note (Inward Commercial Tax Voucher)
-            </div>
-            <div style={{ fontSize: 11, color: '#475569' }}>
-              Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka
-            </div>
-            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 2 }}>
-              GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: <code>U21012KA2015PTC081234</code>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 6px' }} />
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
+                SRI M.K. PAPER MILLS PRIVATE LIMITED
+              </div>
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                Store Department — Goods Receipt Note (Inward Commercial Tax Voucher)
+              </div>
+              <div style={{ fontSize: 11, color: '#475569' }}>
+                Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka
+              </div>
+              <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 2 }}>
+                GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: <code>U21012KA2015PTC081234</code>
+              </div>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -898,26 +1039,28 @@ export default function Purchase() {
           </div>
         </div>
 
-        {/* Line Items Table with CGST, SGST, IGST Breakdown */}
+        {/* Line Items Table with Unit Rate, Discount, Other Charges, and CGST/SGST/IGST Breakdown */}
         <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
           <thead>
             <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
-              <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
+              <th style={{ padding: '8px 6px', width: 24, textAlign: 'center' }}>#</th>
               <th style={{ padding: '8px 6px' }}>Material Description &amp; Specifications</th>
-              <th style={{ padding: '8px 6px', width: 65 }}>HSN/SAC</th>
-              <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 60 }}>Accepted</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>Unit Rate</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>Taxable Val</th>
+              <th style={{ padding: '8px 6px', width: 55 }}>HSN</th>
+              <th style={{ padding: '8px 6px', width: 40 }}>UOM</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 55 }}>Accepted</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>Rate (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 55 }}>Disc %</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Other Chg</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Taxable (₹)</th>
               {!isInterState ? (
                 <>
-                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>CGST</th>
-                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>SGST</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>CGST</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>SGST</th>
                 </>
               ) : (
-                <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>IGST</th>
+                <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>IGST</th>
               )}
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Total Val (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 90 }}>Total (₹)</th>
             </tr>
           </thead>
           <tbody>
@@ -933,11 +1076,17 @@ export default function Purchase() {
                 <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
                 <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{it.accQty.toFixed(2)}</td>
                 <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{it.uPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', color: it.discPct > 0 ? '#b45309' : '#64748b' }}>
+                  {it.discPct > 0 ? `${it.discPct}%` : '—'}
+                </td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', color: it.otherCharges > 0 ? '#0369a1' : '#64748b' }}>
+                  {it.otherCharges > 0 ? `₹${it.otherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'}
+                </td>
                 <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{it.lineTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                 {!isInterState ? (
                   <>
-                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{it.cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{it.sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#059669' }}>₹{it.cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '8px 6px', textAlign: 'right', color: '#059669' }}>₹{it.sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                   </>
                 ) : (
                   <td style={{ padding: '8px 6px', textAlign: 'right', color: '#d97706' }}>₹{it.igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
@@ -966,17 +1115,33 @@ export default function Purchase() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>Taxable Subtotal:</span>
+              <span style={{ color: '#64748b' }}>Gross Base:</span>
+              <span>₹{totalGross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            </div>
+            {totalDiscount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#b45309' }}>
+                <span>Total Discount (-):</span>
+                <span>-₹{totalDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+            )}
+            {totalOtherCharges > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0369a1' }}>
+                <span>Other Charges (Transport / P&amp;F) (+):</span>
+                <span>+₹{totalOtherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #cbd5e1', paddingTop: 2 }}>
+              <span style={{ color: '#0f172a', fontWeight: 700 }}>Taxable Subtotal:</span>
               <strong>₹{totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
             </div>
             {!isInterState ? (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748b' }}>CGST Total:</span>
+                  <span style={{ color: '#059669' }}>CGST Total:</span>
                   <span>₹{totalCgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748b' }}>SGST Total:</span>
+                  <span style={{ color: '#059669' }}>SGST Total:</span>
                   <span>₹{totalSgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
               </>
@@ -1089,10 +1254,13 @@ export default function Purchase() {
       <div id="print-document" style={{ fontFamily: 'Inter, system-ui, sans-serif', color: '#0f172a', lineHeight: 1.4, padding: '16px' }}>
         {/* Letterhead */}
         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f766e', paddingBottom: 12, marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
-            <div style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>CASH PURCHASE &amp; SPOT PROCUREMENT VOUCHER</div>
-            <div style={{ fontSize: 10, color: '#64748b' }}>Plant: Survey No. 42/1, Mill Road, Industrial Area, Karnataka | GSTIN: 29AABCS1429B1Z8</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 44, width: 'auto', maxWidth: 150, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 6px' }} />
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
+              <div style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>CASH PURCHASE &amp; SPOT PROCUREMENT VOUCHER</div>
+              <div style={{ fontSize: 10, color: '#64748b' }}>Plant: Survey No. 42/1, Mill Road, Industrial Area, Karnataka | GSTIN: 29AABCS1429B1Z8</div>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: '#0f766e' }}>{cp.voucher_number || cp.voucherNumber}</div>
@@ -1234,18 +1402,21 @@ export default function Purchase() {
       <div>
         {/* Letterhead */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
-              SRI M.K. PAPER MILLS PRIVATE LIMITED
-            </div>
-            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
-              Finance &amp; Accounts Department · Commercial Purchase Invoice Entry
-            </div>
-            <div style={{ fontSize: 11, color: '#475569' }}>
-              Factory: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
-            </div>
-            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
-              GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 6px' }} />
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
+                SRI M.K. PAPER MILLS PRIVATE LIMITED
+              </div>
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                Finance &amp; Accounts Department · Commercial Purchase Invoice Entry
+              </div>
+              <div style={{ fontSize: 11, color: '#475569' }}>
+                Factory: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
+              </div>
+              <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
+                GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+              </div>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -1388,8 +1559,11 @@ export default function Purchase() {
       const r = await API(`/api/purchase/po/${poRow.id}`)
       if (r.success) po = r.data
     }
-    const isInter = (po.vendorGstin && !po.vendorGstin.startsWith('29')) || (po.vendorState && !po.vendorState.toLowerCase().includes('karnataka'))
+    const isInter = po.tax_type === 'inter' || (po.vendorGstin && !po.vendorGstin.startsWith('29')) || (po.vendorState && !po.vendorState.toLowerCase().includes('karnataka'))
     
+    let totalGross = 0
+    let totalDiscount = 0
+    let totalOtherCharges = 0
     let totalTaxable = 0
     let totalCgst = 0
     let totalSgst = 0
@@ -1399,7 +1573,12 @@ export default function Purchase() {
     const calculatedItems = (po.items || []).map((it, i) => {
       const qty = parseFloat(it.qty || 0)
       const unitPrice = parseFloat(it.unit_price || 0)
-      const lineTaxable = qty * unitPrice
+      const gross = qty * unitPrice
+      const discPct = parseFloat(it.discount_pct || 0)
+      const discAmt = gross * (discPct / 100)
+      const discBase = Math.max(0, gross - discAmt)
+      const otherCharges = parseFloat(it.other_charges || 0)
+      const lineTaxable = discBase + otherCharges
       const gstPct = parseFloat(it.gst_pct ?? 18)
       
       const cgstPct = isInter ? 0 : gstPct / 2
@@ -1411,6 +1590,9 @@ export default function Purchase() {
       const igstAmt = (lineTaxable * igstPct) / 100
       const lineTotal = lineTaxable + cgstAmt + sgstAmt + igstAmt
 
+      totalGross += gross
+      totalDiscount += discAmt
+      totalOtherCharges += otherCharges
       totalTaxable += lineTaxable
       totalCgst += cgstAmt
       totalSgst += sgstAmt
@@ -1430,6 +1612,10 @@ export default function Purchase() {
         ...it,
         qty,
         unitPrice,
+        gross,
+        discPct,
+        discAmt,
+        otherCharges,
         lineTaxable,
         gstPct,
         cgstPct,
@@ -1449,18 +1635,21 @@ export default function Purchase() {
       <div>
         {/* Header with Sri M.K. Paper Mills Official Identity */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 14, marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
-              SRI M.K. PAPER MILLS PRIVATE LIMITED
-            </div>
-            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
-              Manufacturers of High-BF Kraft Paper &amp; Duplex Board · ISO 9001:2015 Certified
-            </div>
-            <div style={{ fontSize: 11, color: '#475569' }}>
-              Factory &amp; Central Stores: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
-            </div>
-            <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
-              GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 6px' }} />
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>
+                SRI M.K. PAPER MILLS PRIVATE LIMITED
+              </div>
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                Manufacturers of High-BF Kraft Paper &amp; Duplex Board · ISO 9001:2015 Certified
+              </div>
+              <div style={{ fontSize: 11, color: '#475569' }}>
+                Factory &amp; Central Stores: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
+              </div>
+              <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
+                GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+              </div>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -1525,20 +1714,22 @@ export default function Purchase() {
             <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
               <th style={{ padding: '8px 6px', width: 24, textAlign: 'center' }}>#</th>
               <th style={{ padding: '8px 6px' }}>Item Description &amp; Technical Code</th>
-              <th style={{ padding: '8px 6px', textAlign: 'center', width: 60 }}>HSN/SAC</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 55 }}>Qty</th>
+              <th style={{ padding: '8px 6px', textAlign: 'center', width: 55 }}>HSN</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 50 }}>Qty</th>
               <th style={{ padding: '8px 6px', width: 40 }}>UOM</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>Rate (₹)</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>Taxable (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 70 }}>Rate (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 50 }}>Disc %</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>Other Chg</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Taxable (₹)</th>
               {!isInter ? (
                 <>
-                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>CGST (₹)</th>
-                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>SGST (₹)</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>CGST (₹)</th>
+                  <th style={{ padding: '8px 6px', textAlign: 'right', width: 65 }}>SGST (₹)</th>
                 </>
               ) : (
-                <th style={{ padding: '8px 6px', textAlign: 'right', width: 85 }}>IGST (₹)</th>
+                <th style={{ padding: '8px 6px', textAlign: 'right', width: 75 }}>IGST (₹)</th>
               )}
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Total (₹)</th>
+              <th style={{ padding: '8px 6px', textAlign: 'right', width: 90 }}>Total (₹)</th>
             </tr>
           </thead>
           <tbody>
@@ -1553,6 +1744,12 @@ export default function Purchase() {
                 <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
                 <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || 'NOS'}</td>
                 <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{it.unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', color: it.discPct > 0 ? '#b45309' : '#64748b' }}>
+                  {it.discPct > 0 ? `${it.discPct}%` : '—'}
+                </td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', color: it.otherCharges > 0 ? '#0369a1' : '#64748b' }}>
+                  {it.otherCharges > 0 ? `₹${it.otherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'}
+                </td>
                 <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 600 }}>₹{it.lineTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                 {!isInter ? (
                   <>
@@ -1647,8 +1844,24 @@ export default function Purchase() {
           <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
             <tbody>
               <tr>
-                <td style={{ padding: '4px 6px', color: '#64748b' }}>Taxable Value:</td>
-                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600 }}>₹{totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '4px 6px', color: '#64748b' }}>Gross Base Amount:</td>
+                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600 }}>₹{totalGross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              </tr>
+              {totalDiscount > 0 && (
+                <tr>
+                  <td style={{ padding: '4px 6px', color: '#b45309' }}>Total Discount (-):</td>
+                  <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#b45309' }}>-₹{totalDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              )}
+              {totalOtherCharges > 0 && (
+                <tr>
+                  <td style={{ padding: '4px 6px', color: '#0369a1' }}>Other Charges (Transport / P&amp;F) (+):</td>
+                  <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#0369a1' }}>+₹{totalOtherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              )}
+              <tr style={{ borderTop: '1px solid #cbd5e1', paddingTop: 2 }}>
+                <td style={{ padding: '4px 6px', color: '#0f172a', fontWeight: 700 }}>Taxable Subtotal:</td>
+                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 700 }}>₹{totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               </tr>
               {isInter ? (
                 <tr>
@@ -2122,7 +2335,14 @@ export default function Purchase() {
                             onClick={() => printGRNDocument(g)}
                             title="View & Print Official GRN Note"
                           >
-                            🖨️ GRN Note
+                            🖨️ Note
+                          </button>
+                          <button
+                            style={{ ...S.btnIcon, color: '#d97706', fontWeight: 600, fontSize: 12 }}
+                            onClick={() => openEditGrn(g)}
+                            title="Edit GRN Quantities, Rates, Discounts, Other Charges & Taxes"
+                          >
+                            ✏️ Edit
                           </button>
                           <button
                             style={{ ...S.btnIcon, color: '#0369a1', fontWeight: 600, fontSize: 12 }}
@@ -2332,35 +2552,57 @@ export default function Purchase() {
       {/* ═══════ CREATE PO MODAL ═══════ */}
       {modal && (() => {
         const vObj = vendorObj(form.vendor_id)
-        const isInterstate = Boolean(vObj?.gstin && !vObj.gstin.startsWith('29'))
+        const defaultTaxType = vObj?.gstin && !vObj.gstin.startsWith('29') ? 'inter' : 'intra'
+        const currentTaxType = form.tax_type || defaultTaxType
+        const isInterstate = currentTaxType === 'inter' || currentTaxType === 'state' || currentTaxType === 'igst'
+
         const calcLine = it => {
-          const q = parseFloat(it.qty) || 0, p2 = parseFloat(it.unit_price) || 0, g = parseFloat(it.gst_pct) || 0
-          const base = q * p2
-          const tax = (base * g) / 100
-          const cgst = isInterstate ? 0 : tax / 2
-          const sgst = isInterstate ? 0 : tax / 2
-          const igst = isInterstate ? tax : 0
-          return { base, tax, cgst, sgst, igst, total: base + tax }
+          const q = parseFloat(it.qty) || 0
+          const p2 = parseFloat(it.unit_price) || 0
+          const gross = Math.round((q * p2 + Number.EPSILON) * 100) / 100
+          const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct || 0) || 0))
+          const discAmt = Math.round((gross * (discPct / 100) + Number.EPSILON) * 100) / 100
+          const discBase = Math.max(0, gross - discAmt)
+          const otherCharges = parseFloat(it.other_charges || 0) || 0
+          const taxable = Math.round((discBase + otherCharges + Number.EPSILON) * 100) / 100
+          const g = parseFloat(it.gst_pct !== undefined && it.gst_pct !== '' ? it.gst_pct : 18) || 0
+
+          let cgst = 0, sgst = 0, igst = 0
+          if (isInterstate) {
+            igst = Math.round((taxable * (g / 100) + Number.EPSILON) * 100) / 100
+          } else {
+            cgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+            sgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+          }
+          const tax = cgst + sgst + igst
+          const total = Math.round((taxable + tax + Number.EPSILON) * 100) / 100
+          return { q, p2, gross, discPct, discAmt, discBase, otherCharges, taxable, g, cgst, sgst, igst, tax, total }
         }
-        const subtotal = form.items.reduce((a, it) => a + calcLine(it).base, 0)
+
+        const totalGross = form.items.reduce((a, it) => a + calcLine(it).gross, 0)
+        const totalDiscount = form.items.reduce((a, it) => a + calcLine(it).discAmt, 0)
+        const totalOtherCharges = form.items.reduce((a, it) => a + calcLine(it).otherCharges, 0)
+        const subtotal = form.items.reduce((a, it) => a + calcLine(it).taxable, 0)
         const totalCgst = form.items.reduce((a, it) => a + calcLine(it).cgst, 0)
         const totalSgst = form.items.reduce((a, it) => a + calcLine(it).sgst, 0)
         const totalIgst = form.items.reduce((a, it) => a + calcLine(it).igst, 0)
         const totalTax = form.items.reduce((a, it) => a + calcLine(it).tax, 0)
         const grandTotal = subtotal + totalTax
-        const fmtAmt = v => v > 0 ? `₹${v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'
+
+        const fmtAmt = v => v > 0 ? `₹${v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₹0.00'
         const PAYMENT_PRESETS = ['Net 15', 'Net 30', 'Net 45', 'Advance', 'COD', 'Custom']
         const dupIds = form.items.map(it => it.material_id).filter((id, i, arr) => id && arr.indexOf(id) !== i)
         const isDirty = form.vendor_id || form.items.some(it => it.material_id)
         const handleClose = () => { if (isDirty && !window.confirm('Discard changes to this PO?')) return; setModal(false) }
+
         return (
           <div style={S.overlay} onClick={handleClose}>
-            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e7e6df', width: '96vw', maxWidth: 1180, height: '92vh', maxHeight: '92vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e7e6df', width: '98vw', maxWidth: 1240, height: '94vh', maxHeight: '94vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
 
               {/* ── Sticky Header ── */}
               <div style={{ padding: '16px 24px 14px', borderBottom: '1px solid #f1efe8', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0, background: '#fff' }}>
                 <div>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: '#1b1b1d' }}>Create Purchase Order</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#1b1b1d' }}>Create Purchase Order (PO)</div>
                   <div style={{ display: 'flex', gap: 16, marginTop: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 11, color: '#a0a0a6' }}>PO Date:</span>
                     <input style={{ ...S.input, padding: '3px 8px', fontSize: 12, width: 140 }} type="date" value={form.po_date}
@@ -2376,10 +2618,10 @@ export default function Purchase() {
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <form id="po-create-form" onSubmit={save}>
 
-                  {/* ── Vendor & Delivery (3-col) ── */}
+                  {/* ── Vendor & Delivery & Tax Mode (4-col grid) ── */}
                   <div style={{ marginBottom: 20 }}>
-                    <div style={SS.sectionLabel}>VENDOR &amp; DELIVERY</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+                    <div style={SS.sectionLabel}>VENDOR, COMMERCIAL &amp; GST TAX MODE</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr 1.2fr', gap: 14 }}>
 
                       <div>
                         <label style={S.label}>Vendor *</label>
@@ -2389,9 +2631,11 @@ export default function Purchase() {
                             const v = vendors.find(x => String(x.id) === String(id))
                             const vpt = v?.payment_terms
                             const presetMatch = vpt && PAYMENT_PRESETS.includes(vpt)
+                            const autoTaxType = v?.gstin && !v.gstin.startsWith('29') ? 'inter' : 'intra'
                             setForm(f => ({
                               ...f,
                               vendor_id: id,
+                              tax_type: autoTaxType,
                               payment_terms: vpt ? (presetMatch ? vpt : 'Custom') : f.payment_terms,
                               payment_terms_custom: vpt && !presetMatch ? vpt : f.payment_terms_custom
                             }))
@@ -2408,16 +2652,56 @@ export default function Purchase() {
                           }))}
                           selectStyle={{ borderColor: formErrors.vendor_id ? '#ef4444' : undefined }}
                         />
-                        {vObj?.gstin && <div style={SS.hint}>GST: {vObj.gstin} {isInterstate ? '(Inter-State IGST)' : '(Intra-State CGST+SGST)'}</div>}
+                        {vObj?.gstin && <div style={SS.hint}>GSTIN: {vObj.gstin} {isInterstate ? '(Inter-State IGST)' : '(In-State CGST+SGST)'}</div>}
                         {formErrors.vendor_id && <div style={SS.fieldErr}>{formErrors.vendor_id}</div>}
                       </div>
 
+                      {/* Tax Type / GST Supply Mode Selector */}
                       <div>
-                        <label style={S.label}>Link Purchase Request (Indent / PR)</label>
+                        <label style={S.label}>GST Tax Mode / Supply Type *</label>
+                        <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                          <button
+                            type="button"
+                            onClick={() => setForm(f => ({ ...f, tax_type: 'intra' }))}
+                            style={{
+                              flex: 1, padding: '7px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                              border: !isInterstate ? '2px solid #059669' : '1px solid #e2e8f0',
+                              background: !isInterstate ? '#ecfdf5' : '#ffffff',
+                              color: !isInterstate ? '#065f46' : '#64748b',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
+                            }}
+                            title="In-State Supply: 50% CGST + 50% SGST"
+                          >
+                            <span>📍 In-State</span>
+                            <span style={{ fontSize: 9, background: !isInterstate ? '#059669' : '#e2e8f0', color: !isInterstate ? '#fff' : '#475569', padding: '1px 5px', borderRadius: 6 }}>CGST+SGST</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setForm(f => ({ ...f, tax_type: 'inter' }))}
+                            style={{
+                              flex: 1, padding: '7px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                              border: isInterstate ? '2px solid #6366f1' : '1px solid #e2e8f0',
+                              background: isInterstate ? '#eef2ff' : '#ffffff',
+                              color: isInterstate ? '#4338ca' : '#64748b',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
+                            }}
+                            title="State / Interstate Supply: 100% IGST"
+                          >
+                            <span>🌐 State / Inter</span>
+                            <span style={{ fontSize: 9, background: isInterstate ? '#6366f1' : '#e2e8f0', color: isInterstate ? '#fff' : '#475569', padding: '1px 5px', borderRadius: 6 }}>IGST</span>
+                          </button>
+                        </div>
+                        <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>
+                          {!isInterstate ? 'Split into equal CGST + SGST' : 'Applied as full IGST'}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={S.label}>Link PR / Indent</label>
                         <SearchableSelect
                           value={String(form.indent_id || '')}
                           onChange={id => handleSelectIndent(id)}
-                          placeholder="-- Direct PO (No PR Linked) --"
+                          placeholder="-- Direct PO --"
                           searchPlaceholder="Type indent number or department..."
                           allowClear={true}
                           options={[
@@ -2432,12 +2716,8 @@ export default function Purchase() {
                           selectStyle={{ background: form.indent_id ? '#f0fdf4' : undefined, borderColor: form.indent_id ? '#86efac' : undefined }}
                         />
                         {form.indent_id ? (
-                          <div style={{ fontSize: 11, color: '#16a34a', marginTop: 3, fontWeight: 600 }}>
-                            ✓ Items auto-populated from approved PR
-                          </div>
-                        ) : (
-                          <div style={SS.hint}>Optional: Link approved PR to auto-fill line items</div>
-                        )}
+                          <div style={{ fontSize: 11, color: '#16a34a', marginTop: 3, fontWeight: 600 }}>✓ Items loaded from PR</div>
+                        ) : null}
                       </div>
 
                       <div>
@@ -2476,9 +2756,9 @@ export default function Purchase() {
                         />
                       </div>
 
-                      <div>
-                        <label style={S.label}>Remarks / Work Order
-                          <input style={S.input} value={form.remarks} placeholder="Optional notes for this PO…"
+                      <div style={{ gridColumn: 'span 2' }}>
+                        <label style={S.label}>Remarks / Work Order Notes
+                          <input style={S.input} value={form.remarks} placeholder="Optional instructions or work order specifications…"
                             onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} />
                         </label>
                       </div>
@@ -2489,7 +2769,10 @@ export default function Purchase() {
                   {/* ── Line Items Table ── */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                      <span style={SS.sectionLabel}>LINE ITEMS</span>
+                      <div>
+                        <span style={SS.sectionLabel}>LINE ITEMS (UNIT RATE, DISCOUNT %, OTHER CHARGES &amp; GST)</span>
+                        <span style={{ fontSize: 11, color: '#64748b', marginLeft: 10 }}>All rates and taxes live calculated</span>
+                      </div>
                       <button type="button"
                         style={{ background: '#dc2626', color: '#ffffff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
                         onClick={addItem}>＋ Add Item</button>
@@ -2508,16 +2791,22 @@ export default function Purchase() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ width: 20, flexShrink: 0 }} />
                           <div style={{ flex: '1.4 1 260px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Material *</div>
-                          <div style={{ flex: '1 1 160px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Description</div>
+                          <div style={{ flex: '1 1 160px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Description / Specifications</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <div style={{ width: 20, flexShrink: 0 }} />
-                          <div style={{ width: 90, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Qty *</div>
-                          <div style={{ width: 70, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>UOM</div>
-                          <div style={{ width: 100, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Unit Price ₹</div>
-                          <div style={{ width: 140, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GST Slab %</div>
-                          <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Line Total</div>
-                          <div style={{ width: 32, flexShrink: 0 }} />
+                          <div style={{ width: 80, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Qty *</div>
+                          <div style={{ width: 60, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase' }}>UOM</div>
+                          <div style={{ width: 90, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Unit Rate ₹ *</div>
+                          <div style={{ width: 75, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Disc %</div>
+                          <div style={{ width: 90, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Other Chg ₹</div>
+                          <div style={{ width: 95, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Taxable ₹</div>
+                          <div style={{ width: 120, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase' }}>GST Slab %</div>
+                          <div style={{ width: 110, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>
+                            {!isInterstate ? 'CGST+SGST (₹)' : 'IGST (₹)'}
+                          </div>
+                          <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Line Total ₹</div>
+                          <div style={{ width: 28, flexShrink: 0 }} />
                         </div>
                       </div>
 
@@ -2649,18 +2938,18 @@ export default function Purchase() {
                               {/* Description */}
                               <div style={{ flex: '1 1 160px' }}>
                                 <input style={{ ...S.input, fontSize: 12, padding: '6px 8px', width: '100%' }}
-                                  value={it.description || ''} placeholder="Item details…"
+                                  value={it.description || ''} placeholder="Item specifications &amp; notes…"
                                   onChange={e => setItem(i, 'description', e.target.value)} />
                               </div>
                             </div>
 
-                            {/* Line 2: Qty, UOM, Unit Price, GST Slab, Line Total, Remove */}
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                            {/* Line 2: Qty, UOM, Unit Price, Disc%, Other Charges, Taxable, GST Slab, Tax, Line Total, Remove */}
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                               <div style={{ width: 20, flexShrink: 0 }} />
 
                               {/* Qty */}
-                              <div style={{ width: 90, flexShrink: 0 }}>
-                                <input style={{ ...S.input, fontSize: 12, padding: '6px 8px', textAlign: 'right', width: '100%', ...(itErr.qty ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
+                              <div style={{ width: 80, flexShrink: 0 }}>
+                                <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', ...(itErr.qty ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
                                   type="number" step="0.001" min="0.001"
                                   value={it.qty} placeholder="0"
                                   onChange={e => { setItem(i, 'qty', e.target.value); if (formErrors.itemFields) setFormErrors(fe => ({ ...fe, itemFields: fe.itemFields.map((x,j)=>j===i?{...x,qty:undefined}:x) })) }} />
@@ -2668,25 +2957,48 @@ export default function Purchase() {
                               </div>
 
                               {/* UOM */}
-                              <div style={{ width: 70, flexShrink: 0 }}>
-                                <input style={{ ...S.input, fontSize: 12, padding: '6px 8px', width: '100%' }}
-                                  value={it.uom} placeholder="kg/pcs"
+                              <div style={{ width: 60, flexShrink: 0 }}>
+                                <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', width: '100%' }}
+                                  value={it.uom} placeholder="NOS"
                                   onChange={e => setItem(i, 'uom', e.target.value)} />
                               </div>
 
-                              {/* Unit Price */}
-                              <div style={{ width: 100, flexShrink: 0 }}>
-                                <input style={{ ...S.input, fontSize: 12, padding: '6px 8px', textAlign: 'right', width: '100%', ...(itErr.unit_price ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
-                                  type="number" step="0.01" min="0.01"
+                              {/* Unit Rate */}
+                              <div style={{ width: 90, flexShrink: 0 }}>
+                                <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', ...(itErr.unit_price ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
+                                  type="number" step="0.01" min="0"
                                   value={it.unit_price} placeholder="0.00"
                                   onChange={e => { setItem(i, 'unit_price', e.target.value); if (formErrors.itemFields) setFormErrors(fe => ({ ...fe, itemFields: fe.itemFields.map((x,j)=>j===i?{...x,unit_price:undefined}:x) })) }} />
                                 {itErr.unit_price && <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginTop: 2 }}>{itErr.unit_price}</div>}
                               </div>
 
+                              {/* Discount % */}
+                              <div style={{ width: 75, flexShrink: 0 }}>
+                                <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', color: lt.discPct > 0 ? '#b45309' : undefined, fontWeight: lt.discPct > 0 ? 600 : undefined }}
+                                  type="number" step="0.01" min="0" max="100"
+                                  value={it.discount_pct !== undefined ? it.discount_pct : ''} placeholder="0%"
+                                  onChange={e => setItem(i, 'discount_pct', e.target.value)}
+                                  title="Item discount percentage (deducted from gross)" />
+                              </div>
+
+                              {/* Other Charges (Transport / P&F) */}
+                              <div style={{ width: 90, flexShrink: 0 }}>
+                                <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', color: lt.otherCharges > 0 ? '#0369a1' : undefined, fontWeight: lt.otherCharges > 0 ? 600 : undefined }}
+                                  type="number" step="0.01" min="0"
+                                  value={it.other_charges !== undefined ? it.other_charges : ''} placeholder="0.00"
+                                  onChange={e => setItem(i, 'other_charges', e.target.value)}
+                                  title="Other charges: Transport, Packing & Forwarding (P&F)" />
+                              </div>
+
+                              {/* Taxable Base (Readonly) */}
+                              <div style={{ width: 95, flexShrink: 0, textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#334155', paddingTop: 8 }}>
+                                {fmtAmt(lt.taxable)}
+                              </div>
+
                               {/* GST Slab Descriptive Select */}
-                              <div style={{ width: 140, flexShrink: 0 }}>
+                              <div style={{ width: 120, flexShrink: 0 }}>
                                 <select
-                                  style={{ ...S.select, fontSize: 11, padding: '5px 6px', width: '100%', height: 32, background: '#fff' }}
+                                  style={{ ...S.select, fontSize: 11, padding: '5px 4px', width: '100%', height: 32, background: '#fff' }}
                                   value={Number(it.gst_pct ?? 18)}
                                   onChange={e => setItem(i, 'gst_pct', Number(e.target.value))}
                                 >
@@ -2696,13 +3008,21 @@ export default function Purchase() {
                                 </select>
                               </div>
 
+                              {/* Tax Amount Breakdown */}
+                              <div style={{ width: 110, flexShrink: 0, textAlign: 'right', fontSize: 11, color: !isInterstate ? '#059669' : '#6366f1', paddingTop: 6 }}>
+                                <div style={{ fontWeight: 700 }}>{fmtAmt(lt.tax)}</div>
+                                <div style={{ fontSize: 9 }}>
+                                  {!isInterstate ? `(C: ${fmtAmt(lt.cgst)} + S: ${fmtAmt(lt.sgst)})` : `(IGST: ${fmtAmt(lt.igst)})`}
+                                </div>
+                              </div>
+
                               {/* Line Total */}
-                              <div style={{ flex: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: 12, fontWeight: 700, color: lt.total > 0 ? '#16a34a' : '#a0a0a6', paddingTop: 8, paddingRight: 4 }}>
+                              <div style={{ flex: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: 13, fontWeight: 800, color: lt.total > 0 ? '#16a34a' : '#a0a0a6', paddingTop: 8, paddingRight: 4 }}>
                                 {fmtAmt(lt.total)}
                               </div>
 
                               {/* Remove Button */}
-                              <div style={{ width: 32, flexShrink: 0, textAlign: 'center', paddingTop: 4 }}>
+                              <div style={{ width: 28, flexShrink: 0, textAlign: 'center', paddingTop: 4 }}>
                                 <button type="button"
                                   style={{ background: 'none', border: 'none', cursor: form.items.length > 1 ? 'pointer' : 'not-allowed', color: form.items.length > 1 ? '#ef4444' : '#d0d0d8', fontSize: 15, lineHeight: 1 }}
                                   disabled={form.items.length <= 1}
@@ -2722,12 +3042,35 @@ export default function Purchase() {
               {/* ── Sticky Footer: Itemized Tax Summary + Buttons ── */}
               <div style={{ borderTop: '1px solid #e7e6df', padding: '14px 24px', background: '#f6f5f0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                 {/* Itemized Calculation Summary */}
-                <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                   <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontSize: 10, color: '#8a8a90', fontWeight: 700, textTransform: 'uppercase' }}>Taxable Subtotal</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1b1b1d' }}>{fmtAmt(subtotal)}</div>
+                    <div style={{ fontSize: 10, color: '#8a8a90', fontWeight: 700, textTransform: 'uppercase' }}>Gross Base</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1b1b1d' }}>{fmtAmt(totalGross)}</div>
                   </div>
-                  <div style={{ width: 1, height: 28, background: '#e7e6df' }} />
+                  {totalDiscount > 0 && (
+                    <>
+                      <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: 10, color: '#b45309', fontWeight: 700, textTransform: 'uppercase' }}>Discount (-)</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#b45309' }}>-{fmtAmt(totalDiscount)}</div>
+                      </div>
+                    </>
+                  )}
+                  {totalOtherCharges > 0 && (
+                    <>
+                      <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: 10, color: '#0369a1', fontWeight: 700, textTransform: 'uppercase' }}>Other Chg (+)</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0369a1' }}>+{fmtAmt(totalOtherCharges)}</div>
+                      </div>
+                    </>
+                  )}
+                  <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: 10, color: '#0f172a', fontWeight: 700, textTransform: 'uppercase' }}>Taxable Base</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{fmtAmt(subtotal)}</div>
+                  </div>
+                  <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
                   {isInterstate ? (
                     <div style={{ textAlign: 'left' }}>
                       <div style={{ fontSize: 10, color: '#6366f1', fontWeight: 700, textTransform: 'uppercase' }}>IGST (Inter-State)</div>
@@ -2736,24 +3079,24 @@ export default function Purchase() {
                   ) : (
                     <>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 10, color: '#059669', fontWeight: 700, textTransform: 'uppercase' }}>CGST Amount</div>
+                        <div style={{ fontSize: 10, color: '#059669', fontWeight: 700, textTransform: 'uppercase' }}>CGST (50%)</div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: '#059669' }}>{fmtAmt(totalCgst)}</div>
                       </div>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 10, color: '#059669', fontWeight: 700, textTransform: 'uppercase' }}>SGST Amount</div>
+                        <div style={{ fontSize: 10, color: '#059669', fontWeight: 700, textTransform: 'uppercase' }}>SGST (50%)</div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: '#059669' }}>{fmtAmt(totalSgst)}</div>
                       </div>
                     </>
                   )}
-                  <div style={{ width: 1, height: 28, background: '#e7e6df' }} />
+                  <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
                   <div style={{ textAlign: 'left' }}>
                     <div style={{ fontSize: 10, color: '#a0a0a6', fontWeight: 700, textTransform: 'uppercase' }}>Total Tax</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1b1b1d' }}>{fmtAmt(totalTax)}</div>
                   </div>
-                  <div style={{ width: 1, height: 28, background: '#e7e6df' }} />
+                  <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
                   <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontSize: 10, color: '#a0a0a6', fontWeight: 700, textTransform: 'uppercase' }}>Grand Total (₹)</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: '#0f766e' }}>{fmtAmt(grandTotal)}</div>
+                    <div style={{ fontSize: 10, color: '#0f766e', fontWeight: 800, textTransform: 'uppercase' }}>Grand Total (₹)</div>
+                    <div style={{ fontSize: 19, fontWeight: 900, color: '#0f766e' }}>{fmtAmt(grandTotal)}</div>
                   </div>
                 </div>
 
@@ -2870,7 +3213,7 @@ export default function Purchase() {
             <table style={{ ...S.table, marginTop: 14 }}>
               <thead>
                 <tr style={S.thead}>
-                  {['#', 'Material & Specification', 'Qty', 'UOM', 'Unit Price', 'GST%', 'Total'].map(h => (
+                  {['#', 'Material & Specification', 'Qty', 'UOM', 'Unit Rate', 'Disc %', 'Other Chg', 'Taxable', 'GST%', 'Total'].map(h => (
                     <th key={h} style={S.th}>{h}</th>
                   ))}
                 </tr>
@@ -2886,8 +3229,17 @@ export default function Purchase() {
                     <td style={{ ...S.td, textAlign: 'right', fontWeight: 600 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
                     <td style={S.td}>{it.uom || 'NOS'}</td>
                     <td style={{ ...S.td, textAlign: 'right' }}>{fmt(it.unit_price)}</td>
+                    <td style={{ ...S.td, textAlign: 'right', color: it.discount_pct > 0 ? '#b45309' : '#64748b' }}>
+                      {it.discount_pct > 0 ? `${it.discount_pct}%` : '—'}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', color: it.other_charges > 0 ? '#0369a1' : '#64748b' }}>
+                      {it.other_charges > 0 ? fmt(it.other_charges) : '—'}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 600 }}>
+                      {fmt(it.taxable_amount || (it.qty * it.unit_price))}
+                    </td>
                     <td style={{ ...S.td, textAlign: 'center' }}>{it.gst_pct || 18}%</td>
-                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>{fmt(it.total)}</td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>{fmt(it.total || it.total_amount)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2920,18 +3272,39 @@ export default function Purchase() {
       {/* ═══════ REDESIGNED EDIT PO MODAL ═══════ */}
       {editModal && (() => {
         const vObj = vendorObj(editForm.vendor_id)
-        const isInterstate = Boolean((editForm.vendorGstin || vObj?.gstin) && !(editForm.vendorGstin || vObj?.gstin || '').startsWith('29'))
+        const defaultTaxType = (editForm.vendorGstin || vObj?.gstin) && !(editForm.vendorGstin || vObj?.gstin || '').startsWith('29') ? 'inter' : 'intra'
+        const currentTaxType = editForm.tax_type || defaultTaxType
+        const isInterstate = currentTaxType === 'inter' || currentTaxType === 'state' || currentTaxType === 'igst'
+
         const calcLineEdit = it => {
           const q = parseFloat(it.qty) || 0
           const p = parseFloat(it.unit_price) || 0
-          const slab = GST_SLABS.find(s => s.value === Number(it.gst_pct ?? 18)) || GST_SLABS[3]
-          const sub = q * p
-          const gst = sub * (slab.value / 100)
-          return { sub, gst, total: sub + gst, cgst: sub * (slab.cgst / 100), sgst: sub * (slab.sgst / 100), igst: sub * (slab.igst / 100) }
+          const gross = Math.round((q * p + Number.EPSILON) * 100) / 100
+          const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct || 0) || 0))
+          const discAmt = Math.round((gross * (discPct / 100) + Number.EPSILON) * 100) / 100
+          const discBase = Math.max(0, gross - discAmt)
+          const otherCharges = parseFloat(it.other_charges || 0) || 0
+          const taxable = Math.round((discBase + otherCharges + Number.EPSILON) * 100) / 100
+          const g = parseFloat(it.gst_pct !== undefined && it.gst_pct !== '' ? it.gst_pct : 18) || 0
+
+          let cgst = 0, sgst = 0, igst = 0
+          if (isInterstate) {
+            igst = Math.round((taxable * (g / 100) + Number.EPSILON) * 100) / 100
+          } else {
+            cgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+            sgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+          }
+          const tax = cgst + sgst + igst
+          const total = Math.round((taxable + tax + Number.EPSILON) * 100) / 100
+          return { q, p, gross, discPct, discAmt, discBase, otherCharges, taxable, g, cgst, sgst, igst, tax, total }
         }
+
         const lines = editForm.items.map(calcLineEdit)
-        const totSub = lines.reduce((s, l) => s + l.sub, 0)
-        const totGst = lines.reduce((s, l) => s + l.gst, 0)
+        const totGross = lines.reduce((s, l) => s + l.gross, 0)
+        const totDiscount = lines.reduce((s, l) => s + l.discAmt, 0)
+        const totOtherCharges = lines.reduce((s, l) => s + l.otherCharges, 0)
+        const totSub = lines.reduce((s, l) => s + l.taxable, 0)
+        const totGst = lines.reduce((s, l) => s + l.tax, 0)
         const totCgst = lines.reduce((s, l) => s + l.cgst, 0)
         const totSgst = lines.reduce((s, l) => s + l.sgst, 0)
         const totIgst = lines.reduce((s, l) => s + l.igst, 0)
@@ -2942,13 +3315,13 @@ export default function Purchase() {
 
         return (
           <div style={S.overlay} onClick={() => setEditModal(null)}>
-            <div style={{ ...S.modal, maxWidth: 1020, padding: 24 }} onClick={e => e.stopPropagation()}>
+            <div style={{ ...S.modal, maxWidth: 1220, padding: 24 }} onClick={e => e.stopPropagation()}>
               
-              {/* Modal Header with Agent Status */}
+              {/* Modal Header with Tax Type Selector */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, borderBottom: '1px solid #e7e6df', paddingBottom: 12 }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1b1b1d' }}>
+                    <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1b1b1d' }}>
                       ✏️ Edit Purchase Order — {editForm.po_number || editModal.po_number || editModal.id}
                     </h2>
                     <span style={{ ...S.badge, background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }}>
@@ -2962,11 +3335,31 @@ export default function Purchase() {
                   </div>
                 </div>
 
-                {/* Agent Status Pill */}
+                {/* Tax Mode Segmented Selector */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600, color: '#166534', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-                    🤖 Procurement Agent: Live Editing
+                  <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 3, borderRadius: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => setEditForm(f => ({ ...f, tax_type: 'intra' }))}
+                      style={{
+                        padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+                        background: !isInterstate ? '#059669' : 'transparent',
+                        color: !isInterstate ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      📍 In-State (CGST+SGST)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditForm(f => ({ ...f, tax_type: 'inter' }))}
+                      style={{
+                        padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+                        background: isInterstate ? '#6366f1' : 'transparent',
+                        color: isInterstate ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      🌐 State / Inter (IGST)
+                    </button>
                   </div>
                   <button style={S.close} onClick={() => setEditModal(null)}>✕</button>
                 </div>
@@ -2999,7 +3392,7 @@ export default function Purchase() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={SS.sectionLabel}>ENCLOSED LINE ITEMS ({editForm.items.length})</span>
-                      <span style={{ fontSize: 11, color: '#64748b' }}>Search catalog materials, adjust quantities and unit rates</span>
+                      <span style={{ fontSize: 11, color: '#64748b' }}>Unit rate, discount %, other charges, and GST live calculated</span>
                     </div>
                     <button type="button"
                       style={{ background: '#0284c7', color: '#ffffff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
@@ -3024,16 +3417,22 @@ export default function Purchase() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 22, flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#8a8a90' }}>#</div>
                         <div style={{ flex: '1.4 1 260px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Material *</div>
-                        <div style={{ flex: '1 1 160px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Description</div>
+                        <div style={{ flex: '1 1 160px', fontSize: 11, fontWeight: 700, color: '#8a8a90', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Description / Specifications</div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <div style={{ width: 22, flexShrink: 0 }} />
-                        <div style={{ width: 100, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Qty *</div>
-                        <div style={{ width: 70, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>UOM</div>
-                        <div style={{ width: 110, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Unit Price ₹</div>
-                        <div style={{ width: 150, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GST Slab %</div>
-                        <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Line Total</div>
-                        <div style={{ width: 32, flexShrink: 0 }} />
+                        <div style={{ width: 80, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Qty *</div>
+                        <div style={{ width: 60, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase' }}>UOM</div>
+                        <div style={{ width: 90, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Unit Rate ₹ *</div>
+                        <div style={{ width: 75, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Disc %</div>
+                        <div style={{ width: 90, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Other Chg ₹</div>
+                        <div style={{ width: 95, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Taxable ₹</div>
+                        <div style={{ width: 120, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase' }}>GST Slab %</div>
+                        <div style={{ width: 110, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>
+                          {!isInterstate ? 'CGST+SGST (₹)' : 'IGST (₹)'}
+                        </div>
+                        <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: '#a0a0a6', textTransform: 'uppercase', textAlign: 'right' }}>Line Total ₹</div>
+                        <div style={{ width: 28, flexShrink: 0 }} />
                       </div>
                     </div>
 
@@ -3174,14 +3573,14 @@ export default function Purchase() {
                             />
                           </div>
 
-                          {/* Bottom Row: Qty + UOM + Unit Price + GST + Line Total + Delete */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {/* Bottom Row: Qty + UOM + Unit Price + Disc% + Other Charges + Taxable + GST + Tax + Line Total + Delete */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <div style={{ width: 22, flexShrink: 0 }} />
 
                             {/* Qty Input */}
-                            <div style={{ width: 100 }}>
+                            <div style={{ width: 80 }}>
                               <input
-                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 8px', borderColor: itErr.qty ? '#ef4444' : '#e7e6df' }}
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 6px', borderColor: itErr.qty ? '#ef4444' : '#e7e6df' }}
                                 type="number"
                                 step="0.001"
                                 min="0.001"
@@ -3192,7 +3591,7 @@ export default function Purchase() {
                             </div>
 
                             {/* UOM */}
-                            <div style={{ width: 70 }}>
+                            <div style={{ width: 60 }}>
                               <input
                                 style={{ ...S.input, width: '100%', fontSize: 11, padding: '6px 6px', background: '#f8fafc', color: '#475569', fontWeight: 600 }}
                                 placeholder="UOM"
@@ -3202,9 +3601,9 @@ export default function Purchase() {
                             </div>
 
                             {/* Unit Price */}
-                            <div style={{ width: 110 }}>
+                            <div style={{ width: 90 }}>
                               <input
-                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 8px', borderColor: itErr.unit_price ? '#ef4444' : '#e7e6df' }}
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 6px', borderColor: itErr.unit_price ? '#ef4444' : '#e7e6df' }}
                                 type="number"
                                 step="0.01"
                                 min="0"
@@ -3214,10 +3613,44 @@ export default function Purchase() {
                               />
                             </div>
 
+                            {/* Discount % */}
+                            <div style={{ width: 75 }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 6px', color: lt.discPct > 0 ? '#b45309' : undefined, fontWeight: lt.discPct > 0 ? 600 : undefined }}
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max="100"
+                                placeholder="0%"
+                                value={it.discount_pct !== undefined ? it.discount_pct : ''}
+                                onChange={e => setEditItem(i, 'discount_pct', e.target.value)}
+                                title="Discount % deducted from gross"
+                              />
+                            </div>
+
+                            {/* Other Charges */}
+                            <div style={{ width: 90 }}>
+                              <input
+                                style={{ ...S.input, width: '100%', textAlign: 'right', fontSize: 12, padding: '6px 6px', color: lt.otherCharges > 0 ? '#0369a1' : undefined, fontWeight: lt.otherCharges > 0 ? 600 : undefined }}
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={it.other_charges !== undefined ? it.other_charges : ''}
+                                onChange={e => setEditItem(i, 'other_charges', e.target.value)}
+                                title="Other charges: Transport / P&F"
+                              />
+                            </div>
+
+                            {/* Taxable Base */}
+                            <div style={{ width: 95, textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#334155', paddingTop: 6 }}>
+                              {fmt(lt.taxable)}
+                            </div>
+
                             {/* GST Slab */}
-                            <div style={{ width: 150 }}>
+                            <div style={{ width: 120 }}>
                               <select
-                                style={{ ...S.select, width: '100%', fontSize: 11, padding: '6px 6px' }}
+                                style={{ ...S.select, width: '100%', fontSize: 11, padding: '5px 4px' }}
                                 value={Number(it.gst_pct ?? 18)}
                                 onChange={e => setEditItem(i, 'gst_pct', Number(e.target.value))}
                               >
@@ -3225,13 +3658,21 @@ export default function Purchase() {
                               </select>
                             </div>
 
+                            {/* Tax Amount */}
+                            <div style={{ width: 110, textAlign: 'right', fontSize: 11, color: !isInterstate ? '#059669' : '#6366f1', paddingTop: 4 }}>
+                              <div style={{ fontWeight: 700 }}>{fmt(lt.tax)}</div>
+                              <div style={{ fontSize: 9 }}>
+                                {!isInterstate ? `(C: ${fmt(lt.cgst)} + S: ${fmt(lt.sgst)})` : `(IGST: ${fmt(lt.igst)})`}
+                              </div>
+                            </div>
+
                             {/* Line Total */}
-                            <div style={{ flex: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 700, fontSize: 12, color: '#0f766e' }}>
+                            <div style={{ flex: 1, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 800, fontSize: 13, color: '#0f766e', paddingTop: 6 }}>
                               {fmt(lt.total)}
                             </div>
 
                             {/* Delete button */}
-                            <div style={{ width: 32, flexShrink: 0, textAlign: 'center' }}>
+                            <div style={{ width: 28, flexShrink: 0, textAlign: 'center', paddingTop: 4 }}>
                               <button
                                 type="button"
                                 style={{ ...S.btnIcon, color: '#ef4444', fontSize: 14, cursor: 'pointer' }}
@@ -3249,32 +3690,48 @@ export default function Purchase() {
 
                 {/* ── Financial Summary Box ── */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-                  <div style={{ ...SS.summaryBox, minWidth: 320, background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: 14 }}>
+                  <div style={{ ...SS.summaryBox, minWidth: 360, background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: 14 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       <div style={SS.summaryRow}>
-                        <span style={{ fontSize: 12, color: '#64748b' }}>Taxable Subtotal:</span>
-                        <span style={SS.summaryVal}>{fmt(totSub)}</span>
+                        <span style={{ fontSize: 12, color: '#64748b' }}>Gross Base Amount:</span>
+                        <span style={SS.summaryVal}>{fmt(totGross)}</span>
+                      </div>
+                      {totDiscount > 0 && (
+                        <div style={{ ...SS.summaryRow, color: '#b45309' }}>
+                          <span style={{ fontSize: 12 }}>Total Discount (-):</span>
+                          <span style={{ ...SS.summaryVal, color: '#b45309' }}>-{fmt(totDiscount)}</span>
+                        </div>
+                      )}
+                      {totOtherCharges > 0 && (
+                        <div style={{ ...SS.summaryRow, color: '#0369a1' }}>
+                          <span style={{ fontSize: 12 }}>Other Charges (Transport / P&amp;F) (+):</span>
+                          <span style={{ ...SS.summaryVal, color: '#0369a1' }}>+{fmt(totOtherCharges)}</span>
+                        </div>
+                      )}
+                      <div style={{ ...SS.summaryRow, borderTop: '1px solid #e2e8f0', paddingTop: 4 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>Taxable Subtotal:</span>
+                        <span style={{ ...SS.summaryVal, fontWeight: 700 }}>{fmt(totSub)}</span>
                       </div>
                       {!isInterstate ? (
                         <>
                           <div style={SS.summaryRow}>
-                            <span style={{ fontSize: 11, color: '#64748b' }}>CGST:</span>
-                            <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totCgst)}</span>
+                            <span style={{ fontSize: 11, color: '#059669' }}>CGST (50%):</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12, color: '#059669' }}>{fmt(totCgst)}</span>
                           </div>
                           <div style={SS.summaryRow}>
-                            <span style={{ fontSize: 11, color: '#64748b' }}>SGST:</span>
-                            <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totSgst)}</span>
+                            <span style={{ fontSize: 11, color: '#059669' }}>SGST (50%):</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12, color: '#059669' }}>{fmt(totSgst)}</span>
                           </div>
                         </>
                       ) : (
                         <div style={SS.summaryRow}>
-                          <span style={{ fontSize: 11, color: '#64748b' }}>IGST (Interstate):</span>
-                          <span style={{ ...SS.summaryVal, fontSize: 12 }}>{fmt(totIgst)}</span>
+                          <span style={{ fontSize: 11, color: '#6366f1' }}>IGST (Interstate):</span>
+                          <span style={{ ...SS.summaryVal, fontSize: 12, color: '#6366f1' }}>{fmt(totIgst)}</span>
                         </div>
                       )}
                       <div style={{ ...SS.summaryRow, borderTop: '1px solid #cbd5e1', paddingTop: 8, marginTop: 4 }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: '#1b1b1d' }}>Grand Total (INR):</span>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: '#0369a1' }}>{fmt(totGrand)}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#0f766e' }}>Grand Total (INR):</span>
+                        <span style={{ fontSize: 18, fontWeight: 900, color: '#0f766e' }}>{fmt(totGrand)}</span>
                       </div>
                     </div>
                   </div>
@@ -3294,49 +3751,281 @@ export default function Purchase() {
       })()}
 
       {/* GRN RECEIVE MODAL */}
-      {grnModal&&(
-        <div style={S.overlay} onClick={()=>setGrnModal(null)}>
-          <div style={{...S.modal,maxWidth:800}} onClick={e=>e.stopPropagation()}>
+      {grnModal && (
+        <div style={S.overlay} onClick={() => setGrnModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 960 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div style={S.modalTitle}>Receive GRN — {grnModal.po_number}</div>
-              <button style={S.close} onClick={()=>setGrnModal(null)}>✕</button>
+              <div>
+                <div style={S.modalTitle}>📦 Receive Inward GRN — {grnModal.po_number}</div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>Vendor: <strong>{grnModal.vendorName}</strong></div>
+              </div>
+              <button style={S.close} onClick={() => setGrnModal(null)}>✕</button>
             </div>
             <form onSubmit={saveGRN} style={S.form}>
               <div style={S.grid2}>
-                <label style={S.label}>Challan No<input style={S.input} value={grnForm.challan_number} onChange={e=>setGrnForm(f=>({...f,challan_number:e.target.value}))} placeholder="DC/Challan number" /></label>
-                <label style={S.label}>Invoice No<input style={S.input} value={grnForm.invoice_number} onChange={e=>setGrnForm(f=>({...f,invoice_number:e.target.value}))} placeholder="Vendor invoice no" /></label>
-                <label style={S.label}>Vehicle No<input style={S.input} value={grnForm.vehicle_number} onChange={e=>setGrnForm(f=>({...f,vehicle_number:e.target.value}))} placeholder="e.g. MH12AB1234" /></label>
-                <label style={S.label}>Remarks<input style={S.input} value={grnForm.remarks} onChange={e=>setGrnForm(f=>({...f,remarks:e.target.value}))} /></label>
+                <label style={S.label}>Challan No<input style={S.input} value={grnForm.challan_number} onChange={e => setGrnForm(f => ({ ...f, challan_number: e.target.value }))} placeholder="DC/Challan number" /></label>
+                <label style={S.label}>Invoice No<input style={S.input} value={grnForm.invoice_number} onChange={e => setGrnForm(f => ({ ...f, invoice_number: e.target.value }))} placeholder="Vendor invoice no" /></label>
+                <label style={S.label}>Vehicle No<input style={S.input} value={grnForm.vehicle_number} onChange={e => setGrnForm(f => ({ ...f, vehicle_number: e.target.value }))} placeholder="e.g. MH12AB1234" /></label>
+                <label style={S.label}>Remarks<input style={S.input} value={grnForm.remarks} onChange={e => setGrnForm(f => ({ ...f, remarks: e.target.value }))} /></label>
               </div>
-              <div style={{fontWeight:600,color:'#a0a0a6',fontSize:11,marginTop:8,textTransform:'uppercase'}}>Items — Enter received quantities</div>
-              <div style={{overflowX:'auto'}}>
-                <table style={S.table}><thead><tr style={S.thead}>
-                  {['Material','PO Qty','Received','Accepted','Rejected','Batch/Lot'].map(h=><th key={h} style={S.th}>{h}</th>)}
-                </tr></thead><tbody>
-                  {grnForm.items.map((it,i)=>(
-                    <tr key={i} style={S.tr}>
-                      <td style={S.td}><span style={{fontSize:12}}>{it.material_name}</span><br/><span style={{...S.muted,fontSize:10}}>{it.uom}</span></td>
-                      <td style={S.td}><span style={S.muted}>{it.po_qty}</span></td>
-                      <td style={S.td}><input style={{...S.input,width:70,padding:'4px 6px'}} type="number" step="0.001" min="0.001" value={it.received_qty} onChange={e=>{const v=e.target.value;setGrnItem(i,'received_qty',v);setGrnItem(i,'accepted_qty',v)}} /></td>
-                      <td style={S.td}>
-                        <input style={{...S.input,width:70,padding:'4px 6px',...((parseFloat(it.accepted_qty)||0)>(parseFloat(it.received_qty)||0)?{border:'1px solid #ef4444',background:'#ef444411'}:{})}} type="number" step="0.001" min="0" value={it.accepted_qty} onChange={e=>setGrnItem(i,'accepted_qty',e.target.value)} />
-                        {(parseFloat(it.accepted_qty)||0)>(parseFloat(it.received_qty)||0) && <div style={{fontSize:9,color:'#ef4444',fontWeight:600,marginTop:2}}>Exceeds received</div>}
-                      </td>
-                      <td style={S.td}><input style={{...S.input,width:70,padding:'4px 6px'}} type="number" step="0.001" value={it.rejected_qty} onChange={e=>setGrnItem(i,'rejected_qty',e.target.value)} /></td>
-                      <td style={S.td}><input style={{...S.input,width:100,padding:'4px 6px'}} value={it.batch_number} onChange={e=>setGrnItem(i,'batch_number',e.target.value)} placeholder="Batch/Lot" /></td>
+              <div style={{ fontWeight: 700, color: '#0f766e', fontSize: 12, marginTop: 8, textTransform: 'uppercase' }}>
+                Items — Enter received quantities, discounts &amp; other charges
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={S.table}>
+                  <thead>
+                    <tr style={S.thead}>
+                      {['Material', 'PO Qty', 'Received', 'Accepted', 'Rejected', 'Unit Rate ₹', 'Disc %', 'Other Chg ₹', 'Batch/Lot'].map(h => <th key={h} style={S.th}>{h}</th>)}
                     </tr>
-                  ))}
-                </tbody></table>
+                  </thead>
+                  <tbody>
+                    {grnForm.items.map((it, i) => (
+                      <tr key={i} style={S.tr}>
+                        <td style={S.td}>
+                          <div style={{ fontWeight: 600, fontSize: 12 }}>{it.material_name}</div>
+                          <span style={{ ...S.muted, fontSize: 10 }}>{it.uom}</span>
+                        </td>
+                        <td style={S.td}><span style={S.muted}>{it.po_qty}</span></td>
+                        <td style={S.td}><input style={{ ...S.input, width: 65, padding: '4px 6px', textAlign: 'right' }} type="number" step="0.001" min="0.001" value={it.received_qty} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, received_qty: v, accepted_qty: v } : x) })) }} /></td>
+                        <td style={S.td}>
+                          <input style={{ ...S.input, width: 65, padding: '4px 6px', textAlign: 'right', ...((parseFloat(it.accepted_qty) || 0) > (parseFloat(it.received_qty) || 0) ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }} type="number" step="0.001" min="0" value={it.accepted_qty} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, accepted_qty: v } : x) })) }} />
+                          {(parseFloat(it.accepted_qty) || 0) > (parseFloat(it.received_qty) || 0) && <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginTop: 2 }}>Exceeds received</div>}
+                        </td>
+                        <td style={S.td}><input style={{ ...S.input, width: 60, padding: '4px 6px', textAlign: 'right' }} type="number" step="0.001" value={it.rejected_qty} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, rejected_qty: v } : x) })) }} /></td>
+                        <td style={S.td}><input style={{ ...S.input, width: 75, padding: '4px 6px', textAlign: 'right' }} type="number" step="0.01" value={it.unit_price} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, unit_price: v } : x) })) }} /></td>
+                        <td style={S.td}><input style={{ ...S.input, width: 60, padding: '4px 6px', textAlign: 'right' }} type="number" step="0.01" min="0" max="100" placeholder="0%" value={it.discount_pct !== undefined ? it.discount_pct : ''} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, discount_pct: v } : x) })) }} /></td>
+                        <td style={S.td}><input style={{ ...S.input, width: 75, padding: '4px 6px', textAlign: 'right' }} type="number" step="0.01" min="0" placeholder="0.00" value={it.other_charges !== undefined ? it.other_charges : ''} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, other_charges: v } : x) })) }} /></td>
+                        <td style={S.td}><input style={{ ...S.input, width: 90, padding: '4px 6px' }} value={it.batch_number} onChange={e => { const v = e.target.value; setGrnForm(f => ({ ...f, items: f.items.map((x, j) => j === i ? { ...x, batch_number: v } : x) })) }} placeholder="Batch/Lot" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              {grnErr&&<div style={S.error}>{grnErr}</div>}
+              {grnErr && <div style={S.error}>{grnErr}</div>}
               <div style={S.modalFooter}>
-                <button type="button" style={S.btnSecondary} onClick={()=>setGrnModal(null)}>Cancel</button>
-                <button type="submit" style={S.btnPrimary} disabled={grnSaving}>{grnSaving?'Saving GRN…':'✓ Save GRN & Print Receipt'}</button>
+                <button type="button" style={S.btnSecondary} onClick={() => setGrnModal(null)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={grnSaving}>{grnSaving ? 'Saving GRN…' : '✓ Save GRN & Print Receipt'}</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* ═══════ DEDICATED EDIT GRN MODAL ═══════ */}
+      {editGrnModal && (() => {
+        const isInterstate = editGrnForm.tax_type === 'inter' || editGrnForm.tax_type === 'state' || editGrnForm.tax_type === 'igst'
+        
+        const calcGrnLine = it => {
+          const accQty = parseFloat(it.accepted_qty) || 0
+          const uPrice = parseFloat(it.unit_price) || 0
+          const gross = Math.round((accQty * uPrice + Number.EPSILON) * 100) / 100
+          const discPct = Math.max(0, Math.min(100, parseFloat(it.discount_pct || 0) || 0))
+          const discAmt = Math.round((gross * (discPct / 100) + Number.EPSILON) * 100) / 100
+          const discBase = Math.max(0, gross - discAmt)
+          const otherCharges = parseFloat(it.other_charges || 0) || 0
+          const taxable = Math.round((discBase + otherCharges + Number.EPSILON) * 100) / 100
+          const g = parseFloat(it.gst_pct !== undefined ? it.gst_pct : 18) || 0
+
+          let cgst = 0, sgst = 0, igst = 0
+          if (isInterstate) {
+            igst = Math.round((taxable * (g / 100) + Number.EPSILON) * 100) / 100
+          } else {
+            cgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+            sgst = Math.round((taxable * (g / 200) + Number.EPSILON) * 100) / 100
+          }
+          const tax = cgst + sgst + igst
+          const total = Math.round((taxable + tax + Number.EPSILON) * 100) / 100
+          return { gross, discAmt, otherCharges, taxable, cgst, sgst, igst, tax, total }
+        }
+
+        const grnLines = editGrnForm.items.map(calcGrnLine)
+        const totGross = grnLines.reduce((s, l) => s + l.gross, 0)
+        const totDisc = grnLines.reduce((s, l) => s + l.discAmt, 0)
+        const totOther = grnLines.reduce((s, l) => s + l.otherCharges, 0)
+        const totTaxable = grnLines.reduce((s, l) => s + l.taxable, 0)
+        const totCgst = grnLines.reduce((s, l) => s + l.cgst, 0)
+        const totSgst = grnLines.reduce((s, l) => s + l.sgst, 0)
+        const totIgst = grnLines.reduce((s, l) => s + l.igst, 0)
+        const totTax = grnLines.reduce((s, l) => s + l.tax, 0)
+        const grandTotal = totTaxable + totTax
+
+        return (
+          <div style={S.overlay} onClick={() => setEditGrnModal(null)}>
+            <div style={{ ...S.modal, maxWidth: 1200, maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+              <div style={S.modalHeader}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: '#0f766e' }}>
+                      ✏️ Edit Goods Receipt Note (GRN) — {editGrnModal.grnNumber || editGrnModal.grn_number}
+                    </div>
+                    <span style={{ ...S.badge, background: '#dcfce7', color: '#15803d' }}>
+                      {editGrnModal.status || 'Received'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                    PO: <strong>{editGrnModal.poNumber || editGrnModal.po_number || 'Direct'}</strong> · Vendor: <strong>{editGrnModal.vendorName}</strong> {editGrnModal.vendorGstin ? `(GSTIN: ${editGrnModal.vendorGstin})` : ''}
+                  </div>
+                </div>
+
+                {/* Tax Type Mode Selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 3, borderRadius: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => setEditGrnForm(f => ({ ...f, tax_type: 'intra' }))}
+                      style={{
+                        padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+                        background: !isInterstate ? '#059669' : 'transparent',
+                        color: !isInterstate ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      📍 In-State (CGST+SGST)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditGrnForm(f => ({ ...f, tax_type: 'inter' }))}
+                      style={{
+                        padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+                        background: isInterstate ? '#6366f1' : 'transparent',
+                        color: isInterstate ? '#ffffff' : '#475569'
+                      }}
+                    >
+                      🌐 State / Inter (IGST)
+                    </button>
+                  </div>
+                  <button style={S.close} onClick={() => setEditGrnModal(null)}>✕</button>
+                </div>
+              </div>
+
+              <form onSubmit={saveEditGrn} style={S.form}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, background: '#f8fafc', padding: 14, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <label style={S.label}>Delivery Challan #<input style={S.input} value={editGrnForm.challan_number} onChange={e => setEditGrnForm(f => ({ ...f, challan_number: e.target.value }))} /></label>
+                  <label style={S.label}>Vendor Invoice #<input style={S.input} value={editGrnForm.invoice_number} onChange={e => setEditGrnForm(f => ({ ...f, invoice_number: e.target.value }))} /></label>
+                  <label style={S.label}>Vehicle #<input style={S.input} value={editGrnForm.vehicle_number} onChange={e => setEditGrnForm(f => ({ ...f, vehicle_number: e.target.value }))} /></label>
+                  <label style={S.label}>Inward Date<input style={S.input} type="date" value={editGrnForm.date} onChange={e => setEditGrnForm(f => ({ ...f, date: e.target.value }))} /></label>
+                  <label style={{ ...S.label, gridColumn: '1 / -1' }}>Remarks / Quality Inspection Notes<input style={S.input} value={editGrnForm.remarks} onChange={e => setEditGrnForm(f => ({ ...f, remarks: e.target.value }))} /></label>
+                </div>
+
+                <div style={{ fontWeight: 700, color: '#0f766e', fontSize: 12, marginTop: 4, textTransform: 'uppercase' }}>
+                  GRN Line Items — Edit Quantities, Unit Rates, Discount %, and Other Charges
+                </div>
+
+                <div style={{ overflowX: 'auto', border: '1px solid #e7e6df', borderRadius: 8 }}>
+                  <table style={S.table}>
+                    <thead>
+                      <tr style={S.thead}>
+                        {['Material', 'Accepted Qty', 'UOM', 'Unit Rate (₹)', 'Disc %', 'Other Chg (₹)', 'Taxable Base (₹)', 'GST Slab', 'Tax Amount (₹)', 'Line Total (₹)', 'Bin / Batch'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {editGrnForm.items.map((it, i) => {
+                        const line = grnLines[i] || calcGrnLine(it)
+                        return (
+                          <tr key={i} style={S.tr}>
+                            <td style={S.td}>
+                              <div style={{ fontWeight: 700, fontSize: 12 }}>{it.materialName}</div>
+                              <div style={{ fontSize: 10, color: '#64748b' }}>{it.materialCode}</div>
+                            </td>
+                            <td style={S.td}>
+                              <input style={{ ...S.input, width: 75, textAlign: 'right', padding: '5px 6px' }} type="number" step="0.001" min="0" value={it.accepted_qty} onChange={e => setEditGrnItem(i, 'accepted_qty', e.target.value)} />
+                            </td>
+                            <td style={S.td}><span style={{ fontSize: 11, color: '#475569' }}>{it.uom}</span></td>
+                            <td style={S.td}>
+                              <input style={{ ...S.input, width: 85, textAlign: 'right', padding: '5px 6px' }} type="number" step="0.01" min="0" value={it.unit_price} onChange={e => setEditGrnItem(i, 'unit_price', e.target.value)} />
+                            </td>
+                            <td style={S.td}>
+                              <input style={{ ...S.input, width: 65, textAlign: 'right', padding: '5px 6px', color: it.discount_pct > 0 ? '#b45309' : undefined, fontWeight: it.discount_pct > 0 ? 700 : undefined }} type="number" step="0.01" min="0" max="100" placeholder="0%" value={it.discount_pct !== undefined ? it.discount_pct : ''} onChange={e => setEditGrnItem(i, 'discount_pct', e.target.value)} />
+                            </td>
+                            <td style={S.td}>
+                              <input style={{ ...S.input, width: 80, textAlign: 'right', padding: '5px 6px', color: it.other_charges > 0 ? '#0369a1' : undefined, fontWeight: it.other_charges > 0 ? 700 : undefined }} type="number" step="0.01" min="0" placeholder="0.00" value={it.other_charges !== undefined ? it.other_charges : ''} onChange={e => setEditGrnItem(i, 'other_charges', e.target.value)} />
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#334155' }}>
+                              {fmt(line.taxable)}
+                            </td>
+                            <td style={S.td}>
+                              <select style={{ ...S.select, fontSize: 11, padding: '4px 6px' }} value={Number(it.gst_pct ?? 18)} onChange={e => setEditGrnItem(i, 'gst_pct', Number(e.target.value))}>
+                                {GST_SLABS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                              </select>
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right', fontSize: 11, color: !isInterstate ? '#059669' : '#6366f1' }}>
+                              <div style={{ fontWeight: 700 }}>{fmt(line.tax)}</div>
+                              <div style={{ fontSize: 9 }}>{!isInterstate ? `(C: ${fmt(line.cgst)} + S: ${fmt(line.sgst)})` : `(IGST: ${fmt(line.igst)})`}</div>
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right', fontWeight: 800, color: '#0f766e' }}>
+                              {fmt(line.total)}
+                            </td>
+                            <td style={S.td}>
+                              <input style={{ ...S.input, width: 80, fontSize: 11, padding: '4px 6px' }} placeholder="Batch" value={it.batch_number || ''} onChange={e => setEditGrnItem(i, 'batch_number', e.target.value)} />
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Live Financial Summary */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                  <div style={{ minWidth: 360, background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: 14 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={SS.summaryRow}>
+                        <span style={{ fontSize: 12, color: '#64748b' }}>Gross Inward Value:</span>
+                        <span style={SS.summaryVal}>{fmt(totGross)}</span>
+                      </div>
+                      {totDisc > 0 && (
+                        <div style={{ ...SS.summaryRow, color: '#b45309' }}>
+                          <span style={{ fontSize: 12 }}>Total Discount (-):</span>
+                          <span style={{ ...SS.summaryVal, color: '#b45309' }}>-{fmt(totDisc)}</span>
+                        </div>
+                      )}
+                      {totOther > 0 && (
+                        <div style={{ ...SS.summaryRow, color: '#0369a1' }}>
+                          <span style={{ fontSize: 12 }}>Other Charges (Transport / P&amp;F) (+):</span>
+                          <span style={{ ...SS.summaryVal, color: '#0369a1' }}>+{fmt(totOther)}</span>
+                        </div>
+                      )}
+                      <div style={{ ...SS.summaryRow, borderTop: '1px solid #e2e8f0', paddingTop: 4 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>Taxable Base:</span>
+                        <span style={{ ...SS.summaryVal, fontWeight: 700 }}>{fmt(totTaxable)}</span>
+                      </div>
+                      {!isInterstate ? (
+                        <>
+                          <div style={SS.summaryRow}>
+                            <span style={{ fontSize: 11, color: '#059669' }}>CGST Total (50%):</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12, color: '#059669' }}>{fmt(totCgst)}</span>
+                          </div>
+                          <div style={SS.summaryRow}>
+                            <span style={{ fontSize: 11, color: '#059669' }}>SGST Total (50%):</span>
+                            <span style={{ ...SS.summaryVal, fontSize: 12, color: '#059669' }}>{fmt(totSgst)}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={SS.summaryRow}>
+                          <span style={{ fontSize: 11, color: '#6366f1' }}>IGST Total (Interstate):</span>
+                          <span style={{ ...SS.summaryVal, fontSize: 12, color: '#6366f1' }}>{fmt(totIgst)}</span>
+                        </div>
+                      )}
+                      <div style={{ ...SS.summaryRow, borderTop: '1px solid #cbd5e1', paddingTop: 8, marginTop: 4 }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#0f766e' }}>Grand Total Valuation:</span>
+                        <span style={{ fontSize: 18, fontWeight: 900, color: '#0f766e' }}>{fmt(grandTotal)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {editGrnErr && <div style={S.error}>{editGrnErr}</div>}
+
+                <div style={S.modalFooter}>
+                  <button type="button" style={S.btnSecondary} onClick={() => setEditGrnModal(null)}>Cancel</button>
+                  <button type="submit" style={{ ...S.btnPrimary, background: '#0f766e' }} disabled={editGrnSaving}>
+                    {editGrnSaving ? 'Updating GRN & Stock Ledger…' : '✓ Save GRN & Sync Ledger'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* ═══════ BOOK VENDOR BILL MODAL ═══════ */}
       {billModal && (

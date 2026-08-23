@@ -1517,10 +1517,42 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
 
       // If GRN was created, attach grn_items under the single GRN
       if (createdGrnId) {
+        const discPct = it.discount_pct !== undefined ? Math.max(0, Math.min(100, parseFloat(it.discount_pct))) : 0;
+        const otherChg = it.other_charges !== undefined ? parseFloat(it.other_charges) : 0;
+        const gstPct = it.gst_pct !== undefined ? parseFloat(it.gst_pct) : 18;
+        const itemTaxType = (it.tax_type || req.body.tax_type || 'intra').toLowerCase();
+
+        const gross = qty * price;
+        const discAmt = gross * (discPct / 100);
+        const discBase = Math.max(0, gross - discAmt);
+        const taxableVal = Math.max(0, discBase + otherChg);
+
+        let cgstPct = 0, sgstPct = 0, igstPct = 0;
+        let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+
+        if (itemTaxType === 'inter' || itemTaxType === 'state' || itemTaxType === 'igst') {
+          igstPct = gstPct;
+          igstAmt = taxableVal * (igstPct / 100);
+        } else {
+          cgstPct = gstPct / 2;
+          sgstPct = gstPct / 2;
+          cgstAmt = taxableVal * (cgstPct / 100);
+          sgstAmt = taxableVal * (sgstPct / 100);
+        }
+        const lineTot = taxableVal + (cgstAmt + sgstAmt + igstAmt);
+
         await client.query(
-          `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, bin_location, batch_number, remarks)
-           VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, $10)`,
-          [createdGrnId, mat.id, qty, qty, qty, mat.uom || 'Nos', price, finalBin || null, itemBatch || null, itemRemarks || null]
+          `INSERT INTO grn_items (
+             grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price,
+             discount_pct, discount_amount, other_charges, taxable_amount, gst_pct, tax_type,
+             cgst_pct, sgst_pct, igst_pct, cgst_amount, sgst_amount, igst_amount, total_amount,
+             bin_location, batch_number, remarks
+           )
+           VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`,
+          [createdGrnId, mat.id, qty, qty, qty, mat.uom || 'Nos', price,
+           discPct, discAmt, otherChg, taxableVal, gstPct, itemTaxType,
+           cgstPct, sgstPct, igstPct, cgstAmt, sgstAmt, igstAmt, lineTot,
+           finalBin || null, itemBatch || null, itemRemarks || null]
         );
       }
 
@@ -1588,6 +1620,22 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
 
       publish(TOPICS.EVENTS_ALL, `inward-${ledger.id}`, { event: 'store.inward.created', id: ledger.id, materialId: mat.id, qty, newStock, userId: req.user.id });
       results.push({ ...ledger, grnNumber: grnNum, grnId: createdGrnId });
+    }
+
+    if (createdGrnId) {
+      await client.query(
+        `UPDATE grn
+         SET total_value = (SELECT COALESCE(SUM(taxable_amount), 0) FROM grn_items WHERE grn_id = $1),
+             discount_value = (SELECT COALESCE(SUM(discount_amount), 0) FROM grn_items WHERE grn_id = $1),
+             other_charges = (SELECT COALESCE(SUM(other_charges), 0) FROM grn_items WHERE grn_id = $1),
+             cgst_value = (SELECT COALESCE(SUM(cgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+             sgst_value = (SELECT COALESCE(SUM(sgst_amount), 0) FROM grn_items WHERE grn_id = $1),
+             igst_value = (SELECT COALESCE(SUM(igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+             gst_value = (SELECT COALESCE(SUM(cgst_amount + sgst_amount + igst_amount), 0) FROM grn_items WHERE grn_id = $1),
+             grand_total = (SELECT COALESCE(SUM(total_amount), 0) FROM grn_items WHERE grn_id = $1)
+         WHERE id = $1`,
+        [createdGrnId]
+      );
     }
 
     await client.query('COMMIT');
@@ -1815,6 +1863,233 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     publish(TOPICS.EVENTS_ALL, `outward-${ledger.id}`, { event: 'store.outward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
 
     res.json({ success: true, message: `Outward issue recorded. New balance: ${newStock} ${mat.uom}`, data: ledger });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// GET /api/store/grn/:id — Fetch Single Master GRN with all consolidated line items & vendor details
+router.get('/grn/:id', requireAuth, ar(async (req, res) => {
+  const grnId = req.params.id;
+  const isNum = /^\d+$/.test(String(grnId));
+  const where = isNum ? `WHERE g.id = $1` : `WHERE g.grn_number = $1 OR g.grn_number ILIKE $1`;
+  const paramVal = isNum ? parseInt(grnId) : grnId;
+
+  const { rows } = await pool.query(`
+    SELECT g.*, g.grn_number AS "grnNumber",
+           po.po_number AS "poNumber", po.date AS "poDate", po.grand_total AS "poGrandTotal",
+           gp.gp_number AS "gatePassNumber",
+           v.name AS "vendorName", v.code AS "vendorCode", v.gstin AS "vendorGstin",
+           v.state AS "vendorState", v.city AS "vendorCity", v.address AS "vendorAddress",
+           v.pincode AS "vendorPincode", v.mobile AS "vendorMobile", v.email AS "vendorEmail",
+           v.pan AS "vendorPan",
+           u.name AS "receivedByName"
+    FROM grn g
+    LEFT JOIN purchase_orders po ON po.id = g.po_id
+    LEFT JOIN gate_passes gp ON gp.id = g.gate_pass_id
+    LEFT JOIN vendors v ON v.id = g.vendor_id
+    LEFT JOIN users u ON u.id = g.received_by
+    ${where}
+  `, [paramVal]);
+
+  if (!rows.length) {
+    return res.status(404).json({ success: false, message: 'GRN not found' });
+  }
+
+  const grn = rows[0];
+  const { rows: items } = await pool.query(`
+    SELECT gi.*,
+           m.name AS "materialName", m.code AS "materialCode", m.uom AS "matUom",
+           m.hsn_code AS "hsnCode", mc.name AS "categoryName",
+           COALESCE(gi.gst_pct, 18) AS gst_pct
+    FROM grn_items gi
+    JOIN materials m ON m.id = gi.material_id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE gi.grn_id = $1
+    ORDER BY gi.id ASC
+  `, [grn.id]);
+
+  res.json({ success: true, data: { ...grn, items } });
+}));
+
+// POST /api/store/grn/:id/items — Append new line item to existing GRN
+router.post('/grn/:id/items', requireAuth, requireStore, ar(async (req, res) => {
+  const grnId = req.params.id;
+  const isNum = /^\d+$/.test(String(grnId));
+  const { material_id, received_qty, unit_price, gst_pct = 18, tax_type = 'intra', discount_pct = 0, other_charges = 0, bin_location, batch_number, mrp, trade_price, remarks } = req.body;
+
+  if (!material_id || !received_qty || Number(received_qty) <= 0) {
+    return res.status(400).json({ success: false, message: 'Valid Material and Received Qty are required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [grn] } = await client.query(
+      isNum ? 'SELECT * FROM grn WHERE id = $1 FOR UPDATE' : 'SELECT * FROM grn WHERE grn_number = $1 FOR UPDATE',
+      [isNum ? parseInt(grnId) : String(grnId)]
+    );
+    if (!grn) throw new Error('GRN not found');
+    if (['Cancelled', 'Closed'].includes(grn.status) && (req.user?.role_level || 1) < 4) {
+      throw new Error(`Cannot append items to a ${grn.status.toLowerCase()} GRN.`);
+    }
+
+    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [material_id]);
+    if (!mat) throw new Error('Material not found');
+
+    const qty = parseFloat(received_qty);
+    const price = unit_price !== undefined && unit_price !== '' ? parseFloat(unit_price) : parseFloat(mat.unit_price || 0);
+    const discPct = Math.max(0, Math.min(100, parseFloat(discount_pct || 0)));
+    const otherChg = parseFloat(other_charges || 0);
+    const gPct = parseFloat(gst_pct || 18);
+    const itemTaxType = (tax_type || 'intra').toLowerCase();
+
+    const gross = qty * price;
+    const discAmt = gross * (discPct / 100);
+    const taxableVal = Math.max(0, gross - discAmt + otherChg);
+
+    let cgstPct = 0, sgstPct = 0, igstPct = 0;
+    let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+    if (itemTaxType === 'inter' || itemTaxType === 'state' || itemTaxType === 'igst') {
+      igstPct = gPct;
+      igstAmt = taxableVal * (igstPct / 100);
+    } else {
+      cgstPct = gPct / 2;
+      sgstPct = gPct / 2;
+      cgstAmt = taxableVal * (cgstPct / 100);
+      sgstAmt = taxableVal * (sgstPct / 100);
+    }
+    const lineTot = taxableVal + (cgstAmt + sgstAmt + igstAmt);
+
+    const newStock = parseFloat(mat.current_stock || 0) + qty;
+    const finalBin = bin_location || mat.bin_location || null;
+    const finalBatch = batch_number || null;
+
+    // 1. Insert grn_item
+    const { rows: [insertedItem] } = await client.query(`
+      INSERT INTO grn_items (
+        grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price,
+        discount_pct, discount_amount, other_charges, taxable_amount, gst_pct, tax_type,
+        cgst_pct, sgst_pct, igst_pct, cgst_amount, sgst_amount, igst_amount, total_amount,
+        bin_location, batch_number, remarks, mrp, trade_price
+      ) VALUES (
+        $1, $2, $3, $4, $5, 0, $6, $7,
+        $8, $9, $10, $11, $12, $13,
+        $14, $15, $16, $17, $18, $19, $20,
+        $21, $22, $23, $24, $25
+      ) RETURNING *
+    `, [
+      grn.id, mat.id, qty, qty, qty, mat.uom || 'Nos', price,
+      discPct, discAmt, otherChg, taxableVal, gPct, itemTaxType,
+      cgstPct, sgstPct, igstPct, cgstAmt, sgstAmt, igstAmt, lineTot,
+      finalBin, finalBatch, remarks || null, mrp ? parseFloat(mrp) : 0, trade_price ? parseFloat(trade_price) : price
+    ]);
+
+    // 2. Increment physical stock
+    await client.query(`
+      UPDATE materials
+      SET current_stock = $1,
+          bin_location = COALESCE($2, bin_location),
+          unit_price = CASE WHEN $3::numeric > 0 THEN $3::numeric ELSE unit_price END
+      WHERE id = $4
+    `, [newStock, finalBin, price, mat.id]);
+
+    // 3. Record in stock_ledger
+    const remarkFull = `[GRN ${grn.grn_number}] Appended Line Item | ${remarks || ''}`.trim();
+    await client.query(`
+      INSERT INTO stock_ledger (
+        material_id, date, transaction_type, reference_type, reference_id,
+        in_qty, out_qty, balance, unit_price, value,
+        batch_number, bin_location, remarks, created_by, vendor_id
+      ) VALUES (
+        $1, CURRENT_DATE, 'grn', 'GRN', $2,
+        $3, 0, $4, $5, $6,
+        $7, $8, $9, $10, $11
+      )
+    `, [
+      mat.id, grn.id, qty, newStock, price, taxableVal,
+      finalBatch, finalBin, remarkFull, req.user.id, grn.vendor_id
+    ]);
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: 'Line item appended to GRN successfully', data: insertedItem });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/issues/:id/receive — Department receiver signs & acknowledges physical store issue
+router.put('/issues/:id/receive', requireAuth, ar(async (req, res) => {
+  const { receiver_name, receiver_emp_code, receiver_signature_note, fitment_date, observations } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [issue] } = await client.query('SELECT * FROM store_issues WHERE id = $1 FOR UPDATE', [req.params.id]);
+    if (!issue) throw new Error('Store issue record not found');
+
+    const recName = receiver_name || req.user.name;
+    const recEmpCode = receiver_emp_code || req.user.employee_code || null;
+
+    await client.query(`
+      UPDATE store_issues
+      SET receiver_name = $1,
+          receiver_emp_code = $2,
+          receiver_signature_note = $3,
+          receiver_signed_at = NOW(),
+          receiver_signed_by = $4,
+          status = 'Acknowledged'
+      WHERE id = $5
+    `, [recName, recEmpCode, receiver_signature_note || null, req.user.id, req.params.id]);
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: 'Receiver signature and acknowledgement recorded successfully' });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// PUT /api/store/indents/:id/receive — Department receiver signs & acknowledges store indent
+router.put('/indents/:id/receive', requireAuth, ar(async (req, res) => {
+  const { receiver_name, receiver_emp_code, receiver_signature_note, fitment_date, fitment_location, observations } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [ind] } = await client.query('SELECT * FROM store_indents WHERE id = $1 FOR UPDATE', [req.params.id]);
+    if (!ind) throw new Error('Store indent not found');
+
+    const recName = receiver_name || req.user.name;
+    const recEmpCode = receiver_emp_code || req.user.employee_code || null;
+
+    await client.query(`
+      UPDATE store_indents
+      SET receiver_name = $1,
+          receiver_emp_code = $2,
+          receiver_signature_note = $3,
+          receiver_signed_at = NOW(),
+          receiver_signed_by = $4,
+          fitment_date = $5,
+          fitment_location = $6,
+          observations = $7,
+          status = 'Closed'
+      WHERE id = $8
+    `, [recName, recEmpCode, receiver_signature_note || null, req.user.id, fitment_date || null, fitment_location || null, observations || null, req.params.id]);
+
+    await client.query(`
+      INSERT INTO store_indent_log (indent_id, action, from_status, to_status, actor_id, actor_name, actor_role, note)
+      VALUES ($1, 'Receiver Signed & Closed', $2, 'Closed', $3, $4, $5, $6)
+    `, [ind.id, ind.status, req.user.id, recName, req.user.role || 'Receiver', receiver_signature_note || observations || 'Received in good condition']);
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: 'Receiver signed and indent closed successfully' });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });

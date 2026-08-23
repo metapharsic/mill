@@ -3228,5 +3228,79 @@
     },
     "ip_address": "::1",
     "created_at": "2026-08-21T04:03:21.132Z"
+  },
+  {
+    "id": 141,
+    "user_id": 24,
+    "action": "store.inward.delete",
+    "module": "store",
+    "record_id": 3033,
+    "old_data": {
+      "in_qty": 2,
+      "curStock": 3,
+      "material_id": 2299
+    },
+    "new_data": {
+      "newStock": 1
+    },
+    "ip_address": "::1",
+    "created_at": "2026-08-23T05:11:25.496Z"
+  },
+  {
+    "id": 142,
+    "user_id": 6,
+    "action": "store.inward",
+    "module": "store",
+    "record_id": 3034,
+    "old_data": null,
+    "new_data": {
+      "qty": 2500,
+      "price": 230,
+      "newStock": 4048.7,
+      "grn_number": "GRN-20260823-0001",
+      "inward_type": "grn",
+      "material_id": 3124,
+      "reference_id": "PO-20260823-0001"
+    },
+    "ip_address": "::1",
+    "created_at": "2026-08-23T05:24:22.941Z"
+  },
+  {
+    "id": 143,
+    "user_id": 6,
+    "action": "store.inward",
+    "module": "store",
+    "record_id": 3035,
+    "old_data": null,
+    "new_data": {
+      "qty": 300,
+      "price": 230,
+      "newStock": 410.16200000000003,
+      "grn_number": "GRN-20260823-0001",
+      "inward_type": "grn",
+      "material_id": 3123,
+      "reference_id": "PO-20260823-0001"
+    },
+    "ip_address": "::1",
+    "created_at": "2026-08-23T05:24:22.941Z"
+  },
+  {
+    "id": 144,
+    "user_id": 6,
+    "action": "store.inward",
+    "module": "store",
+    "record_id": 3036,
+    "old_data": null,
+    "new_data": {
+      "qty": 250,
+      "price": 320,
+      "newStock": 320.1,
+      "grn_number": "GRN-20260823-0001",
+      "inward_type": "grn",
+      "material_id": 3122,
+      "reference_id": "PO-20260823-0001"
+    },
+    "ip_address": "::1",
+    "created_at": "2026-08-23T05:24:22.941Z"
   }
 ]

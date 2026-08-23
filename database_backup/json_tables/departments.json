@@ -7,6 +7,20 @@
     "category": "Production & Operations"
   },
   {
+    "id": 25,
+    "name": "Boiler & Utilities",
+    "code": "BOILER",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Production & Operations"
+  },
+  {
+    "id": 26,
+    "name": "Rewinder & Finishing",
+    "code": "REWINDER",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Production & Operations"
+  },
+  {
     "id": 8,
     "name": "Maintenance",
     "code": "MAINT",
@@ -21,6 +35,27 @@
     "category": "Production & Operations"
   },
   {
+    "id": 22,
+    "name": "Mechanical",
+    "code": "MECH",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Technical & Maintenance"
+  },
+  {
+    "id": 23,
+    "name": "Electrical",
+    "code": "ELEC",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Technical & Maintenance"
+  },
+  {
+    "id": 4,
+    "name": "Store Management",
+    "code": "STORE",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Materials & Stores"
+  },
+  {
     "id": 2,
     "name": "Raw Material Store",
     "code": "RMS",
@@ -31,13 +66,6 @@
     "id": 3,
     "name": "Inventory",
     "code": "INV",
-    "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Materials & Stores"
-  },
-  {
-    "id": 4,
-    "name": "Store Management",
-    "code": "STORE",
     "created_at": "2026-06-26T12:43:01.372Z",
     "category": "Materials & Stores"
   },
@@ -63,13 +91,6 @@
     "category": "Materials & Stores"
   },
   {
-    "id": 7,
-    "name": "Quality",
-    "code": "QC",
-    "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Quality & Lab"
-  },
-  {
     "id": 14,
     "name": "Laboratory",
     "code": "LAB",
@@ -77,25 +98,39 @@
     "category": "Quality & Lab"
   },
   {
+    "id": 7,
+    "name": "Quality Control",
+    "code": "QC",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Quality & Lab"
+  },
+  {
+    "id": 16,
+    "name": "Administration",
+    "code": "ADMIN",
+    "created_at": "2026-06-26T12:43:01.372Z",
+    "category": "Commercial & Admin"
+  },
+  {
     "id": 6,
     "name": "Purchase",
     "code": "PUR",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Supply Chain"
+    "category": "Commercial & Admin"
   },
   {
     "id": 10,
     "name": "Dispatch",
     "code": "DISP",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Supply Chain"
+    "category": "Commercial & Admin"
   },
   {
     "id": 11,
     "name": "Sales",
     "code": "SALES",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Supply Chain"
+    "category": "Commercial & Admin"
   },
   {
     "id": 12,
@@ -112,31 +147,38 @@
     "category": "Commercial & Admin"
   },
   {
-    "id": 16,
-    "name": "Administration",
-    "code": "ADMIN",
+    "id": 29,
+    "name": "Housekeeping",
+    "code": "HK",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Safety, Facility & General"
+  },
+  {
+    "id": 17,
+    "name": "EHS & Safety",
+    "code": "EHS",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Commercial & Admin"
+    "category": "Safety, Facility & General"
   },
   {
     "id": 13,
     "name": "Security",
     "code": "SEC",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Safety & Compliance"
-  },
-  {
-    "id": 17,
-    "name": "EHS",
-    "code": "EHS",
-    "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Safety & Compliance"
+    "category": "Safety, Facility & General"
   },
   {
     "id": 18,
     "name": "Scrap Management",
     "code": "SCRAP",
     "created_at": "2026-06-26T12:43:01.372Z",
-    "category": "Safety & Compliance"
+    "category": "Safety, Facility & General"
+  },
+  {
+    "id": 46,
+    "name": "Other / General Mill",
+    "code": "OTHER",
+    "created_at": "2026-08-23T05:45:00.619Z",
+    "category": "Safety, Facility & General"
   }
 ]
