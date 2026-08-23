@@ -84,7 +84,9 @@ export default function MasterData() {
     e.preventDefault()
     if (!equipForm.equipment_name) return setErr('Equipment / Roll Name is required')
     setSaving(true)
-    const res = await API('/api/master/section-equipment', { method: 'POST', body: JSON.stringify(equipForm) })
+    const res = equipForm.id
+      ? await API(`/api/master/section-equipment/${equipForm.id}`, { method: 'PUT', body: JSON.stringify(equipForm) })
+      : await API('/api/master/section-equipment', { method: 'POST', body: JSON.stringify(equipForm) })
     setSaving(false)
     if (res.success) {
       setEquipModal(false)
@@ -97,6 +99,25 @@ export default function MasterData() {
     } else {
       setErr(res.message || 'Error saving equipment')
     }
+  }
+
+  const openEditEquip = (eq) => {
+    setEquipForm({
+      id: eq.id, equipment_name: eq.equipmentName || '', tag_name: eq.tagName || '',
+      section_id: eq.sectionId ? String(eq.sectionId) : '', machine_id: eq.machineId ? String(eq.machineId) : '',
+      bearing_size: eq.bearingSize || '', lock_nut: eq.lockNut || '', washer: eq.washer || '',
+      belt_no: eq.beltNo || '', shaft_size: eq.shaftSize || '', impeller_size: eq.impellerSize || '',
+      sleeve: eq.sleeve || '', couplings: eq.couplings || '', pulleys: eq.pulleys || '', remarks: eq.remarks || ''
+    })
+    setErr('')
+    setEquipModal(true)
+  }
+
+  const deleteEquip = async (eq) => {
+    if (!window.confirm(`Delete "${eq.equipmentName}" (${eq.tagName || 'no tag'})? This cannot be undone.`)) return
+    const res = await API(`/api/master/section-equipment/${eq.id}`, { method: 'DELETE' })
+    if (res.success) loadData()
+    else alert(res.message || 'Error deleting equipment')
   }
 
   const MODULES = [
@@ -241,11 +262,11 @@ export default function MasterData() {
                 <table style={S.table}>
                   <thead>
                     <tr style={S.thead}>
-                      {['Tag Code', 'Equipment / Roll', 'Plant Section', 'Bearing Size', 'Lock Nut / Washer', 'Belt No', 'Shaft', 'Couplings / Pulleys'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                      {['Tag Code', 'Equipment / Roll', 'Plant Section', 'Bearing Size', 'Lock Nut / Washer', 'Belt No', 'Shaft', 'Couplings / Pulleys', 'Action'].map(h => <th key={h} style={S.th}>{h}</th>)}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredEquip.length === 0 && <tr><td colSpan={8} style={S.empty}>No machinery equipment found</td></tr>}
+                    {filteredEquip.length === 0 && <tr><td colSpan={9} style={S.empty}>No machinery equipment found</td></tr>}
                     {filteredEquip.map((eq, idx) => (
                       <tr key={eq.id || idx} style={S.tr}>
                         <td style={S.td}>
@@ -278,6 +299,18 @@ export default function MasterData() {
                         <td style={S.td}>{eq.shaftSize || '—'}</td>
                         <td style={S.td}>
                           {[eq.couplings ? `Cpl: ${eq.couplings}` : null, eq.pulleys ? `Pul: ${eq.pulleys}` : null].filter(Boolean).join(' | ') || '—'}
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button type="button" onClick={() => openEditEquip(eq)}
+                              style={{ background: '#eff6ff', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}>
+                              ✎ Edit
+                            </button>
+                            <button type="button" onClick={() => deleteEquip(eq)}
+                              style={{ background: '#fef2f2', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}>
+                              🗑 Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -325,7 +358,7 @@ export default function MasterData() {
         <div style={S.overlay} onClick={() => setEquipModal(false)}>
           <div style={{ ...S.modal, maxWidth: 600 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div style={S.modalTitle}>⚙️ Add Machinery / Roll Component</div>
+              <div style={S.modalTitle}>⚙️ {equipForm.id ? 'Edit' : 'Add'} Machinery / Roll Component</div>
               <button style={S.close} onClick={() => setEquipModal(false)}>✕</button>
             </div>
             <form onSubmit={saveEquip} style={S.form}>
@@ -357,7 +390,7 @@ export default function MasterData() {
               {err && <div style={S.error}>{err}</div>}
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setEquipModal(false)}>Cancel</button>
-                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Add Equipment'}</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : (equipForm.id ? 'Save Changes' : 'Add Equipment')}</button>
               </div>
             </form>
           </div>

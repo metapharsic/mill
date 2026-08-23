@@ -1701,6 +1701,54 @@ router.post('/section-equipment', auth, requireLevel(3), ar(async (req, res) => 
   res.status(201).json({ success: true, data: rows[0] });
 }));
 
+router.put('/section-equipment/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const { rows: existing } = await pool.query('SELECT id, tag_name FROM section_equipment WHERE id=$1', [req.params.id]);
+  if (!existing.length) return res.status(404).json({ success: false, message: 'Equipment not found' });
+
+  const { machine_id, tag_name, equipment_name, equipment_type, bearing_size, lock_nut, washer,
+          belt_no, shaft_size, impeller_size, sleeve, couplings, pulleys, remarks } = req.body;
+
+  const { rows } = await pool.query(`
+    UPDATE section_equipment SET
+      machine_id=COALESCE($1,machine_id), tag_name=COALESCE($2,tag_name),
+      equipment_name=COALESCE($3,equipment_name), equipment_type=COALESCE($4,equipment_type),
+      bearing_size=COALESCE($5,bearing_size), lock_nut=COALESCE($6,lock_nut), washer=COALESCE($7,washer),
+      belt_no=COALESCE($8,belt_no), shaft_size=COALESCE($9,shaft_size), impeller_size=COALESCE($10,impeller_size),
+      sleeve=COALESCE($11,sleeve), couplings=COALESCE($12,couplings), pulleys=COALESCE($13,pulleys),
+      remarks=COALESCE($14,remarks)
+    WHERE id=$15
+    RETURNING id, section_id as "sectionId", machine_id as "machineId", tag_name as "tagName",
+              equipment_name as "equipmentName", bearing_size as "bearingSize", is_active as "isActive"
+  `, [machine_id || null, tag_name || null, equipment_name || null, equipment_type || null,
+      bearing_size || null, lock_nut || null, washer || null, belt_no || null, shaft_size || null,
+      impeller_size || null, sleeve || null, couplings || null, pulleys || null, remarks || null,
+      req.params.id]);
+
+  // Keep the mirrored `equipment` table (used by Maintenance) in sync, matched by the tag code
+  // it was originally inserted with — section_equipment has no FK back to it.
+  await pool.query(`
+    UPDATE equipment SET
+      name=COALESCE($1,name), bearing_size=COALESCE($2,bearing_size), lock_nut=COALESCE($3,lock_nut),
+      washer=COALESCE($4,washer), belt_no=COALESCE($5,belt_no), shaft_size=COALESCE($6,shaft_size),
+      impeller_size=COALESCE($7,impeller_size), sleeve=COALESCE($8,sleeve),
+      couplings=COALESCE($9,couplings), pulleys=COALESCE($10,pulleys)
+    WHERE code=$11
+  `, [equipment_name || null, bearing_size || null, lock_nut || null, washer || null, belt_no || null,
+      shaft_size || null, impeller_size || null, sleeve || null, couplings || null, pulleys || null,
+      existing[0].tag_name]).catch(err => console.warn('equipment sync (update) warning:', err.message));
+
+  res.json({ success: true, data: rows[0] });
+}));
+
+router.delete('/section-equipment/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const { rows: existing } = await pool.query('SELECT id, tag_name FROM section_equipment WHERE id=$1', [req.params.id]);
+  if (!existing.length) return res.status(404).json({ success: false, message: 'Equipment not found' });
+  await pool.query('UPDATE section_equipment SET is_active=false WHERE id=$1', [req.params.id]);
+  await pool.query('UPDATE equipment SET is_active=false WHERE code=$1', [existing[0].tag_name])
+    .catch(err => console.warn('equipment sync (deactivate) warning:', err.message));
+  res.json({ success: true });
+}));
+
 // ── MOTOR ELECTRICAL SPECS (F2) ─────────────────────────────────────────────────
 // KW/RPM/Bearing-No-FS/Bearing-No-BS — separate table, source's "Machine" bucket is coarser than
 // the app's 21 granular plant sections, kept as its own section_label rather than forced onto a section_id FK.
