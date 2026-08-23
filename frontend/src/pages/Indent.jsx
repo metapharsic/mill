@@ -238,10 +238,10 @@ export default function Indent() {
       uom: it.uom || it.matUom || 'NOS',
       in_qty: it.issued_qty || it.required_qty || 1,
       unit_price: it.matPrice || it.unit_price || 0,
-      hsnCode: it.hsnCode || '8439',
-      gst_pct: it.gst_pct || 18,
-      batch_number: it.batch_no || `IND-ITEM-00${idx + 1}`,
-      pack_size: '1*1',
+      hsnCode: it.hsnCode || it.hsn_code || '84399900',
+      gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+      batch_number: it.batch_no || it.batch_number || '—',
+      pack_size: it.uom || it.matUom || 'NOS',
       mrp: it.matPrice || it.unit_price || 0,
       trade_price: it.matPrice || it.unit_price || 0
     }))
@@ -249,8 +249,15 @@ export default function Indent() {
       ...fullDoc,
       invoiceNumber: fullDoc.indent_number || fullDoc.indentNumber,
       grnNumber: fullDoc.indent_number || fullDoc.indentNumber,
-      partyName: fullDoc.deptName || 'Plant Department',
-      partyAddress: fullDoc.sectionName ? `Section: ${fullDoc.sectionName}` : 'MK Paper Mill Floor',
+      deptName: fullDoc.deptName || fullDoc.departmentName || 'Mechanical Department',
+      partyName: fullDoc.deptName || fullDoc.departmentName || 'Mechanical Department',
+      sectionName: fullDoc.sectionName || fullDoc.section || '',
+      machineName: fullDoc.machineName || fullDoc.machine_id || '',
+      raisedByName: fullDoc.raisedBy || fullDoc.raisedByName || fullDoc.createdByName || 'Indent Requester',
+      raisedByEmpCode: fullDoc.raisedByEmpCode || fullDoc.emp_code || '',
+      createdByName: fullDoc.raisedBy || fullDoc.raisedByName || fullDoc.createdByName || 'Store Officer',
+      approvedByName: fullDoc.approvedBy || fullDoc.approvedByName || 'Store Manager',
+      itemPurpose: fullDoc.itemPurpose || fullDoc.purpose || fullDoc.remarks || 'Plant Operations & Maintenance',
       items: formattedItems,
       title: 'STORE INDENT / ISSUE VOUCHER'
     })

@@ -24,17 +24,13 @@ try {
 } catch {}
 
 Write-Host " [2/4] Clearing existing ports (5000, 3333)..." -ForegroundColor Cyan
-foreach ($port in @(5000, 3333)) {
-  try {
-    $lines = netstat -ano | Select-String (":{0}\s+.*LISTENING" -f $port)
-    foreach ($line in $lines) {
-      $pidNum = ($line.ToString().Trim() -split '\s+')[-1]
-      if ($pidNum -match '^\d+$' -and [int]$pidNum -gt 0) {
-        Stop-Process -Id [int]$pidNum -Force -ErrorAction SilentlyContinue
-      }
+try {
+  Get-NetTCPConnection -LocalPort 5000, 3333 -ErrorAction SilentlyContinue | ForEach-Object {
+    if ($_.OwningProcess -gt 0) {
+      Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue
     }
-  } catch {}
-}
+  }
+} catch {}
 
 Start-Sleep -Milliseconds 500
 

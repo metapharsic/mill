@@ -41,6 +41,7 @@ import AllSections from './pages/AllSections'
 import PlantSection from './pages/PlantSection'
 import ChemicalStore from './pages/ChemicalStore'
 import StoreDashboard from './pages/StoreDashboard'
+import MultiAgentCheckpoint from './pages/MultiAgentCheckpoint'
 
 // Plant-section keys — must stay in sync with the 'Plant Sections' group in Sidebar.jsx.
 // They are routed as /sections/<code> and rendered by AllSections / PlantSection.
@@ -54,7 +55,7 @@ const NAV_KEYS = ['dashboard','production','daily-report','quality','maintenance
   'rawmaterial','inventory','materials','chemicals','store','store-dashboard','indent','scrap',
   'purchase','customers','vendors','sales','dispatch','finance',
   'packing','fgwarehouse','hr','security','laboratory','ehs',
-  'reports','phases','masterdata','admin','users',
+  'reports','phases','checkpoint','agents','masterdata','admin','users',
   ...SECTION_KEYS]
 
 function AccessDenied({ onNavigate }) {
@@ -117,6 +118,8 @@ const PAGE_COMPONENTS = {
   ehs: EHS,
   admin: Admin,
   chemicals: ChemicalStore,
+  checkpoint: MultiAgentCheckpoint,
+  agents: MultiAgentCheckpoint,
 }
 
 const PAGE_TITLES = {
@@ -127,7 +130,8 @@ const PAGE_TITLES = {
   indent:'Indent / PIIMAS', scrap:'Scrap Management', purchase:'Purchase', customers:'Customers',
   vendors:'Vendors', sales:'Sales', dispatch:'Dispatch', finance:'Finance', packing:'Packing',
   fgwarehouse:'FG Warehouse', hr:'HR & Payroll', security:'Security', laboratory:'Laboratory',
-  ehs:'EHS', reports:'Reports & Analytics', phases:'Phases', masterdata:'Master Data', admin:'Administration',
+  ehs:'EHS', reports:'Reports & Analytics', phases:'Phases', checkpoint:'Multi-Agent Checkpoint', agents:'Multi-Agent Checkpoint',
+  masterdata:'Master Data', admin:'Administration',
   users:'User Management',
 }
 
@@ -297,6 +301,20 @@ function AppShell() {
             </span>
           </div>
           <div style={styles.topActions}>
+            <span
+              style={{
+                ...styles.livePill,
+                cursor: 'pointer',
+                background: 'rgba(244, 200, 75, 0.12)',
+                border: '1px solid rgba(244, 200, 75, 0.35)',
+                color: '#f4c84b',
+              }}
+              onClick={() => handleNavigate('checkpoint')}
+              title="View Multi-Agent Engine & Checkpoint Status"
+            >
+              <span style={{ ...styles.liveDot, background: '#f4c84b', boxShadow: '0 0 6px rgba(244,200,75,0.8)' }} />
+              6/6 Agents Live
+            </span>
             <span style={styles.livePill}>
               <span style={{ ...styles.liveDot }} className="live-dot" />
               System Live

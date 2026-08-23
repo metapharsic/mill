@@ -79,14 +79,8 @@ app.use('/api/chemicals', require('./routes/chemicals'));
 app.use('/api/telemetry', require('./routes/telemetry'));
 app.use('/api/events',    require('./routes/events'));
 
-// --- Dev progress dashboard (reads checkpoint.json) ---
-app.get('/api/dev/progress', (req, res) => {
-  try {
-    const fs = require('fs');
-    const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../../checkpoint.json'), 'utf8'));
-    res.json({ success: true, data });
-  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
-});
+// --- Dev & Multi-Agent progress dashboard ---
+app.use('/api/dev', require('./routes/dev'));
 app.get('/dev/progress', (req, res) =>
   res.sendFile(path.join(__dirname, 'public/progress.html')));
 

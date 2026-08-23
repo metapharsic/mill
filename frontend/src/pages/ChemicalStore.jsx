@@ -73,8 +73,10 @@ export default function ChemicalStore() {
   const [ledgerLoading, setLedgerLoading] = useState(false)
   const [departments, setDepartments] = useState([])
   const [customers, setCustomers]   = useState([])
+  const [sections, setSections]     = useState([])
+  const [machines, setMachines]     = useState([])
 
-  const [pickForm, setPickForm]     = useState({ materialId:'', quantity:'', departmentId:'', purpose:'', section:'', remarks:'' })
+  const [pickForm, setPickForm]     = useState({ materialId:'', quantity:'', departmentId:'', sectionId:'', machineId:'', purpose:'', section:'', remarks:'' })
   const [pickMsg, setPickMsg]       = useState(null)
   const [pickLoading, setPickLoading] = useState(false)
 
@@ -103,6 +105,8 @@ export default function ChemicalStore() {
     fetch(`${API}/chemicals/summary`, { headers: h() }).then(r => r.json()).then(d => { if (d.success) setSummary(d.data) }).catch(()=>{})
     fetch(`${API}/chemicals/departments`, { headers: h() }).then(r => r.json()).then(d => { if (d.success) setDepartments(d.data||[]) }).catch(()=>{})
     fetch(`${API}/chemicals/customers`, { headers: h() }).then(r => r.json()).then(d => { if (d.success) setCustomers(d.data||[]) }).catch(()=>{})
+    fetch(`${API}/master/sections`, { headers: h() }).then(r => r.json()).then(d => { if (d.success) setSections(d.data||[]) }).catch(()=>{})
+    fetch(`${API}/master/machines`, { headers: h() }).then(r => r.json()).then(d => { if (d.success) setMachines(d.data||[]) }).catch(()=>{})
   }, [])
 
   useEffect(() => { fetchChemicals() }, [fetchChemicals])
@@ -129,9 +133,23 @@ export default function ChemicalStore() {
 
   const submitPick = async (e) => {
     e.preventDefault(); setPickLoading(true); setPickMsg(null)
-    const d = await post('/chemicals/pick', { ...pickForm, quantity: Number(pickForm.quantity) }).catch(e => ({ success:false, message:e.message }))
+    const selectedSec = sections.find(s => String(s.id) === String(pickForm.sectionId))
+    const selectedMcn = machines.find(m => String(m.id) === String(pickForm.machineId))
+    const secTag = selectedSec ? `${selectedSec.icon || '🏭'} ${selectedSec.name}` : pickForm.section
+    const mcnTag = selectedMcn ? `Machine: ${selectedMcn.name || selectedMcn.code}` : ''
+    const formattedRemarks = [secTag, mcnTag, pickForm.remarks].filter(Boolean).join(' | ')
+
+    const d = await post('/chemicals/pick', {
+      ...pickForm,
+      section_id: pickForm.sectionId ? Number(pickForm.sectionId) : undefined,
+      machine_id: pickForm.machineId ? Number(pickForm.machineId) : undefined,
+      section: secTag || undefined,
+      remarks: formattedRemarks,
+      quantity: Number(pickForm.quantity)
+    }).catch(e => ({ success:false, message:e.message }))
+
     setPickMsg({ ok: d.success, text: d.success ? `Issued. Ref: ${d.data.issueNo}` : d.message })
-    if (d.success) { setPickForm(f => ({ ...f, quantity:'', purpose:'', remarks:'' })); fetchChemicals() }
+    if (d.success) { setPickForm(f => ({ ...f, quantity:'', sectionId:'', machineId:'', purpose:'', section:'', remarks:'' })); fetchChemicals() }
     setPickLoading(false)
   }
 
@@ -315,8 +333,34 @@ export default function ChemicalStore() {
                     </select>
                   </div>
                 </div>
-                <label style={s.label}>Section / Machine</label>
-                <input type="text" style={s.finput} placeholder="e.g. Wet-End, Boiler, ETP..." value={pickForm.section} onChange={e=>setPickForm(f=>({...f,section:e.target.value}))} />
+                <div style={s.grid2}>
+                  <div>
+                    <label style={s.label}>Plant Section</label>
+                    <select
+                      style={s.fselect}
+                      value={pickForm.sectionId}
+                      onChange={e => setPickForm(f => ({ ...f, sectionId: e.target.value }))}
+                    >
+                      <option value="">Select Plant Section...</option>
+                      {sections.filter(sec => sec.sectionCode !== 'ALL' && sec.code !== 'ALL').map(sec => (
+                        <option key={sec.id} value={sec.id}>{sec.icon || '🏭'} {sec.name || sec.sectionCode}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={s.label}>Target Machine / Unit</label>
+                    <select
+                      style={s.fselect}
+                      value={pickForm.machineId}
+                      onChange={e => setPickForm(f => ({ ...f, machineId: e.target.value }))}
+                    >
+                      <option value="">Select Target Machine...</option>
+                      {machines.map(m => (
+                        <option key={m.id} value={m.id}>{m.name || m.code}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <label style={s.label}>Purpose *</label>
                 <input type="text" required style={s.finput} placeholder="e.g. Retention aid dosing..." value={pickForm.purpose} onChange={e=>setPickForm(f=>({...f,purpose:e.target.value}))} />
                 <label style={s.label}>Remarks</label>

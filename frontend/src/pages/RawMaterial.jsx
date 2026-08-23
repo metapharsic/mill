@@ -37,6 +37,8 @@ export default function RawMaterial({ onNavigate }) {
   const [issuesList, setIssuesList] = useState([])
   const [depts, setDepts] = useState([])
   const [vendors, setVendors] = useState([])
+  const [sections, setSections] = useState([])
+  const [machines, setMachines] = useState([])
 
   // Modal states
   const [inwardModal, setInwardModal] = useState(false)
@@ -57,6 +59,8 @@ export default function RawMaterial({ onNavigate }) {
   const [issueForm, setIssueForm] = useState({
     material_id: '',
     department_id: '',
+    section_id: '',
+    machine_id: '',
     out_qty: '',
     purpose: '',
     remarks: ''
@@ -98,6 +102,12 @@ export default function RawMaterial({ onNavigate }) {
 
       const venRes = await fetch(`${API}/master/vendors?limit=100&is_active=true`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
       if (venRes && venRes.success) setVendors(venRes.data || [])
+
+      const secRes = await fetch(`${API}/master/sections`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
+      if (secRes && secRes.success) setSections(secRes.data || [])
+
+      const mcnRes = await fetch(`${API}/master/machines`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
+      if (mcnRes && mcnRes.success) setMachines(mcnRes.data || [])
     } catch (e) {
       console.error(e)
       addToast('Error loading raw material records', 'error')
@@ -188,16 +198,29 @@ export default function RawMaterial({ onNavigate }) {
     try {
       const selectedMat = materials.find(m => String(m.id) === String(issueForm.material_id))
       const selectedDept = depts.find(d => String(d.id) === String(issueForm.department_id))
+      const selectedSec = sections.find(s => String(s.id) === String(issueForm.section_id))
+      const selectedMcn = machines.find(m => String(m.id) === String(issueForm.machine_id))
       const deptName = selectedDept ? selectedDept.name : 'Pulp Mill / Production'
+      const secTag = selectedSec ? `${selectedSec.icon || '🏭'} ${selectedSec.name}` : ''
+      const mcnTag = selectedMcn ? `Machine: ${selectedMcn.name || selectedMcn.code}` : ''
+
+      const formattedRemarks = [
+        deptName,
+        secTag,
+        mcnTag,
+        issueForm.remarks || ''
+      ].filter(Boolean).join(' | ')
 
       const payload = {
         material_id: parseInt(issueForm.material_id),
         department_id: issueForm.department_id ? parseInt(issueForm.department_id) : null,
+        section_id: issueForm.section_id ? parseInt(issueForm.section_id) : null,
+        machine_id: issueForm.machine_id ? parseInt(issueForm.machine_id) : null,
         out_qty: parseFloat(issueForm.out_qty),
         unit_price: parseFloat(selectedMat?.unit_price || 0),
         outward_type: 'issue',
         purpose: issueForm.purpose || 'Furnish Batch Consumption',
-        remarks: issueForm.remarks ? `${deptName} | ${issueForm.remarks}` : deptName
+        remarks: formattedRemarks
       }
 
       const res = await fetch(`${API}/store/outward`, {
@@ -212,6 +235,8 @@ export default function RawMaterial({ onNavigate }) {
         setIssueForm({
           material_id: '',
           department_id: '',
+          section_id: '',
+          machine_id: '',
           out_qty: '',
           purpose: '',
           remarks: ''
@@ -255,6 +280,13 @@ export default function RawMaterial({ onNavigate }) {
             title="Open Master WhatsApp EOD Customization & Dispatch"
           >
             <WhatsAppIcon size={16} color="#fff" /> WhatsApp EOD Report
+          </button>
+          <button
+            style={{ ...S.btn, background: 'linear-gradient(135deg, #0f766e, #0e7490)', color: '#fff', fontWeight: 700 }}
+            onClick={() => setSelectedProductModalId('new')}
+            title="Create New Raw Material / Chemical Catalog Item"
+          >
+            <Plus size={15} /> + Add Material
           </button>
           <button
             style={{ ...S.btn, background: '#0f766e', color: '#fff' }}
@@ -837,7 +869,7 @@ export default function RawMaterial({ onNavigate }) {
                   />
                 </label>
                 <label style={S.label}>
-                  Target Department / Section *
+                  Target Department *
                   <select
                     style={S.input}
                     value={issueForm.department_id}
@@ -846,6 +878,35 @@ export default function RawMaterial({ onNavigate }) {
                     <option value="">-- Choose Recipient Dept --</option>
                     {depts.map(d => (
                       <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <label style={S.label}>
+                  Plant Section (Target)
+                  <select
+                    style={S.input}
+                    value={issueForm.section_id}
+                    onChange={e => setIssueForm(prev => ({ ...prev, section_id: e.target.value }))}
+                  >
+                    <option value="">-- Choose Target Section --</option>
+                    {sections.filter(s => s.sectionCode !== 'ALL' && s.code !== 'ALL').map(s => (
+                      <option key={s.id} value={s.id}>{s.icon || '🏭'} {s.name || s.sectionCode} ({s.sectionCode || s.code})</option>
+                    ))}
+                  </select>
+                </label>
+                <label style={S.label}>
+                  Target Machine / Pulper
+                  <select
+                    style={S.input}
+                    value={issueForm.machine_id}
+                    onChange={e => setIssueForm(prev => ({ ...prev, machine_id: e.target.value }))}
+                  >
+                    <option value="">-- General / Pulper / Any --</option>
+                    {machines.map(m => (
+                      <option key={m.id} value={m.id}>{m.name || m.code}</option>
                     ))}
                   </select>
                 </label>

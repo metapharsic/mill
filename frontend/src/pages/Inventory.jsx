@@ -422,6 +422,13 @@ export default function Inventory() {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button
+            style={{ ...S.btnRefresh, background: 'linear-gradient(135deg, #0f766e, #0e7490)', color: '#fff', border: 'none', fontWeight: 700, boxShadow: '0 2px 4px rgba(15,118,110,0.2)' }}
+            onClick={() => setSelectedProductModalId('new')}
+            title="Create New Store Catalog Material"
+          >
+            <Boxes size={14} /> <span>+ Add Material</span>
+          </button>
+          <button
             style={{ ...S.btnRefresh, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
             onClick={() => setExportModal(true)}
             title="Download Comprehensive Multi-Sheet Excel Master"

@@ -46,7 +46,6 @@ db/backup_*.sql
 # ─── Auto-Generated Status Files ───────────────────────────────
 CHECKPOINT.md
 SYNC_STATUS.md
-checkpoint.json
 
 # ─── Large Reference Files ─────────────────────────────────────
 Documentation/Paper Mill.pdf
