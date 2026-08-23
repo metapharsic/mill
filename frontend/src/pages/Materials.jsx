@@ -4,6 +4,7 @@ import InventoryExportModal from '../components/InventoryExportModal'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import SearchableSelect from '../components/SearchableSelect'
+import MultiSearchableSelect from '../components/MultiSearchableSelect'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -28,6 +29,8 @@ const emptyForm = {
   section_id: '',
   machine_id: '',
   section_equipment_id: '',
+  section_ids: [],
+  section_equipment_ids: [],
   uom: 'NOS',
   hsn_code: '',
   bin_location: '',
@@ -61,6 +64,18 @@ export default function Materials() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [colSearch, setColSearch] = useState({
+    code: '',
+    name: '',
+    section: '',
+    machine: '',
+    category: '',
+    crit: '',
+    hsn: '',
+    bin: '',
+    status: ''
+  })
+  const [showColSearch, setShowColSearch] = useState(true)
   const [filterCat, setFilterCat] = useState('')
   const [filterSection, setFilterSection] = useState('')
   const [filterMachine, setFilterMachine] = useState('')
@@ -160,27 +175,34 @@ export default function Materials() {
     if (filterActive) params.set('is_active', filterActive)
     if (filterCat) params.set('category_id', filterCat)
     if (filterSection) params.set('section_id', filterSection)
-    if (filterMachine) params.set('machine_id', filterMachine)
+    // filterMachine now holds a section_equipment_id (from MCN equipment list)
+    if (filterMachine) params.set('section_equipment_id', filterMachine)
     if (filterCrit) params.set('criticality_class', filterCrit)
     if (search) params.set('search', search)
+    if (colSearch.code) params.set('col_code', colSearch.code)
+    if (colSearch.name) params.set('col_name', colSearch.name)
+    if (colSearch.section) params.set('col_section', colSearch.section)
+    if (colSearch.machine) params.set('col_machine', colSearch.machine)
+    if (colSearch.category) params.set('col_category', colSearch.category)
+    if (colSearch.hsn) params.set('col_hsn', colSearch.hsn)
+    if (colSearch.bin) params.set('col_bin', colSearch.bin)
+    if (colSearch.status) params.set('col_status', colSearch.status)
     if (sortBy) {
       params.set('sort_by', sortBy)
       params.set('sort_order', sortOrder)
     }
-    const [m, c, s, eq, mcn] = await Promise.all([
+    const [m, c, s, eq] = await Promise.all([
       API(`/api/master/materials?${params}`),
       API('/api/master/categories'),
       API('/api/master/sections').catch(() => ({ data: [] })),
       API('/api/master/section-equipment').catch(() => ({ data: [] })),
-      API('/api/master/machines').catch(() => ({ data: [] }))
     ])
     if (m.success) { setMaterials(m.data); setTotal(m.total) }
     if (c.success) setCategories(c.data)
     if (s.success) setSections(s.data)
     if (eq.success) setSectionEquipment(eq.data)
-    if (mcn.success) setMachines(mcn.data)
     setLoading(false)
-  }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search, sortBy, sortOrder])
+  }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search, colSearch, sortBy, sortOrder])
 
   const handleSort = (key, order) => {
     setSortBy(key)
@@ -201,6 +223,14 @@ export default function Materials() {
     if (filterMachine) params.set('machine_id', filterMachine)
     if (filterCrit) params.set('criticality_class', filterCrit)
     if (search) params.set('search', search)
+    if (colSearch.code) params.set('col_code', colSearch.code)
+    if (colSearch.name) params.set('col_name', colSearch.name)
+    if (colSearch.section) params.set('col_section', colSearch.section)
+    if (colSearch.machine) params.set('col_machine', colSearch.machine)
+    if (colSearch.category) params.set('col_category', colSearch.category)
+    if (colSearch.hsn) params.set('col_hsn', colSearch.hsn)
+    if (colSearch.bin) params.set('col_bin', colSearch.bin)
+    if (colSearch.status) params.set('col_status', colSearch.status)
     API(`/api/master/materials?${params}`).then(r => {
       if (cancelled || !r.success) return
       const rows = r.data || []
@@ -214,7 +244,7 @@ export default function Materials() {
       setKpiTotals({ opening, received, issued, valuation, loaded: true })
     })
     return () => { cancelled = true }
-  }, [filterActive, filterCat, filterSection, filterMachine, filterCrit, search])
+  }, [filterActive, filterCat, filterSection, filterMachine, filterCrit, search, colSearch])
 
   useEffect(() => {
     if (filterCat && !quickForm.category_id) {
@@ -260,6 +290,8 @@ export default function Materials() {
       ...emptyForm,
       category_id: filterCat || '',
       section_id: filterSection || '',
+      section_ids: filterSection ? [String(filterSection)] : [],
+      section_equipment_ids: [],
       machine_id: filterMachine || ''
     })
     setErr('')
@@ -273,6 +305,13 @@ export default function Materials() {
     const iss = Number(m.issued || 0)
     const cur = Number(m.current_stock || 0)
     const op = Number((cur - rec + iss).toFixed(3))
+    const secIds = (m.sections && m.sections.length > 0)
+      ? m.sections.map(s => String(s.id))
+      : (m.sectionId ? [String(m.sectionId)] : [])
+    const equipIds = (m.equipment && m.equipment.length > 0)
+      ? m.equipment.map(eq => String(eq.id))
+      : (m.sectionEquipmentId ? [String(m.sectionEquipmentId)] : [])
+
     setForm({
       code: m.code ?? '',
       name: m.name ?? '',
@@ -280,6 +319,8 @@ export default function Materials() {
       section_id: String(m.sectionId ?? m.section_id ?? ''),
       machine_id: String(m.machineId ?? m.machine_id ?? ''),
       section_equipment_id: String(m.sectionEquipmentId ?? m.section_equipment_id ?? ''),
+      section_ids: secIds,
+      section_equipment_ids: equipIds,
       uom: m.uom ?? 'NOS',
       hsn_code: m.hsn_code ?? '',
       bin_location: m.binLocation ?? m.bin_location ?? '',
@@ -370,9 +411,11 @@ export default function Materials() {
     const payload = {
       ...form,
       category_id: parseInt(form.category_id),
-      section_id: form.section_id ? parseInt(form.section_id) : null,
+      section_id: form.section_id ? parseInt(form.section_id) : (form.section_ids?.[0] ? parseInt(form.section_ids[0]) : null),
+      section_ids: form.section_ids || [],
       machine_id: form.machine_id ? parseInt(form.machine_id) : null,
-      section_equipment_id: form.section_equipment_id ? parseInt(form.section_equipment_id) : null,
+      section_equipment_id: form.section_equipment_id ? parseInt(form.section_equipment_id) : (form.section_equipment_ids?.[0] ? parseInt(form.section_equipment_ids[0]) : null),
+      section_equipment_ids: form.section_equipment_ids || [],
       section_context: derivedContext || null,
       opening: form.opening === '' ? 0 : Number(form.opening),
       current_stock: form.current_stock === '' ? 0 : Number(form.current_stock),
@@ -754,15 +797,27 @@ export default function Materials() {
           onChange={val => { setFilterSection(val); setPage(1) }}
           placeholder="🏭 All Plant Sections"
           searchPlaceholder="Type section name..."
-          style={{ width: 190 }}
-          options={sections.map(s => ({ value: String(s.id), label: s.name || s.sectionCode }))}
+          style={{ width: 210 }}
+          options={sections.filter(s => s.sectionCode !== 'ALL').map(s => ({
+            value: String(s.id),
+            label: `${s.icon || '🏭'} ${s.name || s.sectionCode}`,
+            code: s.sectionCode || ''
+          }))}
         />
-        <select style={S.select} value={filterMachine} onChange={e => { setFilterMachine(e.target.value); setPage(1) }}>
-          <option value="">⚙️ All Machines</option>
-          {machines.map(m => (
-            <option key={m.id} value={m.id}>{m.name || m.code}</option>
-          ))}
-        </select>
+        <SearchableSelect
+          value={filterMachine}
+          onChange={val => { setFilterMachine(val); setPage(1) }}
+          placeholder="⚙️ All Machines / Rolls"
+          searchPlaceholder="Type machine or roll name..."
+          style={{ width: 220 }}
+          options={sectionEquipment.map(eq => ({
+            value: String(eq.id),
+            label: eq.equipmentName,
+            group: eq.sectionName || eq.sectionCode || '',
+            subtext: eq.sectionCode ? `[${eq.sectionCode}]` : '',
+            code: eq.tagName || ''
+          }))}
+        />
         <select style={S.select} value={filterActive} onChange={e => { setFilterActive(e.target.value); setPage(1) }}>
           <option value="true">Active Only</option>
           <option value="false">Inactive Only</option>
@@ -1114,6 +1169,101 @@ export default function Materials() {
                   <SortableTh label="Status" columnKey="is_active" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort} width={75} align="center" />
                   <th style={{ ...S.th, width: 80, textAlign: 'center' }}>Actions</th>
                 </tr>
+                {/* ── Per-Column Universal Search Filter Row ── */}
+                <tr style={{ background: '#f1f5f9', borderBottom: '2px solid #cbd5e1' }}>
+                  <th style={{ padding: '4px 6px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 10, color: '#64748b' }}>🔍</span>
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="Filter code..."
+                      value={colSearch.code}
+                      onChange={e => { setColSearch(s => ({ ...s, code: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="Filter name / specs..."
+                      value={colSearch.name}
+                      onChange={e => { setColSearch(s => ({ ...s, name: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="Filter section / roll..."
+                      value={colSearch.section}
+                      onChange={e => { setColSearch(s => ({ ...s, section: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="Filter category..."
+                      value={colSearch.category}
+                      onChange={e => { setColSearch(s => ({ ...s, category: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="A/B/C..."
+                      value={colSearch.crit}
+                      onChange={e => { setColSearch(s => ({ ...s, crit: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="HSN..."
+                      value={colSearch.hsn}
+                      onChange={e => { setColSearch(s => ({ ...s, hsn: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={S.colSearchInp}
+                      placeholder="Rack/Box..."
+                      value={colSearch.bin}
+                      onChange={e => { setColSearch(s => ({ ...s, bin: e.target.value })); setPage(1) }}
+                    />
+                  </th>
+                  {/* Stock Metrics Columns (Empty Search Spacers) */}
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <select
+                      style={{ ...S.colSearchInp, padding: '2px 4px', fontSize: 10 }}
+                      value={colSearch.status}
+                      onChange={e => { setColSearch(s => ({ ...s, status: e.target.value })); setPage(1) }}
+                    >
+                      <option value="">All</option>
+                      <option value="true">Active</option>
+                      <option value="false">Inactive</option>
+                    </select>
+                  </th>
+                  <th style={{ padding: '4px 6px', textAlign: 'center' }}>
+                    {(colSearch.code || colSearch.name || colSearch.section || colSearch.category || colSearch.crit || colSearch.hsn || colSearch.bin || colSearch.status) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setColSearch({ code: '', name: '', section: '', machine: '', category: '', crit: '', hsn: '', bin: '', status: '' })
+                          setPage(1)
+                        }}
+                        style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 6px', fontSize: 9.5, cursor: 'pointer', fontWeight: 700 }}
+                        title="Clear all column search filters"
+                      >
+                        ✕ Clear
+                      </button>
+                    )}
+                  </th>
+                </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && <tr><td colSpan={16} style={S.empty}>No materials match your filters</td></tr>}
@@ -1128,6 +1278,8 @@ export default function Materials() {
                   const reorder = Number(m.reorder_level || 0)
                   const secName = m.sectionName || m.section_name
                   const eqName = m.equipmentName || m.equipment_name || m.machineName || m.machine_name
+                  const mSections = Array.isArray(m.sections) && m.sections.length > 0 ? m.sections : []
+                  const mEquipment = Array.isArray(m.equipment) && m.equipment.length > 0 ? m.equipment : []
 
                   return (
                     <React.Fragment key={m.id}>
@@ -1157,17 +1309,61 @@ export default function Materials() {
                         </td>
                         <td style={S.td}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {secName && (
+                            {mSections.length > 0 ? (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                                {mSections.map(sec => (
+                                  <span
+                                    key={sec.id}
+                                    style={{
+                                      fontSize: 10.5,
+                                      fontWeight: 700,
+                                      color: '#0f766e',
+                                      background: '#f0fdf4',
+                                      border: '1px solid #bbf7d0',
+                                      padding: '1px 5px',
+                                      borderRadius: 3,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 2
+                                    }}
+                                    title={sec.name}
+                                  >
+                                    🏭 {sec.sectionCode || sec.name}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : secName ? (
                               <span style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
                                 🏭 {secName}
                               </span>
-                            )}
-                            {eqName && (
+                            ) : null}
+
+                            {mEquipment.length > 0 ? (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginTop: 2 }}>
+                                {mEquipment.map(eq => (
+                                  <span
+                                    key={eq.id}
+                                    style={{
+                                      fontSize: 10,
+                                      color: '#334155',
+                                      background: '#f8fafc',
+                                      border: '1px solid #e2e8f0',
+                                      padding: '1px 5px',
+                                      borderRadius: 3
+                                    }}
+                                    title={eq.remarks ? `${eq.equipmentName} (${eq.remarks})` : eq.equipmentName}
+                                  >
+                                    ⚙️ {eq.equipmentName}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : eqName ? (
                               <span style={{ fontSize: 11, color: '#475569', background: '#f8fafc', padding: '1px 6px', borderRadius: 4, width: 'fit-content' }}>
                                 ⚙️ {eqName}
                               </span>
-                            )}
-                            {!secName && !eqName && (
+                            ) : null}
+
+                            {mSections.length === 0 && mEquipment.length === 0 && !secName && !eqName && (
                               <span style={S.muted}>—</span>
                             )}
                           </div>
@@ -1674,14 +1870,21 @@ export default function Materials() {
 
               {/* Section 2: Plant Section & Machine / Equipment Assignment */}
               <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: '12px 16px', marginBottom: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span>🏭</span>
-                  <span>Plant Section &amp; Machine / Equipment Allocation (Section-Wise Provisioning)</span>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>🏭</span>
+                    <span>Plant Section &amp; Machinery Allocation (Multi-Section &amp; Multi-Machine Support)</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>
+                    💡 One item can be allocated to multiple sections &amp; machines across the mill
+                  </span>
                 </div>
-                <div style={S.grid3}>
+                
+                <div style={S.grid2}>
+                  {/* Multi-Section Selector */}
                   <label style={S.label}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Plant Section *</span>
+                      <span>Allocated Plant Section(s) *</span>
                       <button
                         type="button"
                         onClick={() => { setSecErr(''); setSecModal(true) }}
@@ -1690,33 +1893,36 @@ export default function Materials() {
                         + Add Section
                       </button>
                     </div>
-                    <SearchableSelect
-                      value={String(form.section_id || '')}
-                      onChange={val => {
-                        setForm(f => ({ ...f, section_id: val, section_equipment_id: '' }))
+                    <MultiSearchableSelect
+                      selectedValues={form.section_ids || (form.section_id ? [form.section_id] : [])}
+                      onChange={vals => {
+                        setForm(f => ({
+                          ...f,
+                          section_ids: vals,
+                          section_id: vals[0] || '',
+                          section_equipment_ids: (f.section_equipment_ids || []).filter(eqId => {
+                            const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                            return !eq || !eq.sectionId || vals.includes(String(eq.sectionId))
+                          })
+                        }))
                       }}
-                      placeholder="— Select Plant Section —"
-                      searchPlaceholder="Type section name..."
-                      options={sections.map(s => ({ value: String(s.id), label: s.name || s.sectionCode }))}
+                      placeholder="— Select One or Multiple Plant Sections —"
+                      searchPlaceholder="Search plant sections (Wire, Press, Boiler, ETP, Pulp...)..."
+                      options={sections
+                        .filter(s => s.sectionCode !== 'ALL')
+                        .sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99))
+                        .map(s => ({
+                          value: String(s.id),
+                          label: `${s.icon || '🏭'} ${s.name}`,
+                          code: s.sectionCode
+                        }))}
                     />
                   </label>
 
-                  <label style={S.label}>Target Machine / Unit
-                    <select
-                      style={S.select}
-                      value={String(form.machine_id || '')}
-                      onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))}
-                    >
-                      <option value="">— Select Machine / Unit —</option>
-                      {machines.map(m => (
-                        <option key={m.id} value={String(m.id)}>{m.name || m.code}</option>
-                      ))}
-                    </select>
-                  </label>
-
+                  {/* Multi-Equipment / Machinery Selector */}
                   <label style={S.label}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Roll / Section Equipment</span>
+                      <span>Allocated Machine(s) / Roll(s)</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -1729,44 +1935,58 @@ export default function Materials() {
                         + Add Equipment
                       </button>
                     </div>
-                    <select
-                      style={S.select}
-                      value={String(form.section_equipment_id || '')}
-                      onChange={e => {
-                        const eqId = e.target.value
-                        const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                    <MultiSearchableSelect
+                      selectedValues={form.section_equipment_ids || (form.section_equipment_id ? [form.section_equipment_id] : [])}
+                      onChange={vals => {
                         setForm(f => ({
                           ...f,
-                          section_equipment_id: eqId,
-                          section_id: eq?.sectionId ? String(eq.sectionId) : f.section_id,
-                          machine_id: eq?.machineId ? String(eq.machineId) : f.machine_id
+                          section_equipment_ids: vals,
+                          section_equipment_id: vals[0] || ''
                         }))
                       }}
-                    >
-                      <option value="">— Select Specific Roll / Equipment —</option>
-                      {(form.section_id
-                        ? sectionEquipment.filter(eq => String(eq.sectionId) === String(form.section_id))
-                        : sectionEquipment
-                      ).map(eq => (
-                        <option key={eq.id} value={String(eq.id)}>
-                          {eq.equipmentName} {eq.tagName ? `(${eq.tagName})` : ''} {eq.bearingSize ? `[${eq.bearingSize}]` : ''}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="— Select One or Multiple Machinery / Rolls —"
+                      searchPlaceholder="Search equipment / machine roll..."
+                      options={(
+                        (form.section_ids && form.section_ids.length > 0)
+                          ? sectionEquipment.filter(eq => form.section_ids.includes(String(eq.sectionId)))
+                          : sectionEquipment
+                      ).map(eq => {
+                        const sec = sections.find(s => String(s.id) === String(eq.sectionId))
+                        return {
+                          value: String(eq.id),
+                          label: eq.equipmentName,
+                          code: eq.tagName || '',
+                          group: sec ? sec.icon + ' ' + sec.name : (eq.sectionName || eq.sectionCode || ''),
+                          subtext: eq.sectionCode || ''
+                        }
+                      })}
+                    />
                   </label>
                 </div>
 
-                {/* Live Technical Specs Card from Section Equipment */}
-                {(() => {
-                  const selectedEq = sectionEquipment.find(x => String(x.id) === String(form.section_equipment_id))
-                  if (!selectedEq || !selectedEq.remarks) return null
-                  return (
-                    <div style={{ marginTop: 10, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 6, padding: '8px 12px', fontSize: 12, color: '#166534' }}>
-                      <span style={{ fontWeight: 700 }}>⚙️ Machine Roll Specifications: </span>
-                      <span>{selectedEq.remarks}</span>
-                    </div>
-                  )
-                })()}
+                {/* Primary Machine Context Selector */}
+                <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12 }}>
+                  <label style={S.label}>Primary Machine Unit
+                    <select
+                      style={S.select}
+                      value={String(form.machine_id || '')}
+                      onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))}
+                    >
+                      <option value="">— General / Any Machine —</option>
+                      {machines.map(m => (
+                        <option key={m.id} value={String(m.id)}>{m.name || m.code}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label style={S.label}>Section Context / Technical Placement
+                    <input
+                      style={S.input}
+                      value={form.section_context || ''}
+                      onChange={e => setForm(f => ({ ...f, section_context: e.target.value }))}
+                      placeholder="e.g. Wire Section Couch Roll &amp; Press Section Drive Roller"
+                    />
+                  </label>
+                </div>
               </div>
 
               {/* Thresholds */}
@@ -2108,5 +2328,8 @@ const S = {
   quickLabel: { display: 'block', fontSize: 10, fontWeight: 700, color: '#0f766e', textTransform: 'uppercase', marginBottom: 3 },
   quickInput: { background: '#ffffff', border: '1px solid #94a3b8', borderRadius: 5, padding: '6px 8px', fontSize: 12, color: '#0f172a', width: '100%', boxSizing: 'border-box', outline: 'none' },
   quickSelect: { background: '#ffffff', border: '1px solid #94a3b8', borderRadius: 5, padding: '6px 6px', fontSize: 12, color: '#0f172a', width: '100%', boxSizing: 'border-box' },
-  quickAddBtn: { background: '#0f766e', color: '#ffffff', border: 'none', borderRadius: 5, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', height: 28, whiteSpace: 'nowrap' }
+  quickAddBtn: { background: '#0f766e', color: '#ffffff', border: 'none', borderRadius: 5, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', height: 28, whiteSpace: 'nowrap' },
+
+  // Universal Column Search Style
+  colSearchInp: { background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 4, padding: '4px 6px', fontSize: 11, color: '#0f172a', width: '100%', boxSizing: 'border-box', outline: 'none' }
 }

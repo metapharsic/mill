@@ -1701,11 +1701,20 @@ export default function Indent() {
             {form.items.map((it, i) => {
               const mat = matByID(it.material_id)
               const price = it.unit_price !== '' && it.unit_price !== undefined ? parseFloat(it.unit_price) : matPrice(mat)
-              const filtered = mats.filter(m =>
-                !(matSearch[i] || '') ||
-                (m.name || '').toLowerCase().includes((matSearch[i] || '').toLowerCase()) ||
-                (m.code || '').toLowerCase().includes((matSearch[i] || '').toLowerCase())
-              ).slice(0, 40)
+              const filtered = mats.filter(m => {
+                const q = (matSearch[i] || '').toLowerCase()
+                if (!q) return true
+                const secMatch = m.sections ? m.sections.some(s => (s.name || s.sectionCode || '').toLowerCase().includes(q)) : false
+                const eqMatch = m.equipment ? m.equipment.some(e => (e.equipmentName || e.tagName || '').toLowerCase().includes(q)) : false
+                return (
+                  (m.name || '').toLowerCase().includes(q) ||
+                  (m.code || '').toLowerCase().includes(q) ||
+                  (m.sectionName || '').toLowerCase().includes(q) ||
+                  (m.machineName || '').toLowerCase().includes(q) ||
+                  secMatch ||
+                  eqMatch
+                )
+              }).slice(0, 50)
 
               return (
                 <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 14, marginBottom: 12 }}>
@@ -1728,41 +1737,62 @@ export default function Indent() {
                       <label style={S.lbl}>Material / Spare Part *
                         <input
                           style={{ ...S.inp, ...(formErrors.items?.[i]?.material_id ? { border: '1px solid #ef4444' } : {}) }}
-                          placeholder="🔍 Type material name or code..."
+                          placeholder="🔍 Search name, code, section (Wire/Press/Boiler), machine..."
                           value={matSearch[i] !== undefined ? matSearch[i] : (mat ? `${mat.name} [${mat.code}]` : '')}
                           onFocus={() => setMatDropOpen(d => ({ ...d, [i]: true }))}
                           onChange={e => {
                             setMatSearch(s => ({ ...s, [i]: e.target.value }))
                             setMatDropOpen(d => ({ ...d, [i]: true }))
                           }}
-                          onBlur={() => setTimeout(() => setMatDropOpen(d => ({ ...d, [i]: false })), 180)}
+                          onBlur={() => setTimeout(() => setMatDropOpen(d => ({ ...d, [i]: false })), 200)}
                         />
                       </label>
                       {formErrors.items?.[i]?.material_id && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.items[i].material_id}</span>}
 
                       {matDropOpen[i] && (
-                        <div style={S.dropMenu}>
-                          {filtered.map(m => (
-                            <div
-                              key={m.id}
-                              onMouseDown={() => {
-                                setItem(i, 'material_id', m.id)
-                                setItem(i, 'uom', m.uom || 'NOS')
-                                setItem(i, 'unit_price', m.unit_price || '')
-                                setMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
-                                setMatDropOpen(d => ({ ...d, [i]: false }))
-                              }}
-                              style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 12, borderBottom: '1px solid #f1f5f9' }}
-                            >
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{m.name}</div>
-                              <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 10, marginTop: 2 }}>
-                                <span style={{ fontFamily: 'monospace', color: '#0f766e', fontWeight: 700 }}>[{m.code}]</span>
-                                <span>Stock: <strong style={{ color: m.current_stock > 0 ? '#16a34a' : '#dc2626' }}>{m.current_stock} {m.uom}</strong></span>
-                                <span>Rate: ₹{Number(m.unit_price || 0).toFixed(2)}</span>
-                                {m.hsn_code && <span>HSN: {m.hsn_code}</span>}
-                              </div>
+                        <div style={{ ...S.dropMenu, maxHeight: 260, overflowY: 'auto' }}>
+                          {filtered.length === 0 ? (
+                            <div style={{ padding: '10px 14px', fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>
+                              No matching materials or parts found
                             </div>
-                          ))}
+                          ) : filtered.map(m => {
+                            const mSecs = Array.isArray(m.sections) && m.sections.length > 0 ? m.sections : []
+                            const mEquips = Array.isArray(m.equipment) && m.equipment.length > 0 ? m.equipment : []
+                            return (
+                              <div
+                                key={m.id}
+                                onMouseDown={() => {
+                                  setItem(i, 'material_id', m.id)
+                                  setItem(i, 'uom', m.uom || 'NOS')
+                                  setItem(i, 'unit_price', m.unit_price || '')
+                                  setMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
+                                  setMatDropOpen(d => ({ ...d, [i]: false }))
+                                }}
+                                style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 12, borderBottom: '1px solid #f1f5f9' }}
+                              >
+                                <div style={{ fontWeight: 600, color: '#0f172a' }}>{m.name}</div>
+                                <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 8, marginTop: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+                                  <span style={{ fontFamily: 'monospace', color: '#0f766e', fontWeight: 700 }}>[{m.code}]</span>
+                                  <span>Stock: <strong style={{ color: m.current_stock > 0 ? '#16a34a' : '#dc2626' }}>{m.current_stock} {m.uom}</strong></span>
+                                  <span>Rate: ₹{Number(m.unit_price || 0).toFixed(2)}</span>
+                                  {mSecs.length > 0 ? (
+                                    <span style={{ color: '#0f766e', fontWeight: 700, background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '1px 5px', borderRadius: 3 }}>
+                                      🏭 {mSecs.map(s => s.sectionCode || s.name).join(', ')}
+                                    </span>
+                                  ) : m.sectionName ? (
+                                    <span style={{ color: '#0f766e', fontWeight: 600, background: '#f0fdf4', padding: '1px 5px', borderRadius: 3 }}>
+                                      🏭 {m.sectionName}
+                                    </span>
+                                  ) : null}
+                                  {mEquips.length > 0 && (
+                                    <span style={{ color: '#475569', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '1px 5px', borderRadius: 3 }}>
+                                      ⚙️ {mEquips.map(e => e.equipmentName).join(', ')}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       )}
                     </div>

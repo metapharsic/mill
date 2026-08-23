@@ -983,7 +983,7 @@ export default function Purchase() {
                 Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka
               </div>
               <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 2 }}>
-                GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: <code>U21012KA2015PTC081234</code>
+                GSTIN: <code>29AABCS1429B1Z8</code> | PAN: <code>AAICM7429L</code> | State: Karnataka (Code: 29)
               </div>
             </div>
           </div>
@@ -1415,7 +1415,7 @@ export default function Purchase() {
                 Factory: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
               </div>
               <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
-                GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+                GSTIN: <code>29AABCS1429B1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AAICM7429L</code>
               </div>
             </div>
           </div>
@@ -1648,7 +1648,7 @@ export default function Purchase() {
                 Factory &amp; Central Stores: Survey No. 42/1, Mill Road, Industrial Area, Dharwad - 580011, Karnataka
               </div>
               <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 600, marginTop: 2 }}>
-                GSTIN: <code>29AABCS1234F1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AABCS1234F</code> · CIN: <code>U21012KA2015PTC081234</code>
+                GSTIN: <code>29AABCS1429B1Z8</code> · State: Karnataka (Code: 29) · PAN: <code>AAICM7429L</code>
               </div>
             </div>
           </div>

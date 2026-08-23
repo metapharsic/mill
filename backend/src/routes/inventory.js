@@ -83,7 +83,8 @@ router.get('/categories', auth, asyncRoute(async (req, res) => {
 }));
 
 router.get('/materials', auth, asyncRoute(async (req, res) => {
-  const { categoryId, store_type, search, low_stock, page = 1, limit = 50 } = req.query;
+  const { categoryId, store_type, search, low_stock, page = 1, limit = 50,
+          col_code, col_name, col_section, col_machine, col_category } = req.query;
   const conditions = ['m.is_active = true'];
   const params = [];
   let p = 1;
@@ -104,8 +105,32 @@ router.get('/materials', auth, asyncRoute(async (req, res) => {
     conditions.push(`m.current_stock <= m.reorder_level`);
   }
 
+  if (col_code)     { conditions.push(`m.code ILIKE $${p++}`); params.push(`%${col_code}%`); }
+  if (col_name)     { conditions.push(`m.name ILIKE $${p++}`); params.push(`%${col_name}%`); }
+  if (col_category) { conditions.push(`mc.name ILIKE $${p++}`); params.push(`%${col_category}%`); }
+  if (col_section) {
+    conditions.push(`(ps.name ILIKE $${p} OR ps.section_code ILIKE $${p} OR m.id IN (SELECT ms_s.material_id FROM material_sections ms_s JOIN plant_sections ps_s ON ps_s.id = ms_s.section_id WHERE ps_s.name ILIKE $${p} OR ps_s.section_code ILIKE $${p}))`);
+    params.push(`%${col_section}%`);
+    p++;
+  }
+  if (col_machine) {
+    conditions.push(`(mac.name ILIKE $${p} OR mac.code ILIKE $${p} OR se.equipment_name ILIKE $${p} OR se.tag_name ILIKE $${p} OR m.id IN (SELECT me_s.material_id FROM material_equipment me_s JOIN section_equipment se_s ON se_s.id = me_s.section_equipment_id WHERE se_s.equipment_name ILIKE $${p} OR se_s.tag_name ILIKE $${p}))`);
+    params.push(`%${col_machine}%`);
+    p++;
+  }
+
   if (search) {
-    conditions.push(`(m.name ILIKE $${p} OR m.code ILIKE $${p})`);
+    conditions.push(`(
+      m.name ILIKE $${p} OR
+      m.code ILIKE $${p} OR
+      m.hsn_code ILIKE $${p} OR
+      mc.name ILIKE $${p} OR
+      ps.name ILIKE $${p} OR
+      mac.name ILIKE $${p} OR
+      se.equipment_name ILIKE $${p} OR
+      m.id IN (SELECT ms_s.material_id FROM material_sections ms_s JOIN plant_sections ps_s ON ps_s.id = ms_s.section_id WHERE ps_s.name ILIKE $${p} OR ps_s.section_code ILIKE $${p}) OR
+      m.id IN (SELECT me_s.material_id FROM material_equipment me_s JOIN section_equipment se_s ON se_s.id = me_s.section_equipment_id WHERE se_s.equipment_name ILIKE $${p} OR se_s.tag_name ILIKE $${p})
+    )`);
     params.push(`%${search}%`);
     p++;
   }
@@ -127,12 +152,37 @@ router.get('/materials', auth, asyncRoute(async (req, res) => {
             m.unit_price as "unitPrice",
             m.unit_price as "unit_price",
             m.is_active as "isActive",
+            m.bin_location as "binLocation",
+            m.criticality_class as "criticalityClass",
+            m.section_id as "sectionId",
+            m.machine_id as "machineId",
+            m.section_equipment_id as "sectionEquipmentId",
+            ps.name as "sectionName",
+            ps.section_code as "sectionCode",
+            mac.name as "machineName",
+            mac.code as "machineCode",
+            se.equipment_name as "equipmentName",
             mc.name as "categoryName",
             mc.type as "categoryType",
+            COALESCE((
+              SELECT jsonb_agg(jsonb_build_object('id', ps_sub.id, 'name', ps_sub.name, 'sectionCode', ps_sub.section_code, 'icon', ps_sub.icon) ORDER BY ps_sub.sort_order, ps_sub.name)
+              FROM material_sections ms_sub
+              JOIN plant_sections ps_sub ON ps_sub.id = ms_sub.section_id
+              WHERE ms_sub.material_id = m.id
+            ), '[]'::jsonb) AS sections,
+            COALESCE((
+              SELECT jsonb_agg(jsonb_build_object('id', se_sub.id, 'equipmentName', se_sub.equipment_name, 'tagName', se_sub.tag_name, 'sectionId', se_sub.section_id, 'machineId', se_sub.machine_id, 'remarks', se_sub.remarks) ORDER BY se_sub.equipment_name)
+              FROM material_equipment me_sub
+              JOIN section_equipment se_sub ON se_sub.id = me_sub.section_equipment_id
+              WHERE me_sub.material_id = m.id
+            ), '[]'::jsonb) AS equipment,
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS "poCount",
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS po_count
      FROM materials m
      LEFT JOIN material_categories mc ON mc.id = m.category_id
+     LEFT JOIN plant_sections ps ON ps.id = m.section_id
+     LEFT JOIN machines mac ON mac.id = m.machine_id
+     LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
      ${where}
      ORDER BY m.code, m.name
      LIMIT $${p++} OFFSET $${p++}`,
@@ -142,6 +192,9 @@ router.get('/materials', auth, asyncRoute(async (req, res) => {
   const count = await pool.query(`
     SELECT COUNT(*) AS total FROM materials m
     LEFT JOIN material_categories mc ON mc.id = m.category_id
+    LEFT JOIN plant_sections ps ON ps.id = m.section_id
+    LEFT JOIN machines mac ON mac.id = m.machine_id
+    LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
     ${where}
   `, params);
   res.json({ success: true, data: rows, total: parseInt(count.rows[0].total) });

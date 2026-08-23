@@ -56,6 +56,12 @@ export default function Inventory() {
   const [matPage, setMatPage] = useState(1)
   const [matSearch, setMatSearch] = useState('')
   const [matCategory, setMatCategory] = useState('')
+  const [matColSearch, setMatColSearch] = useState({
+    code: '',
+    name: '',
+    section: '',
+    category: ''
+  })
   const [lowStockOnly, setLowStockOnly] = useState(false)
   const [matLoading, setMatLoading] = useState(false)
   const [matSortBy, setMatSortBy] = useState('current_stock')
@@ -131,6 +137,10 @@ export default function Inventory() {
       if (matSearch) p.set('search', matSearch)
       if (matCategory) p.set('categoryId', matCategory)
       if (lowStockOnly) p.set('low_stock', 'true')
+      if (matColSearch.code) p.set('col_code', matColSearch.code)
+      if (matColSearch.name) p.set('col_name', matColSearch.name)
+      if (matColSearch.section) p.set('col_section', matColSearch.section)
+      if (matColSearch.category) p.set('col_category', matColSearch.category)
 
       const res = await API(`/api/inventory/materials?${p}`)
       if (res.success) {
@@ -141,7 +151,7 @@ export default function Inventory() {
       console.error(e)
     }
     setMatLoading(false)
-  }, [activeStoreTab, matPage, matSearch, matCategory, lowStockOnly])
+  }, [activeStoreTab, matPage, matSearch, matCategory, lowStockOnly, matColSearch])
 
   // Fetch ledger
   const loadLedger = useCallback(async () => {
@@ -593,6 +603,7 @@ export default function Inventory() {
                 <tr>
                   <SortableTh label="Code" columnKey="code" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} width={100} />
                   <SortableTh label="Material Name / Specs" columnKey="name" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} />
+                  <SortableTh label="Plant Section / Equipment" columnKey="section" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} />
                   <SortableTh label="Category" columnKey="categoryName" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} />
                   <SortableTh label="Current Stock" columnKey="currentStock" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
                   <SortableTh label="Reorder Level" columnKey="reorderLevel" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="right" />
@@ -601,12 +612,67 @@ export default function Inventory() {
                   <SortableTh label="Stock Status" columnKey="isLow" currentSortKey={matSortBy} currentSortOrder={matSortOrder} onSort={(k, o) => { setMatSortBy(k); setMatSortOrder(o) }} align="center" width={100} />
                   <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Actions</th>
                 </tr>
+                {/* ── Per-Column Search Row ── */}
+                <tr style={{ background: '#f1f5f9', borderBottom: '2px solid #cbd5e1' }}>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 4, padding: '3px 6px', fontSize: 11, width: '100%', boxSizing: 'border-box' }}
+                      placeholder="Filter code..."
+                      value={matColSearch.code}
+                      onChange={e => { setMatColSearch(s => ({ ...s, code: e.target.value })); setMatPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 4, padding: '3px 6px', fontSize: 11, width: '100%', boxSizing: 'border-box' }}
+                      placeholder="Filter name..."
+                      value={matColSearch.name}
+                      onChange={e => { setMatColSearch(s => ({ ...s, name: e.target.value })); setMatPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 4, padding: '3px 6px', fontSize: 11, width: '100%', boxSizing: 'border-box' }}
+                      placeholder="Filter section..."
+                      value={matColSearch.section}
+                      onChange={e => { setMatColSearch(s => ({ ...s, section: e.target.value })); setMatPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}>
+                    <input
+                      style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 4, padding: '3px 6px', fontSize: 11, width: '100%', boxSizing: 'border-box' }}
+                      placeholder="Filter category..."
+                      value={matColSearch.category}
+                      onChange={e => { setMatColSearch(s => ({ ...s, category: e.target.value })); setMatPage(1) }}
+                    />
+                  </th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px' }}></th>
+                  <th style={{ padding: '4px 6px', textAlign: 'center' }}>
+                    {(matColSearch.code || matColSearch.name || matColSearch.section || matColSearch.category) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMatColSearch({ code: '', name: '', section: '', category: '' })
+                          setMatPage(1)
+                        }}
+                        style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 6px', fontSize: 9.5, cursor: 'pointer', fontWeight: 700 }}
+                        title="Clear column filters"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </th>
+                </tr>
               </thead>
               <tbody>
                 {matLoading ? (
-                  <tr><td colSpan={9} style={S.empty}>Loading catalog items...</td></tr>
+                  <tr><td colSpan={10} style={S.empty}>Loading catalog items...</td></tr>
                 ) : materials.length === 0 ? (
-                  <tr><td colSpan={9} style={S.empty}>No materials matching filter in {activeTabMeta.label}</td></tr>
+                  <tr><td colSpan={10} style={S.empty}>No materials matching filter in {activeTabMeta.label}</td></tr>
                 ) : (
                   sortTableData(
                     materials,
@@ -627,6 +693,9 @@ export default function Inventory() {
                     const value = stock * price
                     const isLow = stock <= reorder
                     const isZero = stock <= 0
+                    const mSections = Array.isArray(m.sections) && m.sections.length > 0 ? m.sections : []
+                    const mEquipment = Array.isArray(m.equipment) && m.equipment.length > 0 ? m.equipment : []
+                    const secName = m.sectionName || m.section_name
 
                     return (
                       <tr key={m.id} style={{ background: isZero ? '#fef2f222' : isLow ? '#fffbeb33' : undefined }}>
@@ -647,6 +716,25 @@ export default function Inventory() {
                           >
                             <span>{m.name}</span>
                             <ExternalLink size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+                          </div>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {mSections.length > 0 ? (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                                {mSections.map(sec => (
+                                  <span key={sec.id} style={{ fontSize: 10, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '1px 5px', borderRadius: 3 }}>
+                                    🏭 {sec.sectionCode || sec.name}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : secName ? (
+                              <span style={{ fontSize: 10.5, fontWeight: 700, color: '#0f766e', background: '#f0fdf4', padding: '1px 5px', borderRadius: 3 }}>
+                                🏭 {secName}
+                              </span>
+                            ) : (
+                              <span style={{ color: '#9ca3af', fontSize: 11 }}>General</span>
+                            )}
                           </div>
                         </td>
                         <td style={S.td}>

@@ -66,14 +66,14 @@ const A3_PRINT_STYLE = `
   position: relative;
 }
 .a3-watermark-bg::after {
-  content: 'METAPHARSIC';
+  content: 'SRI M.K. PAPER MILLS';
   position: absolute;
   top: 52%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-12deg);
-  font-size: 88px;
+  font-size: 76px;
   font-weight: 900;
-  letter-spacing: 12px;
+  letter-spacing: 10px;
   color: rgba(15, 118, 110, 0.05);
   pointer-events: none;
   z-index: 0;
@@ -120,15 +120,15 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'GST INV
 
   // Company details
   const company = {
-    name: docData.companyName || 'METAPHARSIC LIFESCIENCES',
-    subTitle: 'SRI M.K. PAPER MILLS PRIVATE LIMITED',
-    address: 'H.NO.4-9-147, GROUND FLOOR, STREET NO-5, HMT NAGAR, NACHARAM VILLAGE, UPPAL MANDAL, MEDCHAL MALKAJGIRI DISTRICT, TELANGANA, Nacharam(V), Uppal(M), MEDCHAL - MALKAJGIRI(Dist.), Telangana State, India',
-    gstin: docData.companyGstin || '36ACHFM0773D1ZC',
-    phone: '9985589599',
-    dlNo: 'TG/MDL/2026-147387',
-    panNo: 'AAICM7429L',
-    state: 'Telangana',
-    stateCode: '36'
+    name: docData.companyName || 'SRI M.K. PAPER MILLS PRIVATE LIMITED',
+    subTitle: 'MANUFACTURERS OF KRAFT & FLUTING PAPER',
+    address: docData.companyAddress || 'Survey No. 42/1, Mill Road, Industrial Area, Karnataka, India',
+    gstin: docData.companyGstin || '29AABCS1429B1Z8',
+    phone: docData.companyPhone || '+91 99855 89599',
+    dlNo: docData.companyDlNo || 'KA/MDL/2026-147387',
+    panNo: docData.companyPan || 'AAICM7429L',
+    state: docData.companyState || 'Karnataka',
+    stateCode: docData.companyStateCode || '29'
   }
 
   // Party / Customer / Vendor details

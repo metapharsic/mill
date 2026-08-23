@@ -217,16 +217,68 @@ router.get('/section-equipment', auth, ar(async (req, res) => {
 
 // Schema: id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active, section_id, machine_id, section_equipment_id
 router.get('/materials', auth, ar(async (req, res) => {
-  const { category_id, is_active, search, criticality_class, section_context, section_id, machine_id, section_equipment_id, sort_by, sort_order = 'ASC', page = 1, limit = 50 } = req.query;
+  const { category_id, is_active, search, criticality_class, section_context, section_id, machine_id, section_equipment_id, sort_by, sort_order = 'ASC', page = 1, limit = 50,
+          col_code, col_name, col_section, col_machine, col_category, col_hsn, col_bin, col_status } = req.query;
   const w = []; const p = []; let i = 1;
   if (category_id)        { w.push(`m.category_id IN (SELECT id FROM material_categories WHERE id=$${i} OR parent_id=$${i})`); p.push(category_id); i++; }
   if (is_active !== undefined) { w.push(`m.is_active=$${i++}`);     p.push(is_active === 'true'); }
   if (criticality_class)  { w.push(`m.criticality_class=$${i++}`);  p.push(criticality_class.toUpperCase()); }
-  if (section_id)         { w.push(`m.section_id = $${i++}`);      p.push(parseInt(section_id)); }
-  if (machine_id)         { w.push(`m.machine_id = $${i++}`);      p.push(parseInt(machine_id)); }
-  if (section_equipment_id) { w.push(`m.section_equipment_id = $${i++}`); p.push(parseInt(section_equipment_id)); }
+  if (section_id) {
+    w.push(`(m.section_id = $${i} OR m.id IN (SELECT material_id FROM material_sections WHERE section_id = $${i}))`);
+    p.push(parseInt(section_id));
+    i++;
+  }
+  if (machine_id) {
+    w.push(`(m.machine_id = $${i} OR m.id IN (SELECT material_id FROM material_equipment WHERE machine_id = $${i}))`);
+    p.push(parseInt(machine_id));
+    i++;
+  }
+  if (section_equipment_id) {
+    w.push(`(m.section_equipment_id = $${i} OR m.id IN (SELECT material_id FROM material_equipment WHERE section_equipment_id = $${i}))`);
+    p.push(parseInt(section_equipment_id));
+    i++;
+  }
   if (section_context)    { w.push(`m.section_context ILIKE $${i++}`); p.push(`%${section_context}%`); }
-  if (search)             { w.push(`(m.name ILIKE $${i} OR m.code ILIKE $${i} OR m.oem_supplier ILIKE $${i} OR ps.name ILIKE $${i} OR mac.name ILIKE $${i} OR se.equipment_name ILIKE $${i})`); p.push(`%${search}%`); i++; }
+  
+  // Specific Column Search Filters
+  if (col_code)     { w.push(`m.code ILIKE $${i++}`); p.push(`%${col_code}%`); }
+  if (col_name)     { w.push(`m.name ILIKE $${i++}`); p.push(`%${col_name}%`); }
+  if (col_category) { w.push(`mc.name ILIKE $${i++}`); p.push(`%${col_category}%`); }
+  if (col_hsn)      { w.push(`m.hsn_code ILIKE $${i++}`); p.push(`%${col_hsn}%`); }
+  if (col_bin)      { w.push(`m.bin_location ILIKE $${i++}`); p.push(`%${col_bin}%`); }
+  if (col_status !== undefined && col_status !== '') {
+    w.push(`m.is_active = $${i++}`);
+    p.push(col_status === 'true' || col_status === 'Active' || col_status === 'active');
+  }
+  if (col_section) {
+    w.push(`(ps.name ILIKE $${i} OR ps.section_code ILIKE $${i} OR m.id IN (SELECT ms_s.material_id FROM material_sections ms_s JOIN plant_sections ps_s ON ps_s.id = ms_s.section_id WHERE ps_s.name ILIKE $${i} OR ps_s.section_code ILIKE $${i}))`);
+    p.push(`%${col_section}%`);
+    i++;
+  }
+  if (col_machine) {
+    w.push(`(mac.name ILIKE $${i} OR mac.code ILIKE $${i} OR se.equipment_name ILIKE $${i} OR se.tag_name ILIKE $${i} OR se.remarks ILIKE $${i} OR m.id IN (SELECT me_s.material_id FROM material_equipment me_s JOIN section_equipment se_s ON se_s.id = me_s.section_equipment_id WHERE se_s.equipment_name ILIKE $${i} OR se_s.tag_name ILIKE $${i} OR se_s.remarks ILIKE $${i}))`);
+    p.push(`%${col_machine}%`);
+    i++;
+  }
+
+  // Universal Cross-Column Search
+  if (search) {
+    w.push(`(
+      m.name ILIKE $${i} OR
+      m.code ILIKE $${i} OR
+      m.hsn_code ILIKE $${i} OR
+      m.bin_location ILIKE $${i} OR
+      m.oem_supplier ILIKE $${i} OR
+      mc.name ILIKE $${i} OR
+      ps.name ILIKE $${i} OR
+      mac.name ILIKE $${i} OR
+      se.equipment_name ILIKE $${i} OR
+      m.id IN (SELECT ms_s.material_id FROM material_sections ms_s JOIN plant_sections ps_s ON ps_s.id = ms_s.section_id WHERE ps_s.name ILIKE $${i} OR ps_s.section_code ILIKE $${i}) OR
+      m.id IN (SELECT me_s.material_id FROM material_equipment me_s JOIN section_equipment se_s ON se_s.id = me_s.section_equipment_id WHERE se_s.equipment_name ILIKE $${i} OR se_s.tag_name ILIKE $${i} OR se_s.remarks ILIKE $${i})
+    )`);
+    p.push(`%${search}%`);
+    i++;
+  }
   const where = w.length ? 'WHERE '+w.join(' AND ') : '';
   const offset = (parseInt(page)-1)*parseInt(limit);
 
@@ -286,6 +338,18 @@ router.get('/materials', auth, ar(async (req, res) => {
             m.expected_lifespan_days as "expectedLifespanDays",
             mc.name                as "categoryName",
             m.category_id          as "categoryId",
+            COALESCE((
+              SELECT jsonb_agg(jsonb_build_object('id', ps_sub.id, 'name', ps_sub.name, 'sectionCode', ps_sub.section_code, 'icon', ps_sub.icon) ORDER BY ps_sub.sort_order, ps_sub.name)
+              FROM material_sections ms_sub
+              JOIN plant_sections ps_sub ON ps_sub.id = ms_sub.section_id
+              WHERE ms_sub.material_id = m.id
+            ), '[]'::jsonb) AS sections,
+            COALESCE((
+              SELECT jsonb_agg(jsonb_build_object('id', se_sub.id, 'equipmentName', se_sub.equipment_name, 'tagName', se_sub.tag_name, 'sectionId', se_sub.section_id, 'machineId', se_sub.machine_id, 'remarks', se_sub.remarks) ORDER BY se_sub.equipment_name)
+              FROM material_equipment me_sub
+              JOIN section_equipment se_sub ON se_sub.id = me_sub.section_equipment_id
+              WHERE me_sub.material_id = m.id
+            ), '[]'::jsonb) AS equipment,
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS "poCount",
             COALESCE((SELECT COUNT(DISTINCT pi.po_id) FROM po_items pi WHERE pi.material_id = m.id), 0)::int AS po_count,
             COALESCE((SELECT SUM(sl.in_qty)  FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.date = CURRENT_DATE AND sl.transaction_type != 'opening'), 0) AS received,
@@ -301,6 +365,7 @@ router.get('/materials', auth, ar(async (req, res) => {
   const { rows: cnt } = await pool.query(`
     SELECT COUNT(*)
     FROM materials m
+    LEFT JOIN material_categories mc ON mc.id=m.category_id
     LEFT JOIN plant_sections ps ON ps.id = m.section_id
     LEFT JOIN machines mac ON mac.id = m.machine_id
     LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
@@ -314,6 +379,7 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
           oem_supplier, last_audit_cycle, calibration_protocol,
           is_serialized, expected_lifespan_days, is_active,
           section_id, machine_id, section_equipment_id,
+          section_ids, section_equipment_ids,
           current_stock, balance, received, issued } = req.body;
   if (!code||!name||!category_id||!uom) return res.status(400).json({ success: false, message: 'code,name,category_id,uom required' });
   const stockVal = parseNum(balance) ?? parseNum(current_stock) ?? 0;
@@ -322,9 +388,20 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
   const price = parseNum(unit_price) ?? 0;
   const opQty = parseNum(req.body.opening) ?? parseFloat((stockVal - inQty + outQty).toFixed(3));
   const activeVal = is_active !== undefined ? Boolean(is_active) : true;
-  const secId = parseNum(section_id);
+  
+  // Normalize multi-section and multi-equipment IDs
+  let rawSecIds = Array.isArray(section_ids) ? section_ids.map(id => parseNum(id)).filter(Boolean) : [];
+  if (rawSecIds.length === 0 && parseNum(section_id)) {
+    rawSecIds = [parseNum(section_id)];
+  }
+  const primarySecId = rawSecIds[0] || parseNum(section_id) || null;
+
+  let rawSecEqIds = Array.isArray(section_equipment_ids) ? section_equipment_ids.map(id => parseNum(id)).filter(Boolean) : [];
+  if (rawSecEqIds.length === 0 && parseNum(section_equipment_id)) {
+    rawSecEqIds = [parseNum(section_equipment_id)];
+  }
+  const primarySecEqId = rawSecEqIds[0] || parseNum(section_equipment_id) || null;
   const mcnId = parseNum(machine_id);
-  const secEqId = parseNum(section_equipment_id);
 
   const client = await pool.connect();
   try {
@@ -339,10 +416,37 @@ router.post('/materials', auth, requireLevel(1), ar(async (req, res) => {
        stockVal, price, bin_location ? bin_location.trim() : null,
        parseNum(reorder_buffer)??0, section_context||null, criticality_class ? criticality_class.trim().toUpperCase() : null,
        procurement_strategy||null, oem_supplier||null, last_audit_cycle||null, calibration_protocol||null,
-       Boolean(is_serialized), parseNum(expected_lifespan_days)??365, activeVal, secId, mcnId, secEqId]
+       Boolean(is_serialized), parseNum(expected_lifespan_days)??365, activeVal, primarySecId, mcnId, primarySecEqId]
     );
 
     const matId = rows[0].id;
+
+    // Ingest multi-section mappings
+    if (rawSecIds.length > 0) {
+      for (let sIdx = 0; sIdx < rawSecIds.length; sIdx++) {
+        const sId = rawSecIds[sIdx];
+        await client.query(`
+          INSERT INTO material_sections (material_id, section_id, is_primary)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (material_id, section_id) DO UPDATE SET is_primary = EXCLUDED.is_primary
+        `, [matId, sId, sIdx === 0]);
+      }
+    }
+
+    // Ingest multi-equipment mappings
+    if (rawSecEqIds.length > 0) {
+      for (const eqId of rawSecEqIds) {
+        const { rows: eqInfo } = await client.query('SELECT section_id, machine_id FROM section_equipment WHERE id = $1', [eqId]);
+        const sId = eqInfo[0]?.section_id || primarySecId;
+        const mId = eqInfo[0]?.machine_id || mcnId;
+        await client.query(`
+          INSERT INTO material_equipment (material_id, section_id, machine_id, section_equipment_id)
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT (material_id, section_equipment_id) DO NOTHING
+        `, [matId, sId, mId, eqId]);
+      }
+    }
+
     // 1. Opening stock ledger record
     if (opQty > 0 || (stockVal > 0 && inQty === 0 && outQty === 0)) {
       await client.query(
@@ -490,6 +594,18 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
            se.equipment_name AS "equipmentName",
            se.tag_name AS "equipmentTagName",
            se.remarks AS "equipmentRemarks",
+           COALESCE((
+             SELECT jsonb_agg(jsonb_build_object('id', ps_sub.id, 'name', ps_sub.name, 'sectionCode', ps_sub.section_code, 'icon', ps_sub.icon) ORDER BY ps_sub.sort_order, ps_sub.name)
+             FROM material_sections ms_sub
+             JOIN plant_sections ps_sub ON ps_sub.id = ms_sub.section_id
+             WHERE ms_sub.material_id = m.id
+           ), '[]'::jsonb) AS sections,
+           COALESCE((
+             SELECT jsonb_agg(jsonb_build_object('id', se_sub.id, 'equipmentName', se_sub.equipment_name, 'tagName', se_sub.tag_name, 'sectionId', se_sub.section_id, 'machineId', se_sub.machine_id, 'remarks', se_sub.remarks) ORDER BY se_sub.equipment_name)
+             FROM material_equipment me_sub
+             JOIN section_equipment se_sub ON se_sub.id = me_sub.section_equipment_id
+             WHERE me_sub.material_id = m.id
+           ), '[]'::jsonb) AS equipment,
            (m.current_stock <= m.min_stock) AS "lowStock",
            (m.current_stock * m.unit_price) AS valuation
     FROM materials m
@@ -515,14 +631,6 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
     LIMIT 20
   `, [req.params.id]);
 
-  // Aggregate stats
-  // NOTE: must exclude only 'opening' (not whitelist specific type strings) — real write paths
-  // across the app use many transaction_type values beyond 'grn'/'issue' (e.g. 'return',
-  // 'return_to_vendor', 'transfer', 'cash_purchase', 'Adjustment', 'adjustment_plus', 'sale',
-  // 'receipt', and capitalized 'Issue'). A whitelist here silently drops those from
-  // received/issued, which then desyncs opening_stock = current_stock - today_received +
-  // today_issued below. Matches the comprehensive `transaction_type != 'opening'` pattern used
-  // by GET /materials and GET /materials/:id/stock-summary elsewhere in this file.
   const statsRes = await pool.query(`
     SELECT
       COALESCE(SUM(CASE WHEN transaction_type != 'opening' THEN in_qty ELSE 0 END), 0) AS total_received,
@@ -559,6 +667,7 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
           oem_supplier, last_audit_cycle, calibration_protocol,
           is_serialized, expected_lifespan_days,
           section_id, machine_id, section_equipment_id,
+          section_ids, section_equipment_ids,
           current_stock, balance, received, issued, opening } = req.body;
 
   const stockVal = parseNum(balance) ?? parseNum(current_stock);
@@ -566,9 +675,20 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
   const outQty = parseNum(issued);
   const opQty = parseNum(opening);
   const price = parseNum(unit_price) ?? 0;
-  const secId = parseNum(section_id);
+  
+  // Normalize multi-section and multi-equipment IDs
+  let rawSecIds = Array.isArray(section_ids) ? section_ids.map(id => parseNum(id)).filter(Boolean) : [];
+  if (rawSecIds.length === 0 && parseNum(section_id)) {
+    rawSecIds = [parseNum(section_id)];
+  }
+  const primarySecId = rawSecIds[0] || parseNum(section_id) || null;
+
+  let rawSecEqIds = Array.isArray(section_equipment_ids) ? section_equipment_ids.map(id => parseNum(id)).filter(Boolean) : [];
+  if (rawSecEqIds.length === 0 && parseNum(section_equipment_id)) {
+    rawSecEqIds = [parseNum(section_equipment_id)];
+  }
+  const primarySecEqId = rawSecEqIds[0] || parseNum(section_equipment_id) || null;
   const mcnId = parseNum(machine_id);
-  const secEqId = parseNum(section_equipment_id);
 
   let updateQuery = `
     UPDATE materials SET
@@ -596,7 +716,7 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
     last_audit_cycle||null, calibration_protocol||null,
     bin_location ? bin_location.trim() : null, Boolean(is_serialized),
     parseNum(expected_lifespan_days)??365,
-    secId, mcnId, secEqId
+    primarySecId, mcnId, primarySecEqId
   ];
 
   if (stockVal !== null && stockVal !== undefined) {
@@ -608,6 +728,34 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
   updateQuery += ` WHERE id=$${params.length}`;
 
   await pool.query(updateQuery, params);
+
+  // Sync multi-section mappings
+  if (Array.isArray(section_ids)) {
+    await pool.query('DELETE FROM material_sections WHERE material_id = $1', [req.params.id]);
+    for (let sIdx = 0; sIdx < rawSecIds.length; sIdx++) {
+      const sId = rawSecIds[sIdx];
+      await pool.query(`
+        INSERT INTO material_sections (material_id, section_id, is_primary)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (material_id, section_id) DO UPDATE SET is_primary = EXCLUDED.is_primary
+      `, [req.params.id, sId, sIdx === 0]);
+    }
+  }
+
+  // Sync multi-equipment mappings
+  if (Array.isArray(section_equipment_ids)) {
+    await pool.query('DELETE FROM material_equipment WHERE material_id = $1', [req.params.id]);
+    for (const eqId of rawSecEqIds) {
+      const { rows: eqInfo } = await pool.query('SELECT section_id, machine_id FROM section_equipment WHERE id = $1', [eqId]);
+      const sId = eqInfo[0]?.section_id || primarySecId;
+      const mId = eqInfo[0]?.machine_id || mcnId;
+      await pool.query(`
+        INSERT INTO material_equipment (material_id, section_id, machine_id, section_equipment_id)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (material_id, section_equipment_id) DO NOTHING
+      `, [req.params.id, sId, mId, eqId]);
+    }
+  }
 
   // Sync stock ledger entries (opening, received, issued) if provided
   if (stockVal !== null || inQty !== null || outQty !== null || opQty !== null) {
@@ -623,12 +771,10 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
     let finalStock = stockVal;
 
     if (finalOp !== null && finalOp !== undefined) {
-      // If opening is explicitly given, closing is opening + existing receipts - existing issues
       if (finalStock === null || finalStock === undefined) {
         finalStock = parseFloat((finalOp + existingRec - existingIss).toFixed(3));
       }
     } else if (finalStock !== null && finalStock !== undefined) {
-      // If closing is given, opening is closing - receipts + issues
       finalOp = parseFloat((finalStock - existingRec + existingIss).toFixed(3));
     } else {
       finalOp = parseFloat(((stockVal ?? 0) - existingRec + existingIss).toFixed(3));
@@ -675,11 +821,21 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
     }
   }
 
-  // Fetch updated full row for instant frontend reflection
+  // Fetch updated full row with sections and equipment for instant frontend reflection
   const { rows: [updated] } = await pool.query(`
     SELECT m.id, m.code, m.name, m.uom, m.hsn_code,
            m.current_stock, m.reorder_level, m.min_stock, m.max_stock,
            m.reorder_buffer, m.unit_price, m.is_active,
+           m.section_id           as "sectionId",
+           m.machine_id           as "machineId",
+           m.section_equipment_id as "sectionEquipmentId",
+           ps.name                as "sectionName",
+           ps.section_code        as "sectionCode",
+           mac.name               as "machineName",
+           mac.code               as "machineCode",
+           se.equipment_name      as "equipmentName",
+           se.tag_name            as "equipmentTagName",
+           se.remarks             as "equipmentRemarks",
            m.section_context      as "sectionContext",
            m.criticality_class    as "criticalityClass",
            m.procurement_strategy as "procurementStrategy",
@@ -691,10 +847,25 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
            m.expected_lifespan_days as "expectedLifespanDays",
            mc.name                as "categoryName",
            m.category_id          as "categoryId",
+           COALESCE((
+             SELECT jsonb_agg(jsonb_build_object('id', ps_sub.id, 'name', ps_sub.name, 'sectionCode', ps_sub.section_code, 'icon', ps_sub.icon) ORDER BY ps_sub.sort_order, ps_sub.name)
+             FROM material_sections ms_sub
+             JOIN plant_sections ps_sub ON ps_sub.id = ms_sub.section_id
+             WHERE ms_sub.material_id = m.id
+           ), '[]'::jsonb) AS sections,
+           COALESCE((
+             SELECT jsonb_agg(jsonb_build_object('id', se_sub.id, 'equipmentName', se_sub.equipment_name, 'tagName', se_sub.tag_name, 'sectionId', se_sub.section_id, 'machineId', se_sub.machine_id, 'remarks', se_sub.remarks) ORDER BY se_sub.equipment_name)
+             FROM material_equipment me_sub
+             JOIN section_equipment se_sub ON se_sub.id = me_sub.section_equipment_id
+             WHERE me_sub.material_id = m.id
+           ), '[]'::jsonb) AS equipment,
            COALESCE((SELECT SUM(sl.in_qty)  FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type != 'opening'), 0) AS received,
            COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type != 'opening'), 0) AS issued
     FROM materials m
     LEFT JOIN material_categories mc ON mc.id=m.category_id
+    LEFT JOIN plant_sections ps ON ps.id = m.section_id
+    LEFT JOIN machines mac ON mac.id = m.machine_id
+    LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
     WHERE m.id = $1
   `, [req.params.id]);
 

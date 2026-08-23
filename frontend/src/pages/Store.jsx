@@ -2698,22 +2698,29 @@ export default function Store({ onNavigate }) {
                 {/* Material Catalog Selector */}
                 <div>
                   <label style={S.label}>Select Material *</label>
-                  <select style={S.select} value={inwardForm.material_id} onChange={e => {
-                    const m = mats.find(x => String(x.id) === String(e.target.value))
-                    setInwardForm({
-                      ...inwardForm,
-                      material_id: e.target.value,
-                      unit_price: m?.unit_price || '',
-                      bin_location: m?.binLocation || m?.bin_location || ''
-                    })
-                  }} required>
-                    <option value="">-- Choose Material (1,075 catalog items) --</option>
-                    {mats.map(m => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} [{m.code}] { (m.poCount || m.po_count) ? `[${m.poCount || m.po_count} POs]` : '' } (Stock: {m.current_stock || m.currentStock || 0} {m.uom})
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    value={String(inwardForm.material_id || '')}
+                    onChange={val => {
+                      const m = mats.find(x => String(x.id) === String(val))
+                      setInwardForm({
+                        ...inwardForm,
+                        material_id: val,
+                        unit_price: m?.unit_price || '',
+                        bin_location: m?.binLocation || m?.bin_location || ''
+                      })
+                    }}
+                    placeholder="-- Choose Material (1,075 catalog items) --"
+                    searchPlaceholder="Search material name, code, section, machine..."
+                    options={mats.map(m => {
+                      const sec = m.sections && m.sections.length > 0 ? m.sections.map(s => s.sectionCode || s.name).join(', ') : (m.sectionName || '')
+                      const eq = m.equipment && m.equipment.length > 0 ? m.equipment.map(e => e.equipmentName).join(', ') : (m.machineName || '')
+                      return {
+                        value: String(m.id),
+                        label: `${m.name} [${m.code}]`,
+                        subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Rate: ₹${m.unit_price || 0}${sec ? ` · 🏭 ${sec}` : ''}${eq ? ` · ⚙️ ${eq}` : ''}`
+                      }
+                    })}
+                  />
                 </div>
 
                 {/* Inward Quantity, Unit Price, Discount %, Other Charges, GST Slab */}
@@ -3069,7 +3076,7 @@ export default function Store({ onNavigate }) {
                         Plant: Survey No. 128/1, Industrial Area, Village Gangur, Dist. Dharwad - 580011, Karnataka, India
                       </div>
                       <div style={{ fontSize: 11, color: '#0f172a', fontWeight: 700, marginTop: 4 }}>
-                        GSTIN: <code>29AABCS1234F1Z8</code> | State: Karnataka (Code: 29) | CIN: U21012KA2015PTC081234
+                        GSTIN: <code>29AABCS1429B1Z8</code> | PAN: <code>AAICM7429L</code> | State: Karnataka (Code: 29)
                       </div>
                     </div>
                   </div>

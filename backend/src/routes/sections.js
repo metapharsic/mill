@@ -11,23 +11,23 @@ function hasSectionWriteAccess(user, sectionCode) {
 
   if (dept === 'PROD') {
     const prodSections = [
-      'PULPMILL', 'CENTRICLEANER', 'WIRE', 'PRESS', 'UNIRUN', 
-      'PRE_DRYER', 'SIZE_PRESS', 'POST_DRYER', 'CALENDER', 
-      'POPE_REEL', 'REWINDER', 'CRANES'
+      'PULPMILL', 'CENTRI', 'WIRE', 'PRESS', 'UNIRUN',
+      'PREDRYER', 'SIZEPRESS', 'POSTDRYER', 'CALENDER',
+      'POPEREEL', 'REWINDER', 'CRANES', 'VACUUM', 'SIZEKITCHEN'
     ];
     return prodSections.includes(code);
   }
 
   if (dept === 'QC' || dept === 'QA' || dept === 'LAB') {
     const qcSections = [
-      'LAB', 'SIZE_PRESS', 'SIZE_KITCHEN', 'STARCH_KITCHEN', 'POPE_REEL'
+      'LAB', 'SIZEPRESS', 'SIZEKITCHEN'
     ];
     return qcSections.includes(code);
   }
 
   if (dept === 'UTIL') {
     const utilSections = [
-      'BOILER', 'STEAM_COND', 'ETP', 'COMPRESSORS', 'VACUUM'
+      'BOILER', 'STEAMCOND', 'ETP', 'COMPRESSORS', 'VACUUM'
     ];
     return utilSections.includes(code);
   }
@@ -79,6 +79,37 @@ router.get('/all/kpi-snapshot', requireAuth, ar(async (req, res) => {
   );
   res.json({ success: true, data: rows });
 }));
+
+// ── ALL SECTIONS WITH GROUPED MACHINES (for UI dropdowns) ──────────────────
+router.get('/all/with-machines', requireAuth, ar(async (req, res) => {
+  // Returns each section with its machines array, sorted by sort_order
+  const { rows: sections } = await pool.query(
+    `SELECT ps.id, ps.section_code as "sectionCode", ps.name, ps.icon,
+            ps.sort_order as "sortOrder", ps.is_active as "isActive"
+     FROM plant_sections ps
+     WHERE ps.is_active=true AND ps.section_code != 'ALL'
+     ORDER BY ps.sort_order, ps.name`
+  );
+  const { rows: equipment } = await pool.query(
+    `SELECT se.id, se.section_id as "sectionId", se.equipment_name as "equipmentName",
+            se.tag_name as "tagName", se.sno
+     FROM section_equipment se
+     WHERE se.is_active=true
+     ORDER BY se.sno ASC NULLS LAST, se.equipment_name`
+  );
+  // Group machines under their section
+  const eqBySection = {};
+  equipment.forEach(e => {
+    if (!eqBySection[e.sectionId]) eqBySection[e.sectionId] = [];
+    eqBySection[e.sectionId].push({ id: e.id, name: e.equipmentName, tagName: e.tagName, sno: e.sno });
+  });
+  const result = sections.map(s => ({
+    ...s,
+    machines: eqBySection[s.id] || []
+  }));
+  res.json({ success: true, data: result });
+}));
+
 
 // ── SECTION DETAIL + EQUIPMENT ─────────────────────────────────────────────
 router.get('/:code', requireAuth, ar(async (req, res) => {
