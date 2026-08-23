@@ -22,13 +22,12 @@ const NAV = [
   { key: 'maintenance', label: 'Maintenance', icon: Wrench, group: 'Operations' },
   { key: 'utility', label: 'Utility', icon: Zap, group: 'Operations' },
   { key: 'grades', label: 'Grades', icon: FileText, group: 'Operations' },
-  { key: 'machines', label: 'Machines', icon: Cog, group: 'Operations' },
-  { key: 'rawmaterial', label: 'Raw Material Store', icon: Package, group: 'Materials' },
-  { key: 'inventory', label: 'Inventory', icon: Boxes, group: 'Materials' },
-  { key: 'materials', label: 'Materials', icon: FlaskConical, group: 'Materials' },
-  { key: 'store', label: 'Store Management', icon: StoreIcon, group: 'Materials' },
-  { key: 'store-dashboard', label: 'Store Dashboard', icon: BarChart3, group: 'Materials' },
-  { key: 'indent', label: 'Indent / PIIMAS', icon: ClipboardList, group: 'Materials' },
+  { key: 'materials', label: 'Materials Master', icon: FlaskConical, group: 'Materials & Inventory' },
+  { key: 'rawmaterial', label: 'Raw Material Store', icon: Package, group: 'Materials & Inventory' },
+  { key: 'inventory', label: 'Inventory', icon: Boxes, group: 'Materials & Inventory' },
+  { key: 'store', label: 'Store Management', icon: StoreIcon, group: 'Store & Indent' },
+  { key: 'store-dashboard', label: 'Store Dashboard', icon: BarChart3, group: 'Store & Indent' },
+  { key: 'indent', label: 'Indent / PIIMAS', icon: ClipboardList, group: 'Store & Indent' },
   { key: 'purchase', label: 'Purchase', icon: ShoppingCart, group: 'Commercial' },
   { key: 'scrap', label: 'Scrap Management', icon: Recycle, group: 'Commercial' },
   { key: 'customers', label: 'Customers', icon: Users, group: 'Commercial' },
@@ -46,37 +45,38 @@ const NAV = [
   { key: 'masterdata', label: 'Master Data', icon: Database, group: 'System' },
   { key: 'admin', label: 'Administration', icon: Settings, group: 'System' },
   { key: 'users', label: 'User Management', icon: UserCog, group: 'System' },
-  { key: 'sections-all',           label: 'All Sections',        icon: Globe,        group: 'Plant Sections' },
-  { key: 'sections-pulp',          label: 'Pulp Mill',           icon: Layers,       group: 'Plant Sections' },
-  { key: 'sections-centri',        label: 'Centricleaner',       icon: RefreshCcw,   group: 'Plant Sections' },
-  { key: 'sections-wire',          label: 'Wire Section',        icon: Grid2X2,      group: 'Plant Sections' },
-  { key: 'sections-vacuum',        label: 'Vacuum',              icon: Wind,         group: 'Plant Sections' },
-  { key: 'sections-press',         label: 'Press Section',       icon: ArrowDownUp,  group: 'Plant Sections' },
-  { key: 'sections-unirun',        label: 'Unirun',              icon: ArrowRight,   group: 'Plant Sections' },
-  { key: 'sections-predryer',      label: 'Pre Dryer',           icon: Flame,        group: 'Plant Sections' },
-  { key: 'sections-sizepress',     label: 'Size Press',          icon: Ruler,        group: 'Plant Sections' },
-  { key: 'sections-sizekitchen',   label: 'Size Kitchen',        icon: ChefHat,      group: 'Plant Sections' },
-  { key: 'sections-postdryer',     label: 'Post Dryer',          icon: Sun,          group: 'Plant Sections' },
-  { key: 'sections-calender',      label: 'Calender',            icon: Disc,         group: 'Plant Sections' },
-  { key: 'sections-pope',          label: 'Pope Reel',           icon: Circle,       group: 'Plant Sections' },
-  { key: 'sections-rewinder',      label: 'Rewinder',            icon: RotateCw,     group: 'Plant Sections' },
-  { key: 'sections-starchkitchen', label: 'Starch Kitchen',      icon: FlaskConical, group: 'Plant Sections' },
-  { key: 'sections-steamcond',     label: 'Steam & Condensate',  icon: Droplets,     group: 'Plant Sections' },
-  { key: 'sections-etp',           label: 'ETP',                 icon: Leaf,         group: 'Plant Sections' },
-  { key: 'sections-boiler',        label: 'Boiler',              icon: Thermometer,  group: 'Plant Sections' },
-  { key: 'sections-lab',           label: 'Lab',                 icon: Microscope,   group: 'Plant Sections' },
-  { key: 'sections-cranes',        label: 'Cranes',              icon: HardHat,      group: 'Plant Sections' },
-  { key: 'sections-compressors',   label: 'Compressors',         icon: Fan,          group: 'Plant Sections' },
-  { key: 'sections-store',         label: 'Store Section',       icon: StoreIcon,    group: 'Plant Sections' },
+  { key: 'sections-all',           label: 'All Sections (Overview)', icon: Globe,        group: 'Plant & Machines' },
+  { key: 'machines',               label: 'Machine Register',        icon: Cog,          group: 'Plant & Machines' },
+  { key: 'sections-pulp',          label: 'Pulp Mill',           icon: Layers,       group: 'Plant & Machines' },
+  { key: 'sections-centri',        label: 'Centricleaner',       icon: RefreshCcw,   group: 'Plant & Machines' },
+  { key: 'sections-wire',          label: 'Wire Section',        icon: Grid2X2,      group: 'Plant & Machines' },
+  { key: 'sections-vacuum',        label: 'Vacuum',              icon: Wind,         group: 'Plant & Machines' },
+  { key: 'sections-press',         label: 'Press Section',       icon: ArrowDownUp,  group: 'Plant & Machines' },
+  { key: 'sections-unirun',        label: 'Unirun',              icon: ArrowRight,   group: 'Plant & Machines' },
+  { key: 'sections-predryer',      label: 'Pre Dryer',           icon: Flame,        group: 'Plant & Machines' },
+  { key: 'sections-sizepress',     label: 'Size Press',          icon: Ruler,        group: 'Plant & Machines' },
+  { key: 'sections-sizekitchen',   label: 'Size Kitchen',        icon: ChefHat,      group: 'Plant & Machines' },
+  { key: 'sections-postdryer',     label: 'Post Dryer',          icon: Sun,          group: 'Plant & Machines' },
+  { key: 'sections-calender',      label: 'Calender',            icon: Disc,         group: 'Plant & Machines' },
+  { key: 'sections-pope',          label: 'Pope Reel',           icon: Circle,       group: 'Plant & Machines' },
+  { key: 'sections-rewinder',      label: 'Rewinder',            icon: RotateCw,     group: 'Plant & Machines' },
+  { key: 'sections-starchkitchen', label: 'Starch Kitchen',      icon: FlaskConical, group: 'Plant & Machines' },
+  { key: 'sections-steamcond',     label: 'Steam & Condensate',  icon: Droplets,     group: 'Plant & Machines' },
+  { key: 'sections-boiler',        label: 'Boiler',              icon: Thermometer,  group: 'Plant & Machines' },
+  { key: 'sections-compressors',   label: 'Compressors',         icon: Fan,          group: 'Plant & Machines' },
+  { key: 'sections-cranes',        label: 'Cranes',              icon: HardHat,      group: 'Plant & Machines' },
+  { key: 'sections-etp',           label: 'ETP',                 icon: Leaf,         group: 'Plant & Machines' },
+  { key: 'sections-lab',           label: 'Lab Section',         icon: Microscope,   group: 'Plant & Machines' },
+  { key: 'sections-store',         label: 'Store Section',       icon: StoreIcon,    group: 'Plant & Machines' },
 ]
 
-const groups = ['Operations', 'Materials', 'Commercial', 'Warehouse', 'People', 'System', 'Plant Sections']
+const groups = ['Operations', 'Materials & Inventory', 'Store & Indent', 'Commercial', 'Warehouse', 'People', 'System', 'Plant & Machines']
 
 export default function Sidebar({ active, onNavigate, collapsed, onToggle, mobileOpen, onCloseMobile }) {
   const { user, logout } = useAuth()
 
   const [expandedGroups, setExpandedGroups] = useState(
-    new Set(['Operations', 'Materials', 'Commercial', 'Warehouse', 'People', 'System'])
+    new Set(['Operations', 'Materials & Inventory', 'Store & Indent', 'Commercial', 'Warehouse', 'People', 'System'])
   )
   const [menuSearch, setMenuSearch] = useState('')
 

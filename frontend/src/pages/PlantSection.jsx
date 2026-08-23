@@ -23,6 +23,7 @@ export default function PlantSection({ sectionCode }) {
   const [readingForm, setReadingForm] = useState({ equipmentId: '', tagName: '', parameterName: '', value: '', uom: '' })
   const [alarmForm, setAlarmForm]     = useState({ equipmentId: '', alarmType: 'Warning', description: '' })
   const [equipForm, setEquipForm]     = useState({ tagName: '', equipmentName: '', equipmentType: '', motorKw: '', isCritical: false })
+  const [editingEquipId, setEditingEquipId] = useState(null)
   const [saving, setSaving]     = useState(false)
   const [resolveId, setResolveId]     = useState(null)
   const [resolutionNote, setResolutionNote] = useState('')
@@ -42,6 +43,11 @@ export default function PlantSection({ sectionCode }) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(body)
+  }).then(r => r.json())
+
+  const del = (path) => fetch(`/api/sections${path}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
   }).then(r => r.json())
 
   const hasWriteAccess = () => {
@@ -117,12 +123,36 @@ export default function PlantSection({ sectionCode }) {
     setSaving(false)
   }
 
+  const resetEquipForm = () => {
+    setEquipForm({ tagName: '', equipmentName: '', equipmentType: '', motorKw: '', isCritical: false })
+    setEditingEquipId(null)
+  }
+
   const submitEquip = async (e) => {
     e.preventDefault(); setSaving(true)
-    const r = await post(`/${code}/equipment`, equipForm)
-    if (r.success) { setEquipForm({ tagName: '', equipmentName: '', equipmentType: '', motorKw: '', isCritical: false }); fetchAll() }
+    const r = editingEquipId
+      ? await put(`/equipment/${editingEquipId}`, equipForm)
+      : await post(`/${code}/equipment`, equipForm)
+    if (r.success) { resetEquipForm(); fetchAll() }
     else alert(r.message)
     setSaving(false)
+  }
+
+  const startEditEquip = (eq) => {
+    setEditingEquipId(eq.id)
+    setEquipForm({
+      tagName: eq.tagName || '', equipmentName: eq.equipmentName || '',
+      equipmentType: eq.equipmentType || '', motorKw: eq.motorKw ?? '',
+      isCritical: !!eq.isCritical,
+    })
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  }
+
+  const deleteEquip = async (eq) => {
+    if (!window.confirm(`Delete "${eq.equipmentName}" (${eq.tagName})? This cannot be undone.`)) return
+    const r = await del(`/equipment/${eq.id}`)
+    if (r.success) { if (editingEquipId === eq.id) resetEquipForm(); fetchAll() }
+    else alert(r.message)
   }
 
   const ackAlarm = async (id) => {
@@ -304,29 +334,42 @@ export default function PlantSection({ sectionCode }) {
                       {[e.couplings ? `Cpl: ${e.couplings}` : null, e.pulleys ? `Pul: ${e.pulleys}` : null].filter(Boolean).join(' | ') || '—'}
                     </td>
                     <td style={{ padding: '9px 12px', textAlign: 'center' }}>
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/indent`)}
-                        style={{
-                          background: '#f0fdfa',
-                          border: '1px solid #0f766e',
-                          color: '#0f766e',
-                          borderRadius: 4,
-                          padding: '3px 8px',
-                          fontSize: 10,
-                          fontWeight: 700,
-                          cursor: 'pointer'
-                        }}
-                        title={`Raise Indent for ${e.equipmentName}`}
-                      >
-                        ⚡ Indent
-                      </button>
+                      <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/indent`)}
+                          style={{ background: '#f0fdfa', border: '1px solid #0f766e', color: '#0f766e', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
+                          title={`Raise Indent for ${e.equipmentName}`}
+                        >
+                          ⚡ Indent
+                        </button>
+                        {hasWriteAccess() && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => startEditEquip(e)}
+                              style={{ background: '#eff6ff', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
+                              title={`Edit ${e.equipmentName}`}
+                            >
+                              ✎ Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteEquip(e)}
+                              style={{ background: '#fef2f2', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 4, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
+                              title={`Delete ${e.equipmentName}`}
+                            >
+                              🗑 Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {filteredEquip.length === 0 && (
                   <tr>
-                    <td colSpan={11} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
+                    <td colSpan={12} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
                       No machinery components match your search.
                     </td>
                   </tr>
@@ -337,7 +380,7 @@ export default function PlantSection({ sectionCode }) {
 
           {hasWriteAccess() && (
             <div style={{ ...s.formCard, marginTop: 18 }}>
-              <h4 style={s.formTitle}>Add Custom Roll / Assembly Component</h4>
+              <h4 style={s.formTitle}>{editingEquipId ? 'Edit Roll / Assembly Component' : 'Add Custom Roll / Assembly Component'}</h4>
               <form onSubmit={submitEquip} style={s.form}>
                 <input style={s.input} placeholder="Tag Name (e.g. WIRE-MCN-026)*" required
                   value={equipForm.tagName} onChange={e=>setEquipForm(f=>({...f,tagName:e.target.value}))} />
@@ -355,7 +398,12 @@ export default function PlantSection({ sectionCode }) {
                     onChange={e=>setEquipForm(f=>({...f,isCritical:e.target.checked}))} />
                   &nbsp;Is Critical (breakdown = production stop)
                 </label>
-                <button style={s.btn} disabled={saving}>{saving?'Saving...':'Add Component'}</button>
+                <button style={s.btn} disabled={saving}>{saving?'Saving...':(editingEquipId?'Save Changes':'Add Component')}</button>
+                {editingEquipId && (
+                  <button type="button" onClick={resetEquipForm} style={{ ...s.btn, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}>
+                    Cancel
+                  </button>
+                )}
               </form>
             </div>
           )}

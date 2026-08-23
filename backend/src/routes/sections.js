@@ -378,30 +378,50 @@ router.post('/:code/equipment', requireAuth, requireLevel(3), ar(async (req, res
 }));
 
 router.put('/equipment/:id', requireAuth, requireLevel(3), ar(async (req, res) => {
-  const { equipmentName, equipmentType, manufacturer, modelNumber, serialNumber,
+  const { tagName, equipmentName, equipmentType, manufacturer, modelNumber, serialNumber,
           installationDate, ratedCapacity, designPressure, designTemp,
           motorKw, rpm, isCritical, isActive, remarks } = req.body;
+  const { rows } = await pool.query(
+    `SELECT se.id, ps.section_code as "sectionCode" FROM section_equipment se
+     JOIN plant_sections ps ON ps.id = se.section_id WHERE se.id=$1`, [req.params.id]);
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Equipment not found' });
+  if (!hasSectionWriteAccess(req.user, rows[0].sectionCode)) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Insufficient department permission for this section.' });
+  }
   await pool.query(
     `UPDATE section_equipment SET
-       equipment_name=COALESCE($1,equipment_name),
-       equipment_type=COALESCE($2,equipment_type),
-       manufacturer=COALESCE($3,manufacturer),
-       model_number=COALESCE($4,model_number),
-       serial_number=COALESCE($5,serial_number),
-       installation_date=COALESCE($6,installation_date),
-       rated_capacity=COALESCE($7,rated_capacity),
-       design_pressure=COALESCE($8,design_pressure),
-       design_temp=COALESCE($9,design_temp),
-       motor_kw=COALESCE($10,motor_kw),
-       rpm=COALESCE($11,rpm),
-       is_critical=COALESCE($12,is_critical),
-       is_active=COALESCE($13,is_active),
-       remarks=COALESCE($14,remarks)
-     WHERE id=$15`,
-    [equipmentName,equipmentType,manufacturer,modelNumber,serialNumber,
+       tag_name=COALESCE($1,tag_name),
+       equipment_name=COALESCE($2,equipment_name),
+       equipment_type=COALESCE($3,equipment_type),
+       manufacturer=COALESCE($4,manufacturer),
+       model_number=COALESCE($5,model_number),
+       serial_number=COALESCE($6,serial_number),
+       installation_date=COALESCE($7,installation_date),
+       rated_capacity=COALESCE($8,rated_capacity),
+       design_pressure=COALESCE($9,design_pressure),
+       design_temp=COALESCE($10,design_temp),
+       motor_kw=COALESCE($11,motor_kw),
+       rpm=COALESCE($12,rpm),
+       is_critical=COALESCE($13,is_critical),
+       is_active=COALESCE($14,is_active),
+       remarks=COALESCE($15,remarks)
+     WHERE id=$16`,
+    [tagName,equipmentName,equipmentType,manufacturer,modelNumber,serialNumber,
      installationDate,ratedCapacity,designPressure,designTemp,
      motorKw,rpm,isCritical,isActive,remarks, req.params.id]
   );
+  res.json({ success: true });
+}));
+
+router.delete('/equipment/:id', requireAuth, requireLevel(3), ar(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT se.id, ps.section_code as "sectionCode" FROM section_equipment se
+     JOIN plant_sections ps ON ps.id = se.section_id WHERE se.id=$1`, [req.params.id]);
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Equipment not found' });
+  if (!hasSectionWriteAccess(req.user, rows[0].sectionCode)) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Insufficient department permission for this section.' });
+  }
+  await pool.query('DELETE FROM section_equipment WHERE id=$1', [req.params.id]);
   res.json({ success: true });
 }));
 
