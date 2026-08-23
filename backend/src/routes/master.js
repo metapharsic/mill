@@ -182,6 +182,17 @@ router.put('/categories/:id', auth, requireLevel(1), ar(async (req, res) => {
 // does not try to cast '' as numeric (which throws "invalid input syntax").
 const parseNum = v => (v === '' || v === null || v === undefined) ? null : Number(v);
 
+// ── COMPANY PROFILE ────────────────────────────────────────────────────────────
+router.get('/company-profile', auth, ar(async (req, res) => {
+  const { rows } = await pool.query("SELECT key, value FROM system_settings WHERE category = 'Company Profile'");
+  // Convert array of {key, value} to an object for easier frontend consumption
+  const profile = {};
+  rows.forEach(r => {
+    profile[r.key] = r.value;
+  });
+  res.json({ success: true, data: profile });
+}));
+
 // ── SECTIONS & SECTION EQUIPMENT MASTER LOOKUPS ──────────────────────────────
 router.get('/sections', auth, ar(async (req, res) => {
   const { rows } = await pool.query(`
@@ -193,27 +204,11 @@ router.get('/sections', auth, ar(async (req, res) => {
   res.json({ success: true, data: rows });
 }));
 
-router.get('/section-equipment', auth, ar(async (req, res) => {
-  const { section_id, machine_id } = req.query;
-  const w = ['se.is_active = true'];
-  const p = [];
-  let i = 1;
-  if (section_id) { w.push(`se.section_id = $${i++}`); p.push(parseInt(section_id)); }
-  if (machine_id) { w.push(`se.machine_id = $${i++}`); p.push(parseInt(machine_id)); }
-  const { rows } = await pool.query(`
-    SELECT se.id, se.section_id AS "sectionId", se.machine_id AS "machineId",
-           se.tag_name AS "tagName", se.equipment_name AS "equipmentName",
-           se.equipment_type AS "equipmentType", se.remarks,
-           ps.name AS "sectionName", ps.section_code AS "sectionCode",
-           m.name AS "machineName", m.code AS "machineCode"
-    FROM section_equipment se
-    LEFT JOIN plant_sections ps ON ps.id = se.section_id
-    LEFT JOIN machines m ON m.id = se.machine_id
-    WHERE ${w.join(' AND ')}
-    ORDER BY ps.sort_order NULLS LAST, ps.name, se.equipment_name
-  `, p);
-  res.json({ success: true, data: rows });
-}));
+// NOTE: the full GET /section-equipment handler (with bearing/lock-nut/belt spec
+// columns, search, and dual sections/plant_sections lookup) lives further down
+// this file next to its matching POST handler — a duplicate stub used to live
+// here and silently shadow it (Express uses the first route match), which is
+// why the equipment table's mechanical-spec columns were coming back empty.
 
 // Schema: id, code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock, current_stock, unit_price, is_active, section_id, machine_id, section_equipment_id
 router.get('/materials', auth, ar(async (req, res) => {

@@ -5,6 +5,7 @@ import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import SearchableSelect from '../components/SearchableSelect'
 import MultiSearchableSelect from '../components/MultiSearchableSelect'
+import SectionMachineAllocator from '../components/SectionMachineAllocator'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -191,16 +192,18 @@ export default function Materials() {
       params.set('sort_by', sortBy)
       params.set('sort_order', sortOrder)
     }
-    const [m, c, s, eq] = await Promise.all([
+    const [m, c, s, eq, mc] = await Promise.all([
       API(`/api/master/materials?${params}`),
       API('/api/master/categories'),
       API('/api/master/sections').catch(() => ({ data: [] })),
       API('/api/master/section-equipment').catch(() => ({ data: [] })),
+      API('/api/master/machines?is_active=true').catch(() => ({ data: [] })),
     ])
     if (m.success) { setMaterials(m.data); setTotal(m.total) }
     if (c.success) setCategories(c.data)
     if (s.success) setSections(s.data)
     if (eq.success) setSectionEquipment(eq.data)
+    if (mc.success) setMachines(mc.data)
     setLoading(false)
   }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search, colSearch, sortBy, sortOrder])
 
@@ -672,51 +675,98 @@ export default function Materials() {
             {total} catalog materials — {reorderAlertCount != null ? reorderAlertCount : materials.filter(m => Number(m.current_stock) <= Number(m.reorder_level)).length} below reorder level
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Primary Material Actions */}
           <button
-            style={{ ...S.btnSecondary, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
-            onClick={() => setExportModal(true)}
-            title="Download Comprehensive Multi-Sheet Excel Master with Categories & Reorder Alerts"
-          >
-            📊 Export Excel
-          </button>
-          <button
-            style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }}
-            onClick={() => { setExcelTargetCat(filterCat || ''); setExcelErr(''); setExcelSuccess(''); setExcelPreview(null); setExcelFile(null); setExcelModal(true) }}
-            title="Upload and sync custom store Excel file with live preview into selected category"
-          >
-            📤 Upload Store Excel
-          </button>
-          <button style={S.btnSecondary} onClick={handleDownloadTemplate} title="Download ready-to-fill standard store Excel template">
-            📥 Download Template
-          </button>
-          <button style={S.btnSecondary} onClick={() => setCatModal(true)}>+ Category</button>
-          <button
-            style={{ ...S.btnSecondary, background: '#f8fafc', borderColor: '#cbd5e1', color: '#0f766e', fontWeight: 700 }}
-            onClick={() => { setSecErr(''); setSecModal(true) }}
-            title="Create and provision a new Plant Section on the fly"
-          >
-            🏭 + Plant Section
-          </button>
-          <button
-            style={{ ...S.btnSecondary, background: '#f8fafc', borderColor: '#cbd5e1', color: '#0f766e', fontWeight: 700 }}
-            onClick={() => {
-              setEquipFormState(eq => ({ ...eq, section_id: filterSection || quickForm.section_id || form.section_id || '' }))
-              setEquipErr('')
-              setEquipModal(true)
+            style={{
+              ...S.btnPrimary,
+              background: 'linear-gradient(135deg, #0f766e, #0d9488)',
+              color: '#ffffff',
+              boxShadow: '0 2px 8px rgba(15, 118, 110, 0.35)',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6
             }}
-            title="Create and provision a new Machinery / Roll / Component on the fly"
+            onClick={openAdd}
+            title="Open comprehensive material catalog entry modal"
           >
-            ⚙️ + Machine / Roll
+            <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+            <span>Add Material</span>
           </button>
-          <button style={S.btnPrimary} onClick={openNew}>+ Add Material</button>
+
           <button
-            style={{ ...S.btnSecondary, background: showQuickEntry ? '#e0f2fe' : '#ffffff', color: '#0369a1', borderColor: '#bae6fd' }}
+            style={{
+              ...S.btnSecondary,
+              background: showQuickEntry ? 'linear-gradient(135deg, #e0f2fe, #bae6fd)' : '#ffffff',
+              color: showQuickEntry ? '#0369a1' : '#0284c7',
+              borderColor: showQuickEntry ? '#0284c7' : '#bae6fd',
+              fontWeight: 700,
+              boxShadow: showQuickEntry ? '0 0 0 2px rgba(2, 132, 199, 0.2)' : 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6
+            }}
             onClick={() => setShowQuickEntry(s => !s)}
+            title="Toggle high-speed spreadsheet fast entry row"
           >
-            ⚡ {showQuickEntry ? 'Hide Fast Entry' : 'Show Fast Entry'}
+            <span>⚡</span>
+            <span>{showQuickEntry ? 'Hide Fast Entry' : 'Fast Material Entry'}</span>
           </button>
-          <button style={S.btnPrimary} onClick={openAdd}>+ Add Material</button>
+
+          {/* Master Entity Creation Group */}
+          <div style={{ display: 'flex', gap: 6, paddingLeft: 4, borderLeft: '1px solid #cbd5e1' }}>
+            <button
+              style={{ ...S.btnSecondary, background: '#f8fafc', borderColor: '#cbd5e1', color: '#0f766e', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              onClick={() => { setSecErr(''); setSecModal(true) }}
+              title="Create and provision a new Plant Section on the fly"
+            >
+              <span>🏭</span>
+              <span>+ Plant Section</span>
+            </button>
+
+            <button
+              style={{ ...S.btnSecondary, background: '#f8fafc', borderColor: '#cbd5e1', color: '#0f766e', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              onClick={() => {
+                setEquipFormState(eq => ({ ...eq, section_id: filterSection || quickForm.section_id || form.section_id || '' }))
+                setEquipErr('')
+                setEquipModal(true)
+              }}
+              title="Create and provision a new Machinery / Roll / Component on the fly"
+            >
+              <span>⚙️</span>
+              <span>+ Machine / Roll</span>
+            </button>
+
+            <button
+              style={{ ...S.btnSecondary, background: '#f8fafc', borderColor: '#cbd5e1', color: '#475569', fontWeight: 600 }}
+              onClick={() => setCatModal(true)}
+              title="Create new root or subcategory"
+            >
+              📁 + Category
+            </button>
+          </div>
+
+          {/* Data Tools Group */}
+          <div style={{ display: 'flex', gap: 6, paddingLeft: 4, borderLeft: '1px solid #cbd5e1' }}>
+            <button
+              style={{ ...S.btnSecondary, background: '#f0fdfa', borderColor: '#0f766e', color: '#0f766e', fontWeight: 700 }}
+              onClick={() => setExportModal(true)}
+              title="Download Comprehensive Multi-Sheet Excel Master with Categories & Reorder Alerts"
+            >
+              📊 Export Excel
+            </button>
+            <button
+              style={{ ...S.btnSecondary, background: '#0f766e', color: '#fff', fontWeight: 700 }}
+              onClick={() => { setExcelTargetCat(filterCat || ''); setExcelErr(''); setExcelSuccess(''); setExcelPreview(null); setExcelFile(null); setExcelModal(true) }}
+              title="Upload and sync custom store Excel file with live preview into selected category"
+            >
+              📤 Upload Excel
+            </button>
+            <button style={S.btnSecondary} onClick={handleDownloadTemplate} title="Download ready-to-fill standard store Excel template">
+              📥 Template
+            </button>
+          </div>
         </div>
       </div>
 
@@ -878,13 +928,28 @@ export default function Materials() {
         {/* ── Fast Inline Entry Panel ── */}
         {showQuickEntry && (
           <form onSubmit={handleQuickSubmit} style={S.quickEntryBar}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>⚡</span>
-                <span>Fast Material Entry Row (Direct Catalog Addition with Section &amp; Machine Linking)</span>
+                <span style={{ fontSize: 16 }}>⚡</span>
+                <span>Fast Material Entry Row — Rapid Catalog Addition with Section &amp; Machinery Linking</span>
               </div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>
-                Formula: <span style={{ fontWeight: 600, color: '#0284c7' }}>Opening (Yesterday)</span> ＋ <span style={{ fontWeight: 600, color: '#16a34a' }}>Received (Today)</span> － <span style={{ fontWeight: 600, color: '#dc2626' }}>Issued (Today)</span> ＝ <span style={{ fontWeight: 700, color: '#0f766e' }}>Closing Balance</span>
+              
+              {/* Dynamic Live Formula & Live Stock Valuation Indicator */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f8fafc', padding: '4px 10px', borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
+                <span style={{ color: '#64748b' }}>Daily Rollover:</span>
+                <span style={{ fontWeight: 700, color: '#0284c7' }}>Op: {Number(quickForm.opening || 0).toFixed(3)}</span>
+                <span style={{ color: '#94a3b8' }}>＋</span>
+                <span style={{ fontWeight: 700, color: '#16a34a' }}>Rec: {Number(quickForm.received || 0).toFixed(3)}</span>
+                <span style={{ color: '#94a3b8' }}>－</span>
+                <span style={{ fontWeight: 700, color: '#dc2626' }}>Iss: {Number(quickForm.issued || 0).toFixed(3)}</span>
+                <span style={{ color: '#94a3b8' }}>＝</span>
+                <span style={{ fontWeight: 800, color: '#0f766e', background: '#dcfce7', padding: '2px 6px', borderRadius: 4 }}>
+                  Closing: {Number(quickForm.current_stock || 0).toFixed(3)} {quickForm.uom || 'NOS'}
+                </span>
+                <span style={{ color: '#cbd5e1' }}>|</span>
+                <span style={{ fontWeight: 700, color: '#0f766e' }}>
+                  Valuation: ₹{(Number(quickForm.current_stock || 0) * Number(quickForm.unit_price || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
               </div>
             </div>
 
@@ -902,7 +967,7 @@ export default function Materials() {
               </div>
 
               {/* Name */}
-              <div style={{ minWidth: 180 }}>
+              <div style={{ minWidth: 200 }}>
                 <span style={S.quickLabel}>Material Name / Specs *</span>
                 <input
                   style={S.quickInput}
@@ -914,7 +979,7 @@ export default function Materials() {
               </div>
 
               {/* Plant Section */}
-              <div style={{ minWidth: 150 }}>
+              <div style={{ minWidth: 160 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                   <span style={S.quickLabel}>Plant Section</span>
                   <button
@@ -931,15 +996,15 @@ export default function Materials() {
                   value={String(quickForm.section_id || '')}
                   onChange={e => setQuickForm(q => ({ ...q, section_id: e.target.value, section_equipment_id: '' }))}
                 >
-                  <option value="">— General / Any —</option>
-                  {sections.map(s => (
-                    <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>
+                  <option value="">— General / Any Section —</option>
+                  {sections.filter(s => s.sectionCode !== 'ALL').map(s => (
+                    <option key={s.id} value={String(s.id)}>{s.icon || '🏭'} {s.name || s.sectionCode}</option>
                   ))}
                 </select>
               </div>
 
               {/* Machine / Equipment */}
-              <div style={{ minWidth: 160 }}>
+              <div style={{ minWidth: 170 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                   <span style={S.quickLabel}>Machine / Equipment</span>
                   <button
@@ -969,12 +1034,12 @@ export default function Materials() {
                     }))
                   }}
                 >
-                  <option value="">— Select Equipment —</option>
+                  <option value="">— Select Equipment / Roll —</option>
                   {(quickForm.section_id
                     ? sectionEquipment.filter(eq => String(eq.sectionId) === String(quickForm.section_id))
                     : sectionEquipment
                   ).slice(0, 100).map(eq => (
-                    <option key={eq.id} value={String(eq.id)}>{eq.equipmentName} {eq.bearingSize ? `(${eq.bearingSize})` : ''}</option>
+                    <option key={eq.id} value={String(eq.id)}>{eq.equipmentName} {eq.bearingSize ? `[${eq.bearingSize}]` : ''}</option>
                   ))}
                 </select>
               </div>
@@ -1136,13 +1201,39 @@ export default function Materials() {
                   type="submit"
                   disabled={quickSaving}
                   style={S.quickAddBtn}
+                  title="Submit and add to catalog (Enter)"
                 >
-                  {quickSaving ? 'Adding...' : '＋ Add Entry'}
+                  {quickSaving ? 'Adding...' : '＋ Add Material'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuickForm({
+                    code: '',
+                    name: '',
+                    category_id: filterCat || '',
+                    section_id: filterSection || '',
+                    machine_id: filterMachine || '',
+                    section_equipment_id: '',
+                    criticality_class: '',
+                    hsn_code: '',
+                    bin_location: '',
+                    opening: '0',
+                    received: '0',
+                    issued: '0',
+                    current_stock: '0',
+                    unit_price: '0',
+                    is_active: true,
+                    uom: 'NOS'
+                  })}
+                  style={{ ...S.btnSecondary, padding: '5px 8px', fontSize: 11, height: 32 }}
+                  title="Clear inputs"
+                >
+                  ✕
                 </button>
               </div>
             </div>
 
-            {quickErr && <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>⚠️ {quickErr}</div>}
+            {quickErr && <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6, fontWeight: 600 }}>⚠️ {quickErr}</div>}
           </form>
         )}
 
@@ -1868,126 +1959,44 @@ export default function Materials() {
                 </div>
               </div>
 
-              {/* Section 2: Plant Section & Machine / Equipment Assignment */}
-              <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8, padding: '12px 16px', marginBottom: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>🏭</span>
-                    <span>Plant Section &amp; Machinery Allocation (Multi-Section &amp; Multi-Machine Support)</span>
-                  </div>
-                  <span style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>
-                    💡 One item can be allocated to multiple sections &amp; machines across the mill
-                  </span>
-                </div>
-                
-                <div style={S.grid2}>
-                  {/* Multi-Section Selector */}
-                  <label style={S.label}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Allocated Plant Section(s) *</span>
-                      <button
-                        type="button"
-                        onClick={() => { setSecErr(''); setSecModal(true) }}
-                        style={{ background: '#f0fdfa', border: '1px solid #0f766e', color: '#0f766e', borderRadius: 4, fontSize: 10, padding: '1px 6px', cursor: 'pointer', fontWeight: 700 }}
-                      >
-                        + Add Section
-                      </button>
-                    </div>
-                    <MultiSearchableSelect
-                      selectedValues={form.section_ids || (form.section_id ? [form.section_id] : [])}
-                      onChange={vals => {
-                        setForm(f => ({
-                          ...f,
-                          section_ids: vals,
-                          section_id: vals[0] || '',
-                          section_equipment_ids: (f.section_equipment_ids || []).filter(eqId => {
-                            const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
-                            return !eq || !eq.sectionId || vals.includes(String(eq.sectionId))
-                          })
-                        }))
-                      }}
-                      placeholder="— Select One or Multiple Plant Sections —"
-                      searchPlaceholder="Search plant sections (Wire, Press, Boiler, ETP, Pulp...)..."
-                      options={sections
-                        .filter(s => s.sectionCode !== 'ALL')
-                        .sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99))
-                        .map(s => ({
-                          value: String(s.id),
-                          label: `${s.icon || '🏭'} ${s.name}`,
-                          code: s.sectionCode
-                        }))}
-                    />
-                  </label>
-
-                  {/* Multi-Equipment / Machinery Selector */}
-                  <label style={S.label}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Allocated Machine(s) / Roll(s)</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEquipFormState(eq => ({ ...eq, section_id: form.section_id || '' }))
-                          setEquipErr('')
-                          setEquipModal(true)
-                        }}
-                        style={{ background: '#f0fdfa', border: '1px solid #0f766e', color: '#0f766e', borderRadius: 4, fontSize: 10, padding: '1px 6px', cursor: 'pointer', fontWeight: 700 }}
-                      >
-                        + Add Equipment
-                      </button>
-                    </div>
-                    <MultiSearchableSelect
-                      selectedValues={form.section_equipment_ids || (form.section_equipment_id ? [form.section_equipment_id] : [])}
-                      onChange={vals => {
-                        setForm(f => ({
-                          ...f,
-                          section_equipment_ids: vals,
-                          section_equipment_id: vals[0] || ''
-                        }))
-                      }}
-                      placeholder="— Select One or Multiple Machinery / Rolls —"
-                      searchPlaceholder="Search equipment / machine roll..."
-                      options={(
-                        (form.section_ids && form.section_ids.length > 0)
-                          ? sectionEquipment.filter(eq => form.section_ids.includes(String(eq.sectionId)))
-                          : sectionEquipment
-                      ).map(eq => {
-                        const sec = sections.find(s => String(s.id) === String(eq.sectionId))
-                        return {
-                          value: String(eq.id),
-                          label: eq.equipmentName,
-                          code: eq.tagName || '',
-                          group: sec ? sec.icon + ' ' + sec.name : (eq.sectionName || eq.sectionCode || ''),
-                          subtext: eq.sectionCode || ''
-                        }
-                      })}
-                    />
-                  </label>
-                </div>
-
-                {/* Primary Machine Context Selector */}
-                <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12 }}>
-                  <label style={S.label}>Primary Machine Unit
-                    <select
-                      style={S.select}
-                      value={String(form.machine_id || '')}
-                      onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))}
-                    >
-                      <option value="">— General / Any Machine —</option>
-                      {machines.map(m => (
-                        <option key={m.id} value={String(m.id)}>{m.name || m.code}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label style={S.label}>Section Context / Technical Placement
-                    <input
-                      style={S.input}
-                      value={form.section_context || ''}
-                      onChange={e => setForm(f => ({ ...f, section_context: e.target.value }))}
-                      placeholder="e.g. Wire Section Couch Roll &amp; Press Section Drive Roller"
-                    />
-                  </label>
-                </div>
-              </div>
+              {/* Section 2: Universal Plant Section & Machinery Allocation Panel */}
+              <SectionMachineAllocator
+                sectionIds={form.section_ids || (form.section_id ? [form.section_id] : [])}
+                onSectionIdsChange={(vals) => {
+                  setForm(f => ({
+                    ...f,
+                    section_ids: vals,
+                    section_id: vals[0] || '',
+                    section_equipment_ids: (f.section_equipment_ids || []).filter(eqId => {
+                      const eq = sectionEquipment.find(x => String(x.id) === String(eqId))
+                      return !eq || !eq.sectionId || vals.includes(String(eq.sectionId))
+                    })
+                  }))
+                }}
+                equipmentIds={form.section_equipment_ids || (form.section_equipment_id ? [form.section_equipment_id] : [])}
+                onEquipmentIdsChange={(vals) => {
+                  setForm(f => ({
+                    ...f,
+                    section_equipment_ids: vals,
+                    section_equipment_id: vals[0] || ''
+                  }))
+                }}
+                machineId={form.machine_id}
+                onMachineIdChange={(val) => setForm(f => ({ ...f, machine_id: val }))}
+                sectionContext={form.section_context}
+                onSectionContextChange={(val) => setForm(f => ({ ...f, section_context: val }))}
+                sections={sections}
+                sectionEquipment={sectionEquipment}
+                machines={machines}
+                onAddSection={() => { setSecErr(''); setSecModal(true) }}
+                onAddEquipment={() => {
+                  setEquipFormState(eq => ({ ...eq, section_id: form.section_id || '' }))
+                  setEquipErr('')
+                  setEquipModal(true)
+                }}
+                required={true}
+                errors={{ section: (!form.section_ids?.length && !form.section_id && err && err.toLowerCase().includes('section')) ? 'Please select at least one plant section' : null }}
+              />
 
               {/* Thresholds */}
               <div style={S.grid4}>
@@ -2079,9 +2088,15 @@ export default function Materials() {
       {/* ── ADD PLANT SECTION MODAL ── */}
       {secModal && (
         <div style={S.overlay} onClick={() => setSecModal(false)}>
-          <div style={{ ...S.modal, maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+          <div style={{ ...S.modal, maxWidth: 540 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div style={S.modalTitle}>🏭 Add New Plant Section</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20 }}>🏭</span>
+                <div>
+                  <div style={S.modalTitle}>Provision New Plant Section</div>
+                  <div style={S.sub}>Register a plant process section with real-time equipment &amp; material routing</div>
+                </div>
+              </div>
               <button style={S.close} onClick={() => setSecModal(false)}>✕</button>
             </div>
             <form onSubmit={saveSectionDirect} style={S.form}>
@@ -2099,22 +2114,65 @@ export default function Materials() {
                 />
               </label>
 
-              <label style={S.label}>Section Code *
-                <input
-                  style={S.input}
-                  value={secForm.code}
-                  onChange={e => setSecForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
-                  required
-                  placeholder="e.g. CHEM_STORE"
-                />
-              </label>
+              <div style={S.grid2}>
+                <label style={S.label}>Section Code *
+                  <input
+                    style={S.input}
+                    value={secForm.code}
+                    onChange={e => setSecForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
+                    required
+                    placeholder="e.g. CHEM_STORE"
+                  />
+                </label>
+
+                <label style={S.label}>Owning Department
+                  <select
+                    style={S.select}
+                    value={secForm.department_id || ''}
+                    onChange={e => setSecForm(f => ({ ...f, department_id: e.target.value }))}
+                  >
+                    <option value="">— Select Department —</option>
+                    <option value="1">Production</option>
+                    <option value="2">Maintenance / Mechanical</option>
+                    <option value="3">Electrical &amp; Instrumentation</option>
+                    <option value="4">Boiler &amp; Powerhouse</option>
+                    <option value="5">Stores &amp; Purchase</option>
+                    <option value="6">Quality Control &amp; Lab</option>
+                  </select>
+                </label>
+              </div>
+
+              {/* Icon Picker */}
+              <div>
+                <span style={S.label}>Process Section Icon</span>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                  {['🏭', '🌀', '🕸️', '💨', '🔄', '☀️', '🔘', '💧', '🌿', '🔬', '📦', '⚡', '⚙️', '🛢️'].map(ic => (
+                    <button
+                      key={ic}
+                      type="button"
+                      onClick={() => setSecForm(f => ({ ...f, icon: ic }))}
+                      style={{
+                        background: (secForm.icon || '🏭') === ic ? '#0f766e' : '#f1f5f9',
+                        color: (secForm.icon || '🏭') === ic ? '#ffffff' : '#1e293b',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: 6,
+                        padding: '4px 10px',
+                        fontSize: 16,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {ic}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <label style={S.label}>Section Description
                 <input
                   style={S.input}
                   value={secForm.description || ''}
                   onChange={e => setSecForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="e.g. Storage for alum, rosin, PAC & chemicals"
+                  placeholder="e.g. Storage &amp; dosing for alum, rosin, PAC, polymer and process sizing chemicals"
                 />
               </label>
 
@@ -2123,7 +2181,7 @@ export default function Materials() {
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setSecModal(false)}>Cancel</button>
                 <button type="submit" style={S.btnPrimary} disabled={secSaving}>
-                  {secSaving ? 'Saving...' : 'Create Section'}
+                  {secSaving ? 'Saving...' : '✨ Create & Link Section'}
                 </button>
               </div>
             </form>
@@ -2134,11 +2192,14 @@ export default function Materials() {
       {/* ── ADD MACHINE / EQUIPMENT / ROLL MODAL ── */}
       {equipModal && (
         <div style={S.overlay} onClick={() => setEquipModal(false)}>
-          <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
+          <div style={{ ...S.modal, maxWidth: 680 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
-              <div>
-                <div style={S.modalTitle}>⚙️ Add Machinery / Equipment / Roll Component</div>
-                <div style={S.sub}>Provision new machine component or roll with mechanical digital twin specs</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20 }}>⚙️</span>
+                <div>
+                  <div style={S.modalTitle}>Add Machinery / Equipment / Roll Component</div>
+                  <div style={S.sub}>Provision machine component with complete mechanical digital twin specifications</div>
+                </div>
               </div>
               <button style={S.close} onClick={() => setEquipModal(false)}>✕</button>
             </div>
@@ -2172,7 +2233,9 @@ export default function Materials() {
                     onChange={e => setEquipFormState(f => ({ ...f, section_id: e.target.value }))}
                   >
                     <option value="">— Select Section —</option>
-                    {sections.map(s => <option key={s.id} value={String(s.id)}>{s.name || s.sectionCode}</option>)}
+                    {sections.filter(s => s.sectionCode !== 'ALL').map(s => (
+                      <option key={s.id} value={String(s.id)}>{s.icon || '🏭'} {s.name || s.sectionCode}</option>
+                    ))}
                   </select>
                 </label>
 
@@ -2188,10 +2251,11 @@ export default function Materials() {
                 </label>
               </div>
 
-              {/* Mechanical Specs */}
-              <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', textTransform: 'uppercase', marginBottom: 8 }}>
-                  🔧 Mechanical Specifications (Digital Twin Link)
+              {/* Mechanical Specs Digital Twin Box */}
+              <div style={{ background: '#f8fafc', padding: 14, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', textTransform: 'uppercase', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>🔧</span>
+                  <span>Mechanical Specifications &amp; Spares Matching (Digital Twin Link)</span>
                 </div>
                 <div style={S.grid3}>
                   <label style={S.label}>Bearing Size
@@ -2246,6 +2310,33 @@ export default function Materials() {
                     />
                   </label>
                 </div>
+
+                <div style={{ ...S.grid3, marginTop: 8 }}>
+                  <label style={S.label}>Couplings
+                    <input
+                      style={S.input}
+                      value={equipFormState.couplings || ''}
+                      onChange={e => setEquipFormState(f => ({ ...f, couplings: e.target.value }))}
+                      placeholder="e.g. Lovejoy L-110"
+                    />
+                  </label>
+                  <label style={S.label}>Pulleys
+                    <input
+                      style={S.input}
+                      value={equipFormState.pulleys || ''}
+                      onChange={e => setEquipFormState(f => ({ ...f, pulleys: e.target.value }))}
+                      placeholder="e.g. 3 Groove 8'' PCD"
+                    />
+                  </label>
+                  <label style={S.label}>Technical Remarks
+                    <input
+                      style={S.input}
+                      value={equipFormState.remarks || ''}
+                      onChange={e => setEquipFormState(f => ({ ...f, remarks: e.target.value }))}
+                      placeholder="e.g. Drive side assembly"
+                    />
+                  </label>
+                </div>
               </div>
 
               {equipErr && <div style={S.error}>⚠️ {equipErr}</div>}
@@ -2253,7 +2344,7 @@ export default function Materials() {
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setEquipModal(false)}>Cancel</button>
                 <button type="submit" style={S.btnPrimary} disabled={equipSaving}>
-                  {equipSaving ? 'Saving...' : 'Add Equipment'}
+                  {equipSaving ? 'Saving...' : '✨ Add Machinery Component'}
                 </button>
               </div>
             </form>
