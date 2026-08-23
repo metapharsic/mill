@@ -1398,18 +1398,30 @@ router.get('/sections', auth, ar(async (req, res) => {
   const { rows } = await pool.query(
     `SELECT s.*, d.name as "departmentName" FROM sections s 
      LEFT JOIN departments d ON d.id=s.department_id 
+     WHERE s.is_active = true
      ORDER BY s.name`
   );
   res.json({ success: true, data: rows });
 }));
 
 router.post('/sections', auth, requireLevel(3), ar(async (req, res) => {
-  const { name, code, department_id } = req.body;
+  const { name, code, department_id, description } = req.body;
   if (!name) return res.status(400).json({ success: false, message: 'Section name required' });
+  const secCode = (code || name.toUpperCase().replace(/[^A-Z0-9]/g, '_').slice(0, 20)).toUpperCase();
+  
   const { rows } = await pool.query(
-    `INSERT INTO sections (name, code, department_id) VALUES ($1, $2, $3) RETURNING *`,
-    [name, code || null, department_id || null]
+    `INSERT INTO sections (name, code, department_id, is_active) VALUES ($1, $2, $3, true) RETURNING *`,
+    [name, secCode, department_id || null]
   );
+
+  // Sync with plant_sections table as well
+  await pool.query(`
+    INSERT INTO plant_sections (section_code, name, description, department_id, is_active)
+    VALUES ($1, $2, $3, $4, true)
+    ON CONFLICT (section_code) DO UPDATE
+    SET name = EXCLUDED.name, description = EXCLUDED.description, is_active = true
+  `, [secCode, name, description || `${name} Section`, department_id || null]).catch(err => console.warn('plant_sections sync:', err.message));
+
   res.status(201).json({ success: true, data: rows[0] });
 }));
 
@@ -1428,6 +1440,99 @@ router.put('/sections/:id', auth, requireLevel(3), ar(async (req, res) => {
 router.delete('/sections/:id', auth, requireLevel(3), ar(async (req, res) => {
   await pool.query('UPDATE sections SET is_active=false WHERE id=$1', [req.params.id]);
   res.json({ success: true });
+}));
+
+// ── SECTION EQUIPMENT & MACHINERY REGISTRY ──────────────────────────────────
+router.get('/section-equipment', auth, ar(async (req, res) => {
+  const { section_id, machine_id, search } = req.query;
+  let query = `
+    SELECT se.id, se.section_id as "sectionId", se.machine_id as "machineId",
+           se.tag_name as "tagName", se.equipment_name as "equipmentName",
+           se.equipment_type as "equipmentType", se.bearing_size as "bearingSize",
+           se.lock_nut as "lockNut", se.washer, se.belt_no as "beltNo",
+           se.shaft_size as "shaftSize", se.impeller_size as "impellerSize",
+           se.sleeve, se.couplings, se.pulleys, se.is_active as "isActive",
+           s.name as "sectionName", ps.name as "plantSectionName",
+           m.name as "machineName"
+    FROM section_equipment se
+    LEFT JOIN sections s ON s.id = se.section_id
+    LEFT JOIN plant_sections ps ON ps.id = se.section_id OR ps.section_code = se.section_code
+    LEFT JOIN machines m ON m.id = se.machine_id
+    WHERE se.is_active = true
+  `;
+  const params = [];
+  if (section_id) {
+    params.push(section_id);
+    query += ` AND (se.section_id = $${params.length} OR ps.id = $${params.length} OR s.id = $${params.length})`;
+  }
+  if (machine_id) {
+    params.push(machine_id);
+    query += ` AND se.machine_id = $${params.length}`;
+  }
+  if (search) {
+    params.push(`%${search}%`);
+    query += ` AND (LOWER(se.equipment_name) LIKE LOWER($${params.length}) OR LOWER(COALESCE(se.tag_name, '')) LIKE LOWER($${params.length}) OR LOWER(COALESCE(se.bearing_size, '')) LIKE LOWER($${params.length}))`;
+  }
+  query += ` ORDER BY se.sno ASC NULLS LAST, se.equipment_name ASC`;
+  const { rows } = await pool.query(query, params);
+  res.json({ success: true, data: rows, total: rows.length });
+}));
+
+router.post('/section-equipment', auth, requireLevel(3), ar(async (req, res) => {
+  const { section_id, machine_id, tag_name, equipment_name, equipment_type, bearing_size, lock_nut, washer, belt_no, shaft_size, impeller_size, sleeve, couplings, pulleys, remarks } = req.body;
+  if (!equipment_name) return res.status(400).json({ success: false, message: 'Equipment / Roll name required' });
+  
+  // Resolve section_id to valid plant_sections id
+  let resolvedPlantSecId = null;
+  let resolvedSecId = null;
+  if (section_id) {
+    const { rows: psDirect } = await pool.query('SELECT id, section_code FROM plant_sections WHERE id = $1', [section_id]);
+    if (psDirect.length) {
+      resolvedPlantSecId = psDirect[0].id;
+      const { rows: sDirect } = await pool.query('SELECT id FROM sections WHERE code = $1 OR id = $2', [psDirect[0].section_code, section_id]);
+      if (sDirect.length) resolvedSecId = sDirect[0].id;
+    } else {
+      const { rows: sDirect } = await pool.query('SELECT id, code FROM sections WHERE id = $1', [section_id]);
+      if (sDirect.length) {
+        resolvedSecId = sDirect[0].id;
+        const { rows: psMatch } = await pool.query('SELECT id FROM plant_sections WHERE section_code = $1', [sDirect[0].code]);
+        if (psMatch.length) resolvedPlantSecId = psMatch[0].id;
+      }
+    }
+  }
+
+  // Fallback to section 4 (WIRE) or first active plant section if still null
+  if (!resolvedPlantSecId) {
+    const { rows: anyPs } = await pool.query('SELECT id FROM plant_sections ORDER BY id ASC LIMIT 1');
+    resolvedPlantSecId = anyPs.length ? anyPs[0].id : 4;
+  }
+
+  const tag = tag_name || `EQ-${Date.now().toString().slice(-6)}`;
+  const { rows } = await pool.query(`
+    INSERT INTO section_equipment (
+      section_id, machine_id, tag_name, equipment_name, equipment_type,
+      bearing_size, lock_nut, washer, belt_no, shaft_size, impeller_size,
+      sleeve, couplings, pulleys, remarks, is_active
+    ) VALUES ($1, $2, $3, $4, COALESCE($5, 'Roll/Assembly'), $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, true)
+    RETURNING id, section_id as "sectionId", machine_id as "machineId", tag_name as "tagName", equipment_name as "equipmentName", bearing_size as "bearingSize", is_active as "isActive"
+  `, [
+    resolvedPlantSecId, machine_id || null, tag, equipment_name, equipment_type || null,
+    bearing_size || null, lock_nut || null, washer || null, belt_no || null,
+    shaft_size || null, impeller_size || null, sleeve || null, couplings || null,
+    pulleys || null, remarks || null
+  ]);
+
+  // Also sync to equipment table
+  await pool.query(`
+    INSERT INTO equipment (name, code, section_id, bearing_size, lock_nut, washer, belt_no, shaft_size, impeller_size, sleeve, couplings, pulleys, is_active)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, true)
+  `, [
+    equipment_name, tag, resolvedSecId || null, bearing_size || null, lock_nut || null,
+    washer || null, belt_no || null, shaft_size || null, impeller_size || null,
+    sleeve || null, couplings || null, pulleys || null
+  ]).catch(err => console.warn('equipment sync warning:', err.message));
+
+  res.status(201).json({ success: true, data: rows[0] });
 }));
 
 // ── MOTOR ELECTRICAL SPECS (F2) ─────────────────────────────────────────────────

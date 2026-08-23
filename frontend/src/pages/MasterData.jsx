@@ -9,6 +9,8 @@ export default function MasterData() {
   const [tab, setTab] = useState('summary')
   const [sections, setSections] = useState([])
   const [departments, setDepartments] = useState([])
+  const [equipmentList, setEquipmentList] = useState([])
+  const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', code: '', department_id: '' })
   const [modal, setModal] = useState(false)
@@ -16,17 +18,42 @@ export default function MasterData() {
   const [err, setErr] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Equipment Master State
+  const [equipModal, setEquipModal] = useState(false)
+  const [equipForm, setEquipForm] = useState({
+    id: null,
+    equipment_name: '',
+    tag_name: '',
+    section_id: '',
+    machine_id: '',
+    bearing_size: '',
+    lock_nut: '',
+    washer: '',
+    belt_no: '',
+    shaft_size: '',
+    impeller_size: '',
+    sleeve: '',
+    couplings: '',
+    pulleys: '',
+    remarks: ''
+  })
+  const [equipSearch, setEquipSearch] = useState('')
+  const [filterEquipSec, setFilterEquipSec] = useState('')
+
   const loadData = useCallback(async () => {
-    if (tab !== 'sections') return
     setLoading(true)
-    const [secRes, deptRes] = await Promise.all([
+    const [secRes, deptRes, eqRes, mcnRes] = await Promise.all([
       API('/api/master/sections'),
       API('/api/users/departments'),
+      API('/api/master/section-equipment'),
+      API('/api/master/machines')
     ])
     if (secRes.success) setSections(secRes.data)
     if (deptRes.success) setDepartments(deptRes.data)
+    if (eqRes.success) setEquipmentList(eqRes.data)
+    if (mcnRes.success) setMachines(mcnRes.data)
     setLoading(false)
-  }, [tab])
+  }, [])
 
   useEffect(() => { loadData() }, [loadData])
 
@@ -53,33 +80,63 @@ export default function MasterData() {
     setModal(true)
   }
 
+  const saveEquip = async (e) => {
+    e.preventDefault()
+    if (!equipForm.equipment_name) return setErr('Equipment / Roll Name is required')
+    setSaving(true)
+    const res = await API('/api/master/section-equipment', { method: 'POST', body: JSON.stringify(equipForm) })
+    setSaving(false)
+    if (res.success) {
+      setEquipModal(false)
+      setEquipForm({
+        id: null, equipment_name: '', tag_name: '', section_id: '', machine_id: '',
+        bearing_size: '', lock_nut: '', washer: '', belt_no: '', shaft_size: '',
+        impeller_size: '', sleeve: '', couplings: '', pulleys: '', remarks: ''
+      })
+      loadData()
+    } else {
+      setErr(res.message || 'Error saving equipment')
+    }
+  }
+
   const MODULES = [
     { title: 'Customers', status: 'Live', color: '#1b1b1d', desc: 'Keep company names, contacts, credit terms, and GST info.', bullets: ['Add and edit customers', 'Search and filter', 'Credit and payment terms'] },
     { title: 'Materials', status: 'Live', color: '#1b1b1d', desc: 'Track raw materials, UOM, stock, reorder points, and GST.', bullets: ['Material master', 'Category setup', 'Reorder alerts'] },
+    { title: 'Plant Sections & Spares', status: 'Live', color: '#0f766e', desc: 'Manage 16 plant sections and 282 machinery rolls dynamically.', bullets: ['Add/edit sections', 'Assign rolls & bearings', 'Digital twin link'] },
     { title: 'Vendors', status: 'Live', color: '#1b1b1d', desc: 'Manage supplier details, payment terms, and vendor records.', bullets: ['Vendor list', 'Contact details', 'Terms and status'] },
     { title: 'Grades', status: 'Live', color: '#16a34a', desc: 'Keep paper grades, quality specs, and grade-level metadata.', bullets: ['Grade catalog', 'Quality notes', 'Simple lookup'] },
     { title: 'Machines', status: 'Live', color: '#d97706', desc: 'Record machines, maintenance data, and equipment setup.', bullets: ['Machine master', 'Setup info', 'Status tracking'] },
-    { title: 'Users', status: 'Live', color: '#dc2626', desc: 'Control user access, roles, shifts, and departments.', bullets: ['User setup', 'Role and dept', 'Password reset'] },
   ]
+
+  const filteredEquip = equipmentList.filter(eq => {
+    const matchesSearch = !equipSearch ||
+      (eq.equipmentName && eq.equipmentName.toLowerCase().includes(equipSearch.toLowerCase())) ||
+      (eq.tagName && eq.tagName.toLowerCase().includes(equipSearch.toLowerCase())) ||
+      (eq.bearingSize && eq.bearingSize.toLowerCase().includes(equipSearch.toLowerCase())) ||
+      (eq.beltNo && eq.beltNo.toLowerCase().includes(equipSearch.toLowerCase()))
+    const matchesSec = !filterEquipSec || String(eq.sectionId) === String(filterEquipSec)
+    return matchesSearch && matchesSec
+  })
 
   return (
     <div style={S.page}>
       <div style={S.header}>
         <div>
-          <div style={S.title}>Phase 2 — Master Data</div>
-          <div style={S.sub}>Big bone data. All main master records now have a home.</div>
+          <div style={S.title}>Master Data Management</div>
+          <div style={S.sub}>Central registry for Plant Sections, Machinery &amp; Spares Digital Twin, Customers, and Catalog.</div>
         </div>
         <div style={S.tabs}>
           <button style={{ ...S.tabBtn, ...(tab === 'summary' ? S.tabActive : {}) }} onClick={() => setTab('summary')}>Overview</button>
-          <button style={{ ...S.tabBtn, ...(tab === 'sections' ? S.tabActive : {}) }} onClick={() => setTab('sections')}>Plant Sections (F5)</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'sections' ? S.tabActive : {}) }} onClick={() => setTab('sections')}>Plant Sections ({sections.length})</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'equipment' ? S.tabActive : {}) }} onClick={() => setTab('equipment')}>Machinery &amp; Spares Registry ({equipmentList.length})</button>
         </div>
       </div>
 
       {tab === 'summary' && (
         <>
           <div style={S.hero}>
-            <div style={S.heroTitle}>This phase make system strong.</div>
-            <div style={S.heroText}>Customers, materials, vendors, grades, machines, and users now have working screens so the ERP can grow from solid base.</div>
+            <div style={S.heroTitle}>Master Data Engine &amp; Digital Twin Provisioning</div>
+            <div style={S.heroText}>Plant Sections, Machinery, Materials, and Categories are dynamically manageable with live database synchronization.</div>
           </div>
           <div style={S.grid}>
             {MODULES.map(mod => (
@@ -98,22 +155,23 @@ export default function MasterData() {
         </>
       )}
 
+      {/* PLANT SECTIONS TAB */}
       {tab === 'sections' && (
         <div style={S.sectionContainer}>
           <div style={S.card}>
             <div style={{ ...S.header, marginBottom: 16 }}>
-              <div style={S.cardTitle}>Sections</div>
+              <div style={S.cardTitle}>🏭 Plant Sections Master</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input style={{...S.input, maxWidth: 200}} placeholder="Search sections..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
-                <button style={S.btnPrimary} onClick={() => { setForm({ name: '', code: '', department_id: '' }); setErr(''); setModal(true) }}>+ Add Section</button>
+                <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search sections..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
+                <button style={S.btnPrimary} onClick={() => { setForm({ name: '', code: '', department_id: '' }); setErr(''); setModal(true) }}>+ Add Plant Section</button>
               </div>
             </div>
             
-            {loading ? <div style={S.loading}>Loading...</div> : (
+            {loading ? <div style={S.loading}>Loading sections...</div> : (
               <table style={S.table}>
                 <thead>
                   <tr style={S.thead}>
-                    {['Action', 'Code', 'Name', 'Department', 'Status'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                    {['Action', 'Section Code', 'Section Name', 'Department', 'Status'].map(h => <th key={h} style={S.th}>{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -140,6 +198,98 @@ export default function MasterData() {
         </div>
       )}
 
+      {/* MACHINERY & EQUIPMENT REGISTRY TAB */}
+      {tab === 'equipment' && (
+        <div style={S.sectionContainer}>
+          <div style={S.card}>
+            <div style={{ ...S.header, marginBottom: 16 }}>
+              <div style={S.cardTitle}>⚙️ Machinery &amp; Spares Registry (282 Digital Twin Rolls &amp; Equipment)</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <select
+                  style={{ ...S.input, maxWidth: 200 }}
+                  value={filterEquipSec}
+                  onChange={e => setFilterEquipSec(e.target.value)}
+                >
+                  <option value="">All Plant Sections</option>
+                  {sections.map(s => <option key={s.id} value={String(s.id)}>{s.name || s.code}</option>)}
+                </select>
+                <input
+                  style={{ ...S.input, maxWidth: 260 }}
+                  placeholder="🔍 Search roll, bearing (e.g. 23234K), belt..."
+                  value={equipSearch}
+                  onChange={e => setEquipSearch(e.target.value)}
+                />
+                <button
+                  style={S.btnPrimary}
+                  onClick={() => {
+                    setEquipForm({
+                      id: null, equipment_name: '', tag_name: '', section_id: filterEquipSec || '', machine_id: '',
+                      bearing_size: '', lock_nut: '', washer: '', belt_no: '', shaft_size: '',
+                      impeller_size: '', sleeve: '', couplings: '', pulleys: '', remarks: ''
+                    })
+                    setErr('')
+                    setEquipModal(true)
+                  }}
+                >
+                  + Add Machinery / Roll
+                </button>
+              </div>
+            </div>
+
+            {loading ? <div style={S.loading}>Loading equipment registry...</div> : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={S.table}>
+                  <thead>
+                    <tr style={S.thead}>
+                      {['Tag Code', 'Equipment / Roll', 'Plant Section', 'Bearing Size', 'Lock Nut / Washer', 'Belt No', 'Shaft', 'Couplings / Pulleys'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredEquip.length === 0 && <tr><td colSpan={8} style={S.empty}>No machinery equipment found</td></tr>}
+                    {filteredEquip.map((eq, idx) => (
+                      <tr key={eq.id || idx} style={S.tr}>
+                        <td style={S.td}>
+                          <code style={{ background: '#f1f5f9', color: '#0f766e', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
+                            {eq.tagName || '—'}
+                          </code>
+                        </td>
+                        <td style={S.td}>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{eq.equipmentName}</div>
+                          {eq.machineName && <div style={{ fontSize: 11, color: '#64748b' }}>Unit: {eq.machineName}</div>}
+                        </td>
+                        <td style={S.td}>{eq.sectionName || eq.plantSectionName || '—'}</td>
+                        <td style={S.td}>
+                          {eq.bearingSize ? (
+                            <span style={{ background: '#cffafe', color: '#0891b2', fontWeight: 800, padding: '2px 8px', borderRadius: 12, fontSize: 11 }}>
+                              {eq.bearingSize}
+                            </span>
+                          ) : '—'}
+                        </td>
+                        <td style={S.td}>
+                          {[eq.lockNut ? `Nut: ${eq.lockNut}` : null, eq.washer ? `W: ${eq.washer}` : null].filter(Boolean).join(' | ') || '—'}
+                        </td>
+                        <td style={S.td}>
+                          {eq.beltNo ? (
+                            <span style={{ background: '#fef3c7', color: '#d97706', fontWeight: 700, padding: '2px 7px', borderRadius: 10, fontSize: 11 }}>
+                              {eq.beltNo}
+                            </span>
+                          ) : '—'}
+                        </td>
+                        <td style={S.td}>{eq.shaftSize || '—'}</td>
+                        <td style={S.td}>
+                          {[eq.couplings ? `Cpl: ${eq.couplings}` : null, eq.pulleys ? `Pul: ${eq.pulleys}` : null].filter(Boolean).join(' | ') || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION MODAL */}
       {modal && (
         <div style={S.overlay} onClick={() => setModal(false)}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
@@ -152,18 +302,62 @@ export default function MasterData() {
                 <input style={S.input} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required placeholder="e.g. Wire Part" />
               </label>
               <label style={S.label}>Section Code
-                <input style={S.input} value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="e.g. PM1_WIRE" />
+                <input style={S.input} value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="e.g. WIRE" />
               </label>
               <label style={S.label}>Responsible Department
                 <select style={S.select} value={form.department_id} onChange={e => setForm(f => ({ ...f, department_id: e.target.value }))}>
-                  <option value="">Select...</option>
+                  <option value="">Select Department...</option>
                   {departments.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
                 </select>
               </label>
               {err && <div style={S.error}>{err}</div>}
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setModal(false)}>Cancel</button>
-                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Add Section'}</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Save Section'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EQUIPMENT MODAL */}
+      {equipModal && (
+        <div style={S.overlay} onClick={() => setEquipModal(false)}>
+          <div style={{ ...S.modal, maxWidth: 600 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div style={S.modalTitle}>⚙️ Add Machinery / Roll Component</div>
+              <button style={S.close} onClick={() => setEquipModal(false)}>✕</button>
+            </div>
+            <form onSubmit={saveEquip} style={S.form}>
+              <label style={S.label}>Equipment / Roll Name *
+                <input style={S.input} value={equipForm.equipment_name} onChange={e => setEquipForm(f => ({ ...f, equipment_name: e.target.value }))} required placeholder="e.g. Top Wire Guide Roll #3" />
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <label style={S.label}>Tag Code
+                  <input style={S.input} value={equipForm.tag_name} onChange={e => setEquipForm(f => ({ ...f, tag_name: e.target.value }))} placeholder="e.g. WIRE-MCN-028" />
+                </label>
+                <label style={S.label}>Plant Section
+                  <select style={S.select} value={equipForm.section_id} onChange={e => setEquipForm(f => ({ ...f, section_id: e.target.value }))}>
+                    <option value="">Select Section...</option>
+                    {sections.map(s => <option key={s.id} value={s.id}>{s.name || s.code}</option>)}
+                  </select>
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                <label style={S.label}>Bearing Size
+                  <input style={S.input} value={equipForm.bearing_size} onChange={e => setEquipForm(f => ({ ...f, bearing_size: e.target.value }))} placeholder="23234K" />
+                </label>
+                <label style={S.label}>Lock Nut
+                  <input style={S.input} value={equipForm.lock_nut} onChange={e => setEquipForm(f => ({ ...f, lock_nut: e.target.value }))} placeholder="KM 34" />
+                </label>
+                <label style={S.label}>Belt No
+                  <input style={S.input} value={equipForm.belt_no} onChange={e => setEquipForm(f => ({ ...f, belt_no: e.target.value }))} placeholder="C-144" />
+                </label>
+              </div>
+              {err && <div style={S.error}>{err}</div>}
+              <div style={S.modalFooter}>
+                <button type="button" style={S.btnSecondary} onClick={() => setEquipModal(false)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Add Equipment'}</button>
               </div>
             </form>
           </div>
@@ -178,40 +372,39 @@ const S = {
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap', marginBottom: 18 },
   title: { fontSize: 24, fontWeight: 700, color: '#1b1b1d' },
   sub: { fontSize: 13, color: '#8a8a90', marginTop: 4 },
-  tabs: { display: 'flex', gap: 8, background: '#ecebe5', padding: 4, borderRadius: 8 },
-  tabBtn: { background: 'none', border: 'none', padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#3a3a3e', borderRadius: 6, cursor: 'pointer' },
-  tabActive: { background: '#fff', color: '#1b1b1d', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
-  hero: { background: 'linear-gradient(90deg, #eff6ff, #f6f5f0)', border: '1px solid #dbeafe', borderRadius: 16, padding: 20, marginBottom: 18 },
-  heroTitle: { fontSize: 18, fontWeight: 700, color: '#1e3a8a' },
-  heroText: { fontSize: 14, color: '#3a3a3e', lineHeight: 1.6, marginTop: 4 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 },
-  card: { background: '#fff', border: '1px solid #ecebe5', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(15,23,42,0.06)' },
-  cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 },
-  cardTitle: { fontSize: 16, fontWeight: 700 },
-  statusBadge: { fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 999 },
-  desc: { fontSize: 13, color: '#3a3a3e', lineHeight: 1.5, marginBottom: 10 },
-  list: { margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4, color: '#3a3a3e' },
-  listItem: { fontSize: 12 },
-  sectionContainer: { background: '#fff', border: '1px solid #ecebe5', borderRadius: 16, padding: 20 },
-  tableWrap: { overflowX: 'auto', marginTop: 12 },
+  tabs: { display: 'flex', gap: 8, flexWrap: 'wrap' },
+  tabBtn: { background: '#ffffff', border: '1px solid #e7e6df', color: '#64748b', borderRadius: 8, padding: '8px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer' },
+  tabActive: { background: '#0f766e', color: '#ffffff', borderColor: '#0f766e' },
+  hero: { background: '#ffffff', border: '1px solid #e7e6df', borderRadius: 10, padding: 18, marginBottom: 18 },
+  heroTitle: { fontSize: 16, fontWeight: 700, color: '#1b1b1d', marginBottom: 4 },
+  heroText: { fontSize: 13, color: '#64748b' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 },
+  card: { background: '#ffffff', border: '1px solid #e7e6df', borderRadius: 10, padding: 18 },
+  cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  cardTitle: { fontSize: 15, fontWeight: 700, color: '#1b1b1d' },
+  statusBadge: { fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12 },
+  desc: { fontSize: 12, color: '#64748b', marginBottom: 10 },
+  list: { paddingLeft: 16, margin: 0, fontSize: 12, color: '#475569' },
+  listItem: { marginBottom: 4 },
+  sectionContainer: { marginTop: 10 },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
-  thead: { background: '#f6f5f0' },
-  th: { textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid #ecebe5', color: '#8a8a90', fontWeight: 700 },
-  td: { padding: '10px 12px', borderBottom: '1px solid #f6f5f0', color: '#3a3a3e' },
-  tr: { borderBottom: '1px solid #f6f5f0' },
-  empty: { padding: 32, color: '#a0a0a6', textAlign: 'center' },
-  loading: { padding: 32, color: '#a0a0a6', textAlign: 'center' },
-  btnPrimary: { background: '#1b1b1d', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
-  btnSecondary: { background: '#ecebe5', color: '#3a3a3e', border: 'none', borderRadius: 8, padding: '8px 16px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modal: { background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 480 },
+  thead: { background: '#f8fafc', borderBottom: '2px solid #0f766e' },
+  th: { padding: '10px 12px', textAlign: 'left', color: '#0f766e', fontWeight: 700, fontSize: 12, textTransform: 'uppercase' },
+  tr: { borderBottom: '1px solid #f1efe8' },
+  td: { padding: '10px 12px', verticalAlign: 'middle' },
+  input: { width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: 6, fontSize: 13, outline: 'none', background: '#f8fafc', boxSizing: 'border-box' },
+  select: { width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: 6, fontSize: 13, background: '#f8fafc', boxSizing: 'border-box' },
+  label: { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, color: '#475569', fontWeight: 600, width: '100%' },
+  btnPrimary: { background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 700, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' },
+  btnSecondary: { background: '#ffffff', color: '#1b1b1d', border: '1px solid #e7e6df', borderRadius: 6, padding: '8px 14px', fontWeight: 600, fontSize: 12, cursor: 'pointer' },
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 6000, padding: 20 },
+  modal: { background: '#ffffff', borderRadius: 10, padding: 22, width: '100%', maxWidth: 500, border: '1px solid #e7e6df' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 16, fontWeight: 700, color: '#1b1b1d' },
-  close: { background: 'none', border: 'none', color: '#a0a0a6', fontSize: 18, cursor: 'pointer' },
-  form: { display: 'flex', flexDirection: 'column', gap: 14 },
-  label: { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: '#3a3a3e', fontWeight: 600 },
-  input: { border: '1px solid #d8d6cc', borderRadius: 6, padding: '8px 10px', fontSize: 13, outline: 'none' },
-  select: { border: '1px solid #d8d6cc', borderRadius: 6, padding: '8px 10px', fontSize: 13 },
-  error: { color: '#ef4444', fontSize: 12 },
-  modalFooter: { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }
+  close: { background: 'none', border: 'none', color: '#94a3b8', fontSize: 18, cursor: 'pointer' },
+  form: { display: 'flex', flexDirection: 'column', gap: 12 },
+  modalFooter: { display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 },
+  error: { background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '8px 12px', borderRadius: 6, fontSize: 12 },
+  loading: { padding: 30, textAlign: 'center', color: '#64748b' },
+  empty: { padding: 30, textAlign: 'center', color: '#94a3b8' }
 }
