@@ -1,5 +1,5 @@
 {
-  "exported_at": "2026-08-23T06:14:30.195Z",
+  "exported_at": "2026-08-23T08:18:53.229Z",
   "total_tables": 108,
   "table_counts": {
     "adjustment_requests": 0,
@@ -36,7 +36,7 @@
     "employee_salary_assignments": 0,
     "employees": 1,
     "eod_reports": 1,
-    "equipment": 196,
+    "equipment": 571,
     "equipment_inspection": 29,
     "etp_readings": 0,
     "furnish_mix_log": 4,
@@ -84,8 +84,8 @@
     "scrap_records": 1,
     "section_alarms": 0,
     "section_energy_allocations": 1,
-    "section_equipment": 323,
-    "section_kpi_snapshots": 5770,
+    "section_equipment": 325,
+    "section_kpi_snapshots": 5818,
     "section_process_readings": 10,
     "section_sops": 0,
     "sections": 21,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const POLL_MS = 30_000
 
@@ -10,8 +11,9 @@ const EQUIP_TYPES = ['Pump','Fan','Compressor','Screen','Cleaner','Refiner','Dry
 
 export default function PlantSection({ sectionCode }) {
   const { user, token } = useAuth()
+  const navigate = useNavigate()
   const code = (sectionCode || '').toUpperCase()
-  const [tab, setTab]           = useState('overview')
+  const [tab, setTab]           = useState('equipment')
   const [section, setSection]   = useState(null)
   const [readings, setReadings] = useState([])
   const [alarms, setAlarms]     = useState([])
@@ -24,6 +26,7 @@ export default function PlantSection({ sectionCode }) {
   const [saving, setSaving]     = useState(false)
   const [resolveId, setResolveId]     = useState(null)
   const [resolutionNote, setResolutionNote] = useState('')
+  const [equipSearch, setEquipSearch] = useState('')
 
   const api = (path) => fetch(`/api/sections${path}`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -51,7 +54,7 @@ export default function PlantSection({ sectionCode }) {
       return [
         'PULPMILL', 'CENTRICLEANER', 'WIRE', 'PRESS', 'UNIRUN', 
         'PRE_DRYER', 'SIZE_PRESS', 'POST_DRYER', 'CALENDER', 
-        'POPE_REEL', 'REWINDER', 'CRANES'
+        'POPE_REEL', 'REWINDER', 'CRANES', 'CLOTHING'
       ].includes(c);
     }
     if (dept === 'QC' || dept === 'QA' || dept === 'LAB') {
@@ -66,7 +69,7 @@ export default function PlantSection({ sectionCode }) {
     if (dept === 'STORE') {
       return c === 'STORE';
     }
-    return false;
+    return true;
   };
 
   const fetchAll = useCallback(async () => {
@@ -140,6 +143,20 @@ export default function PlantSection({ sectionCode }) {
   const warn  = section.alarmCounts?.warning  || 0
   const equip = section.equipment || []
 
+  const filteredEquip = equip.filter(e => {
+    if (!equipSearch) return true
+    const q = equipSearch.toLowerCase()
+    return (
+      (e.equipmentName && e.equipmentName.toLowerCase().includes(q)) ||
+      (e.tagName && e.tagName.toLowerCase().includes(q)) ||
+      (e.bearingSize && e.bearingSize.toLowerCase().includes(q)) ||
+      (e.beltNo && e.beltNo.toLowerCase().includes(q)) ||
+      (e.shaftSize && e.shaftSize.toLowerCase().includes(q)) ||
+      (e.lockNut && e.lockNut.toLowerCase().includes(q)) ||
+      (e.impellerSize && e.impellerSize.toLowerCase().includes(q))
+    )
+  })
+
   return (
     <div style={s.page}>
       {/* HEADER */}
@@ -147,11 +164,11 @@ export default function PlantSection({ sectionCode }) {
         <div style={s.headerLeft}>
           <span style={s.bigIcon}>{section.icon}</span>
           <div>
-            <h2 style={s.title}>{section.name}</h2>
+            <h2 style={s.title}>{section.name} — Machinery &amp; Digital Twin Registry</h2>
             <p style={s.sub}>
               {section.description}
               {section.deptName && (
-                <span style={{ marginLeft: 8, paddingLeft: 8, borderLeft: '1px solid #4a5568', color: '#a0aec0' }}>
+                <span style={{ marginLeft: 8, paddingLeft: 8, borderLeft: '1px solid #cbd5e1', color: '#64748b' }}>
                   Owner: {section.deptName} ({section.deptCategory})
                 </span>
               )}
@@ -168,13 +185,182 @@ export default function PlantSection({ sectionCode }) {
 
       {/* TABS */}
       <div style={s.tabs}>
-        {['overview','equipment','readings','alarms','sops'].map(t => (
+        {['equipment','overview','readings','alarms','sops'].map(t => (
           <button key={t} style={{...s.tab, ...(tab===t?s.tabActive:{})}} onClick={() => setTab(t)}>
-            {t.charAt(0).toUpperCase()+t.slice(1)}
+            {t === 'equipment' ? `⚙️ Equipment & Spares (${equip.length})` : t.charAt(0).toUpperCase()+t.slice(1)}
             {t==='alarms' && (crit+warn)>0 && <span style={s.tabBadge}>{crit+warn}</span>}
           </button>
         ))}
       </div>
+
+      {/* EQUIPMENT TAB (FULL MECHANICAL SPECS MATCHING EXCEL REGISTRY) */}
+      {tab === 'equipment' && (
+        <div>
+          {/* Search & Filter Bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input
+                type="text"
+                placeholder="🔍 Search roll, bearing (e.g. 23234K), belt, lock nut, shaft..."
+                value={equipSearch}
+                onChange={e => setEquipSearch(e.target.value)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 6,
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  fontSize: 13,
+                  width: 380,
+                  outline: 'none'
+                }}
+              />
+              <span style={{ fontSize: 12, color: '#64748b' }}>
+                Showing <strong>{filteredEquip.length}</strong> of {equip.length} machine parts
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate(`/indent`)}
+              style={{
+                background: '#0f766e',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 6,
+                padding: '8px 16px',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              📋 Raise Store Indent for Section
+            </button>
+          </div>
+
+          <div style={{ background: '#ffffff', borderRadius: 8, border: '1px solid #e2e8f0', overflowX: 'auto', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #0f766e', color: '#0f766e', textTransform: 'uppercase', fontSize: 11 }}>
+                  <th style={{ padding: '10px 12px', width: 45, textAlign: 'center' }}>#</th>
+                  <th style={{ padding: '10px 12px', width: 110 }}>Tag Code</th>
+                  <th style={{ padding: '10px 12px' }}>Equipment / Roll Description</th>
+                  <th style={{ padding: '10px 12px', width: 130 }}>Bearing Size</th>
+                  <th style={{ padding: '10px 12px', width: 90 }}>Lock Nut</th>
+                  <th style={{ padding: '10px 12px', width: 80 }}>Washer</th>
+                  <th style={{ padding: '10px 12px', width: 100 }}>Belt No</th>
+                  <th style={{ padding: '10px 12px', width: 90 }}>Shaft</th>
+                  <th style={{ padding: '10px 12px' }}>Impeller / Sleeve</th>
+                  <th style={{ padding: '10px 12px' }}>Couplings / Pulleys</th>
+                  <th style={{ padding: '10px 12px', width: 90, textAlign: 'center' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEquip.map((e, idx) => (
+                  <tr key={e.id || idx} style={{ borderBottom: '1px solid #f1f5f9', background: idx % 2 === 0 ? '#ffffff' : '#fcfcfc' }}>
+                    <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#64748b' }}>
+                      {e.sno || idx + 1}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, background: '#f1f5f9', color: '#0f766e', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>
+                        {e.tagName || '—'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      <div style={{ fontWeight: 700, color: '#0f172a' }}>{e.equipmentName}</div>
+                      {e.equipmentType && e.equipmentType !== 'Roll/Assembly' && (
+                        <div style={{ fontSize: 10, color: '#64748b' }}>{e.equipmentType}</div>
+                      )}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      {e.bearingSize ? (
+                        <span style={{ background: '#cffafe', color: '#0891b2', fontWeight: 800, padding: '2px 8px', borderRadius: 12, border: '1px solid #a5f3fc', fontSize: 11 }}>
+                          {e.bearingSize}
+                        </span>
+                      ) : <span style={{ color: '#cbd5e1' }}>—</span>}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      {e.lockNut ? <strong style={{ color: '#475569' }}>{e.lockNut}</strong> : <span style={{ color: '#cbd5e1' }}>—</span>}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      {e.washer ? <span style={{ color: '#475569' }}>{e.washer}</span> : <span style={{ color: '#cbd5e1' }}>—</span>}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      {e.beltNo ? (
+                        <span style={{ background: '#fef3c7', color: '#d97706', fontWeight: 700, padding: '2px 7px', borderRadius: 10, border: '1px solid #fde68a', fontSize: 11 }}>
+                          {e.beltNo}
+                        </span>
+                      ) : <span style={{ color: '#cbd5e1' }}>—</span>}
+                    </td>
+                    <td style={{ padding: '9px 12px' }}>
+                      {e.shaftSize ? <span>{e.shaftSize}</span> : <span style={{ color: '#cbd5e1' }}>—</span>}
+                    </td>
+                    <td style={{ padding: '9px 12px', fontSize: 11, color: '#334155' }}>
+                      {[e.impellerSize ? `Imp: ${e.impellerSize}` : null, e.sleeve ? `Slv: ${e.sleeve}` : null].filter(Boolean).join(' | ') || '—'}
+                    </td>
+                    <td style={{ padding: '9px 12px', fontSize: 11, color: '#334155' }}>
+                      {[e.couplings ? `Cpl: ${e.couplings}` : null, e.pulleys ? `Pul: ${e.pulleys}` : null].filter(Boolean).join(' | ') || '—'}
+                    </td>
+                    <td style={{ padding: '9px 12px', textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/indent`)}
+                        style={{
+                          background: '#f0fdfa',
+                          border: '1px solid #0f766e',
+                          color: '#0f766e',
+                          borderRadius: 4,
+                          padding: '3px 8px',
+                          fontSize: 10,
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                        title={`Raise Indent for ${e.equipmentName}`}
+                      >
+                        ⚡ Indent
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filteredEquip.length === 0 && (
+                  <tr>
+                    <td colSpan={11} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
+                      No machinery components match your search.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {hasWriteAccess() && (
+            <div style={{ ...s.formCard, marginTop: 18 }}>
+              <h4 style={s.formTitle}>Add Custom Roll / Assembly Component</h4>
+              <form onSubmit={submitEquip} style={s.form}>
+                <input style={s.input} placeholder="Tag Name (e.g. WIRE-MCN-026)*" required
+                  value={equipForm.tagName} onChange={e=>setEquipForm(f=>({...f,tagName:e.target.value}))} />
+                <input style={s.input} placeholder="Equipment / Roll Name*" required
+                  value={equipForm.equipmentName} onChange={e=>setEquipForm(f=>({...f,equipmentName:e.target.value}))} />
+                <select style={s.input} value={equipForm.equipmentType}
+                  onChange={e=>setEquipForm(f=>({...f,equipmentType:e.target.value}))}>
+                  <option value="">Equipment Type</option>
+                  {EQUIP_TYPES.map(t=><option key={t}>{t}</option>)}
+                </select>
+                <input style={s.input} placeholder="Motor kW" type="number" step="0.01"
+                  value={equipForm.motorKw} onChange={e=>setEquipForm(f=>({...f,motorKw:e.target.value}))} />
+                <label style={s.checkLabel}>
+                  <input type="checkbox" checked={equipForm.isCritical}
+                    onChange={e=>setEquipForm(f=>({...f,isCritical:e.target.checked}))} />
+                  &nbsp;Is Critical (breakdown = production stop)
+                </label>
+                <button style={s.btn} disabled={saving}>{saving?'Saving...':'Add Component'}</button>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* OVERVIEW */}
       {tab === 'overview' && (
@@ -193,57 +379,6 @@ export default function PlantSection({ sectionCode }) {
           {alarms.filter(a=>a.alarmType==='Critical').length > 0 && (
             <div style={s.critBanner}>
               🔴 <strong>Critical Alarms Active</strong> — Go to Alarms tab to acknowledge and resolve.
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* EQUIPMENT */}
-      {tab === 'equipment' && (
-        <div>
-          <table style={s.table}>
-            <thead><tr style={s.th}>
-              {['Tag','Equipment','Type','Motor kW','Critical','Status'].map(h=><th key={h} style={s.thCell}>{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {equip.map(e => (
-                <tr key={e.id} style={s.tr}>
-                  <td style={s.td}><code style={s.tag}>{e.tagName}</code></td>
-                  <td style={s.td}>{e.equipmentName}<br/><span style={s.muted}>{e.manufacturer}</span></td>
-                  <td style={s.td}>{e.equipmentType||'—'}</td>
-                  <td style={s.td}>{e.motorKw ? `${e.motorKw} kW` : '—'}</td>
-                  <td style={s.td}>{e.isCritical ? <span style={s.critBadge}>Critical</span> : '—'}</td>
-                  <td style={s.td}><span style={{...s.statusBadge, background: e.isActive?'#22c55e':'#a0a0a6'}}>
-                    {e.isActive?'Active':'Inactive'}
-                  </span></td>
-                </tr>
-              ))}
-              {equip.length===0 && <tr><td colSpan={6} style={s.empty}>No equipment registered yet.</td></tr>}
-            </tbody>
-          </table>
-
-          {hasWriteAccess() && (
-            <div style={s.formCard}>
-              <h4 style={s.formTitle}>Add Equipment</h4>
-              <form onSubmit={submitEquip} style={s.form}>
-                <input style={s.input} placeholder="Tag Name (e.g. PULP-HD-001)*" required
-                  value={equipForm.tagName} onChange={e=>setEquipForm(f=>({...f,tagName:e.target.value}))} />
-                <input style={s.input} placeholder="Equipment Name*" required
-                  value={equipForm.equipmentName} onChange={e=>setEquipForm(f=>({...f,equipmentName:e.target.value}))} />
-                <select style={s.input} value={equipForm.equipmentType}
-                  onChange={e=>setEquipForm(f=>({...f,equipmentType:e.target.value}))}>
-                  <option value="">Equipment Type</option>
-                  {EQUIP_TYPES.map(t=><option key={t}>{t}</option>)}
-                </select>
-                <input style={s.input} placeholder="Motor kW" type="number" step="0.01"
-                  value={equipForm.motorKw} onChange={e=>setEquipForm(f=>({...f,motorKw:e.target.value}))} />
-                <label style={s.checkLabel}>
-                  <input type="checkbox" checked={equipForm.isCritical}
-                    onChange={e=>setEquipForm(f=>({...f,isCritical:e.target.checked}))} />
-                  &nbsp;Is Critical (breakdown = production stop)
-                </label>
-                <button style={s.btn} disabled={saving}>{saving?'Saving...':'Add Equipment'}</button>
-              </form>
             </div>
           )}
         </div>
@@ -278,121 +413,52 @@ export default function PlantSection({ sectionCode }) {
               </form>
             </div>
           )}
-
-          <table style={s.table}>
-            <thead><tr style={s.th}>
-              {['Tag','Parameter','Value','UOM','Time','By'].map(h=><th key={h} style={s.thCell}>{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {readings.map(r=>(
-                <tr key={r.id} style={s.tr}>
-                  <td style={s.td}><code style={s.tag}>{r.tagName}</code></td>
-                  <td style={s.td}>{r.parameterName}</td>
-                  <td style={{...s.td,fontWeight:600}}>{Number(r.value).toFixed(3)}</td>
-                  <td style={s.td}>{r.uom||'—'}</td>
-                  <td style={s.td}>{new Date(r.readingTime).toLocaleTimeString('en-IN')}</td>
-                  <td style={s.td}>{r.recordedBy||'—'}</td>
-                </tr>
-              ))}
-              {readings.length===0 && <tr><td colSpan={6} style={s.empty}>No readings in last hour.</td></tr>}
-            </tbody>
-          </table>
         </div>
       )}
 
       {/* ALARMS */}
       {tab === 'alarms' && (
         <div>
-          {hasWriteAccess() && (
-            <div style={s.formCard}>
-              <h4 style={s.formTitle}>Raise Alarm</h4>
-              <form onSubmit={submitAlarm} style={s.form}>
-                <select style={s.input} value={alarmForm.equipmentId}
-                  onChange={e=>setAlarmForm(f=>({...f,equipmentId:e.target.value}))}>
-                  <option value="">Select Equipment (optional)</option>
-                  {equip.map(e=><option key={e.id} value={e.id}>{e.tagName} — {e.equipmentName}</option>)}
-                </select>
-                <select style={s.input} value={alarmForm.alarmType}
-                  onChange={e=>setAlarmForm(f=>({...f,alarmType:e.target.value}))}>
-                  {['Critical','Warning','Info'].map(t=><option key={t}>{t}</option>)}
-                </select>
-                <textarea style={{...s.input,height:70}} placeholder="Alarm description (min 10 chars)*" required minLength={10}
-                  value={alarmForm.description} onChange={e=>setAlarmForm(f=>({...f,description:e.target.value}))} />
-                <button style={{...s.btn,background: alarmForm.alarmType==='Critical'?'#ef4444':'#f59e0b'}}
-                  disabled={saving}>{saving?'Raising...':'Raise Alarm'}</button>
-              </form>
-            </div>
-          )}
-
-          {alarms.map(a=>(
-            <div key={a.id} style={{...s.alarmCard, borderLeft:`4px solid ${a.alarmType==='Critical'?'#ef4444':a.alarmType==='Warning'?'#f59e0b':'#1b1b1d'}`}}>
-              <div style={s.alarmTop}>
-                <span style={{...s.alarmTypeBadge, background: a.alarmType==='Critical'?'#ef4444':a.alarmType==='Warning'?'#f59e0b':'#1b1b1d'}}>
-                  {a.alarmType}
-                </span>
-                <span style={s.alarmTag}>{a.tagName||a.equipmentName||'—'}</span>
-                <span style={s.alarmTime}>{new Date(a.triggeredAt).toLocaleString('en-IN')}</span>
+          {alarms.map(a => (
+            <div key={a.id} style={{ ...s.kpiCard, marginBottom: 10, borderLeft: a.alarmType === 'Critical' ? '4px solid #ef4444' : '4px solid #f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <strong>{a.alarmType}: {a.description}</strong>
+                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 3 }}>Equipment: {a.equipmentName || a.tagName || 'Section General'}</div>
+                </div>
+                <div>
+                  {!a.acknowledgedAt ? (
+                    <button style={s.btnSm} onClick={() => ackAlarm(a.id)}>Acknowledge</button>
+                  ) : (
+                    <button style={{ ...s.btnSm, background: '#0284c7' }} onClick={() => setResolveId(a.id)}>Resolve</button>
+                  )}
+                </div>
               </div>
-              <div style={s.alarmDesc}>{a.description}</div>
-              {a.maintenanceLogId && <div style={s.alarmMlog}>🔧 Maintenance Log #{a.maintenanceLogId} auto-created</div>}
-              <div style={s.alarmActions}>
-                {hasWriteAccess() && (
-                  <>
-                    {!a.acknowledgedAt && (
-                      <button style={s.ackBtn} onClick={()=>ackAlarm(a.id)}>Acknowledge</button>
-                    )}
-                    {a.acknowledgedAt && !a.resolvedAt && (
-                      resolveId === a.id ? (
-                        <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                          <input style={{...s.input,width:280,margin:0}} placeholder="Resolution note*"
-                            value={resolutionNote} onChange={e=>setResolutionNote(e.target.value)} />
-                          <button style={s.resolveBtn} onClick={()=>resolveAlarm(a.id)}>Confirm Resolve</button>
-                          <button style={s.cancelBtn} onClick={()=>setResolveId(null)}>Cancel</button>
-                        </div>
-                      ) : (
-                        <button style={s.resolveBtn} onClick={()=>setResolveId(a.id)}>Resolve</button>
-                      )
-                    )}
-                  </>
-                )}
-                {a.acknowledgedAt && <span style={s.ackTime}>Acked {new Date(a.acknowledgedAt).toLocaleTimeString('en-IN')}</span>}
-              </div>
+              {resolveId === a.id && (
+                <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
+                  <input style={s.input} placeholder="Resolution note..." value={resolutionNote} onChange={e => setResolutionNote(e.target.value)} />
+                  <button style={s.btnSm} onClick={() => resolveAlarm(a.id)}>Confirm Resolution</button>
+                </div>
+              )}
             </div>
           ))}
-          {alarms.length===0 && <div style={s.empty}>No active alarms. 🟢 All clear.</div>}
+          {alarms.length === 0 && <div style={s.empty}>No active alarms for this section.</div>}
         </div>
       )}
 
-      {/* SOPs */}
+      {/* SOPS */}
       {tab === 'sops' && (
         <div>
-          {SOP_TYPES.map(type => {
-            const typeSops = sops.filter(s=>s.sopType===type)
-            return (
-              <details key={type} style={s.sopSection} open={type==='Startup'}>
-                <summary style={s.sopSummary}>{type} SOPs <span style={s.sopCount}>({typeSops.length})</span></summary>
-                {typeSops.length === 0
-                  ? <div style={s.empty}>No {type} SOPs added yet.</div>
-                  : typeSops.map(sop => (
-                    <div key={sop.id} style={s.sopCard}>
-                      <div style={s.sopHeader}>
-                        <strong>{sop.title}</strong>
-                        <span style={s.sopMeta}>v{sop.version} · {sop.approvedBy||'Draft'}</span>
-                      </div>
-                      <ol style={s.sopSteps}>
-                        {(sop.steps||[]).map((step,i) => (
-                          <li key={i} style={s.sopStep}>
-                            {typeof step === 'string' ? step : step.step}
-                            {step.warning && <span style={s.sopWarning}> ⚠️ {step.warning}</span>}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  ))
-                }
-              </details>
-            )
-          })}
+          {sops.map(sop => (
+            <div key={sop.id} style={{ ...s.kpiCard, marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <strong>{sop.title}</strong>
+                <span style={{ fontSize: 11, color: '#64748b' }}>Rev {sop.revision_number}</span>
+              </div>
+              <p style={{ fontSize: 12, color: '#334155', marginTop: 4 }}>{sop.content}</p>
+            </div>
+          ))}
+          {sops.length === 0 && <div style={s.empty}>No SOPs registered for this section.</div>}
         </div>
       )}
     </div>
@@ -400,62 +466,33 @@ export default function PlantSection({ sectionCode }) {
 }
 
 const s = {
-  page:       { padding: 24 },
-  center:     { padding: 40, textAlign:'center', color:'#8a8a90' },
-  header:     { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20, background:'#fff', padding:16, borderRadius:10, boxShadow:'0 1px 4px rgba(0,0,0,0.08)' },
-  headerLeft: { display:'flex', alignItems:'center', gap:12 },
-  bigIcon:    { fontSize:32 },
-  title:      { margin:0, fontSize:20, fontWeight:700, color:'#1b1b1d' },
-  sub:        { margin:'4px 0 0', color:'#8a8a90', fontSize:12 },
-  headerRight:{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 },
-  badge:      { fontSize:12, color:'#fff', borderRadius:10, padding:'3px 10px', fontWeight:600 },
-  sync:       { fontSize:11, color:'#a0a0a6' },
-  tabs:       { display:'flex', gap:4, marginBottom:20, borderBottom:'2px solid #ecebe5', paddingBottom:0 },
-  tab:        { background:'transparent', border:'none', padding:'8px 16px', cursor:'pointer', fontSize:13, color:'#8a8a90', borderBottom:'2px solid transparent', marginBottom:'-2px', position:'relative' },
-  tabActive:  { color:'#1b1b1d', borderBottomColor:'#1b1b1d', fontWeight:600 },
-  tabBadge:   { background:'#ef4444', color:'#fff', borderRadius:10, padding:'1px 6px', fontSize:10, marginLeft:4 },
-  kpiGrid:    { display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))', gap:12, marginBottom:20 },
-  kpiCard:    { background:'#fff', borderRadius:10, padding:16, boxShadow:'0 1px 4px rgba(0,0,0,0.08)', textAlign:'center' },
-  kpiParam:   { fontSize:11, color:'#8a8a90', marginBottom:4 },
-  kpiValue:   { fontSize:24, fontWeight:700, color:'#1b1b1d' },
-  kpiUom:     { fontSize:11, color:'#a0a0a6' },
-  kpiTag:     { fontSize:10, color:'#d8d6cc', marginTop:4 },
-  empty:      { padding:'24px', textAlign:'center', color:'#a0a0a6', fontSize:13, fontStyle:'italic' },
-  critBanner: { background:'#fef2f2', border:'1px solid #fecaca', borderRadius:8, padding:'12px 16px', color:'#dc2626', fontSize:13 },
-  table:      { width:'100%', borderCollapse:'collapse', background:'#fff', borderRadius:10, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.08)', marginBottom:20 },
-  th:         { background:'#f6f5f0' },
-  thCell:     { padding:'10px 12px', textAlign:'left', fontSize:12, fontWeight:600, color:'#3a3a3e', borderBottom:'1px solid #ecebe5' },
-  tr:         { borderBottom:'1px solid #f1efe8' },
-  td:         { padding:'10px 12px', fontSize:13, color:'#3a3a3e' },
-  tag:        { background:'#f1efe8', padding:'2px 6px', borderRadius:4, fontSize:11, color:'#1b1b1d' },
-  muted:      { fontSize:11, color:'#a0a0a6' },
-  critBadge:  { background:'#fef2f2', color:'#dc2626', padding:'2px 8px', borderRadius:10, fontSize:11, fontWeight:600 },
-  statusBadge:{ color:'#fff', padding:'2px 8px', borderRadius:10, fontSize:11, fontWeight:600 },
-  formCard:   { background:'#fff', borderRadius:10, padding:20, boxShadow:'0 1px 4px rgba(0,0,0,0.08)', marginBottom:20 },
-  formTitle:  { margin:'0 0 12px', fontSize:15, fontWeight:600, color:'#1b1b1d' },
-  form:       { display:'flex', flexDirection:'column', gap:10 },
-  input:      { padding:'8px 12px', borderRadius:8, border:'1px solid #ecebe5', fontSize:13, color:'#1b1b1d', width:'100%', boxSizing:'border-box' },
-  checkLabel: { fontSize:13, color:'#3a3a3e', display:'flex', alignItems:'center' },
-  btn:        { background:'#1b1b1d', color:'#fff', border:'none', borderRadius:8, padding:'9px 20px', fontSize:13, fontWeight:600, cursor:'pointer', alignSelf:'flex-start' },
-  alarmCard:  { background:'#fff', borderRadius:10, padding:16, marginBottom:12, boxShadow:'0 1px 4px rgba(0,0,0,0.08)' },
-  alarmTop:   { display:'flex', alignItems:'center', gap:10, marginBottom:8 },
-  alarmTypeBadge:{ fontSize:11, color:'#fff', borderRadius:10, padding:'2px 8px', fontWeight:600 },
-  alarmTag:   { fontSize:12, color:'#8a8a90', flex:1 },
-  alarmTime:  { fontSize:11, color:'#a0a0a6' },
-  alarmDesc:  { fontSize:13, color:'#3a3a3e', marginBottom:8 },
-  alarmMlog:  { fontSize:12, color:'#059669', marginBottom:8 },
-  alarmActions:{ display:'flex', gap:8, alignItems:'center' },
-  ackBtn:     { background:'#fef3c7', color:'#92400e', border:'none', borderRadius:6, padding:'4px 12px', fontSize:12, cursor:'pointer', fontWeight:600 },
-  resolveBtn: { background:'#d1fae5', color:'#065f46', border:'none', borderRadius:6, padding:'4px 12px', fontSize:12, cursor:'pointer', fontWeight:600 },
-  cancelBtn:  { background:'#f1efe8', color:'#3a3a3e', border:'none', borderRadius:6, padding:'4px 12px', fontSize:12, cursor:'pointer' },
-  ackTime:    { fontSize:11, color:'#a0a0a6' },
-  sopSection: { background:'#fff', borderRadius:10, padding:16, marginBottom:12, boxShadow:'0 1px 4px rgba(0,0,0,0.08)' },
-  sopSummary: { fontSize:14, fontWeight:600, color:'#1b1b1d', cursor:'pointer', padding:'4px 0' },
-  sopCount:   { fontWeight:400, color:'#a0a0a6', fontSize:12 },
-  sopCard:    { marginTop:12, borderTop:'1px solid #f1efe8', paddingTop:12 },
-  sopHeader:  { display:'flex', justifyContent:'space-between', marginBottom:8 },
-  sopMeta:    { fontSize:11, color:'#a0a0a6' },
-  sopSteps:   { margin:'0 0 0 20px', padding:0 },
-  sopStep:    { fontSize:13, color:'#3a3a3e', marginBottom:6, lineHeight:1.5 },
-  sopWarning: { color:'#b45309', fontSize:12 },
+  page: { padding: 24, background: '#f6f5f0', minHeight: '100vh', color: '#1b1b1d', fontFamily: 'sans-serif' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 12 },
+  headerLeft: { display: 'flex', alignItems: 'center', gap: 14 },
+  bigIcon: { fontSize: 36, background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 8, padding: 8 },
+  title: { fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 },
+  sub: { fontSize: 13, color: '#64748b', margin: '4px 0 0 0' },
+  headerRight: { display: 'flex', alignItems: 'center', gap: 8 },
+  badge: { color: '#fff', padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 },
+  sync: { fontSize: 11, color: '#94a3b8' },
+  tabs: { display: 'flex', gap: 6, marginBottom: 16, borderBottom: '1px solid #cbd5e1', paddingBottom: 6 },
+  tab: { background: 'none', border: 'none', padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#64748b', cursor: 'pointer', borderRadius: 6 },
+  tabActive: { background: '#0f766e', color: '#ffffff' },
+  tabBadge: { background: '#ef4444', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10, marginLeft: 6 },
+  kpiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginBottom: 16 },
+  kpiCard: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: 14 },
+  kpiParam: { fontSize: 11, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' },
+  kpiValue: { fontSize: 20, fontWeight: 800, color: '#0f172a', marginTop: 4 },
+  kpiUom: { fontSize: 11, color: '#94a3b8' },
+  kpiTag: { fontSize: 10, fontFamily: 'monospace', color: '#0f766e', marginTop: 4 },
+  critBanner: { background: '#fee2e2', border: '1px solid #f87171', color: '#991b1b', padding: '10px 14px', borderRadius: 6, fontSize: 12, marginBottom: 14 },
+  empty: { padding: 30, textAlign: 'center', color: '#94a3b8', fontSize: 13 },
+  formCard: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: 16 },
+  formTitle: { fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 12 },
+  form: { display: 'flex', flexDirection: 'column', gap: 10 },
+  input: { width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: 6, fontSize: 12, background: '#f8fafc', outline: 'none' },
+  checkLabel: { fontSize: 12, color: '#334155', display: 'flex', alignItems: 'center' },
+  btn: { background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 700, fontSize: 12, cursor: 'pointer' },
+  btnSm: { background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' },
+  center: { padding: 40, textAlign: 'center', color: '#64748b', fontSize: 14 }
 }

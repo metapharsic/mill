@@ -1482,6 +1482,33 @@ router.delete('/motors/:id', auth, requireLevel(4), ar(async (req, res) => {
   res.json({ success: true });
 }));
 
+// ── MCN EQUIPMENT & DIGITAL TWIN REGISTRY ──────────────────────────────────
+router.get('/equipment', auth, ar(async (req, res) => {
+  const { search, section } = req.query;
+  let query = `
+    SELECT e.id, e.name, e.code, e.type, e.sno, e.section_code as "sectionCode",
+           e.bearing_size as "bearingSize", e.lock_nut as "lockNut", e.washer,
+           e.belt_no as "beltNo", e.shaft_size as "shaftSize", e.impeller_size as "impellerSize",
+           e.sleeve, e.couplings, e.pulleys, e.is_active as "isActive",
+           ps.name as "sectionName", ps.icon as "sectionIcon"
+    FROM equipment e
+    LEFT JOIN plant_sections ps ON ps.section_code = e.section_code
+    WHERE 1=1
+  `;
+  const params = [];
+  if (search) {
+    params.push(`%${search}%`);
+    query += ` AND (LOWER(e.name) LIKE LOWER($${params.length}) OR LOWER(COALESCE(e.code, '')) LIKE LOWER($${params.length}) OR LOWER(COALESCE(e.bearing_size, '')) LIKE LOWER($${params.length}) OR LOWER(COALESCE(e.belt_no, '')) LIKE LOWER($${params.length}))`;
+  }
+  if (section && section !== 'ALL' && section !== 'All Sections') {
+    params.push(section);
+    query += ` AND (e.section_code = $${params.length} OR LOWER(ps.name) = LOWER($${params.length}))`;
+  }
+  query += ` ORDER BY e.sno ASC NULLS LAST, e.id ASC`;
+  const { rows } = await pool.query(query, params);
+  res.json({ success: true, data: rows, total: rows.length });
+}));
+
 // ── ERROR HANDLER ─────────────────────────────────────────────────────────────
 router.use((err,req,res,next) => {
   if (err.code==='23505') return res.status(409).json({ success:false, message:'Duplicate record' });

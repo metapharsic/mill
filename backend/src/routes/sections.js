@@ -97,10 +97,14 @@ router.get('/:code', requireAuth, ar(async (req, res) => {
             se.equipment_type as "equipmentType", se.manufacturer, se.model_number as "modelNumber",
             se.serial_number as "serialNumber", se.rated_capacity as "ratedCapacity",
             se.motor_kw as "motorKw", se.rpm, se.is_critical as "isCritical",
-            se.is_active as "isActive", m.name as "machineName"
+            se.is_active as "isActive", se.sno, se.section_code as "sectionCode",
+            se.bearing_size as "bearingSize", se.lock_nut as "lockNut", se.washer,
+            se.belt_no as "beltNo", se.shaft_size as "shaftSize", se.impeller_size as "impellerSize",
+            se.sleeve, se.couplings, se.pulleys, se.remarks,
+            m.name as "machineName"
      FROM section_equipment se
      LEFT JOIN machines m ON m.id=se.machine_id
-     WHERE se.section_id=$1 AND se.is_active=true ORDER BY se.tag_name`,
+     WHERE se.section_id=$1 AND se.is_active=true ORDER BY se.sno ASC NULLS LAST, se.tag_name`,
     [sec[0].id]
   );
   const { rows: alarmCounts } = await pool.query(
@@ -301,10 +305,14 @@ router.get('/:code/equipment', requireAuth, ar(async (req, res) => {
             se.rated_capacity as "ratedCapacity", se.design_pressure as "designPressure",
             se.design_temp as "designTemp", se.motor_kw as "motorKw", se.rpm,
             se.is_critical as "isCritical", se.is_active as "isActive", se.remarks,
+            se.sno, se.section_code as "sectionCode",
+            se.bearing_size as "bearingSize", se.lock_nut as "lockNut", se.washer,
+            se.belt_no as "beltNo", se.shaft_size as "shaftSize", se.impeller_size as "impellerSize",
+            se.sleeve, se.couplings, se.pulleys,
             m.name as "machineName"
      FROM section_equipment se
      LEFT JOIN machines m ON m.id=se.machine_id
-     WHERE se.section_id=$1 ORDER BY se.tag_name`,
+     WHERE se.section_id=$1 ORDER BY se.sno ASC NULLS LAST, se.tag_name`,
     [sec[0].id]
   );
   res.json({ success: true, data: rows, total: rows.length });
