@@ -1920,7 +1920,7 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
       ps.id AS "sectionId",
       ps.section_code AS "sectionCode",
       ps.name AS "sectionName",
-      COALESCE(ps.icon, '⚙️') AS "sectionIcon",
+      COALESCE(ps.icon, '🏭') AS "sectionIcon",
       d.name AS "departmentName",
       COUNT(DISTINCT m.id)::int AS "materialCount",
       COALESCE(SUM(m.current_stock * m.unit_price), 0)::numeric(15,2) AS "totalValuation",
@@ -1931,8 +1931,9 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
       COALESCE(SUM(moves.inward_val), 0)::numeric(15,2) AS "periodInwardVal"
     FROM plant_sections ps
     LEFT JOIN departments d ON ps.department_id = d.id
-    LEFT JOIN section_equipment se ON se.section_id = ps.id
-    LEFT JOIN materials m ON m.section_id = ps.id AND m.is_active = true
+    LEFT JOIN section_equipment se ON se.section_id = ps.id AND se.is_active = true
+    LEFT JOIN material_sections ms ON ms.section_id = ps.id
+    LEFT JOIN materials m ON (m.section_id = ps.id OR ms.material_id = m.id) AND m.is_active = true
     LEFT JOIN LATERAL (
       SELECT 
         COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,
@@ -1948,7 +1949,7 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
 
   // 2. Granular Equipment & Material Level Breakdown
   const { rows: granularItems } = await pool.query(`
-    SELECT 
+    SELECT DISTINCT
       m.id AS "materialId",
       m.code AS "materialCode",
       m.name AS "materialName",
@@ -1964,11 +1965,19 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
       ps.id AS "sectionId",
       ps.name AS "sectionName",
       ps.section_code AS "sectionCode",
+      ps.icon AS "sectionIcon",
+      d.name AS "departmentName",
       mac.id AS "machineId",
       mac.name AS "machineName",
       se.id AS "equipmentId",
       se.equipment_name AS "equipmentName",
       se.equipment_type AS "equipmentType",
+      se.tag_name AS "tagName",
+      se.bearing_size AS "bearingSize",
+      se.lock_nut AS "lockNut",
+      se.washer,
+      se.belt_no AS "beltNo",
+      se.shaft_size AS "shaftSize",
       COALESCE(moves.consumed_qty, 0)::numeric(12,3) AS "consumedQty",
       COALESCE(moves.consumed_val, 0)::numeric(15,2) AS "consumedValue",
       COALESCE(moves.inward_qty, 0)::numeric(12,3) AS "inwardQty",
@@ -1976,9 +1985,12 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
       moves.last_txn_date AS "lastTxnDate"
     FROM materials m
     LEFT JOIN material_categories mc ON m.category_id = mc.id
-    LEFT JOIN plant_sections ps ON m.section_id = ps.id
-    LEFT JOIN machines mac ON m.machine_id = mac.id
-    LEFT JOIN section_equipment se ON m.section_equipment_id = se.id
+    LEFT JOIN material_sections ms ON ms.material_id = m.id
+    LEFT JOIN plant_sections ps ON (m.section_id = ps.id OR ms.section_id = ps.id)
+    LEFT JOIN departments d ON ps.department_id = d.id
+    LEFT JOIN material_equipment me ON me.material_id = m.id
+    LEFT JOIN machines mac ON (m.machine_id = mac.id OR me.machine_id = mac.id)
+    LEFT JOIN section_equipment se ON (m.section_equipment_id = se.id OR me.section_equipment_id = se.id)
     LEFT JOIN LATERAL (
       SELECT 
         COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,

@@ -3036,12 +3036,26 @@ function PlantSectionsDetailedReportView({ data, search }) {
                 filteredItems.map(it => (
                   <tr key={it.materialId} style={S.tr}>
                     <td style={S.td}>
-                      <span style={{ fontWeight: 600, color: '#0f172a' }}>{it.sectionName || 'Unassigned'}</span>
-                      {it.sectionCode && <div style={{ fontSize: 10, color: '#64748b' }}>{it.sectionCode}</div>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span>{it.sectionIcon || '🏭'}</span>
+                        <div>
+                          <span style={{ fontWeight: 600, color: '#0f172a' }}>{it.sectionName || 'Unassigned'}</span>
+                          <div style={{ fontSize: 10, color: '#64748b' }}>{it.sectionCode || '—'} {it.departmentName ? `· ${it.departmentName}` : ''}</div>
+                        </div>
+                      </div>
                     </td>
                     <td style={S.td}>
-                      <div style={{ fontWeight: 600 }}>{it.machineName || '—'}</div>
-                      <div style={{ fontSize: 11, color: '#64748b' }}>{it.equipmentName || '—'}</div>
+                      <div style={{ fontWeight: 600, color: '#0369a1' }}>{it.machineName ? `⚡ ${it.machineName}` : '—'}</div>
+                      {it.equipmentName && (
+                        <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
+                          <span>⚙️ {it.tagName ? `[${it.tagName}] ` : ''}{it.equipmentName}</span>
+                          {(it.bearingSize || it.beltNo) && (
+                            <div style={{ fontSize: 10, color: '#0f766e', fontWeight: 600 }}>
+                              {[it.bearingSize ? `Brg: ${it.bearingSize}` : null, it.beltNo ? `Belt: ${it.beltNo}` : null].filter(Boolean).join(' | ')}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td style={S.td}>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{it.materialName}</div>

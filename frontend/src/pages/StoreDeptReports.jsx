@@ -267,12 +267,26 @@ export default function StoreDeptReports({ onNavigate }) {
                   (sectionData.granularItems || []).map(it => (
                     <tr key={it.materialId} style={S.tr}>
                       <td style={S.td}>
-                        <div style={{ fontWeight: 600 }}>{it.sectionName || 'Unassigned'}</div>
-                        <div style={S.muted}>{it.sectionCode || '—'}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>{it.sectionIcon || '🏭'}</span>
+                          <div>
+                            <div style={{ fontWeight: 600, color: '#1b1b1d' }}>{it.sectionName || 'Unassigned'}</div>
+                            <div style={S.muted}>{it.sectionCode || '—'} {it.departmentName ? `· ${it.departmentName}` : ''}</div>
+                          </div>
+                        </div>
                       </td>
                       <td style={S.td}>
-                        <div style={{ fontWeight: 600 }}>{it.machineName || '—'}</div>
-                        <div style={S.muted}>{it.equipmentName || '—'}</div>
+                        <div style={{ fontWeight: 600, color: '#0369a1' }}>{it.machineName ? `⚡ ${it.machineName}` : '—'}</div>
+                        {it.equipmentName && (
+                          <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
+                            <span>⚙️ {it.tagName ? `[${it.tagName}] ` : ''}{it.equipmentName}</span>
+                            {(it.bearingSize || it.beltNo) && (
+                              <div style={{ fontSize: 10, color: '#0f766e', fontWeight: 600 }}>
+                                {[it.bearingSize ? `Brg: ${it.bearingSize}` : null, it.beltNo ? `Belt: ${it.beltNo}` : null].filter(Boolean).join(' | ')}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td style={S.td}>
                         <div style={{ fontWeight: 600 }}>{it.materialName}</div>

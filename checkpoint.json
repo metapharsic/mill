@@ -1,7 +1,7 @@
 {
   "lastDone": {
     "date": "2026-08-24",
-    "summary": "Indent Plant Section, Machine & Digital Twin Roll Selection Synchronization: 1) Solved empty machine dropdown issue in Indent.jsx by adding sectionEquipment state and fetching 725 digital twin equipment/rolls from /api/master/section-equipment alongside registered machines and sections. 2) Replaced fragmented section/machine inputs with a unified Plant Section & Machinery Allocation panel with dynamic cross-filtering (Plant Section -> Registered Machines -> Machinery Rolls with bearing/belt specs). 3) Added two-way auto-sync in Line Items (material selection auto-detects mapped section/machine, position field provides datalist of section rolls with bearing details). 4) Multi-agent validation passing 45/45 assertions with 100% integrity."
+    "summary": "Reporting Suite Multi-Section & Digital Twin Machinery Synchronization: 1) Enhanced backend reporting route GET /api/reports/plant-sections/detailed with joined multi-section (material_sections) and multi-machine (material_equipment) mappings, ensuring mill-wide catalog inventory valuation and consumption are 100% accurate. 2) Enriched granular report rows with Digital Twin roll specifications (bearing size, lock nut, washer, belt no, shaft size, tag code, and section icons). 3) Upgraded frontend Reports.jsx and StoreDeptReports.jsx with real-time visual badges and 1-click CSV export. 4) Multi-agent validation passing 45/45 assertions with 100% database integrity."
   },
   "modules": {
     "storeManagement": {
