@@ -26,3 +26,4 @@ of re-auditing from scratch.
 | 2026-08-24 | Materials Action Toolbar redesign, Fast Entry Row spreadsheet upgrade, Section & Machinery Digital Twin modals | [2026-08-24-materials-fast-entry-enhancement.md](./2026-08-24-materials-fast-entry-enhancement.md) |
 | 2026-08-24 | Universal Plant Section & Machinery Allocation Component Standardization mill-wide | [2026-08-24-universal-section-machine-allocation.md](./2026-08-24-universal-section-machine-allocation.md) |
 | 2026-08-24 | Official A3 Invoice & Store SIV Voucher Dynamic Overhaul & Toolbar Suite Audit | [2026-08-24-a3-invoice-and-toolbar-enhancements.md](./2026-08-24-a3-invoice-and-toolbar-enhancements.md) |
+| 2026-08-24 | Master Data Deletion Privileges & Multi-Agent Checkpoint Visibility Guard | [2026-08-24-master-data-deletion-privileges-and-checkpoint-hiding.md](./2026-08-24-master-data-deletion-privileges-and-checkpoint-hiding.md) |

@@ -62,7 +62,7 @@ router.get('/machines', auth, ar(async (req, res) => {
   res.json({ success: true, data: rows });
 }));
 
-router.post('/machines', auth, requireLevel(4), ar(async (req, res) => {
+router.post('/machines', auth, requireLevel(3), ar(async (req, res) => {
   const { name, code, type, capacity_tpd, ideal_speed_mpm, design_speed_mpm } = req.body;
   if (!name || !code) return res.status(400).json({ success: false, message: 'name and code required' });
   const { rows } = await pool.query(
@@ -71,7 +71,7 @@ router.post('/machines', auth, requireLevel(4), ar(async (req, res) => {
   res.status(201).json({ success: true, data: rows[0] });
 }));
 
-router.put('/machines/:id', auth, requireLevel(4), ar(async (req, res) => {
+router.put('/machines/:id', auth, requireLevel(3), ar(async (req, res) => {
   const { name, code, type, capacity_tpd, is_active, ideal_speed_mpm, design_speed_mpm } = req.body;
   await pool.query(
     `UPDATE machines SET name=$1,code=$2,type=$3,capacity_tpd=$4,is_active=$5,ideal_speed_mpm=$7,design_speed_mpm=$8 WHERE id=$6`,
@@ -1494,9 +1494,9 @@ router.put('/customers/:id', auth, requireLevel(3), ar(async (req, res) => {
 }));
 
 // ── SOFT DELETE (is_active = false) ──────────────────────────────────────────
-router.delete('/machines/:id', auth, requireLevel(4), ar(async (req, res) => {
+router.delete('/machines/:id', auth, requireLevel(3), ar(async (req, res) => {
   await pool.query('UPDATE machines SET is_active=false, deleted_by=$1 WHERE id=$2', [req.user.id, req.params.id]);
-  res.json({ success: true });
+  res.json({ success: true, message: 'Machine deactivated successfully' });
 }));
 
 router.delete('/grades/:id', auth, requireLevel(4), ar(async (req, res) => {
@@ -1519,11 +1519,18 @@ router.delete('/customers/:id', auth, requireLevel(3), ar(async (req, res) => {
   res.json({ success: true });
 }));
 
-router.delete('/categories/:id', auth, requireLevel(4), ar(async (req, res) => {
-  const { rows } = await pool.query('SELECT COUNT(*) FROM materials WHERE category_id=$1', [req.params.id]);
-  if (parseInt(rows[0].count) > 0) return res.status(400).json({ success: false, message: 'Category in use by materials — cannot delete' });
-  await pool.query('DELETE FROM material_categories WHERE id=$1', [req.params.id]);
-  res.json({ success: true });
+router.delete('/categories/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const catId = req.params.id;
+  const { rows: childCats } = await pool.query('SELECT COUNT(*) FROM material_categories WHERE parent_id=$1', [catId]);
+  if (parseInt(childCats[0].count) > 0) {
+    return res.status(400).json({ success: false, message: `Category has ${childCats[0].count} sub-categories — please reassign or delete child categories first.` });
+  }
+  const { rows: matCount } = await pool.query('SELECT COUNT(*) FROM materials WHERE category_id=$1', [catId]);
+  if (parseInt(matCount[0].count) > 0) {
+    return res.status(400).json({ success: false, message: `Category is in use by ${matCount[0].count} material item(s) — please reassign materials before deleting.` });
+  }
+  await pool.query('DELETE FROM material_categories WHERE id=$1', [catId]);
+  res.json({ success: true, message: 'Category deleted successfully' });
 }));
 
 // ── RESTORE (re-activate) ─────────────────────────────────────────────────────
@@ -1604,8 +1611,23 @@ router.put('/sections/:id', auth, requireLevel(3), ar(async (req, res) => {
 }));
 
 router.delete('/sections/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const { rows: sec } = await pool.query('SELECT id, code FROM sections WHERE id=$1', [req.params.id]);
   await pool.query('UPDATE sections SET is_active=false WHERE id=$1', [req.params.id]);
-  res.json({ success: true });
+  if (sec.length && sec[0].code) {
+    await pool.query('UPDATE plant_sections SET is_active=false WHERE section_code=$1', [sec[0].code]).catch(() => {});
+  } else {
+    await pool.query('UPDATE plant_sections SET is_active=false WHERE id=$1', [req.params.id]).catch(() => {});
+  }
+  res.json({ success: true, message: 'Plant section deactivated successfully' });
+}));
+
+router.delete('/plant-sections/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const { rows: ps } = await pool.query('SELECT id, section_code FROM plant_sections WHERE id=$1', [req.params.id]);
+  await pool.query('UPDATE plant_sections SET is_active=false WHERE id=$1', [req.params.id]);
+  if (ps.length && ps[0].section_code) {
+    await pool.query('UPDATE sections SET is_active=false WHERE code=$1', [ps[0].section_code]).catch(() => {});
+  }
+  res.json({ success: true, message: 'Plant section deactivated successfully' });
 }));
 
 // ── SECTION EQUIPMENT & MACHINERY REGISTRY ──────────────────────────────────
@@ -1746,7 +1768,17 @@ router.delete('/section-equipment/:id', auth, requireLevel(3), ar(async (req, re
   await pool.query('UPDATE section_equipment SET is_active=false WHERE id=$1', [req.params.id]);
   await pool.query('UPDATE equipment SET is_active=false WHERE code=$1', [existing[0].tag_name])
     .catch(err => console.warn('equipment sync (deactivate) warning:', err.message));
-  res.json({ success: true });
+  res.json({ success: true, message: 'Equipment deactivated successfully' });
+}));
+
+router.delete('/equipment/:id', auth, requireLevel(3), ar(async (req, res) => {
+  const { rows: existing } = await pool.query('SELECT id, code FROM equipment WHERE id=$1', [req.params.id]);
+  if (!existing.length) return res.status(404).json({ success: false, message: 'Equipment record not found' });
+  await pool.query('UPDATE equipment SET is_active=false WHERE id=$1', [req.params.id]);
+  if (existing[0].code) {
+    await pool.query('UPDATE section_equipment SET is_active=false WHERE tag_name=$1', [existing[0].code]).catch(() => {});
+  }
+  res.json({ success: true, message: 'Equipment deactivated successfully' });
 }));
 
 // ── MOTOR ELECTRICAL SPECS (F2) ─────────────────────────────────────────────────

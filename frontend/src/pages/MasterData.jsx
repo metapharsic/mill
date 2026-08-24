@@ -11,12 +11,25 @@ export default function MasterData() {
   const [departments, setDepartments] = useState([])
   const [equipmentList, setEquipmentList] = useState([])
   const [machines, setMachines] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ name: '', code: '', department_id: '' })
+  
+  // Section Form State
+  const [form, setForm] = useState({ id: null, name: '', code: '', department_id: '', description: '' })
   const [modal, setModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Machine Master State
+  const [mcnModal, setMcnModal] = useState(false)
+  const [mcnForm, setMcnForm] = useState({ id: null, name: '', code: '', type: 'Paper Machine', capacity_tpd: '', ideal_speed_mpm: '', design_speed_mpm: '', is_active: true })
+  const [mcnSearch, setMcnSearch] = useState('')
+
+  // Category Master State
+  const [catModal, setCatModal] = useState(false)
+  const [catForm, setCatForm] = useState({ id: null, name: '', code: '', type: 'Raw Material', parent_id: '' })
+  const [catSearch, setCatSearch] = useState('')
 
   // Equipment Master State
   const [equipModal, setEquipModal] = useState(false)
@@ -42,21 +55,24 @@ export default function MasterData() {
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    const [secRes, deptRes, eqRes, mcnRes] = await Promise.all([
+    const [secRes, deptRes, eqRes, mcnRes, catRes] = await Promise.all([
       API('/api/master/sections'),
       API('/api/users/departments'),
       API('/api/master/section-equipment'),
-      API('/api/master/machines')
+      API('/api/master/machines'),
+      API('/api/master/categories')
     ])
     if (secRes.success) setSections(secRes.data)
     if (deptRes.success) setDepartments(deptRes.data)
     if (eqRes.success) setEquipmentList(eqRes.data)
     if (mcnRes.success) setMachines(mcnRes.data)
+    if (catRes.success) setCategories(catRes.data)
     setLoading(false)
   }, [])
 
   useEffect(() => { loadData() }, [loadData])
 
+  // ── Section Actions ──
   const saveSection = async (e) => {
     e.preventDefault()
     if (!form.name) return setErr('Name is required')
@@ -67,19 +83,96 @@ export default function MasterData() {
     setSaving(false)
     if (res.success) {
       setModal(false)
-      setForm({ name: '', code: '', department_id: '' })
+      setForm({ id: null, name: '', code: '', department_id: '', description: '' })
       loadData()
     } else {
-      setErr(res.message || 'Error saving')
+      setErr(res.message || 'Error saving section')
     }
   }
 
   const openEditSection = (s) => {
-    setForm({ id: s.id, name: s.name, code: s.code || '', department_id: s.department_id || '' })
+    setForm({ id: s.id, name: s.name, code: s.code || s.sectionCode || '', department_id: s.department_id || '', description: s.description || '' })
     setErr('')
     setModal(true)
   }
 
+  const deleteSection = async (s) => {
+    if (!window.confirm(`Are you sure you want to deactivate plant section "${s.name}" (${s.code || s.sectionCode || ''})?`)) return
+    const res = await API(`/api/master/sections/${s.id}`, { method: 'DELETE' })
+    if (res.success) loadData()
+    else alert(res.message || 'Error deactivating section')
+  }
+
+  // ── Machine Actions ──
+  const saveMachine = async (e) => {
+    e.preventDefault()
+    if (!mcnForm.name || !mcnForm.code) return setErr('Machine name and code required')
+    setSaving(true)
+    const res = mcnForm.id
+      ? await API(`/api/master/machines/${mcnForm.id}`, { method: 'PUT', body: JSON.stringify(mcnForm) })
+      : await API('/api/master/machines', { method: 'POST', body: JSON.stringify(mcnForm) })
+    setSaving(false)
+    if (res.success) {
+      setMcnModal(false)
+      setMcnForm({ id: null, name: '', code: '', type: 'Paper Machine', capacity_tpd: '', ideal_speed_mpm: '', design_speed_mpm: '', is_active: true })
+      loadData()
+    } else {
+      setErr(res.message || 'Error saving machine')
+    }
+  }
+
+  const openEditMachine = (m) => {
+    setMcnForm({
+      id: m.id, name: m.name, code: m.code, type: m.type || 'Paper Machine',
+      capacity_tpd: m.capacity_tpd || '', ideal_speed_mpm: m.ideal_speed_mpm || '',
+      design_speed_mpm: m.design_speed_mpm || '', is_active: m.is_active !== false
+    })
+    setErr('')
+    setMcnModal(true)
+  }
+
+  const deleteMachine = async (m) => {
+    if (!window.confirm(`Are you sure you want to deactivate machine "${m.name}" (${m.code})?`)) return
+    const res = await API(`/api/master/machines/${m.id}`, { method: 'DELETE' })
+    if (res.success) loadData()
+    else alert(res.message || 'Error deactivating machine')
+  }
+
+  // ── Category Actions ──
+  const saveCategory = async (e) => {
+    e.preventDefault()
+    if (!catForm.name) return setErr('Category name is required')
+    setSaving(true)
+    const res = catForm.id
+      ? await API(`/api/master/categories/${catForm.id}`, { method: 'PUT', body: JSON.stringify(catForm) })
+      : await API('/api/master/categories', { method: 'POST', body: JSON.stringify(catForm) })
+    setSaving(false)
+    if (res.success) {
+      setCatModal(false)
+      setCatForm({ id: null, name: '', code: '', type: 'Raw Material', parent_id: '' })
+      loadData()
+    } else {
+      setErr(res.message || 'Error saving category')
+    }
+  }
+
+  const openEditCategory = (c) => {
+    setCatForm({
+      id: c.id, name: c.name, code: c.code || '',
+      type: c.type || 'Raw Material', parent_id: c.parent_id || ''
+    })
+    setErr('')
+    setCatModal(true)
+  }
+
+  const deleteCategory = async (c) => {
+    if (!window.confirm(`Are you sure you want to delete category "${c.name}"?`)) return
+    const res = await API(`/api/master/categories/${c.id}`, { method: 'DELETE' })
+    if (res.success) loadData()
+    else alert(res.message || 'Error deleting category')
+  }
+
+  // ── Equipment Actions ──
   const saveEquip = async (e) => {
     e.preventDefault()
     if (!equipForm.equipment_name) return setErr('Equipment / Roll Name is required')
@@ -114,19 +207,19 @@ export default function MasterData() {
   }
 
   const deleteEquip = async (eq) => {
-    if (!window.confirm(`Delete "${eq.equipmentName}" (${eq.tagName || 'no tag'})? This cannot be undone.`)) return
+    if (!window.confirm(`Delete "${eq.equipmentName}" (${eq.tagName || 'no tag'})? This will deactivate the component in digital twin.`)) return
     const res = await API(`/api/master/section-equipment/${eq.id}`, { method: 'DELETE' })
     if (res.success) loadData()
     else alert(res.message || 'Error deleting equipment')
   }
 
   const MODULES = [
-    { title: 'Customers', status: 'Live', color: '#1b1b1d', desc: 'Keep company names, contacts, credit terms, and GST info.', bullets: ['Add and edit customers', 'Search and filter', 'Credit and payment terms'] },
+    { title: 'Plant Sections & Spares', status: 'Live', color: '#0f766e', desc: 'Manage 23 plant sections and 725 machinery rolls dynamically.', bullets: ['Add/edit/delete sections', 'Assign rolls & bearings', 'Digital twin link'] },
+    { title: 'Machine Units', status: 'Live', color: '#d97706', desc: 'Record machines, speed capabilities, and production equipment setup.', bullets: ['Machine master', 'Setup info & speed', 'Status tracking & deletion'] },
+    { title: 'Material Categories', status: 'Live', color: '#0284c7', desc: 'Multi-level category hierarchy across Store, Spares, RM, and Chemicals.', bullets: ['Root & sub-categories', 'Type allocation', 'Safe dependency deletion'] },
     { title: 'Materials', status: 'Live', color: '#1b1b1d', desc: 'Track raw materials, UOM, stock, reorder points, and GST.', bullets: ['Material master', 'Category setup', 'Reorder alerts'] },
-    { title: 'Plant Sections & Spares', status: 'Live', color: '#0f766e', desc: 'Manage 16 plant sections and 282 machinery rolls dynamically.', bullets: ['Add/edit sections', 'Assign rolls & bearings', 'Digital twin link'] },
     { title: 'Vendors', status: 'Live', color: '#1b1b1d', desc: 'Manage supplier details, payment terms, and vendor records.', bullets: ['Vendor list', 'Contact details', 'Terms and status'] },
     { title: 'Grades', status: 'Live', color: '#16a34a', desc: 'Keep paper grades, quality specs, and grade-level metadata.', bullets: ['Grade catalog', 'Quality notes', 'Simple lookup'] },
-    { title: 'Machines', status: 'Live', color: '#d97706', desc: 'Record machines, maintenance data, and equipment setup.', bullets: ['Machine master', 'Setup info', 'Status tracking'] },
   ]
 
   const filteredEquip = equipmentList.filter(eq => {
@@ -144,12 +237,14 @@ export default function MasterData() {
       <div style={S.header}>
         <div>
           <div style={S.title}>Master Data Management</div>
-          <div style={S.sub}>Central registry for Plant Sections, Machinery &amp; Spares Digital Twin, Customers, and Catalog.</div>
+          <div style={S.sub}>Central registry for Plant Sections, Machinery &amp; Spares Digital Twin, Machine Units, and Catalog Categories.</div>
         </div>
         <div style={S.tabs}>
           <button style={{ ...S.tabBtn, ...(tab === 'summary' ? S.tabActive : {}) }} onClick={() => setTab('summary')}>Overview</button>
-          <button style={{ ...S.tabBtn, ...(tab === 'sections' ? S.tabActive : {}) }} onClick={() => setTab('sections')}>Plant Sections ({sections.length})</button>
-          <button style={{ ...S.tabBtn, ...(tab === 'equipment' ? S.tabActive : {}) }} onClick={() => setTab('equipment')}>Machinery &amp; Spares Registry ({equipmentList.length})</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'sections' ? S.tabActive : {}) }} onClick={() => setTab('sections')}>🏭 Plant Sections ({sections.length})</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'equipment' ? S.tabActive : {}) }} onClick={() => setTab('equipment')}>⚙️ Machinery &amp; Spares ({equipmentList.length})</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'machines' ? S.tabActive : {}) }} onClick={() => setTab('machines')}>⚡ Machine Units ({machines.length})</button>
+          <button style={{ ...S.tabBtn, ...(tab === 'categories' ? S.tabActive : {}) }} onClick={() => setTab('categories')}>📁 Material Categories ({categories.length})</button>
         </div>
       </div>
 
@@ -157,7 +252,7 @@ export default function MasterData() {
         <>
           <div style={S.hero}>
             <div style={S.heroTitle}>Master Data Engine &amp; Digital Twin Provisioning</div>
-            <div style={S.heroText}>Plant Sections, Machinery, Materials, and Categories are dynamically manageable with live database synchronization.</div>
+            <div style={S.heroText}>Plant Sections, Machinery Units, Rolls, Materials, and Categories are dynamically configurable with authorized CRUD and delete guards.</div>
           </div>
           <div style={S.grid}>
             {MODULES.map(mod => (
@@ -184,7 +279,7 @@ export default function MasterData() {
               <div style={S.cardTitle}>🏭 Plant Sections Master</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search sections..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
-                <button style={S.btnPrimary} onClick={() => { setForm({ name: '', code: '', department_id: '' }); setErr(''); setModal(true) }}>+ Add Plant Section</button>
+                <button style={S.btnPrimary} onClick={() => { setForm({ id: null, name: '', code: '', department_id: '', description: '' }); setErr(''); setModal(true) }}>+ Add Plant Section</button>
               </div>
             </div>
             
@@ -196,18 +291,21 @@ export default function MasterData() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sections.filter(s => !searchTerm || s.name.toLowerCase().includes(searchTerm.toLowerCase()) || (s.code||'').toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && <tr><td colSpan={5} style={S.empty}>No sections found</td></tr>}
-                  {sections.filter(s => !searchTerm || s.name.toLowerCase().includes(searchTerm.toLowerCase()) || (s.code||'').toLowerCase().includes(searchTerm.toLowerCase())).map(sec => (
+                  {sections.filter(s => !searchTerm || s.name?.toLowerCase().includes(searchTerm.toLowerCase()) || (s.code || s.sectionCode || '').toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && <tr><td colSpan={5} style={S.empty}>No sections found</td></tr>}
+                  {sections.filter(s => !searchTerm || s.name?.toLowerCase().includes(searchTerm.toLowerCase()) || (s.code || s.sectionCode || '').toLowerCase().includes(searchTerm.toLowerCase())).map(sec => (
                     <tr key={sec.id} style={S.tr}>
                       <td style={S.td}>
-                        <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 12 }} onClick={() => openEditSection(sec)}>✏️ Edit</button>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditSection(sec)}>✏️ Edit</button>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteSection(sec)}>🗑️ Deactivate</button>
+                        </div>
                       </td>
-                      <td style={S.td}><strong>{sec.code || '—'}</strong></td>
+                      <td style={S.td}><strong>{sec.code || sec.sectionCode || '—'}</strong></td>
                       <td style={S.td}>{sec.name}</td>
-                      <td style={S.td}>{sec.departmentName || 'Production'}</td>
+                      <td style={S.td}>{sec.departmentName || 'Production / Mill Operations'}</td>
                       <td style={S.td}>
-                        <span style={{ ...S.statusBadge, background: sec.is_active ? '#22c55e22' : '#ef444422', color: sec.is_active ? '#22c55e' : '#ef4444' }}>
-                          {sec.is_active ? 'Active' : 'Inactive'}
+                        <span style={{ ...S.statusBadge, background: sec.is_active !== false ? '#22c55e22' : '#ef444422', color: sec.is_active !== false ? '#22c55e' : '#ef4444' }}>
+                          {sec.is_active !== false ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                     </tr>
@@ -224,7 +322,7 @@ export default function MasterData() {
         <div style={S.sectionContainer}>
           <div style={S.card}>
             <div style={{ ...S.header, marginBottom: 16 }}>
-              <div style={S.cardTitle}>⚙️ Machinery &amp; Spares Registry (282 Digital Twin Rolls &amp; Equipment)</div>
+              <div style={S.cardTitle}>⚙️ Machinery &amp; Spares Registry ({equipmentList.length} Digital Twin Rolls &amp; Equipment)</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   style={{ ...S.input, maxWidth: 200 }}
@@ -322,6 +420,101 @@ export default function MasterData() {
         </div>
       )}
 
+      {/* MACHINE UNITS TAB */}
+      {tab === 'machines' && (
+        <div style={S.sectionContainer}>
+          <div style={S.card}>
+            <div style={{ ...S.header, marginBottom: 16 }}>
+              <div style={S.cardTitle}>⚡ Machine Units Master</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search machines..." value={mcnSearch} onChange={e=>setMcnSearch(e.target.value)} />
+                <button style={S.btnPrimary} onClick={() => { setMcnForm({ id: null, name: '', code: '', type: 'Paper Machine', capacity_tpd: '', ideal_speed_mpm: '', design_speed_mpm: '', is_active: true }); setErr(''); setMcnModal(true) }}>+ Add Machine Unit</button>
+              </div>
+            </div>
+            
+            {loading ? <div style={S.loading}>Loading machines...</div> : (
+              <table style={S.table}>
+                <thead>
+                  <tr style={S.thead}>
+                    {['Action', 'Machine Code', 'Machine Name', 'Type', 'Capacity (TPD)', 'Ideal Speed', 'Design Speed', 'Status'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {machines.filter(m => !mcnSearch || m.name?.toLowerCase().includes(mcnSearch.toLowerCase()) || m.code?.toLowerCase().includes(mcnSearch.toLowerCase())).length === 0 && <tr><td colSpan={8} style={S.empty}>No machine units found</td></tr>}
+                  {machines.filter(m => !mcnSearch || m.name?.toLowerCase().includes(mcnSearch.toLowerCase()) || m.code?.toLowerCase().includes(mcnSearch.toLowerCase())).map(mcn => (
+                    <tr key={mcn.id} style={S.tr}>
+                      <td style={S.td}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditMachine(mcn)}>✏️ Edit</button>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteMachine(mcn)}>🗑️ Deactivate</button>
+                        </div>
+                      </td>
+                      <td style={S.td}><strong>{mcn.code}</strong></td>
+                      <td style={S.td}>{mcn.name}</td>
+                      <td style={S.td}>{mcn.type || 'Paper Machine'}</td>
+                      <td style={S.td}>{mcn.capacity_tpd || '—'} TPD</td>
+                      <td style={S.td}>{mcn.ideal_speed_mpm ? `${mcn.ideal_speed_mpm} mpm` : '—'}</td>
+                      <td style={S.td}>{mcn.design_speed_mpm ? `${mcn.design_speed_mpm} mpm` : '—'}</td>
+                      <td style={S.td}>
+                        <span style={{ ...S.statusBadge, background: mcn.is_active !== false ? '#22c55e22' : '#ef444422', color: mcn.is_active !== false ? '#22c55e' : '#ef4444' }}>
+                          {mcn.is_active !== false ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* MATERIAL CATEGORIES TAB */}
+      {tab === 'categories' && (
+        <div style={S.sectionContainer}>
+          <div style={S.card}>
+            <div style={{ ...S.header, marginBottom: 16 }}>
+              <div style={S.cardTitle}>📁 Material Categories Master</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search categories..." value={catSearch} onChange={e=>setCatSearch(e.target.value)} />
+                <button style={S.btnPrimary} onClick={() => { setCatForm({ id: null, name: '', code: '', type: 'Raw Material', parent_id: '' }); setErr(''); setCatModal(true) }}>+ Add Category</button>
+              </div>
+            </div>
+            
+            {loading ? <div style={S.loading}>Loading categories...</div> : (
+              <table style={S.table}>
+                <thead>
+                  <tr style={S.thead}>
+                    {['Action', 'Category Name', 'Code', 'Classification Type', 'Parent Category'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.filter(c => !catSearch || c.name?.toLowerCase().includes(catSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(catSearch.toLowerCase())).length === 0 && <tr><td colSpan={5} style={S.empty}>No categories found</td></tr>}
+                  {categories.filter(c => !catSearch || c.name?.toLowerCase().includes(catSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(catSearch.toLowerCase())).map(cat => (
+                    <tr key={cat.id} style={S.tr}>
+                      <td style={S.td}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditCategory(cat)}>✏️ Edit</button>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteCategory(cat)}>🗑️ Delete</button>
+                        </div>
+                      </td>
+                      <td style={S.td}><strong>{cat.name}</strong></td>
+                      <td style={S.td}><code>{cat.code || '—'}</code></td>
+                      <td style={S.td}>
+                        <span style={{ ...S.statusBadge, background: '#f0fdfa', color: '#0f766e', border: '1px solid #ccfbf1' }}>
+                          {cat.type || 'Store'}
+                        </span>
+                      </td>
+                      <td style={S.td}>{cat.parentName || '— (Root)'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* SECTION MODAL */}
       {modal && (
         <div style={S.overlay} onClick={() => setModal(false)}>
@@ -347,6 +540,81 @@ export default function MasterData() {
               <div style={S.modalFooter}>
                 <button type="button" style={S.btnSecondary} onClick={() => setModal(false)}>Cancel</button>
                 <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Save Section'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MACHINE MODAL */}
+      {mcnModal && (
+        <div style={S.overlay} onClick={() => setMcnModal(false)}>
+          <div style={S.modal} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div style={S.modalTitle}>{mcnForm.id ? 'Edit Machine Unit' : 'Add Machine Unit'}</div>
+              <button style={S.close} onClick={() => setMcnModal(false)}>✕</button>
+            </div>
+            <form onSubmit={saveMachine} style={S.form}>
+              <label style={S.label}>Machine Name *
+                <input style={S.input} value={mcnForm.name} onChange={e => setMcnForm(f => ({ ...f, name: e.target.value }))} required placeholder="e.g. Paper Machine 1 (PM-1)" />
+              </label>
+              <label style={S.label}>Machine Code *
+                <input style={S.input} value={mcnForm.code} onChange={e => setMcnForm(f => ({ ...f, code: e.target.value }))} required placeholder="e.g. PM1" />
+              </label>
+              <label style={S.label}>Machine Type
+                <input style={S.input} value={mcnForm.type} onChange={e => setMcnForm(f => ({ ...f, type: e.target.value }))} placeholder="e.g. Fourdrinier / Kraft Paper Machine" />
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                <label style={S.label}>Capacity (TPD)
+                  <input style={S.input} type="number" value={mcnForm.capacity_tpd} onChange={e => setMcnForm(f => ({ ...f, capacity_tpd: e.target.value }))} placeholder="150" />
+                </label>
+                <label style={S.label}>Ideal Speed (mpm)
+                  <input style={S.input} type="number" value={mcnForm.ideal_speed_mpm} onChange={e => setMcnForm(f => ({ ...f, ideal_speed_mpm: e.target.value }))} placeholder="350" />
+                </label>
+                <label style={S.label}>Design Speed (mpm)
+                  <input style={S.input} type="number" value={mcnForm.design_speed_mpm} onChange={e => setMcnForm(f => ({ ...f, design_speed_mpm: e.target.value }))} placeholder="400" />
+                </label>
+              </div>
+              {err && <div style={S.error}>{err}</div>}
+              <div style={S.modalFooter}>
+                <button type="button" style={S.btnSecondary} onClick={() => setMcnModal(false)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Save Machine'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CATEGORY MODAL */}
+      {catModal && (
+        <div style={S.overlay} onClick={() => setCatModal(false)}>
+          <div style={S.modal} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div style={S.modalTitle}>{catForm.id ? 'Edit Category' : 'Add Category'}</div>
+              <button style={S.close} onClick={() => setCatModal(false)}>✕</button>
+            </div>
+            <form onSubmit={saveCategory} style={S.form}>
+              <label style={S.label}>Category Name *
+                <input style={S.input} value={catForm.name} onChange={e => setCatForm(f => ({ ...f, name: e.target.value }))} required placeholder="e.g. Mechanical Spares" />
+              </label>
+              <label style={S.label}>Category Code
+                <input style={S.input} value={catForm.code} onChange={e => setCatForm(f => ({ ...f, code: e.target.value }))} placeholder="e.g. MECH_SPARE" />
+              </label>
+              <label style={S.label}>Classification Type
+                <select style={S.select} value={catForm.type} onChange={e => setCatForm(f => ({ ...f, type: e.target.value }))}>
+                  {['Raw Material', 'Chemical', 'Spare Part', 'Consumable', 'Finished Goods', 'General', 'Electrical'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </label>
+              <label style={S.label}>Parent Category (Optional for subcategory)
+                <select style={S.select} value={catForm.parent_id} onChange={e => setCatForm(f => ({ ...f, parent_id: e.target.value }))}>
+                  <option value="">None (Top-level Category)</option>
+                  {categories.filter(c => !catForm.id || c.id !== catForm.id).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </label>
+              {err && <div style={S.error}>{err}</div>}
+              <div style={S.modalFooter}>
+                <button type="button" style={S.btnSecondary} onClick={() => setCatModal(false)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={saving}>{saving ? 'Saving...' : 'Save Category'}</button>
               </div>
             </form>
           </div>

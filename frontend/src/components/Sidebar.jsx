@@ -354,8 +354,8 @@ export default function Sidebar({ active, onNavigate, collapsed, onToggle, mobil
           )}
         </nav>
 
-        {/* ── Multi-Agent Live Banner ── */}
-        {!collapsed && (
+        {/* ── Multi-Agent Live Banner (Restricted to Admin / Developer) ── */}
+        {!collapsed && (user?.role_level >= 5 || user?.role === 'Admin') && (
           <div
             style={S.agentFooterBanner}
             onClick={() => handleItemClick('checkpoint')}

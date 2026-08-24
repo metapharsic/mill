@@ -2,23 +2,23 @@
 // role_level: 5=Admin, 4=PlantHead, 3=Manager(DeptHead), 2=Supervisor, 1=Operator
 
 // Pages every authenticated user sees
-const PUBLIC = new Set(['dashboard', 'indent', 'reports', 'checkpoint', 'agents'])
+const PUBLIC = new Set(['dashboard', 'indent', 'reports'])
 
 // Dedicated whitelist for Store Management department
 const STORE_NAV = new Set([
-  'dashboard', 'store', 'store-dashboard', 'materials', 'inventory', 'indent', 'rawmaterial', 'purchase', 'vendors', 'reports', 'checkpoint', 'agents',
+  'dashboard', 'store', 'store-dashboard', 'materials', 'inventory', 'indent', 'rawmaterial', 'purchase', 'vendors', 'reports',
 ])
 
 // Minimum level required (anyone >= level sees it, regardless of dept)
 const LEVEL_GATE = {
   users:      5,
   admin:      5,
-  masterdata: 4,
+  masterdata: 3,  // Store Manager & Dept Heads (Level 3+) can access Master Data
   phases:     4,
   grades:     3,
   machines:   3,
-  checkpoint: 1,
-  agents:     1,
+  checkpoint: 5,  // Hidden from Store Management — restricted to System Admin / Dev
+  agents:     5,  // Hidden from Store Management — restricted to System Admin / Dev
   hr:         1,  // all employees: self-service payslip / leave / attendance
 }
 
