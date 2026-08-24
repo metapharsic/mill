@@ -141,6 +141,7 @@ export default function Indent() {
   const [mats, setMats] = useState([])
   const [sections, setSections] = useState([])
   const [machines, setMachines] = useState([])
+  const [sectionEquipment, setSectionEquipment] = useState([])
   const [expandedRow, setExpandedRow] = useState(null)
   const [detail, setDetail] = useState(null)
   const [tier, setTier] = useState(null)
@@ -269,7 +270,9 @@ export default function Indent() {
     required_date: '',
     remarks: '',
     section: '',
+    section_id: '',
     machine_id: '',
+    section_equipment_id: '',
     machine_context: '',
     fulfillment_mode: 'pr', // 'pr' | 'po' | 'cash' | 'issue' | 'dc'
     // PO fields
@@ -323,11 +326,12 @@ export default function Indent() {
 
   useEffect(() => { load() }, [load])
   useEffect(() => {
-    API('/users/departments').then(r => { if (r.success) setDepts(r.data) })
-    API('/master/materials?limit=2500').then(r => { if (r.success) setMats(r.data) })
-    API('/sections').then(r => { if (r.success) setSections(r.data) })
-    API('/master/machines').then(r => { if (r.success) setMachines(r.data) })
-    API('/master/vendors').then(r => { if (r.success) setVendors(r.data) })
+    API('/users/departments').then(r => { if (r.success) setDepts(r.data || []) })
+    API('/master/materials?limit=2500').then(r => { if (r.success) setMats(r.data || []) })
+    API('/sections').then(r => { if (r.success) setSections(r.data || []) })
+    API('/master/machines').then(r => { if (r.success) setMachines(r.data || []) })
+    API('/master/section-equipment').then(r => { if (r.success) setSectionEquipment(r.data || []) })
+    API('/master/vendors').then(r => { if (r.success) setVendors(r.data || []) })
 
     // Check URL params for direct tab / detail routing
     const params = new URLSearchParams(window.location.search)
@@ -1626,7 +1630,8 @@ export default function Indent() {
             )}
 
             <div style={S.grid3}>
-              <label style={S.lbl}>Department *</label>
+              <div>
+                <label style={S.lbl}>Department *</label>
                 <SearchableSelect
                   id="raise-dept"
                   value={String(form.department_id || '')}
@@ -1638,66 +1643,173 @@ export default function Indent() {
                   options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
                 />
                 {formErrors.department_id && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.department_id}</span>}
+              </div>
 
-              <label style={S.lbl}>Required By Date *
-                <input
-                  id="raise-required-date"
-                  style={{ ...S.inp, ...(formErrors.required_date ? { border: '1px solid #ef4444' } : {}) }}
-                  type="date"
-                  value={form.required_date}
-                  onChange={e => setForm(f => ({ ...f, required_date: e.target.value }))}
-                  required
-                />
+              <div>
+                <label style={S.lbl}>Required By Date *
+                  <input
+                    id="raise-required-date"
+                    style={{ ...S.inp, ...(formErrors.required_date ? { border: '1px solid #ef4444' } : {}) }}
+                    type="date"
+                    value={form.required_date}
+                    onChange={e => setForm(f => ({ ...f, required_date: e.target.value }))}
+                    required
+                  />
+                </label>
                 {formErrors.required_date && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.required_date}</span>}
-              </label>
+              </div>
 
-              <label style={S.lbl}>Plant Section / Area *</label>
-                <SearchableSelect
-                  id="raise-section"
-                  value={String(form.section || '')}
-                  onChange={v => setForm(f => ({ ...f, section: v }))}
-                  placeholder="-- Select Plant Section --"
-                  searchPlaceholder="Type section name or code..."
-                  allowClear={true}
-                  selectStyle={formErrors.section ? { border: '1px solid #ef4444' } : {}}
-                  options={sections.map(s => ({
-                    value: String(s.id),
-                    label: s.name,
-                    code: s.sectionCode || s.code
-                  }))}
-                />
-                {formErrors.section && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.section}</span>}
+              <div>
+                <label style={S.lbl}>General Remarks / Work Order Ref
+                  <input
+                    id="raise-remarks"
+                    style={S.inp}
+                    placeholder="e.g. WO-2026-0815: Breakdown / Emergency repair"
+                    value={form.remarks}
+                    onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))}
+                  />
+                </label>
+              </div>
             </div>
 
-            <div style={{ ...S.grid2, marginTop: 12 }}>
-              <label style={S.lbl}>Machine / Equipment Selection &amp; Context
-                <div style={{ display: 'flex', gap: 6 }}>
+            {/* ── Synchronized Plant Section & Machinery Allocation (Digital Twin Context) ── */}
+            <div style={{ background: '#f8fafc', border: formErrors.section ? '1.5px solid #ef4444' : '1px solid #cbd5e1', borderRadius: 8, padding: '14px 16px', marginTop: 14, marginBottom: 14 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f766e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 16 }}>🏭</span>
+                  <span>Plant Section &amp; Machinery Allocation (Digital Twin Roll &amp; Bearing Context)</span>
+                  <span style={{ color: '#dc2626', fontWeight: 800 }}>*</span>
+                </div>
+                <span style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>
+                  Filters 725 roll specs &amp; bearings based on selected plant section
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+                {/* 1. Plant Section */}
+                <div>
+                  <label style={S.lbl}>Plant Section / Process Area *</label>
                   <SearchableSelect
+                    id="raise-section"
+                    value={String(form.section || form.section_id || '')}
+                    onChange={v => {
+                      setForm(f => ({ ...f, section: v, section_id: v }))
+                    }}
+                    placeholder="-- Select Plant Section --"
+                    searchPlaceholder="Type section name or code (Wire/Press/Boiler)..."
+                    allowClear={true}
+                    selectStyle={formErrors.section ? { border: '1px solid #ef4444' } : {}}
+                    options={sections.map(s => {
+                      const icon = s.icon || '🏭'
+                      return {
+                        value: String(s.id),
+                        label: `${icon} ${s.name || s.sectionCode || s.code}`,
+                        code: s.sectionCode || s.code || '',
+                        subtext: s.deptName ? `${s.deptName} [${s.sectionCode || s.code}]` : `[${s.sectionCode || s.code}]`
+                      }
+                    })}
+                  />
+                  {formErrors.section && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.section}</span>}
+                </div>
+
+                {/* 2. Target Machine Unit */}
+                <div>
+                  <label style={S.lbl}>Target Machine Unit</label>
+                  <SearchableSelect
+                    id="raise-machine"
                     value={String(form.machine_id || '')}
                     onChange={v => setForm(f => ({ ...f, machine_id: v }))}
                     placeholder="-- Select Registered Machine --"
-                    searchPlaceholder="Type machine name or code..."
+                    searchPlaceholder="Type machine name or code (PM1/PM2)..."
                     allowClear={true}
                     options={machines.map(m => ({
                       value: String(m.id),
-                      label: m.name,
+                      label: `⚡ ${m.name}`,
                       code: m.code,
-                      subtext: m.type || 'Machine'
+                      subtext: m.capacity_tpd ? `${m.capacity_tpd} TPD • ${m.type || 'Machine'}` : (m.type || 'Machine')
                     }))}
                   />
                 </div>
-              </label>
 
-              <label style={S.lbl}>General Remarks / Work Order Reference &amp; Justification
-                <textarea
-                  id="raise-remarks"
-                  style={{ ...S.inp, minHeight: 38, resize: 'vertical' }}
-                  placeholder="e.g. WO-2026-0815: Emergency breakdown repair due to excessive bearing temperature and vibration on drive roller."
-                  value={form.remarks}
-                  onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))}
-                  rows={2}
-                />
-              </label>
+                {/* 3. Specific Roll / Machinery Equipment */}
+                <div>
+                  <label style={S.lbl}>Machinery Roll / Equipment</label>
+                  <SearchableSelect
+                    id="raise-equipment"
+                    value={String(form.section_equipment_id || '')}
+                    onChange={v => {
+                      const eq = sectionEquipment.find(e => String(e.id) === String(v))
+                      setForm(f => {
+                        const upd = { ...f, section_equipment_id: v }
+                        if (eq) {
+                          if (eq.sectionId || eq.section_id) {
+                            upd.section = String(eq.sectionId || eq.section_id)
+                            upd.section_id = String(eq.sectionId || eq.section_id)
+                          }
+                          if (eq.machineId || eq.machine_id) {
+                            upd.machine_id = String(eq.machineId || eq.machine_id)
+                          }
+                          if (f.items && f.items.length > 0 && !f.items[0].component_position) {
+                            const updatedItems = [...f.items]
+                            updatedItems[0] = {
+                              ...updatedItems[0],
+                              component_position: `${eq.tagName ? `[${eq.tagName}] ` : ''}${eq.equipmentName || eq.name}`
+                            }
+                            upd.items = updatedItems
+                          }
+                        }
+                        return upd
+                      })
+                    }}
+                    placeholder="-- Select Roll / Assembly --"
+                    searchPlaceholder="Search roll, bearing (e.g. 23234K), belt..."
+                    allowClear={true}
+                    options={sectionEquipment
+                      .filter(eq => {
+                        if (!form.section) return true
+                        return String(eq.sectionId || eq.section_id) === String(form.section)
+                      })
+                      .map(eq => {
+                        const specs = [
+                          eq.bearingSize ? `Brg: ${eq.bearingSize}` : null,
+                          eq.beltNo ? `Belt: ${eq.beltNo}` : null,
+                          eq.shaftSize ? `Shaft: ${eq.shaftSize}` : null
+                        ].filter(Boolean).join(' | ')
+                        return {
+                          value: String(eq.id),
+                          label: `⚙️ ${eq.equipmentName || eq.name}`,
+                          code: eq.tagName || '',
+                          subtext: specs || (eq.sectionCode ? `[${eq.sectionCode}]` : '')
+                        }
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Digital Twin Fitment Preview if an equipment is selected */}
+              {form.section_equipment_id && (() => {
+                const eq = sectionEquipment.find(e => String(e.id) === String(form.section_equipment_id))
+                if (!eq) return null
+                return (
+                  <div style={{ marginTop: 10, background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: 6, padding: '8px 12px', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 15 }}>⚙️</span>
+                      <div>
+                        <strong style={{ color: '#0f766e' }}>{eq.equipmentName}</strong>
+                        {eq.tagName && <code style={{ marginLeft: 6, background: '#e0f2fe', color: '#0369a1', padding: '1px 5px', borderRadius: 3, fontWeight: 700 }}>{eq.tagName}</code>}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#334155', flexWrap: 'wrap' }}>
+                      {eq.bearingSize && <span style={{ background: '#ffffff', border: '1px solid #99f6e4', padding: '2px 6px', borderRadius: 4 }}>Bearing: <strong>{eq.bearingSize}</strong></span>}
+                      {eq.lockNut && <span style={{ background: '#ffffff', border: '1px solid #99f6e4', padding: '2px 6px', borderRadius: 4 }}>Nut: <strong>{eq.lockNut}</strong></span>}
+                      {eq.washer && <span style={{ background: '#ffffff', border: '1px solid #99f6e4', padding: '2px 6px', borderRadius: 4 }}>Washer: <strong>{eq.washer}</strong></span>}
+                      {eq.beltNo && <span style={{ background: '#ffffff', border: '1px solid #99f6e4', padding: '2px 6px', borderRadius: 4 }}>Belt: <strong>{eq.beltNo}</strong></span>}
+                      {eq.shaftSize && <span style={{ background: '#ffffff', border: '1px solid #99f6e4', padding: '2px 6px', borderRadius: 4 }}>Shaft: <strong>{eq.shaftSize}</strong></span>}
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Line Items Container */}
@@ -1774,6 +1886,25 @@ export default function Indent() {
                                   setItem(i, 'unit_price', m.unit_price || '')
                                   setMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
                                   setMatDropOpen(d => ({ ...d, [i]: false }))
+
+                                  // Auto-sync Plant Section and Machine if currently unset
+                                  setForm(f => {
+                                    const upd = { ...f }
+                                    if (!f.section && m.section_id) {
+                                      upd.section = String(m.section_id)
+                                      upd.section_id = String(m.section_id)
+                                    }
+                                    if (!f.machine_id && m.machine_id) {
+                                      upd.machine_id = String(m.machine_id)
+                                    }
+                                    return upd
+                                  })
+
+                                  // Auto-set component position if roll mapped
+                                  const mEq = Array.isArray(m.equipment) && m.equipment.length > 0 ? m.equipment[0] : null
+                                  if (mEq && !it.component_position) {
+                                    setItem(i, 'component_position', `${mEq.tagName ? `[${mEq.tagName}] ` : ''}${mEq.equipmentName || mEq.name}`)
+                                  }
                                 }}
                                 style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 12, borderBottom: '1px solid #f1f5f9' }}
                               >
@@ -1865,10 +1996,24 @@ export default function Indent() {
                     <label style={S.lbl}>Position / Mechanical Fitment Location
                       <input
                         style={S.inp}
-                        placeholder="e.g. Drive Side Front Bearing Housing, Tender Side Pump Flange..."
+                        placeholder="e.g. [WIRE-MCN-001] Top Wire Guide Roll #1, Drive Side Housing..."
                         value={it.component_position}
                         onChange={e => setItem(i, 'component_position', e.target.value)}
+                        list={`equip-pos-list-${i}`}
                       />
+                      <datalist id={`equip-pos-list-${i}`}>
+                        {sectionEquipment
+                          .filter(eq => {
+                            if (!form.section) return true
+                            return String(eq.sectionId || eq.section_id) === String(form.section)
+                          })
+                          .map(eq => (
+                            <option key={eq.id} value={`${eq.tagName ? `[${eq.tagName}] ` : ''}${eq.equipmentName || eq.name}`}>
+                              {eq.bearingSize ? `Bearing: ${eq.bearingSize}` : ''}
+                            </option>
+                          ))
+                        }
+                      </datalist>
                     </label>
                   </div>
 

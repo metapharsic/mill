@@ -1,7 +1,7 @@
 {
   "lastDone": {
     "date": "2026-08-24",
-    "summary": "Multi-Section & Multi-Machine Item Mapping and Plant Command Center: 1) Provisioned multi-entity item mapping where one catalog part/spare can belong to multiple plant sections and machine units simultaneously, with backend endpoints (GET/POST/DELETE /api/master/sections/:id/materials and /api/master/machines/:id/materials). 2) Transformed AllSections.jsx from a static snapshot into a high-productivity Plant & Machinery Command Center with live KPI rollup (23 sections, 725 digital twin rolls, mapped inventory valuation), department filters, interactive section cards, and 1-click Mapped Items & Machinery Drawers. 3) Enhanced MasterData.jsx with '📦 Mapped Items' for Sections and '📦 Mapped Spares' for Machines. 4) Multi-agent validation passing 45/45 assertions with 100% integrity."
+    "summary": "Indent Plant Section, Machine & Digital Twin Roll Selection Synchronization: 1) Solved empty machine dropdown issue in Indent.jsx by adding sectionEquipment state and fetching 725 digital twin equipment/rolls from /api/master/section-equipment alongside registered machines and sections. 2) Replaced fragmented section/machine inputs with a unified Plant Section & Machinery Allocation panel with dynamic cross-filtering (Plant Section -> Registered Machines -> Machinery Rolls with bearing/belt specs). 3) Added two-way auto-sync in Line Items (material selection auto-detects mapped section/machine, position field provides datalist of section rolls with bearing details). 4) Multi-agent validation passing 45/45 assertions with 100% integrity."
   },
   "modules": {
     "storeManagement": {
