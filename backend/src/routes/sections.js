@@ -62,15 +62,24 @@ router.get('/', requireAuth, ar(async (req, res) => {
 // ── ALL-SECTIONS KPI SNAPSHOT (aggregator) ─────────────────────────────────
 router.get('/all/kpi-snapshot', requireAuth, ar(async (req, res) => {
   const { rows } = await pool.query(
-    `SELECT ps.section_code as "sectionCode", ps.name, ps.icon,
+    `SELECT ps.id, ps.section_code as "sectionCode", ps.name, ps.icon, ps.description,
+            d.name as "deptName",
             ks.kpi_data as "kpiData", ks.snapshot_time as "snapshotTime",
             (SELECT COUNT(*) FROM section_alarms sa
              WHERE sa.section_id=ps.id AND sa.resolved_at IS NULL
                AND sa.alarm_type='Critical') as "criticalAlarms",
             (SELECT COUNT(*) FROM section_alarms sa
              WHERE sa.section_id=ps.id AND sa.resolved_at IS NULL
-               AND sa.alarm_type='Warning') as "warningAlarms"
+               AND sa.alarm_type='Warning') as "warningAlarms",
+            (SELECT COUNT(*) FROM section_equipment se WHERE (se.section_id=ps.id OR se.section_code=ps.section_code) AND se.is_active=true) as "equipmentCount",
+            (SELECT COUNT(DISTINCT m.id) FROM materials m 
+             LEFT JOIN material_sections ms ON ms.material_id=m.id 
+             WHERE (m.section_id=ps.id OR ms.section_id=ps.id) AND m.is_active=true) as "materialsCount",
+            (SELECT COALESCE(SUM(m.current_stock * m.unit_price), 0) FROM materials m 
+             LEFT JOIN material_sections ms ON ms.material_id=m.id 
+             WHERE (m.section_id=ps.id OR ms.section_id=ps.id) AND m.is_active=true) as "stockValuation"
      FROM plant_sections ps
+     LEFT JOIN departments d ON d.id=ps.department_id
      LEFT JOIN LATERAL (
        SELECT kpi_data, snapshot_time FROM section_kpi_snapshots
        WHERE section_id=ps.id ORDER BY snapshot_time DESC LIMIT 1

@@ -12,6 +12,7 @@ export default function MasterData() {
   const [equipmentList, setEquipmentList] = useState([])
   const [machines, setMachines] = useState([])
   const [categories, setCategories] = useState([])
+  const [catalogMaterials, setCatalogMaterials] = useState([])
   const [loading, setLoading] = useState(false)
   
   // Section Form State
@@ -21,10 +22,30 @@ export default function MasterData() {
   const [err, setErr] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Section Mapped Items Modal State
+  const [activeSecMap, setActiveSecMap] = useState(null)
+  const [secMappedItems, setSecMappedItems] = useState([])
+  const [secMapLoading, setSecMapLoading] = useState(false)
+  const [secAddMapModal, setSecAddMapModal] = useState(false)
+  const [selectedSecMatId, setSelectedSecMatId] = useState('')
+  const [isPrimarySecMat, setIsPrimarySecMat] = useState(false)
+  const [secMapSaving, setSecMapSaving] = useState(false)
+  const [secMapErr, setSecMapErr] = useState('')
+
   // Machine Master State
   const [mcnModal, setMcnModal] = useState(false)
   const [mcnForm, setMcnForm] = useState({ id: null, name: '', code: '', type: 'Paper Machine', capacity_tpd: '', ideal_speed_mpm: '', design_speed_mpm: '', is_active: true })
   const [mcnSearch, setMcnSearch] = useState('')
+
+  // Machine Mapped Items Modal State
+  const [activeMcnMap, setActiveMcnMap] = useState(null)
+  const [mcnMappedItems, setMcnMappedItems] = useState([])
+  const [mcnMapLoading, setMcnMapLoading] = useState(false)
+  const [mcnAddMapModal, setMcnAddMapModal] = useState(false)
+  const [selectedMcnMatId, setSelectedMcnMatId] = useState('')
+  const [mcnRemarks, setMcnRemarks] = useState('')
+  const [mcnMapSaving, setMcnMapSaving] = useState(false)
+  const [mcnMapErr, setMcnMapErr] = useState('')
 
   // Category Master State
   const [catModal, setCatModal] = useState(false)
@@ -72,7 +93,13 @@ export default function MasterData() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // ── Section Actions ──
+  const loadCatalogMaterials = async () => {
+    if (catalogMaterials.length > 0) return
+    const res = await API('/api/master/materials?limit=2000&is_active=true')
+    if (res.success) setCatalogMaterials(res.data || [])
+  }
+
+  // ── Section Actions & Mappings ──
   const saveSection = async (e) => {
     e.preventDefault()
     if (!form.name) return setErr('Name is required')
@@ -103,7 +130,51 @@ export default function MasterData() {
     else alert(res.message || 'Error deactivating section')
   }
 
-  // ── Machine Actions ──
+  const openSectionMaterialsModal = async (sec) => {
+    setActiveSecMap(sec)
+    setSecMapLoading(true)
+    setSecMapErr('')
+    try {
+      const res = await API(`/api/master/sections/${sec.id}/materials`)
+      if (res.success) setSecMappedItems(res.data || [])
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSecMapLoading(false)
+    }
+  }
+
+  const handleSaveSecMap = async (e) => {
+    e.preventDefault()
+    if (!selectedSecMatId) return setSecMapErr('Please select a material')
+    setSecMapSaving(true)
+    try {
+      const res = await API(`/api/master/sections/${activeSecMap.id}/materials`, {
+        method: 'POST',
+        body: JSON.stringify({ material_id: selectedSecMatId, is_primary: isPrimarySecMat })
+      })
+      if (res.success) {
+        setSecAddMapModal(false)
+        setSelectedSecMatId('')
+        openSectionMaterialsModal(activeSecMap)
+      } else {
+        setSecMapErr(res.message || 'Failed to map material')
+      }
+    } catch (e) {
+      setSecMapErr('Error mapping material: ' + e.message)
+    } finally {
+      setSecMapSaving(false)
+    }
+  }
+
+  const handleUnmapSecMaterial = async (mat) => {
+    if (!window.confirm(`Unmap "${mat.name}" from ${activeSecMap.name}?`)) return
+    const res = await API(`/api/master/sections/${activeSecMap.id}/materials/${mat.id}`, { method: 'DELETE' })
+    if (res.success) openSectionMaterialsModal(activeSecMap)
+    else alert(res.message || 'Error unmapping material')
+  }
+
+  // ── Machine Actions & Mappings ──
   const saveMachine = async (e) => {
     e.preventDefault()
     if (!mcnForm.name || !mcnForm.code) return setErr('Machine name and code required')
@@ -136,6 +207,51 @@ export default function MasterData() {
     const res = await API(`/api/master/machines/${m.id}`, { method: 'DELETE' })
     if (res.success) loadData()
     else alert(res.message || 'Error deactivating machine')
+  }
+
+  const openMachineMaterialsModal = async (mcn) => {
+    setActiveMcnMap(mcn)
+    setMcnMapLoading(true)
+    setMcnMapErr('')
+    try {
+      const res = await API(`/api/master/machines/${mcn.id}/materials`)
+      if (res.success) setMcnMappedItems(res.data || [])
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setMcnMapLoading(false)
+    }
+  }
+
+  const handleSaveMcnMap = async (e) => {
+    e.preventDefault()
+    if (!selectedMcnMatId) return setMcnMapErr('Please select a material')
+    setMcnMapSaving(true)
+    try {
+      const res = await API(`/api/master/machines/${activeMcnMap.id}/materials`, {
+        method: 'POST',
+        body: JSON.stringify({ material_id: selectedMcnMatId, remarks: mcnRemarks })
+      })
+      if (res.success) {
+        setMcnAddMapModal(false)
+        setSelectedMcnMatId('')
+        setMcnRemarks('')
+        openMachineMaterialsModal(activeMcnMap)
+      } else {
+        setMcnMapErr(res.message || 'Failed to map material')
+      }
+    } catch (e) {
+      setMcnMapErr('Error mapping material: ' + e.message)
+    } finally {
+      setMcnMapSaving(false)
+    }
+  }
+
+  const handleUnmapMcnMaterial = async (mat) => {
+    if (!window.confirm(`Unmap "${mat.name}" from machine ${activeMcnMap.name}?`)) return
+    const res = await API(`/api/master/machines/${activeMcnMap.id}/materials/${mat.id}`, { method: 'DELETE' })
+    if (res.success) openMachineMaterialsModal(activeMcnMap)
+    else alert(res.message || 'Error unmapping material')
   }
 
   // ── Category Actions ──
@@ -214,8 +330,8 @@ export default function MasterData() {
   }
 
   const MODULES = [
-    { title: 'Plant Sections & Spares', status: 'Live', color: '#0f766e', desc: 'Manage 23 plant sections and 725 machinery rolls dynamically.', bullets: ['Add/edit/delete sections', 'Assign rolls & bearings', 'Digital twin link'] },
-    { title: 'Machine Units', status: 'Live', color: '#d97706', desc: 'Record machines, speed capabilities, and production equipment setup.', bullets: ['Machine master', 'Setup info & speed', 'Status tracking & deletion'] },
+    { title: 'Plant Sections & Spares', status: 'Live', color: '#0f766e', desc: 'Manage 23 plant sections, assign owning departments, and map inventory items.', bullets: ['Add/edit/delete sections', 'Map & unmap inventory items', 'Digital twin roll linkage'] },
+    { title: 'Machine Units', status: 'Live', color: '#d97706', desc: 'Record machines, speed capabilities, and map dedicated inventory spares.', bullets: ['Machine master', 'Map spares to machine', 'Status tracking & deletion'] },
     { title: 'Material Categories', status: 'Live', color: '#0284c7', desc: 'Multi-level category hierarchy across Store, Spares, RM, and Chemicals.', bullets: ['Root & sub-categories', 'Type allocation', 'Safe dependency deletion'] },
     { title: 'Materials', status: 'Live', color: '#1b1b1d', desc: 'Track raw materials, UOM, stock, reorder points, and GST.', bullets: ['Material master', 'Category setup', 'Reorder alerts'] },
     { title: 'Vendors', status: 'Live', color: '#1b1b1d', desc: 'Manage supplier details, payment terms, and vendor records.', bullets: ['Vendor list', 'Contact details', 'Terms and status'] },
@@ -251,8 +367,8 @@ export default function MasterData() {
       {tab === 'summary' && (
         <>
           <div style={S.hero}>
-            <div style={S.heroTitle}>Master Data Engine &amp; Digital Twin Provisioning</div>
-            <div style={S.heroText}>Plant Sections, Machinery Units, Rolls, Materials, and Categories are dynamically configurable with authorized CRUD and delete guards.</div>
+            <div style={S.heroTitle}>Master Data Engine &amp; Multi-Section / Machine Provisioning</div>
+            <div style={S.heroText}>Plant Sections, Machinery Units, Rolls, Materials, and Categories are dynamically configurable with multi-section item mapping and delete guards.</div>
           </div>
           <div style={S.grid}>
             {MODULES.map(mod => (
@@ -276,7 +392,7 @@ export default function MasterData() {
         <div style={S.sectionContainer}>
           <div style={S.card}>
             <div style={{ ...S.header, marginBottom: 16 }}>
-              <div style={S.cardTitle}>🏭 Plant Sections Master</div>
+              <div style={S.cardTitle}>🏭 Plant Sections Master &amp; Item Allocations</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search sections..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
                 <button style={S.btnPrimary} onClick={() => { setForm({ id: null, name: '', code: '', department_id: '', description: '' }); setErr(''); setModal(true) }}>+ Add Plant Section</button>
@@ -287,7 +403,7 @@ export default function MasterData() {
               <table style={S.table}>
                 <thead>
                   <tr style={S.thead}>
-                    {['Action', 'Section Code', 'Section Name', 'Department', 'Status'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                    {['Action', 'Section Code', 'Section Name', 'Owning Department', 'Status'].map(h => <th key={h} style={S.th}>{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -295,14 +411,22 @@ export default function MasterData() {
                   {sections.filter(s => !searchTerm || s.name?.toLowerCase().includes(searchTerm.toLowerCase()) || (s.code || s.sectionCode || '').toLowerCase().includes(searchTerm.toLowerCase())).map(sec => (
                     <tr key={sec.id} style={S.tr}>
                       <td style={S.td}>
-                        <div style={{ display: 'flex', gap: 6 }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0f766e', borderColor: '#0f766e', background: '#f0fdfa' }} onClick={() => openSectionMaterialsModal(sec)}>📦 Mapped Items</button>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditSection(sec)}>✏️ Edit</button>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteSection(sec)}>🗑️ Deactivate</button>
                         </div>
                       </td>
                       <td style={S.td}><strong>{sec.code || sec.sectionCode || '—'}</strong></td>
-                      <td style={S.td}>{sec.name}</td>
-                      <td style={S.td}>{sec.departmentName || 'Production / Mill Operations'}</td>
+                      <td style={S.td}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{sec.name}</div>
+                        {sec.description && <div style={{ fontSize: 11, color: '#64748b' }}>{sec.description}</div>}
+                      </td>
+                      <td style={S.td}>
+                        <span style={{ background: '#f1f5f9', color: '#334155', padding: '2px 8px', borderRadius: 4, fontWeight: 600, fontSize: 11 }}>
+                          {sec.departmentName || 'Production / Mill Operations'}
+                        </span>
+                      </td>
                       <td style={S.td}>
                         <span style={{ ...S.statusBadge, background: sec.is_active !== false ? '#22c55e22' : '#ef444422', color: sec.is_active !== false ? '#22c55e' : '#ef4444' }}>
                           {sec.is_active !== false ? 'Active' : 'Inactive'}
@@ -425,7 +549,7 @@ export default function MasterData() {
         <div style={S.sectionContainer}>
           <div style={S.card}>
             <div style={{ ...S.header, marginBottom: 16 }}>
-              <div style={S.cardTitle}>⚡ Machine Units Master</div>
+              <div style={S.cardTitle}>⚡ Machine Units Master &amp; Mapped Spares</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <input style={{...S.input, maxWidth: 220}} placeholder="🔍 Search machines..." value={mcnSearch} onChange={e=>setMcnSearch(e.target.value)} />
                 <button style={S.btnPrimary} onClick={() => { setMcnForm({ id: null, name: '', code: '', type: 'Paper Machine', capacity_tpd: '', ideal_speed_mpm: '', design_speed_mpm: '', is_active: true }); setErr(''); setMcnModal(true) }}>+ Add Machine Unit</button>
@@ -444,7 +568,8 @@ export default function MasterData() {
                   {machines.filter(m => !mcnSearch || m.name?.toLowerCase().includes(mcnSearch.toLowerCase()) || m.code?.toLowerCase().includes(mcnSearch.toLowerCase())).map(mcn => (
                     <tr key={mcn.id} style={S.tr}>
                       <td style={S.td}>
-                        <div style={{ display: 'flex', gap: 6 }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0f766e', borderColor: '#0f766e', background: '#f0fdfa' }} onClick={() => openMachineMaterialsModal(mcn)}>📦 Mapped Spares</button>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditMachine(mcn)}>✏️ Edit</button>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteMachine(mcn)}>🗑️ Deactivate</button>
                         </div>
@@ -511,6 +636,167 @@ export default function MasterData() {
                 </tbody>
               </table>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── SECTION MAPPED MATERIALS MODAL ── */}
+      {activeSecMap && (
+        <div style={S.overlay} onClick={() => setActiveSecMap(null)}>
+          <div style={{ ...S.modal, maxWidth: 850 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div>
+                <div style={S.modalTitle}>📦 Mapped Inventory Items: {activeSecMap.name} ({activeSecMap.code || activeSecMap.sectionCode})</div>
+                <div style={{ fontSize: 12, color: '#64748b' }}>Inventory items mapped to this plant section for maintenance and operations consumption.</div>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <button style={S.btnPrimary} onClick={() => { loadCatalogMaterials(); setSecAddMapModal(true); setSecMapErr(''); setSelectedSecMatId('') }}>+ Map Item / Spare</button>
+                <button style={S.close} onClick={() => setActiveSecMap(null)}>✕</button>
+              </div>
+            </div>
+
+            {secMapLoading ? <div style={S.loading}>Loading mapped items...</div> : (
+              <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+                <table style={S.table}>
+                  <thead>
+                    <tr style={S.thead}>
+                      {['Material Code', 'Material Name', 'Category', 'Current Stock', 'Unit Price', 'Role', 'Action'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {secMappedItems.length === 0 && <tr><td colSpan={7} style={S.empty}>No inventory materials mapped to this section yet.</td></tr>}
+                    {secMappedItems.map(mat => (
+                      <tr key={mat.id} style={S.tr}>
+                        <td style={S.td}><code style={{ background: '#f1f5f9', color: '#0f766e', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>{mat.code}</code></td>
+                        <td style={S.td}><strong>{mat.name}</strong></td>
+                        <td style={S.td}>{mat.categoryName || 'General Store'}</td>
+                        <td style={S.td}>{Number(mat.currentStock || 0).toFixed(3)} {mat.uom}</td>
+                        <td style={S.td}>₹ {Number(mat.unitPrice || 0).toFixed(2)}</td>
+                        <td style={S.td}>
+                          <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 10, background: mat.isPrimary ? '#dcfce7' : '#f1f5f9', color: mat.isPrimary ? '#166534' : '#475569', fontWeight: 700 }}>
+                            {mat.isPrimary ? 'Primary Section' : 'Multi-Mapped'}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          <button style={{ background: '#fef2f2', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 4, padding: '3px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }} onClick={() => handleUnmapSecMaterial(mat)}>
+                            🗑️ Unmap
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── SUB-MODAL: MAP ITEM TO SECTION ── */}
+      {secAddMapModal && (
+        <div style={{ ...S.overlay, zIndex: 6100 }} onClick={() => setSecAddMapModal(false)}>
+          <div style={{ ...S.modal, maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div style={S.modalTitle}>+ Map Material to {activeSecMap?.name}</div>
+              <button style={S.close} onClick={() => setSecAddMapModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSaveSecMap} style={S.form}>
+              <label style={S.label}>Select Catalog Material *
+                <select style={S.select} value={selectedSecMatId} onChange={e => setSelectedSecMatId(e.target.value)} required>
+                  <option value="">— Select an inventory material —</option>
+                  {catalogMaterials.map(m => (
+                    <option key={m.id} value={m.id}>{m.code} — {m.name} ({m.uom} | Stock: {Number(m.current_stock || 0).toFixed(2)})</option>
+                  ))}
+                </select>
+              </label>
+              <label style={{ ...S.label, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={isPrimarySecMat} onChange={e => setIsPrimarySecMat(e.target.checked)} />
+                <span>Mark as primary section for this item</span>
+              </label>
+              {secMapErr && <div style={S.error}>{secMapErr}</div>}
+              <div style={S.modalFooter}>
+                <button type="button" style={S.btnSecondary} onClick={() => setSecAddMapModal(false)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={secMapSaving}>{secMapSaving ? 'Mapping...' : 'Confirm Mapping'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MACHINE MAPPED MATERIALS MODAL ── */}
+      {activeMcnMap && (
+        <div style={S.overlay} onClick={() => setActiveMcnMap(null)}>
+          <div style={{ ...S.modal, maxWidth: 850 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div>
+                <div style={S.modalTitle}>⚡ Mapped Spares: {activeMcnMap.name} ({activeMcnMap.code})</div>
+                <div style={{ fontSize: 12, color: '#64748b' }}>Catalog materials and spare components dedicated to this machine unit.</div>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <button style={S.btnPrimary} onClick={() => { loadCatalogMaterials(); setMcnAddMapModal(true); setMcnMapErr(''); setSelectedMcnMatId('') }}>+ Map Spare to Machine</button>
+                <button style={S.close} onClick={() => setActiveMcnMap(null)}>✕</button>
+              </div>
+            </div>
+
+            {mcnMapLoading ? <div style={S.loading}>Loading mapped machine spares...</div> : (
+              <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+                <table style={S.table}>
+                  <thead>
+                    <tr style={S.thead}>
+                      {['Material Code', 'Material Name', 'Category', 'Current Stock', 'Unit Price', 'Equipment/Tag', 'Action'].map(h => <th key={h} style={S.th}>{h}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mcnMappedItems.length === 0 && <tr><td colSpan={7} style={S.empty}>No spares mapped to this machine unit yet.</td></tr>}
+                    {mcnMappedItems.map(mat => (
+                      <tr key={mat.id} style={S.tr}>
+                        <td style={S.td}><code style={{ background: '#f1f5f9', color: '#0f766e', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>{mat.code}</code></td>
+                        <td style={S.td}><strong>{mat.name}</strong></td>
+                        <td style={S.td}>{mat.categoryName || 'Spare Part'}</td>
+                        <td style={S.td}>{Number(mat.currentStock || 0).toFixed(3)} {mat.uom}</td>
+                        <td style={S.td}>₹ {Number(mat.unitPrice || 0).toFixed(2)}</td>
+                        <td style={S.td}>{mat.equipmentName || mat.tagName || 'Machine General'}</td>
+                        <td style={S.td}>
+                          <button style={{ background: '#fef2f2', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 4, padding: '3px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }} onClick={() => handleUnmapMcnMaterial(mat)}>
+                            🗑️ Unmap
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── SUB-MODAL: MAP ITEM TO MACHINE ── */}
+      {mcnAddMapModal && (
+        <div style={{ ...S.overlay, zIndex: 6100 }} onClick={() => setMcnAddMapModal(false)}>
+          <div style={{ ...S.modal, maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHeader}>
+              <div style={S.modalTitle}>+ Map Spare to {activeMcnMap?.name}</div>
+              <button style={S.close} onClick={() => setMcnAddMapModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSaveMcnMap} style={S.form}>
+              <label style={S.label}>Select Catalog Material / Spare *
+                <select style={S.select} value={selectedMcnMatId} onChange={e => setSelectedMcnMatId(e.target.value)} required>
+                  <option value="">— Select an inventory spare —</option>
+                  {catalogMaterials.map(m => (
+                    <option key={m.id} value={m.id}>{m.code} — {m.name} ({m.uom} | Stock: {Number(m.current_stock || 0).toFixed(2)})</option>
+                  ))}
+                </select>
+              </label>
+              <label style={S.label}>Fitment Notes / Position
+                <input style={S.input} value={mcnRemarks} onChange={e => setMcnRemarks(e.target.value)} placeholder="e.g. Drive side bearing / Main pump spare" />
+              </label>
+              {mcnMapErr && <div style={S.error}>{mcnMapErr}</div>}
+              <div style={S.modalFooter}>
+                <button type="button" style={S.btnSecondary} onClick={() => setMcnAddMapModal(false)}>Cancel</button>
+                <button type="submit" style={S.btnPrimary} disabled={mcnMapSaving}>{mcnMapSaving ? 'Mapping...' : 'Confirm Mapping'}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

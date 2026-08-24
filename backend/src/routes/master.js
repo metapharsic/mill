@@ -1860,6 +1860,128 @@ router.get('/equipment', auth, ar(async (req, res) => {
   res.json({ success: true, data: rows, total: rows.length });
 }));
 
+// ── SECTION MATERIALS MAPPING (MULTI-SECTION SUPPORT) ───────────────────────
+router.get('/sections/:id/materials', auth, ar(async (req, res) => {
+  const sectionId = req.params.id;
+  const { rows } = await pool.query(`
+    SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
+           m.unit_price as "unitPrice", m.min_stock as "minStock", m.reorder_level as "reorderLevel",
+           m.criticality_class as "criticalityClass", mc.name as "categoryName",
+           COALESCE(ms.is_primary, (m.section_id = ps.id)) as "isPrimary",
+           ms.created_at as "mappedAt"
+    FROM materials m
+    LEFT JOIN material_sections ms ON ms.material_id = m.id AND ms.section_id = $1
+    LEFT JOIN plant_sections ps ON ps.id = $1
+    LEFT JOIN material_categories mc ON mc.id = m.category_id
+    WHERE (ms.section_id = $1 OR m.section_id = $1)
+      AND m.is_active = true
+    ORDER BY m.name ASC
+  `, [sectionId]);
+  res.json({ success: true, data: rows, total: rows.length });
+}));
+
+router.post('/sections/:id/materials', auth, requireLevel(3), ar(async (req, res) => {
+  const sectionId = parseInt(req.params.id);
+  const { material_ids, material_id, is_primary = false } = req.body;
+  const targetIds = Array.isArray(material_ids) ? material_ids : (material_id ? [material_id] : []);
+  if (!targetIds.length) return res.status(400).json({ success: false, message: 'At least one material ID required' });
+
+  for (const mid of targetIds) {
+    await pool.query(`
+      INSERT INTO material_sections (material_id, section_id, is_primary, created_at)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (material_id, section_id) DO UPDATE SET is_primary = EXCLUDED.is_primary
+    `, [mid, sectionId, is_primary]);
+
+    await pool.query(`
+      UPDATE materials SET section_id = COALESCE(section_id, $1) WHERE id = $2
+    `, [sectionId, mid]);
+  }
+
+  res.status(201).json({ success: true, message: `Mapped ${targetIds.length} item(s) to plant section successfully` });
+}));
+
+router.delete('/sections/:id/materials/:materialId', auth, requireLevel(3), ar(async (req, res) => {
+  const sectionId = parseInt(req.params.id);
+  const materialId = parseInt(req.params.materialId);
+
+  await pool.query('DELETE FROM material_sections WHERE section_id = $1 AND material_id = $2', [sectionId, materialId]);
+  
+  await pool.query(`
+    UPDATE materials 
+    SET section_id = (SELECT section_id FROM material_sections WHERE material_id = $1 LIMIT 1)
+    WHERE id = $1 AND section_id = $2
+  `, [materialId, sectionId]);
+
+  res.json({ success: true, message: 'Material unmapped from plant section' });
+}));
+
+// ── MACHINE MATERIALS MAPPING (MULTI-MACHINE SUPPORT) ───────────────────────
+router.get('/machines/:id/materials', auth, ar(async (req, res) => {
+  const machineId = req.params.id;
+  const { rows } = await pool.query(`
+    SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
+           m.unit_price as "unitPrice", mc.name as "categoryName",
+           se.equipment_name as "equipmentName", se.tag_name as "tagName",
+           me.remarks, me.created_at as "mappedAt"
+    FROM materials m
+    LEFT JOIN material_equipment me ON me.material_id = m.id AND me.machine_id = $1
+    LEFT JOIN section_equipment se ON se.id = me.section_equipment_id
+    LEFT JOIN material_categories mc ON mc.id = m.category_id
+    WHERE (me.machine_id = $1 OR m.machine_id = $1)
+      AND m.is_active = true
+    ORDER BY m.name ASC
+  `, [machineId]);
+  res.json({ success: true, data: rows, total: rows.length });
+}));
+
+router.post('/machines/:id/materials', auth, requireLevel(3), ar(async (req, res) => {
+  const machineId = parseInt(req.params.id);
+  const { material_ids, material_id, section_equipment_id, remarks } = req.body;
+  const targetIds = Array.isArray(material_ids) ? material_ids : (material_id ? [material_id] : []);
+  if (!targetIds.length) return res.status(400).json({ success: false, message: 'At least one material ID required' });
+
+  let secEqId = section_equipment_id;
+  if (!secEqId) {
+    const { rows: firstEq } = await pool.query('SELECT id, section_id FROM section_equipment WHERE machine_id = $1 LIMIT 1', [machineId]);
+    if (firstEq.length) {
+      secEqId = firstEq[0].id;
+    } else {
+      const { rows: anyEq } = await pool.query('SELECT id FROM section_equipment LIMIT 1');
+      secEqId = anyEq.length ? anyEq[0].id : 1;
+    }
+  }
+
+  for (const mid of targetIds) {
+    await pool.query(`
+      INSERT INTO material_equipment (material_id, machine_id, section_equipment_id, remarks, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      ON CONFLICT (material_id, section_equipment_id) DO UPDATE SET machine_id = EXCLUDED.machine_id, remarks = EXCLUDED.remarks
+    `, [mid, machineId, secEqId, remarks || 'Mapped to machine unit']);
+
+    await pool.query(`
+      UPDATE materials SET machine_id = COALESCE(machine_id, $1) WHERE id = $2
+    `, [machineId, mid]);
+  }
+
+  res.status(201).json({ success: true, message: `Mapped ${targetIds.length} item(s) to machine unit successfully` });
+}));
+
+router.delete('/machines/:id/materials/:materialId', auth, requireLevel(3), ar(async (req, res) => {
+  const machineId = parseInt(req.params.id);
+  const materialId = parseInt(req.params.materialId);
+
+  await pool.query('DELETE FROM material_equipment WHERE machine_id = $1 AND material_id = $2', [machineId, materialId]);
+  
+  await pool.query(`
+    UPDATE materials 
+    SET machine_id = (SELECT machine_id FROM material_equipment WHERE material_id = $1 LIMIT 1)
+    WHERE id = $1 AND machine_id = $2
+  `, [materialId, machineId]);
+
+  res.json({ success: true, message: 'Material unmapped from machine unit' });
+}));
+
 // ── ERROR HANDLER ─────────────────────────────────────────────────────────────
 router.use((err,req,res,next) => {
   if (err.code==='23505') return res.status(409).json({ success:false, message:'Duplicate record' });
