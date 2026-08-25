@@ -129,14 +129,14 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
 
   // Document identification
   const isIndentOrIssue = Boolean(
-    docData.indent_number || docData.indentNumber ||
-    docData.deptName || docData.departmentName ||
-    title?.includes('INDENT') || title?.includes('ISSUE') || title?.includes('SIV')
+    (docData.indent_number || docData.indentNumber || docData.deptName || docData.departmentName || title?.includes('INDENT') || title?.includes('ISSUE') || title?.includes('SIV')) &&
+    !docData.vendorName && !docData.vendor_name && !docData.vendor_id
   )
 
   const isSupplierOrGrn = Boolean(
     docData.vendor_id || docData.vendor_name || docData.vendorName ||
-    title?.includes('GRN') || title?.includes('RECEIPT')
+    docData.partyName || docData.party_name ||
+    title?.includes('GRN') || title?.includes('RECEIPT') || title?.includes('INWARD') || title?.includes('INVOICE')
   )
 
   // Extract raw items
@@ -147,9 +147,10 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
         materialCode: docData.materialCode || docData.material_code || 'ITM-001',
         uom: docData.uom || docData.matUom || 'NOS',
         hsnCode: docData.hsnCode || docData.hsn_code || '84399900',
-        in_qty: docData.in_qty || docData.issued_qty || docData.required_qty || docData.received_qty || 1,
-        unit_price: docData.unit_price || docData.matPrice || 0,
+        in_qty: docData.in_qty || docData.issued_qty || docData.required_qty || docData.received_qty || docData.qty || 1,
+        unit_price: docData.unit_price || docData.matPrice || docData.price || 0,
         discount_pct: docData.discount_pct || 0,
+        discount_amount: docData.discount_amount || 0,
         gst_pct: docData.gst_pct !== undefined ? docData.gst_pct : 18,
         batch_number: docData.batch_number || docData.batch_no || docData.batch || '—',
         pack_size: docData.pack_size || docData.pack || docData.uom || 'NOS',
@@ -162,27 +163,27 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
   // Party Particulars (Dynamic mapping based on document scope)
   const party = {
     isDepartment: isIndentOrIssue && !isSupplierOrGrn,
-    name: isIndentOrIssue
-      ? (docData.deptName || docData.departmentName || docData.department || 'Mechanical Department')
-      : (docData.vendorName || docData.partyName || docData.customerName || 'Mill Authorized Supplier'),
-    code: docData.vendorCode || docData.deptCode || docData.raisedByEmpCode || docData.customerCode || 'MILL-01',
+    name: (isSupplierOrGrn || !isIndentOrIssue)
+      ? (docData.vendorName || docData.vendor_name || docData.partyName || docData.party_name || docData.customerName || 'Mill Authorized Supplier')
+      : (docData.deptName || docData.departmentName || docData.department || 'Mechanical Department'),
+    code: docData.vendorCode || docData.vendor_code || docData.deptCode || docData.raisedByEmpCode || docData.customerCode || 'MILL-01',
     phone: docData.vendorMobile || docData.vendorPhone || docData.partyPhone || company.phone,
-    gstin: docData.vendorGstin || docData.partyGstin || (isIndentOrIssue ? 'Internal Department (Tax Exempt)' : 'Unregistered'),
-    pan: docData.vendorPan || docData.partyPan || '—',
-    dlNo: docData.vendorDlNo || docData.partyDlNo || '—',
-    address: isIndentOrIssue
-      ? `${docData.sectionName ? `Plant Section: ${docData.sectionName}` : 'MK Paper Mill Floor'}${docData.machineName ? ` · Machine: ${docData.machineName}` : ''}`
-      : (docData.vendorAddress || docData.partyAddress || 'Industrial Area'),
-    city: docData.vendorCity || docData.partyCity || 'Karnataka',
-    state: docData.vendorState || docData.partyState || 'Karnataka',
-    requestedBy: docData.raisedByName || docData.raisedBy || docData.createdByName || docData.issued_to || 'Store Officer',
+    gstin: docData.vendorGstin || docData.vendor_gstin || docData.partyGstin || (isIndentOrIssue && !isSupplierOrGrn ? 'Internal Department (Tax Exempt)' : 'Unregistered'),
+    pan: docData.vendorPan || docData.vendor_pan || docData.partyPan || '—',
+    dlNo: docData.vendorDlNo || docData.vendor_dl_no || docData.partyDlNo || '—',
+    address: (isSupplierOrGrn || !isIndentOrIssue)
+      ? (docData.vendorAddress || docData.vendor_address || docData.partyAddress || 'Industrial Area, Plant Supply Hub')
+      : `${docData.sectionName ? `Plant Section: ${docData.sectionName}` : 'MK Paper Mill Floor'}${docData.machineName ? ` · Machine: ${docData.machineName}` : ''}`,
+    city: docData.vendorCity || docData.vendor_city || docData.partyCity || 'Karnataka',
+    state: docData.vendorState || docData.vendor_state || docData.partyState || 'Karnataka',
+    requestedBy: docData.raisedByName || docData.raisedBy || docData.createdByName || docData.created_by_name || docData.issued_to || 'Store Officer',
     empCode: docData.raisedByEmpCode || docData.emp_code || '—',
     purpose: docData.itemPurpose || docData.purpose || docData.remarks || 'Plant Operations & Regular Maintenance'
   }
 
   // Metadata details
-  const invoiceNo = docData.indent_number || docData.indentNumber || docData.invoiceNumber || docData.invoice_number || docData.grnNumber || docData.grn_number || `SIV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}001`
-  const invoiceDate = docData.date ? new Date(docData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('en-GB')
+  const invoiceNo = docData.invoice_number || docData.invoiceNumber || docData.indent_number || docData.indentNumber || docData.grnNumber || docData.grn_number || `SIV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}001`
+  const invoiceDate = docData.order_date || docData.invoiceDate || docData.invoice_date || docData.date ? new Date(docData.order_date || docData.invoiceDate || docData.invoice_date || docData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('en-GB')
   const grnNo = docData.grnNumber || docData.grn_number || (docData.reference_type === 'GRN' ? docData.reference_id : invoiceNo)
   const grnDate = docData.date ? new Date(docData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : invoiceDate
   const orderNo = docData.poNumber || docData.order_number || docData.reference_id || '—'
@@ -213,25 +214,44 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
     const q = parseFloat(it.in_qty || it.issued_qty || it.required_qty || it.received_qty || it.qty || it.quantity || 0)
     const disQ = parseFloat(it.dis_qty || it.free_qty || 0)
     const price = parseFloat(it.trade_price || it.unit_price || it.matPrice || it.price || 0)
-    const gstRate = parseFloat(it.gst_pct !== undefined ? it.gst_pct : 18)
+    const gstRate = parseFloat(it.gst_pct !== undefined && it.gst_pct !== null ? it.gst_pct : 18)
     const oldMrp = parseFloat(it.old_mrp || 0)
     const mrpVal = parseFloat(it.mrp || price)
 
     const gross = q * price
     const discPct = parseFloat(it.discount_pct || 0)
-    const discVal = discPct > 0 ? (gross * discPct) / 100 : 0
-    const taxable = Math.max(0, gross - discVal)
+    const storedDiscAmt = parseFloat(it.discount_amount || 0)
+    const discVal = discPct > 0 ? (gross * discPct) / 100 : storedDiscAmt
+    const taxable = it.taxable_amount !== undefined && it.taxable_amount !== null && parseFloat(it.taxable_amount) > 0
+      ? parseFloat(it.taxable_amount)
+      : Math.max(0, gross - discVal)
 
     // Determine state tax mode
-    const isInter = (party.state && party.state.toLowerCase() !== company.state.toLowerCase()) || (party.gstin && party.gstin.length >= 2 && !party.gstin.startsWith(company.stateCode) && party.gstin !== 'Unregistered')
+    const isInter = it.tax_type === 'inter' || (party.state && party.state.toLowerCase() !== company.state.toLowerCase()) || (party.gstin && party.gstin.length >= 2 && !party.gstin.startsWith(company.stateCode) && party.gstin !== 'Unregistered')
+    
     let cgst = 0, sgst = 0, igst = 0
-    if (isInter) {
-      igst = (taxable * gstRate) / 100
-    } else {
-      cgst = (taxable * (gstRate / 2)) / 100
-      sgst = (taxable * (gstRate / 2)) / 100
+    if (it.cgst_amount !== undefined && it.cgst_amount !== null && parseFloat(it.cgst_amount) > 0) {
+      cgst = parseFloat(it.cgst_amount)
     }
-    const lineTotal = taxable + cgst + sgst + igst
+    if (it.sgst_amount !== undefined && it.sgst_amount !== null && parseFloat(it.sgst_amount) > 0) {
+      sgst = parseFloat(it.sgst_amount)
+    }
+    if (it.igst_amount !== undefined && it.igst_amount !== null && parseFloat(it.igst_amount) > 0) {
+      igst = parseFloat(it.igst_amount)
+    }
+
+    if (cgst === 0 && sgst === 0 && igst === 0 && gstRate > 0) {
+      if (isInter) {
+        igst = (taxable * gstRate) / 100
+      } else {
+        cgst = (taxable * (gstRate / 2)) / 100
+        sgst = (taxable * (gstRate / 2)) / 100
+      }
+    }
+    
+    const lineTotal = it.total_amount !== undefined && it.total_amount !== null && parseFloat(it.total_amount) > 0
+      ? parseFloat(it.total_amount)
+      : (taxable + cgst + sgst + igst)
 
     totalQty += q
     totalDisQty += disQ
@@ -277,7 +297,10 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
     }
   })
 
-  const grandTotal = Math.round(totalTaxable + totalGst)
+  const rawGrandTotal = docData.grand_total !== undefined && docData.grand_total !== null && parseFloat(docData.grand_total) > 0
+    ? parseFloat(docData.grand_total)
+    : (totalTaxable + totalGst)
+  const grandTotal = Math.round(rawGrandTotal)
   const roundOff = (grandTotal - (totalTaxable + totalGst)).toFixed(2)
   const words = amountInWords(grandTotal)
   const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })

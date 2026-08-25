@@ -1508,6 +1508,12 @@ export default function Reports() {
           </div>
         </div>
       )}
+
+      {/* Enterprise Inventory Excel Exporter Modal */}
+      <InventoryExportModal
+        isOpen={exportModal}
+        onClose={() => setExportModal(false)}
+      />
     </div>
   )
 }
@@ -2849,6 +2855,7 @@ const S = {
 
 function PlantSectionsDetailedReportView({ data, search }) {
   const [selectedSec, setSelectedSec] = useState('')
+  const [exportModal, setExportModal] = useState(false)
   const sections = data?.sections || []
   const kpis = data?.kpis || {}
   const rawItems = data?.granularItems || []
@@ -2996,20 +3003,29 @@ function PlantSectionsDetailedReportView({ data, search }) {
             Granular Equipment & Material Matrix {selectedSec ? `— (Filtered: ${sections.find(s => String(s.sectionId) === String(selectedSec))?.sectionName || ''})` : ''}
             <span style={{ fontSize: 12, fontWeight: 500, color: '#64748b', marginLeft: 8 }}>({filteredItems.length} records)</span>
           </div>
-          <button
-            style={S.btnPrimary}
-            onClick={() => {
-              const p = new URLSearchParams({
-                format: 'csv',
-                from: data?.kpis?.fromDate || today,
-                to: data?.kpis?.toDate || today
-              })
-              if (selectedSec) p.set('section_id', selectedSec)
-              window.open(`/api/reports/plant-sections/detailed?${p}`, '_blank')
-            }}
-          >
-            <Download size={14} /> Download Granular CSV
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              style={{ ...S.btnPrimary, background: '#0f766e' }}
+              onClick={() => setExportModal(true)}
+              title="Download Multi-Sheet Categorized Excel Inventory Master"
+            >
+              <FileSpreadsheet size={14} /> Excel Master
+            </button>
+            <button
+              style={S.btnPrimary}
+              onClick={() => {
+                const p = new URLSearchParams({
+                  format: 'csv',
+                  from: data?.kpis?.fromDate || today,
+                  to: data?.kpis?.toDate || today
+                })
+                if (selectedSec) p.set('section_id', selectedSec)
+                window.open(`/api/reports/plant-sections/detailed?${p}`, '_blank')
+              }}
+            >
+              <Download size={14} /> Download Granular CSV
+            </button>
+          </div>
         </div>
 
         <div style={{ overflowX: 'auto' }}>

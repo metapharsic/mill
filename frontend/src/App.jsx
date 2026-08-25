@@ -41,6 +41,7 @@ import AllSections from './pages/AllSections'
 import PlantSection from './pages/PlantSection'
 import ChemicalStore from './pages/ChemicalStore'
 import StoreDashboard from './pages/StoreDashboard'
+import StoreDeptReports from './pages/StoreDeptReports'
 import MultiAgentCheckpoint from './pages/MultiAgentCheckpoint'
 
 // Plant-section keys — must stay in sync with the 'Plant Sections' group in Sidebar.jsx.
@@ -52,7 +53,7 @@ const SECTION_KEYS = ['sections-all','sections-pulp','sections-centri','sections
   'sections-compressors','sections-store']
 
 const NAV_KEYS = ['dashboard','production','daily-report','quality','maintenance','utility','grades','machines',
-  'rawmaterial','inventory','materials','chemicals','store','store-dashboard','indent','scrap',
+  'rawmaterial','inventory','materials','chemicals','store','store-dashboard','store-reports','indent','scrap',
   'purchase','customers','vendors','sales','dispatch','finance',
   'packing','fgwarehouse','hr','security','laboratory','ehs',
   'reports','phases','checkpoint','agents','masterdata','admin','users',
@@ -110,6 +111,7 @@ const PAGE_COMPONENTS = {
   rawmaterial: RawMaterial,
   store: Store,
   'store-dashboard': StoreDashboard,
+  'store-reports': StoreDeptReports,
   scrap: Scrap,
   packing: Packing,
   fgwarehouse: FGWarehouse,
@@ -127,6 +129,7 @@ const PAGE_TITLES = {
   utility:'Utility', grades:'Grades', machines:'Machines', rawmaterial:'Raw Material Store',
   inventory:'Inventory', materials:'Materials', chemicals:'Chemical Store', store:'Store Management',
   'store-dashboard':'Store Dashboard',
+  'store-reports':'Store Analytics & Reports',
   indent:'Indent / PIIMAS', scrap:'Scrap Management', purchase:'Purchase', customers:'Customers',
   vendors:'Vendors', sales:'Sales', dispatch:'Dispatch', finance:'Finance', packing:'Packing',
   fgwarehouse:'FG Warehouse', hr:'HR & Payroll', security:'Security', laboratory:'Laboratory',

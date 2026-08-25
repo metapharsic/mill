@@ -164,7 +164,7 @@ async function runPiimasEscalation() {
   try {
     // Indents issued > 24h ago with pending ack items
     const { rows: stale } = await pool.query(`
-      SELECT DISTINCT i.id, i.indent_number, i.department_id,
+      SELECT i.id, i.indent_number, i.department_id,
              d.name AS dept_name,
              COUNT(ii.id) FILTER (WHERE ii.ack_status='pending') AS pending_items,
              COALESCE(i.issued_at, i.created_at) AS last_update

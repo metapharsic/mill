@@ -273,6 +273,129 @@ async function runMultiAgentVerification() {
       assert('Live total valuation computed without hardcoding', false, e.message);
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // AGENT 6: CLUBBED GRN INGESTION & INVOICE CALCULATIONS
+    // ─────────────────────────────────────────────────────────────
+    console.log('\n--- [AGENT 6: CLUBBED GRN INGESTION & INVOICE CALCULATIONS] ---');
+
+    // 6.1 Screenshot Exact Verification: GRN 202608-26 (SUNRISE BEARING CORPORATION)
+    try {
+      const { rows: [sunriseGrn] } = await pool.query(`
+        SELECT g.id, g.grn_number, g.date, g.invoice_number, g.total_taxable, g.total_gst, g.grand_total,
+               v.name as vendor_name, v.gstin as vendor_gstin,
+               (SELECT COUNT(*) FROM grn_items gi WHERE gi.grn_id = g.id) as item_count
+        FROM grn g
+        JOIN vendors v ON g.vendor_id = v.id
+        WHERE g.grn_number = '202608-26'
+      `);
+
+      assert('GRN 202608-26 Master Record exists', Boolean(sunriseGrn));
+      if (sunriseGrn) {
+        assert('GRN 202608-26 Vendor is SUNRISE BEARING CORPORATION', sunriseGrn.vendor_name === 'SUNRISE BEARING CORPORATION');
+        assert('GRN 202608-26 Invoice No is SIV-31151', sunriseGrn.invoice_number === 'SIV-31151');
+        assert('GRN 202608-26 has exactly 6 clubbed line items', Number(sunriseGrn.item_count) === 6);
+        assert('GRN 202608-26 Taxable value is ₹1,18,950.00', Math.abs(Number(sunriseGrn.total_taxable) - 118950) < 1);
+        assert('GRN 202608-26 Total GST is ₹21,411.00', Math.abs(Number(sunriseGrn.total_gst) - 21411) < 1);
+        assert('GRN 202608-26 Invoice Total is ₹1,40,361.00', Math.abs(Number(sunriseGrn.grand_total) - 140361) < 1);
+
+        // Verify individual 6 items
+        const { rows: items } = await pool.query(`
+          SELECT gi.id, m.code, m.name, gi.received_qty, gi.uom, gi.unit_price, gi.taxable_amount,
+                 gi.cgst_amount, gi.sgst_amount, gi.total_amount, m.hsn_code
+          FROM grn_items gi
+          JOIN materials m ON gi.material_id = m.id
+          WHERE gi.grn_id = $1
+          ORDER BY gi.id ASC
+        `, [sunriseGrn.id]);
+
+        const expectedCodes = ['BE0135', 'BE0078', 'BE0098', 'BE0179', 'OS0079', 'OS0080'];
+        const actualCodes = items.map(it => it.code);
+        assert('GRN 202608-26 contains all 6 screenshot item codes (BE0135, BE0078, BE0098, BE0179, OS0079, OS0080)',
+          expectedCodes.every(c => actualCodes.includes(c)));
+      }
+    } catch (e) {
+      assert('GRN 202608-26 verification', false, e.message);
+    }
+
+    // 6.1b GRN 202608-34 (14 items - Nagendhra Electrical Works) Verification
+    try {
+      const { rows: [nagendhraGrn] } = await pool.query(`
+        SELECT g.*, v.name as vendor_name, v.code as vendor_code, v.gstin as vendor_gstin
+        FROM grn g
+        LEFT JOIN vendors v ON g.vendor_id = v.id
+        WHERE g.grn_number = '202608-34'
+      `);
+
+      assert('GRN 202608-34 Master Record exists', !!nagendhraGrn);
+      if (nagendhraGrn) {
+        assert('GRN 202608-34 Vendor is NAGENDHRA ELECTRICAL WORKS', nagendhraGrn.vendor_name === 'NAGENDHRA ELECTRICAL WORKS');
+        assert('GRN 202608-34 Invoice No is 26-27/B123', nagendhraGrn.invoice_number === '26-27/B123');
+
+        const { rows: nagItems } = await pool.query(`
+          SELECT gi.*, m.code as mat_code, m.name as mat_name
+          FROM grn_items gi
+          JOIN materials m ON gi.material_id = m.id
+          WHERE gi.grn_id = $1
+          ORDER BY gi.id ASC
+        `, [nagendhraGrn.id]);
+
+        assert('GRN 202608-34 has exactly 14 clubbed line items', nagItems.length === 14);
+        assert('GRN 202608-34 Taxable value is ₹32,837.00', Math.abs(Number(nagendhraGrn.total_taxable) - 32837.00) < 1.0);
+        assert('GRN 202608-34 Total GST is ₹5,910.66', Math.abs(Number(nagendhraGrn.total_gst) - 5910.66) < 1.0);
+        assert('GRN 202608-34 Invoice Total is ₹38,748.00', Math.abs(Number(nagendhraGrn.grand_total) - 38748.00) < 1.0);
+      }
+    } catch (e) {
+      assert('GRN 202608-34 verification', false, e.message);
+    }
+
+    // 6.2 Total Inward 8252026 Synchronization Verification
+    try {
+      const { rows: [grnStats] } = await pool.query(`
+        SELECT COUNT(*) as total_grns,
+               COALESCE(SUM(total_taxable), 0) as total_taxable,
+               COALESCE(SUM(grand_total), 0) as total_grand
+        FROM grn
+        WHERE grn_number LIKE '202608-%'
+      `);
+      assert('26 Master Inward GRNs present in database', Number(grnStats.total_grns) >= 26);
+      assert('Total Inward valuation > ₹25,00,000', Number(grnStats.total_grand) >= 2500000);
+      console.log(`     Synced Master GRNs: ${grnStats.total_grns}, Total Value: ₹${Number(grnStats.total_grand).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+    } catch (e) {
+      assert('Total Inward sync stats verification', false, e.message);
+    }
+
+    // 6.3 Finance AP Vendor Bills Linkage
+    try {
+      const { rows: [billCheck] } = await pool.query(`
+        SELECT COUNT(*) as count, COALESCE(SUM(total_amount), 0) as total_val
+        FROM vendor_bills
+        WHERE bill_number LIKE 'BILL-202608%' OR bill_number LIKE 'BILL-2026608%'
+      `);
+      assert('Finance AP vendor bills generated for inward GRNs', Number(billCheck.count) >= 20);
+    } catch (e) {
+      assert('Finance AP vendor bills check', false, e.message);
+    }
+
+    // 6.4 Zero Negative Stock Invariant Check
+    try {
+      const { rows: [negStock] } = await pool.query(`SELECT COUNT(*) as count FROM materials WHERE current_stock < 0`);
+      assert('Zero negative stock tolerance across all materials in mill', Number(negStock.count) === 0);
+    } catch (e) {
+      assert('Zero negative stock check', false, e.message);
+    }
+
+    // 6.5 Stock Ledger Atomic Linkage Check
+    try {
+      const { rows: [ledgerGrnCheck] } = await pool.query(`
+        SELECT COUNT(*) as count, COALESCE(SUM(in_qty), 0) as total_qty
+        FROM stock_ledger
+        WHERE reference_type = 'GRN' AND transaction_type = 'grn'
+      `);
+      assert('Stock ledger entries linked to GRN references', Number(ledgerGrnCheck.count) >= 50);
+    } catch (e) {
+      assert('Stock ledger GRN check', false, e.message);
+    }
+
   } catch (err) {
     console.error('Fatal test runner error:', err);
     failed++;

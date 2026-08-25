@@ -441,7 +441,7 @@ router.post('/eod/send', auth, requireLevel(2), ar(async (req, res) => {
       sentBy: req.user.name,
       timestamp: new Date()
     });
-  } catch {}
+  } catch { }
 
   res.json({
     success: true,
@@ -680,7 +680,7 @@ router.get('/stores/item-wise', auth, requireLevel(2), ar(async (req, res) => {
       LEFT JOIN period_out pout ON pout.material_id = m.id
       WHERE ${where}
       ORDER BY ps.name NULLS LAST, parent.name NULLS FIRST, mc.name, m.name
-      LIMIT $${p} OFFSET $${p+1}
+      LIMIT $${p} OFFSET $${p + 1}
     `, [...params, parseInt(limit), (parseInt(page) - 1) * parseInt(limit)]),
 
     pool.query(`
@@ -915,7 +915,7 @@ router.get('/stores/consumption-by-item', auth, requireLevel(2), ar(async (req, 
 router.get('/downtime', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to, machine_id, section_id } = req.query;
   const f = from || new Date().toISOString().slice(0, 10);
-  const t = to   || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
 
   const conds = [`d.start_time >= $1::date AND d.start_time <= $2::date + interval '1 day'`];
   const params = [f, t];
@@ -982,7 +982,7 @@ router.get('/downtime', auth, requireLevel(2), ar(async (req, res) => {
 router.get('/indents', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to, status, department_id } = req.query;
   const f = from || new Date().toISOString().slice(0, 10);
-  const t = to   || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
 
   const conds = [`DATE(i.created_at) BETWEEN $1 AND $2`];
   const params = [f, t];
@@ -1086,12 +1086,12 @@ router.get('/indents', auth, requireLevel(2), ar(async (req, res) => {
 // ── 5. PRODUCTION REPORT ──────────────────────────────────────────────────────
 router.get('/production', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to, machine_id, grade_id } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const conds = [`DATE(r.start_time) BETWEEN $1 AND $2`];
   const params = [f, t]; let p = 3;
   if (machine_id) { conds.push(`r.machine_id=$${p++}`); params.push(machine_id); }
-  if (grade_id)   { conds.push(`r.grade_id=$${p++}`);   params.push(grade_id);   }
+  if (grade_id) { conds.push(`r.grade_id=$${p++}`); params.push(grade_id); }
   const where = conds.join(' AND ');
 
   const fmt = req.query.format;
@@ -1129,11 +1129,11 @@ router.get('/production', auth, requireLevel(2), ar(async (req, res) => {
        WHERE ${where} ORDER BY r.start_time DESC LIMIT 500`, params),
   ]);
   if (fmt === 'csv') {
-    const headers = ['Reel No','Start Time','Machine','Grade','GSM','Weight (kg)','Efficiency %','Moisture %','Status','Quality Status'];
-    const rows = reels.rows.map(r => [r.reelNumber, r.startTime?.toISOString().slice(0,16).replace('T',' '), r.machine, r.grade, r.gsm, r.weightKg, r.efficiencyPct, r.moisturePct, r.status, r.qualityStatus]);
+    const headers = ['Reel No', 'Start Time', 'Machine', 'Grade', 'GSM', 'Weight (kg)', 'Efficiency %', 'Moisture %', 'Status', 'Quality Status'];
+    const rows = reels.rows.map(r => [r.reelNumber, r.startTime?.toISOString().slice(0, 16).replace('T', ' '), r.machine, r.grade, r.gsm, r.weightKg, r.efficiencyPct, r.moisturePct, r.status, r.qualityStatus]);
     return sendCSV(res, `production_${f}_${t}.csv`, headers, rows);
   }
-  res.json({ success:true, data:{ from:f, to:t, summary:summary.rows[0], byMachine:byMachine.rows, byGrade:byGrade.rows, reels:reels.rows }});
+  res.json({ success: true, data: { from: f, to: t, summary: summary.rows[0], byMachine: byMachine.rows, byGrade: byGrade.rows, reels: reels.rows } });
 }));
 
 // ── 6. INVENTORY REPORT ───────────────────────────────────────────────────────
@@ -1141,7 +1141,7 @@ router.get('/inventory', auth, requireLevel(2), ar(async (req, res) => {
   const { category_id, low_stock } = req.query;
   const conds = ['m.is_active=true']; const params = []; let p = 1;
   if (category_id) { conds.push(`m.category_id=$${p++}`); params.push(category_id); }
-  if (low_stock==='true') conds.push(`m.current_stock<=m.reorder_level`);
+  if (low_stock === 'true') conds.push(`m.current_stock<=m.reorder_level`);
   const where = conds.join(' AND ');
   const { rows } = await pool.query(
     `SELECT m.code, m.name, mc.name as category, mc.type as "categoryType",
@@ -1151,21 +1151,21 @@ router.get('/inventory', auth, requireLevel(2), ar(async (req, res) => {
             CASE WHEN m.current_stock<=m.reorder_level THEN true ELSE false END as "belowReorder"
      FROM materials m JOIN material_categories mc ON mc.id=m.category_id
      WHERE ${where} ORDER BY mc.name,m.name`, params);
-  const totalValue = rows.reduce((s,r)=>s+parseFloat(r.value||0),0);
-  const alertCount = rows.filter(r=>r.belowReorder).length;
+  const totalValue = rows.reduce((s, r) => s + parseFloat(r.value || 0), 0);
+  const alertCount = rows.filter(r => r.belowReorder).length;
   if (req.query.format === 'csv') {
-    const headers = ['Code','Name','Category','Type','UOM','Current Stock','Reorder Level','Min Stock','Max Stock','Unit Price','Stock Value','Alert'];
+    const headers = ['Code', 'Name', 'Category', 'Type', 'UOM', 'Current Stock', 'Reorder Level', 'Min Stock', 'Max Stock', 'Unit Price', 'Stock Value', 'Alert'];
     const csvRows = rows.map(r => [r.code, r.name, r.category, r.categoryType, r.uom, r.currentStock, r.reorderLevel, r.minStock, r.maxStock, r.unitPrice, r.value, r.belowReorder ? 'LOW STOCK' : 'OK']);
-    return sendCSV(res, `inventory_${new Date().toISOString().slice(0,10)}.csv`, headers, csvRows);
+    return sendCSV(res, `inventory_${new Date().toISOString().slice(0, 10)}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ materials:rows, totalValue, alertCount }});
+  res.json({ success: true, data: { materials: rows, totalValue, alertCount } });
 }));
 
 // ── 7. QUALITY REPORT ─────────────────────────────────────────────────────────
 router.get('/quality', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const [summary, byType, tests] = await Promise.all([
     pool.query(
       `SELECT COUNT(*) as total,
@@ -1173,48 +1173,48 @@ router.get('/quality', auth, requireLevel(2), ar(async (req, res) => {
               SUM(CASE WHEN result='Fail' THEN 1 ELSE 0 END) as failed,
               SUM(CASE WHEN result='Hold' THEN 1 ELSE 0 END) as held,
               ROUND(100.0*SUM(CASE WHEN result='Pass' THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0),2) as pass_rate
-       FROM quality_tests WHERE DATE(test_date) BETWEEN $1 AND $2`, [f,t]),
+       FROM quality_tests WHERE DATE(test_date) BETWEEN $1 AND $2`, [f, t]),
     pool.query(
       `SELECT test_type, COUNT(*) as total,
               SUM(CASE WHEN result='Pass' THEN 1 ELSE 0 END) as passed,
               SUM(CASE WHEN result='Fail' THEN 1 ELSE 0 END) as failed
        FROM quality_tests WHERE DATE(test_date) BETWEEN $1 AND $2
-       GROUP BY test_type ORDER BY total DESC`, [f,t]),
+       GROUP BY test_type ORDER BY total DESC`, [f, t]),
     pool.query(
       `SELECT qt.test_number as "testNumber", qt.test_type as "testType",
               qt.test_date as "testDate", qt.result,
               qt.gsm, qt.moisture_pct as "moisturePct", qt.burst_factor as "burstFactor",
               u.name as "testedBy"
        FROM quality_tests qt LEFT JOIN users u ON u.id=qt.tested_by
-       WHERE DATE(qt.test_date) BETWEEN $1 AND $2 ORDER BY qt.test_date DESC LIMIT 500`, [f,t]),
+       WHERE DATE(qt.test_date) BETWEEN $1 AND $2 ORDER BY qt.test_date DESC LIMIT 500`, [f, t]),
   ]);
   if (req.query.format === 'csv') {
-    const headers = ['Test No','Test Type','Test Date','Result','GSM','Moisture %','Burst Factor','Tested By'];
-    const csvRows = tests.rows.map(r => [r.testNumber, r.testType, r.testDate?.toISOString().slice(0,10), r.result, r.gsm, r.moisturePct, r.burstFactor, r.testedBy]);
+    const headers = ['Test No', 'Test Type', 'Test Date', 'Result', 'GSM', 'Moisture %', 'Burst Factor', 'Tested By'];
+    const csvRows = tests.rows.map(r => [r.testNumber, r.testType, r.testDate?.toISOString().slice(0, 10), r.result, r.gsm, r.moisturePct, r.burstFactor, r.testedBy]);
     return sendCSV(res, `quality_${f}_${t}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ from:f, to:t, summary:summary.rows[0], byType:byType.rows, tests:tests.rows }});
+  res.json({ success: true, data: { from: f, to: t, summary: summary.rows[0], byType: byType.rows, tests: tests.rows } });
 }));
 
 // ── 8. SALES REPORT ───────────────────────────────────────────────────────────
 router.get('/sales', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const [summary, byCustomer, orders] = await Promise.all([
     pool.query(
       `SELECT COUNT(*) as total_orders,
               COALESCE(SUM(qty_mt),0) as total_qty_mt,
               COALESCE(SUM(fulfilled_mt),0) as total_fulfilled_mt,
               COALESCE(SUM(total_value),0) as total_value
-       FROM sales_orders WHERE DATE(date) BETWEEN $1 AND $2`, [f,t]),
+       FROM sales_orders WHERE DATE(date) BETWEEN $1 AND $2`, [f, t]),
     pool.query(
       `SELECT c.name as customer,
               COUNT(so.id) as orders, COALESCE(SUM(so.qty_mt),0) as qty_mt,
               COALESCE(SUM(so.total_value),0) as value
        FROM sales_orders so JOIN customers c ON c.id=so.customer_id
        WHERE DATE(so.date) BETWEEN $1 AND $2
-       GROUP BY c.id,c.name ORDER BY value DESC`, [f,t]),
+       GROUP BY c.id,c.name ORDER BY value DESC`, [f, t]),
     pool.query(
       `SELECT so.so_number as "soNumber", so.date, so.status,
               so.qty_mt as "qtyMt", so.fulfilled_mt as "fulfilledMt",
@@ -1222,21 +1222,21 @@ router.get('/sales', auth, requireLevel(2), ar(async (req, res) => {
               c.name as customer, g.name as grade
        FROM sales_orders so
        LEFT JOIN customers c ON c.id=so.customer_id LEFT JOIN grades g ON g.id=so.grade_id
-       WHERE DATE(so.date) BETWEEN $1 AND $2 ORDER BY so.date DESC LIMIT 500`, [f,t]),
+       WHERE DATE(so.date) BETWEEN $1 AND $2 ORDER BY so.date DESC LIMIT 500`, [f, t]),
   ]);
   if (req.query.format === 'csv') {
-    const headers = ['SO No','Date','Customer','Grade','Qty (MT)','Fulfilled (MT)','Rate/kg','Total Value','Status'];
-    const csvRows = orders.rows.map(r => [r.soNumber, r.date?.toISOString().slice(0,10), r.customer, r.grade, r.qtyMt, r.fulfilledMt, r.ratePerKg, r.totalValue, r.status]);
+    const headers = ['SO No', 'Date', 'Customer', 'Grade', 'Qty (MT)', 'Fulfilled (MT)', 'Rate/kg', 'Total Value', 'Status'];
+    const csvRows = orders.rows.map(r => [r.soNumber, r.date?.toISOString().slice(0, 10), r.customer, r.grade, r.qtyMt, r.fulfilledMt, r.ratePerKg, r.totalValue, r.status]);
     return sendCSV(res, `sales_${f}_${t}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ from:f, to:t, summary:summary.rows[0], byCustomer:byCustomer.rows, orders:orders.rows }});
+  res.json({ success: true, data: { from: f, to: t, summary: summary.rows[0], byCustomer: byCustomer.rows, orders: orders.rows } });
 }));
 
 // ── 9. UTILITY REPORT ─────────────────────────────────────────────────────────
 router.get('/utility', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const [summary, byDate] = await Promise.all([
     pool.query(
       `SELECT COALESCE(SUM(power_units+dg_units),0) as total_power,
@@ -1245,7 +1245,7 @@ router.get('/utility', auth, requireLevel(2), ar(async (req, res) => {
               COALESCE(SUM(fresh_water_kl),0) as total_water,
               COALESCE(AVG(boiler_pressure),0) as avg_pressure,
               COALESCE(AVG(boiler_temp),0) as avg_temp
-       FROM utility_readings WHERE date BETWEEN $1 AND $2`, [f,t]),
+       FROM utility_readings WHERE date BETWEEN $1 AND $2`, [f, t]),
     pool.query(
       `SELECT date, shift_type,
               COALESCE(SUM(power_units+dg_units),0) as power,
@@ -1253,21 +1253,21 @@ router.get('/utility', auth, requireLevel(2), ar(async (req, res) => {
               COALESCE(SUM(coal_consumed_kg),0) as coal,
               COALESCE(SUM(fresh_water_kl),0) as water
        FROM utility_readings WHERE date BETWEEN $1 AND $2
-       GROUP BY date,shift_type ORDER BY date DESC,shift_type`, [f,t]),
+       GROUP BY date,shift_type ORDER BY date DESC,shift_type`, [f, t]),
   ]);
   if (req.query.format === 'csv') {
-    const headers = ['Date','Shift','Power (units)','Steam (MT)','Coal (kg)','Fresh Water (KL)'];
-    const csvRows = byDate.rows.map(r => [r.date?.toISOString().slice(0,10), r.shift_type, r.power, r.steam, r.coal, r.water]);
+    const headers = ['Date', 'Shift', 'Power (units)', 'Steam (MT)', 'Coal (kg)', 'Fresh Water (KL)'];
+    const csvRows = byDate.rows.map(r => [r.date?.toISOString().slice(0, 10), r.shift_type, r.power, r.steam, r.coal, r.water]);
     return sendCSV(res, `utility_${f}_${t}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ from:f, to:t, summary:summary.rows[0], byDate:byDate.rows }});
+  res.json({ success: true, data: { from: f, to: t, summary: summary.rows[0], byDate: byDate.rows } });
 }));
 
 // ── 10. MAINTENANCE REPORT ────────────────────────────────────────────────────
 router.get('/maintenance', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const { rows } = await pool.query(
     `SELECT m.id as machine_id, m.name as machine, m.code,
             COUNT(d.id) as breakdown_count,
@@ -1277,21 +1277,21 @@ router.get('/maintenance', auth, requireLevel(2), ar(async (req, res) => {
      FROM machines m
      LEFT JOIN downtime_entries d ON m.id = d.machine_id AND d.start_time >= $1::date AND d.start_time <= $2::date + interval '1 day'
      GROUP BY m.id, m.name, m.code
-     ORDER BY m.name`, [f,t]
+     ORDER BY m.name`, [f, t]
   );
   if (req.query.format === 'csv') {
-    const headers = ['Machine','Code','Breakdowns','Total Downtime (min)','MTTR (min)','MTBF (min)'];
+    const headers = ['Machine', 'Code', 'Breakdowns', 'Total Downtime (min)', 'MTTR (min)', 'MTBF (min)'];
     const csvRows = rows.map(r => [r.machine, r.code, r.breakdown_count, r.total_downtime_min, r.mttr_min, r.mtbf_min]);
     return sendCSV(res, `maintenance_${f}_${t}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ from:f, to:t, byMachine:rows }});
+  res.json({ success: true, data: { from: f, to: t, byMachine: rows } });
 }));
 
 // ── 11. HR REPORT ─────────────────────────────────────────────────────────────
 router.get('/hr', auth, requireLevel(2), ar(async (req, res) => {
   const { from, to } = req.query;
-  const f = from || new Date().toISOString().slice(0,10);
-  const t = to   || new Date().toISOString().slice(0,10);
+  const f = from || new Date().toISOString().slice(0, 10);
+  const t = to || new Date().toISOString().slice(0, 10);
   const { rows } = await pool.query(
     `SELECT d.id as department_id, d.name as department,
             COUNT(a.id) filter (where a.status = 'Present') as present_count,
@@ -1303,14 +1303,14 @@ router.get('/hr', auth, requireLevel(2), ar(async (req, res) => {
      LEFT JOIN employees e ON d.id = e.department_id
      LEFT JOIN attendance a ON e.id = a.employee_id AND a.date >= $1 AND a.date <= $2
      GROUP BY d.id, d.name
-     ORDER BY d.name`, [f,t]
+     ORDER BY d.name`, [f, t]
   );
   if (req.query.format === 'csv') {
-    const headers = ['Department','Present','Absent','Leave','Holiday','Late'];
+    const headers = ['Department', 'Present', 'Absent', 'Leave', 'Holiday', 'Late'];
     const csvRows = rows.map(r => [r.department, r.present_count, r.absent_count, r.leave_count, r.holiday_count, r.late_count]);
     return sendCSV(res, `hr_${f}_${t}.csv`, headers, csvRows);
   }
-  res.json({ success:true, data:{ from:f, to:t, byDepartment:rows }});
+  res.json({ success: true, data: { from: f, to: t, byDepartment: rows } });
 }));
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1870,8 +1870,8 @@ router.get('/p2p-pipeline', auth, ar(async (req, res) => {
       'Bill Status', 'Payment No', 'Paid Amount', 'Payment Mode', 'UTR / Ref'
     ];
     const csvRows = rows.map(r => [
-      r.indentNumber || '—', r.deptName || '—', r.poNumber, r.poDate ? r.poDate.toISOString().slice(0,10) : '',
-      r.vendorName, r.poGrandTotal, r.grnNumber || '—', r.grnDate ? r.grnDate.toISOString().slice(0,10) : '',
+      r.indentNumber || '—', r.deptName || '—', r.poNumber, r.poDate ? r.poDate.toISOString().slice(0, 10) : '',
+      r.vendorName, r.poGrandTotal, r.grnNumber || '—', r.grnDate ? r.grnDate.toISOString().slice(0, 10) : '',
       r.grnInvoiceNumber || r.vendorInvoiceNumber || '—', r.billNumber || '—', r.billTotalAmount || '0',
       r.billStatus || 'Pending', r.paymentNumber || '—', r.paymentAmount || '0', r.paymentMode || '—', r.paymentRefNumber || '—'
     ]);
@@ -1949,60 +1949,62 @@ router.get('/plant-sections/detailed', auth, requireLevel(2), ar(async (req, res
 
   // 2. Granular Equipment & Material Level Breakdown
   const { rows: granularItems } = await pool.query(`
-    SELECT DISTINCT
-      m.id AS "materialId",
-      m.code AS "materialCode",
-      m.name AS "materialName",
-      m.uom,
-      m.hsn_code AS "hsnCode",
-      m.current_stock::numeric(12,3) AS "currentStock",
-      m.min_stock::numeric(12,3) AS "minStock",
-      m.reorder_level::numeric(12,3) AS "reorderLevel",
-      m.unit_price::numeric(12,2) AS "unitPrice",
-      (m.current_stock * m.unit_price)::numeric(15,2) AS "stockValuation",
-      m.bin_location AS "binLocation",
-      mc.name AS "categoryName",
-      ps.id AS "sectionId",
-      ps.name AS "sectionName",
-      ps.section_code AS "sectionCode",
-      ps.icon AS "sectionIcon",
-      d.name AS "departmentName",
-      mac.id AS "machineId",
-      mac.name AS "machineName",
-      se.id AS "equipmentId",
-      se.equipment_name AS "equipmentName",
-      se.equipment_type AS "equipmentType",
-      se.tag_name AS "tagName",
-      se.bearing_size AS "bearingSize",
-      se.lock_nut AS "lockNut",
-      se.washer,
-      se.belt_no AS "beltNo",
-      se.shaft_size AS "shaftSize",
-      COALESCE(moves.consumed_qty, 0)::numeric(12,3) AS "consumedQty",
-      COALESCE(moves.consumed_val, 0)::numeric(15,2) AS "consumedValue",
-      COALESCE(moves.inward_qty, 0)::numeric(12,3) AS "inwardQty",
-      COALESCE(moves.inward_val, 0)::numeric(15,2) AS "inwardValue",
-      moves.last_txn_date AS "lastTxnDate"
-    FROM materials m
-    LEFT JOIN material_categories mc ON m.category_id = mc.id
-    LEFT JOIN material_sections ms ON ms.material_id = m.id
-    LEFT JOIN plant_sections ps ON (m.section_id = ps.id OR ms.section_id = ps.id)
-    LEFT JOIN departments d ON ps.department_id = d.id
-    LEFT JOIN material_equipment me ON me.material_id = m.id
-    LEFT JOIN machines mac ON (m.machine_id = mac.id OR me.machine_id = mac.id)
-    LEFT JOIN section_equipment se ON (m.section_equipment_id = se.id OR me.section_equipment_id = se.id)
-    LEFT JOIN LATERAL (
-      SELECT 
-        COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,
-        COALESCE(SUM(sl.value) FILTER (WHERE sl.out_qty > 0), 0) AS consumed_val,
-        COALESCE(SUM(sl.in_qty), 0) AS inward_qty,
-        COALESCE(SUM(sl.value) FILTER (WHERE sl.in_qty > 0), 0) AS inward_val,
-        MAX(sl.date) AS last_txn_date
-      FROM stock_ledger sl
-      WHERE sl.material_id = m.id AND sl.date BETWEEN '${f}' AND '${t}'
-    ) moves ON true
-    ${matWhere}
-    ORDER BY ps.name ASC NULLS LAST, mac.name ASC NULLS LAST, (m.current_stock * m.unit_price) DESC
+    SELECT * FROM (
+      SELECT DISTINCT
+        m.id AS "materialId",
+        m.code AS "materialCode",
+        m.name AS "materialName",
+        m.uom,
+        m.hsn_code AS "hsnCode",
+        m.current_stock::numeric(12,3) AS "currentStock",
+        m.min_stock::numeric(12,3) AS "minStock",
+        m.reorder_level::numeric(12,3) AS "reorderLevel",
+        m.unit_price::numeric(12,2) AS "unitPrice",
+        (m.current_stock * m.unit_price)::numeric(15,2) AS "stockValuation",
+        m.bin_location AS "binLocation",
+        mc.name AS "categoryName",
+        ps.id AS "sectionId",
+        ps.name AS "sectionName",
+        ps.section_code AS "sectionCode",
+        ps.icon AS "sectionIcon",
+        d.name AS "departmentName",
+        mac.id AS "machineId",
+        mac.name AS "machineName",
+        se.id AS "equipmentId",
+        se.equipment_name AS "equipmentName",
+        se.equipment_type AS "equipmentType",
+        se.tag_name AS "tagName",
+        se.bearing_size AS "bearingSize",
+        se.lock_nut AS "lockNut",
+        se.washer,
+        se.belt_no AS "beltNo",
+        se.shaft_size AS "shaftSize",
+        COALESCE(moves.consumed_qty, 0)::numeric(12,3) AS "consumedQty",
+        COALESCE(moves.consumed_val, 0)::numeric(15,2) AS "consumedValue",
+        COALESCE(moves.inward_qty, 0)::numeric(12,3) AS "inwardQty",
+        COALESCE(moves.inward_val, 0)::numeric(15,2) AS "inwardValue",
+        moves.last_txn_date AS "lastTxnDate"
+      FROM materials m
+      LEFT JOIN material_categories mc ON m.category_id = mc.id
+      LEFT JOIN material_sections ms ON ms.material_id = m.id
+      LEFT JOIN plant_sections ps ON (m.section_id = ps.id OR ms.section_id = ps.id)
+      LEFT JOIN departments d ON ps.department_id = d.id
+      LEFT JOIN material_equipment me ON me.material_id = m.id
+      LEFT JOIN machines mac ON (m.machine_id = mac.id OR me.machine_id = mac.id)
+      LEFT JOIN section_equipment se ON (m.section_equipment_id = se.id OR me.section_equipment_id = se.id)
+      LEFT JOIN LATERAL (
+        SELECT 
+          COALESCE(SUM(sl.out_qty), 0) AS consumed_qty,
+          COALESCE(SUM(sl.value) FILTER (WHERE sl.out_qty > 0), 0) AS consumed_val,
+          COALESCE(SUM(sl.in_qty), 0) AS inward_qty,
+          COALESCE(SUM(sl.value) FILTER (WHERE sl.in_qty > 0), 0) AS inward_val,
+          MAX(sl.date) AS last_txn_date
+        FROM stock_ledger sl
+        WHERE sl.material_id = m.id AND sl.date BETWEEN '${f}' AND '${t}'
+      ) moves ON true
+      ${matWhere}
+    ) granular_sub
+    ORDER BY "sectionName" ASC NULLS LAST, "machineName" ASC NULLS LAST, "stockValuation" DESC
     LIMIT 2000
   `, matParams);
 

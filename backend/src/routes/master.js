@@ -925,13 +925,14 @@ router.post('/materials/sync-electrical', auth, requireLevel(1), ar(async (req, 
   }
 }));
 
-// Re-sync all stores from Projects_Requirement/8152026 Excel directory
+// Re-sync all stores from Projects_Requirement/8152026 and 8252026 Inward
 router.post('/materials/sync-all-stores', auth, requireLevel(1), ar(async (req, res) => {
   try {
     const { execSync } = require('child_process');
     const backendRoot = path.resolve(__dirname, '../..');
-    const out = execSync('node scripts/import_all_stores_8152026.js', { cwd: backendRoot, encoding: 'utf8' });
-    res.json({ success: true, message: 'All store Excels synchronized successfully from 8152026', output: out });
+    const out1 = execSync('node scripts/import_all_stores_8152026.js', { cwd: backendRoot, encoding: 'utf8' });
+    const out2 = execSync('node scripts/import_inward_8252026_clubbed.js', { cwd: backendRoot, encoding: 'utf8' });
+    res.json({ success: true, message: 'All store Excels and Inward 8252026 synchronized successfully', output: `${out1}\n${out2}` });
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });
   }
@@ -1864,18 +1865,20 @@ router.get('/equipment', auth, ar(async (req, res) => {
 router.get('/sections/:id/materials', auth, ar(async (req, res) => {
   const sectionId = req.params.id;
   const { rows } = await pool.query(`
-    SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
-           m.unit_price as "unitPrice", m.min_stock as "minStock", m.reorder_level as "reorderLevel",
-           m.criticality_class as "criticalityClass", mc.name as "categoryName",
-           COALESCE(ms.is_primary, (m.section_id = ps.id)) as "isPrimary",
-           ms.created_at as "mappedAt"
-    FROM materials m
-    LEFT JOIN material_sections ms ON ms.material_id = m.id AND ms.section_id = $1
-    LEFT JOIN plant_sections ps ON ps.id = $1
-    LEFT JOIN material_categories mc ON mc.id = m.category_id
-    WHERE (ms.section_id = $1 OR m.section_id = $1)
-      AND m.is_active = true
-    ORDER BY m.name ASC
+    SELECT * FROM (
+      SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
+             m.unit_price as "unitPrice", m.min_stock as "minStock", m.reorder_level as "reorderLevel",
+             m.criticality_class as "criticalityClass", mc.name as "categoryName",
+             COALESCE(ms.is_primary, (m.section_id = ps.id)) as "isPrimary",
+             ms.created_at as "mappedAt"
+      FROM materials m
+      LEFT JOIN material_sections ms ON ms.material_id = m.id AND ms.section_id = $1
+      LEFT JOIN plant_sections ps ON ps.id = $1
+      LEFT JOIN material_categories mc ON mc.id = m.category_id
+      WHERE (ms.section_id = $1 OR m.section_id = $1)
+        AND m.is_active = true
+    ) sec_mats
+    ORDER BY name ASC
   `, [sectionId]);
   res.json({ success: true, data: rows, total: rows.length });
 }));
@@ -1920,17 +1923,19 @@ router.delete('/sections/:id/materials/:materialId', auth, requireLevel(3), ar(a
 router.get('/machines/:id/materials', auth, ar(async (req, res) => {
   const machineId = req.params.id;
   const { rows } = await pool.query(`
-    SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
-           m.unit_price as "unitPrice", mc.name as "categoryName",
-           se.equipment_name as "equipmentName", se.tag_name as "tagName",
-           me.remarks, me.created_at as "mappedAt"
-    FROM materials m
-    LEFT JOIN material_equipment me ON me.material_id = m.id AND me.machine_id = $1
-    LEFT JOIN section_equipment se ON se.id = me.section_equipment_id
-    LEFT JOIN material_categories mc ON mc.id = m.category_id
-    WHERE (me.machine_id = $1 OR m.machine_id = $1)
-      AND m.is_active = true
-    ORDER BY m.name ASC
+    SELECT * FROM (
+      SELECT DISTINCT m.id, m.code, m.name, m.uom, m.current_stock as "currentStock",
+             m.unit_price as "unitPrice", mc.name as "categoryName",
+             se.equipment_name as "equipmentName", se.tag_name as "tagName",
+             me.remarks, me.created_at as "mappedAt"
+      FROM materials m
+      LEFT JOIN material_equipment me ON me.material_id = m.id AND me.machine_id = $1
+      LEFT JOIN section_equipment se ON se.id = me.section_equipment_id
+      LEFT JOIN material_categories mc ON mc.id = m.category_id
+      WHERE (me.machine_id = $1 OR m.machine_id = $1)
+        AND m.is_active = true
+    ) mac_mats
+    ORDER BY name ASC
   `, [machineId]);
   res.json({ success: true, data: rows, total: rows.length });
 }));

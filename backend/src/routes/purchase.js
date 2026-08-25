@@ -653,9 +653,8 @@ router.get('/grn', auth, ar(async (req, res) => {
 
 // GET ONE GRN
 router.get('/grn/:id', auth, ar(async (req, res) => {
-  const isNum = /^\d+$/.test(String(req.params.id));
-  const where = isNum ? `WHERE g.id=$1` : `WHERE g.grn_number=$1`;
-  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+  const grnId = String(req.params.id || '').trim();
+  const where = `WHERE g.id::text = $1 OR g.grn_number = $1 OR g.grn_number ILIKE $1 OR g.invoice_number = $1 OR g.invoice_number ILIKE $1 OR g.challan_number = $1 OR g.challan_number ILIKE $1`;
 
   const { rows } = await pool.query(
     `SELECT g.*, g.grn_number as "grnNumber",
@@ -667,20 +666,24 @@ router.get('/grn/:id', auth, ar(async (req, res) => {
      LEFT JOIN purchase_orders po ON po.id = g.po_id
      LEFT JOIN vendors v ON v.id = g.vendor_id
      LEFT JOIN users u ON u.id = g.received_by
-     ${where}`, [paramVal]
+     ${where}
+     ORDER BY g.id DESC
+     LIMIT 1`, [grnId]
   );
   if (!rows.length) return res.json({ success: false, message: 'GRN not found' });
 
-  const grnId = rows[0].id;
+  const resolvedGrnId = rows[0].id;
   const { rows: items } = await pool.query(
     `SELECT gi.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom", m.hsn_code as "hsnCode",
-            COALESCE(gi.gst_pct, pi.gst_pct, 18) as "gst_pct"
+            COALESCE(gi.gst_pct, pi.gst_pct, 18) as "gst_pct",
+            COALESCE(gi.taxable_amount, gi.received_qty * gi.unit_price) as taxable_amount,
+            COALESCE(gi.total_amount, gi.received_qty * gi.unit_price) as total_amount
      FROM grn_items gi
      LEFT JOIN materials m ON m.id = gi.material_id
      LEFT JOIN grn g ON g.id = gi.grn_id
      LEFT JOIN po_items pi ON pi.po_id = g.po_id AND pi.material_id = gi.material_id
      WHERE gi.grn_id = $1
-     ORDER BY gi.id ASC`, [grnId]
+     ORDER BY gi.id ASC`, [resolvedGrnId]
   );
   res.json({ success: true, data: { ...rows[0], items } });
 }));

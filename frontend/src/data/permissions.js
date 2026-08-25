@@ -6,7 +6,7 @@ const PUBLIC = new Set(['dashboard', 'indent', 'reports'])
 
 // Dedicated whitelist for Store Management department
 const STORE_NAV = new Set([
-  'dashboard', 'store', 'store-dashboard', 'materials', 'inventory', 'indent', 'rawmaterial', 'purchase', 'vendors', 'reports', 'masterdata', 'machines', 'sections-all',
+  'dashboard', 'store', 'store-dashboard', 'store-reports', 'materials', 'inventory', 'indent', 'rawmaterial', 'purchase', 'vendors', 'reports', 'masterdata', 'machines', 'sections-all',
 ])
 
 // Minimum level required (anyone >= level sees it, regardless of dept)
@@ -33,6 +33,7 @@ const DEPT_GATE = {
   inventory:         ['Inventory', 'Store Management', 'Raw Material Store'],
   store:             ['Store Management', 'Inventory', 'Raw Material Store'],
   'store-dashboard': ['Store Management', 'Inventory', 'Raw Material Store', 'Purchase'],
+  'store-reports':   ['Store Management', 'Inventory', 'Raw Material Store', 'Purchase'],
   materials:         ['Store Management', 'Inventory', 'Purchase', 'Raw Material Store'],
   purchase:        ['Purchase', 'Store Management'],
   customers:       ['Sales', 'Commercial'],

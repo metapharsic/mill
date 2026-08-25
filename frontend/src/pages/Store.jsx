@@ -15,6 +15,7 @@ import { ExternalLink } from 'lucide-react'
 import { LOGO_DATA_URI } from '../utils/logo'
 import A3InvoicePrintModal from '../components/A3InvoicePrintModal'
 import SequenceEnforcementModal from '../components/SequenceEnforcementModal'
+import StoreDeptReports from './StoreDeptReports'
 
 const GST_SLABS = [
   { value: 0,  label: '0% (Nil / Exempt)', cgst: 0, sgst: 0, igst: 0 },
@@ -162,6 +163,8 @@ export default function Store({ onNavigate }) {
   const [inwardList, setInwardList] = useState([])
   const [inwardSummary, setInwardSummary] = useState({})
   const [inwardLoading, setInwardLoading] = useState(false)
+  const [inwardViewMode, setInwardViewMode] = useState('master') // 'master' (consolidated 1-row-per-GRN) or 'items' (item ledger)
+  const [expandedGrns, setExpandedGrns] = useState({}) // { [grnId]: boolean }
   const [inwardStoreType, setInwardStoreType] = useState('')
   const [inwardSearch, setInwardSearch] = useState('')
   const [inwardPage, setInwardPage] = useState(1)
@@ -264,13 +267,16 @@ export default function Store({ onNavigate }) {
   const openMasterGrn = async (grnRef) => {
     if (!grnRef) return
     setMasterGrnLoading(true)
+    const targetRef = typeof grnRef === 'object'
+      ? (grnRef.grnId || grnRef.grn_id || (grnRef.reference_type === 'GRN' ? grnRef.reference_id : null) || grnRef.grnNumber || grnRef.grn_number || grnRef.invoice_number || grnRef.reference_id || grnRef.id)
+      : grnRef
     try {
-      const res = await fetch(`${API}/store/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+      const res = await fetch(`${API}/store/grn/${encodeURIComponent(targetRef)}`, { headers: h() })
       const data = await res.json()
       if (data.success && data.data) {
         setMasterGrnModal(data.data)
       } else {
-        const res2 = await fetch(`${API}/purchase/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+        const res2 = await fetch(`${API}/purchase/grn/${encodeURIComponent(targetRef)}`, { headers: h() })
         const data2 = await res2.json()
         if (data2.success && data2.data) {
           setMasterGrnModal(data2.data)
@@ -291,14 +297,22 @@ export default function Store({ onNavigate }) {
       setA3PrintDoc(docOrRef)
       return
     }
-    const grnRef = typeof docOrRef === 'object' ? (docOrRef.grnNumber || docOrRef.reference_id || docOrRef.id) : docOrRef
+    const grnRef = typeof docOrRef === 'object'
+      ? (docOrRef.grnId || docOrRef.grn_id || (docOrRef.reference_type === 'GRN' ? docOrRef.reference_id : null) || docOrRef.grnNumber || docOrRef.grn_number || docOrRef.invoice_number || docOrRef.reference_id || docOrRef.id)
+      : docOrRef
     try {
       const res = await fetch(`${API}/store/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
       const data = await res.json()
       if (data.success && data.data) {
         setA3PrintDoc(data.data)
       } else {
-        setA3PrintDoc(typeof docOrRef === 'object' ? docOrRef : { grnNumber: grnRef })
+        const res2 = await fetch(`${API}/purchase/grn/${encodeURIComponent(grnRef)}`, { headers: h() })
+        const data2 = await res2.json()
+        if (data2.success && data2.data) {
+          setA3PrintDoc(data2.data)
+        } else {
+          setA3PrintDoc(typeof docOrRef === 'object' ? docOrRef : { grnNumber: grnRef })
+        }
       }
     } catch {
       setA3PrintDoc(typeof docOrRef === 'object' ? docOrRef : { grnNumber: grnRef })
@@ -918,10 +932,18 @@ export default function Store({ onNavigate }) {
     }
   }
 
+  const toggleExpandGrn = (grnId) => {
+    setExpandedGrns(prev => ({
+      ...prev,
+      [grnId]: !prev[grnId]
+    }))
+  }
+
   const loadInward = useCallback(async () => {
     setInwardLoading(true)
     try {
       const params = new URLSearchParams()
+      params.append('view', inwardViewMode)
       if (inwardStoreType) params.append('store_type', inwardStoreType)
       if (inwardSearch) params.append('search', inwardSearch)
       params.append('limit', String(INWARD_LIMIT))
@@ -937,7 +959,7 @@ export default function Store({ onNavigate }) {
     } finally {
       setInwardLoading(false)
     }
-  }, [inwardStoreType, inwardSearch, inwardPage])
+  }, [inwardStoreType, inwardSearch, inwardPage, inwardViewMode])
 
   const loadOutward = useCallback(async () => {
     setOutwardLoading(true)
@@ -1315,6 +1337,7 @@ export default function Store({ onNavigate }) {
   const tabs = [
     { id: 'inward', label: '📥 Inward Desk (GRN)' },
     { id: 'outward', label: '📤 Outward Desk (Issues)' },
+    { id: 'reports', label: '📈 Store Analytics & Reports' },
     { id: 'rejections', label: '🚫 Rejections & RTV' },
     { id: 'transfers', label: '🔄 Store Transfers (STO)' },
     { id: 'returns', label: '↩️ Store Returns (SRV)' },
@@ -1348,6 +1371,13 @@ export default function Store({ onNavigate }) {
             title="Open Exclusive Store Management Realtime Dashboard"
           >
             📊 Executive Dashboard
+          </button>
+          <button
+            style={{ ...S.btn, background: '#0369a1', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+            onClick={() => setTab('reports')}
+            title="Open In-Depth Store Department Analytics & Consumption Reports"
+          >
+            📈 Store Analytics &amp; Reports
           </button>
           <button
             style={{ ...S.btn, background: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
@@ -1430,11 +1460,52 @@ export default function Store({ onNavigate }) {
             ))}
           </div>
 
-          {/* Filter & Search Bar */}
-          <div style={S.filterBar}>
+          {/* View Mode & Filter Bar */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: 8, padding: 3, gap: 3 }}>
+              <button
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: inwardViewMode === 'master' ? '#0f766e' : 'transparent',
+                  color: inwardViewMode === 'master' ? '#fff' : '#475569',
+                  boxShadow: inwardViewMode === 'master' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}
+                onClick={() => { setInwardViewMode('master'); setInwardPage(1) }}
+              >
+                📦 Master GRNs (Clubbed View)
+              </button>
+              <button
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: inwardViewMode === 'items' ? '#0f766e' : 'transparent',
+                  color: inwardViewMode === 'items' ? '#fff' : '#475569',
+                  boxShadow: inwardViewMode === 'items' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}
+                onClick={() => { setInwardViewMode('items'); setInwardPage(1) }}
+              >
+                📑 Item Ledger View (Split Entries)
+              </button>
+            </div>
+
             <input
-              style={{ ...S.input, maxWidth: 320, background: '#fff' }}
-              placeholder="🔍 Search material, code, batch, vendor..."
+              style={{ ...S.input, maxWidth: 300, background: '#fff' }}
+              placeholder="🔍 Search GRN, invoice, material, vendor..."
               value={inwardSearch}
               onChange={e => { setInwardSearch(e.target.value); setInwardPage(1) }}
             />
@@ -1446,121 +1517,402 @@ export default function Store({ onNavigate }) {
           </div>
 
           {/* Inward Register Table */}
-          <TableScrollWrapper title="Inward (GRN) Register">
+          <TableScrollWrapper title={inwardViewMode === 'master' ? 'Consolidated Master GRN Register (Clubbed)' : 'Inward Item Ledger Register'}>
             <table style={S.table}>
-              <thead>
-                <tr style={S.thead}>
-                  <SortableTh label="Date" columnKey="date" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={95} />
-                  <SortableTh label="Type" columnKey="transaction_type" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={90} />
-                  <SortableTh label="Ref / PO / Invoice" columnKey="reference_id" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Vendor / Supplier" columnKey="vendorName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Material" columnKey="materialName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Inward Qty" columnKey="in_qty" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
-                  <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
-                  <SortableTh label="Total Value" columnKey="value" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
-                  <SortableTh label="Batch / Serial" columnKey="batch_number" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Bin / Rack" columnKey="bin_location" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Remarks" columnKey="remarks" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <SortableTh label="Received By" columnKey="createdByName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
-                  <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Voucher</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inwardLoading ? (
-                  <tr><td colSpan={14} style={S.loading}>Loading inward entries...</td></tr>
-                ) : inwardList.length === 0 ? (
-                  <tr><td colSpan={14} style={S.empty}>No inward records found. Click "+ Fast Inward Entry" to record receipts.</td></tr>
-                ) : sortTableData(inwardList, inwardSortBy, inwardSortOrder).map(inw => (
-                  <tr key={inw.id} style={S.tr}>
-                    <td style={S.td}><span style={S.code}>{new Date(inw.date).toLocaleDateString('en-IN')}</span></td>
-                    <td style={S.td}>
-                      <span style={{ ...S.badge, background: inw.transaction_type === 'return' ? '#fef3c7' : '#ccfbf1', color: inw.transaction_type === 'return' ? '#92400e' : '#0f766e' }}>
-                        {inw.transaction_type === 'return' ? 'Dept Return' : 'GRN'}
-                      </span>
-                    </td>
-                    <td style={S.td}>
-                      <span
-                        onClick={() => openMasterGrn(inw.grnId || inw.grnNumber || inw.reference_id || inw.id)}
-                        style={{
-                          fontWeight: 700,
-                          color: '#0284c7',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4
-                        }}
-                        title="Click to view complete Master GRN with all items"
-                      >
-                        {inw.grnNumber || inw.reference_id || `GRN-${inw.id}`}
-                        <ExternalLink size={11} color="#0284c7" />
-                      </span>
-                    </td>
-                    <td style={S.td}>
-                      {inw.vendorName ? (
-                        <div>
-                          <div style={{ fontWeight: 600, color: '#1b1b1d' }}>{inw.vendorName}</div>
-                          <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 4, marginTop: 1 }}>
-                            {inw.vendorCode && <span>Code: <code>{inw.vendorCode}</code></span>}
-                            {inw.vendorGstin && <span>· GSTIN: <strong>{inw.vendorGstin}</strong></span>}
+              {inwardViewMode === 'master' ? (
+                /* ── 1. MASTER GRN CONSOLIDATED VIEW ── */
+                <>
+                  <thead>
+                    <tr style={S.thead}>
+                      <th style={{ ...S.th, width: 40, textAlign: 'center' }}></th>
+                      <SortableTh label="Date" columnKey="date" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={95} />
+                      <SortableTh label="GRN Number & Ref" columnKey="grn_number" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={140} />
+                      <SortableTh label="Vendor / Supplier" columnKey="vendorName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={200} />
+                      <th style={{ ...S.th, width: 130 }}>Invoice / PO</th>
+                      <th style={S.th}>Clubbed Materials &amp; Spares</th>
+                      <SortableTh label="Total Qty" columnKey="totalQty" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" width={95} />
+                      <SortableTh label="Taxable (₹)" columnKey="total_taxable" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" width={105} />
+                      <SortableTh label="Total GST (₹)" columnKey="total_gst" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" width={100} />
+                      <SortableTh label="Grand Total (₹)" columnKey="grand_total" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" width={120} />
+                      <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Status</th>
+                      <th style={{ ...S.th, width: 110, textAlign: 'center' }}>Print &amp; Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inwardLoading ? (
+                      <tr><td colSpan={12} style={S.loading}>Loading Master GRNs...</td></tr>
+                    ) : inwardList.length === 0 ? (
+                      <tr><td colSpan={12} style={S.empty}>No Master GRNs found. Click "+ Fast Inward Entry" or "⟳ Sync Inward Excel".</td></tr>
+                    ) : sortTableData(inwardList, inwardSortBy, inwardSortOrder).map(grn => {
+                      const isExpanded = Boolean(expandedGrns[grn.id]);
+                      const count = grn.items?.length || grn.itemCount || 1;
+                      return (
+                        <React.Fragment key={grn.id}>
+                          <tr style={{ ...S.tr, background: isExpanded ? '#f0fdf4' : 'inherit' }}>
+                            <td style={{ ...S.td, textAlign: 'center' }}>
+                              <button
+                                onClick={() => toggleExpandGrn(grn.id)}
+                                style={{
+                                  background: isExpanded ? '#0f766e' : '#e2e8f0',
+                                  color: isExpanded ? '#fff' : '#0f172a',
+                                  border: 'none',
+                                  borderRadius: 4,
+                                  width: 22,
+                                  height: 22,
+                                  fontSize: 10,
+                                  cursor: 'pointer',
+                                  fontWeight: 800
+                                }}
+                                title={isExpanded ? 'Collapse Items' : 'Expand All Line Items'}
+                              >
+                                {isExpanded ? '▲' : '▼'}
+                              </button>
+                            </td>
+                            <td style={S.td}><span style={S.code}>{new Date(grn.date).toLocaleDateString('en-IN')}</span></td>
+                            <td style={S.td}>
+                              <div>
+                                <span
+                                  onClick={() => openMasterGrn(grn)}
+                                  style={{
+                                    fontWeight: 800,
+                                    color: '#0284c7',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4
+                                  }}
+                                  title="Click to view Master GRN details"
+                                >
+                                  {grn.grn_number || `GRN-${grn.id}`}
+                                  <ExternalLink size={12} color="#0284c7" />
+                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                                  <span style={{ fontSize: 9.5, background: '#ccfbf1', color: '#0f766e', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>
+                                    {count} {count === 1 ? 'item' : 'items'}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td style={S.td}>
+                              {grn.vendorName ? (
+                                <div>
+                                  <div style={{ fontWeight: 700, color: '#1b1b1d' }}>{grn.vendorName}</div>
+                                  <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 4, marginTop: 1 }}>
+                                    {grn.vendorCode && <span>Code: <code>{grn.vendorCode}</code></span>}
+                                    {grn.vendorGstin && <span>· GSTIN: <strong>{grn.vendorGstin}</strong></span>}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span style={S.muted}>Internal Receipt</span>
+                              )}
+                            </td>
+                            <td style={S.td}>
+                              <div>
+                                {grn.invoice_number ? (
+                                  <div style={{ fontWeight: 600, color: '#0f172a' }}>Inv: <strong>{grn.invoice_number}</strong></div>
+                                ) : (
+                                  <span style={S.muted}>—</span>
+                                )}
+                                {grn.order_number && (
+                                  <div style={{ fontSize: 10, color: '#64748b' }}>PO: {grn.order_number}</div>
+                                )}
+                              </div>
+                            </td>
+                            <td style={S.td}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                <span style={{ background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', padding: '2px 7px', borderRadius: 4, fontWeight: 700, fontSize: 11 }}>
+                                  📦 {count} Line {count === 1 ? 'Item' : 'Items'}
+                                </span>
+                                <span style={{ fontSize: 11, color: '#475569', maxWidth: 260, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {grn.items?.map(it => it.materialName).filter(Boolean).slice(0, 2).join(', ')}{count > 2 ? '…' : ''}
+                                </span>
+                                <button
+                                  onClick={() => toggleExpandGrn(grn.id)}
+                                  style={{
+                                    fontSize: 10,
+                                    padding: '2px 6px',
+                                    background: isExpanded ? '#0f766e' : '#e0f2fe',
+                                    color: isExpanded ? '#fff' : '#0369a1',
+                                    border: 'none',
+                                    borderRadius: 4,
+                                    cursor: 'pointer',
+                                    fontWeight: 700
+                                  }}
+                                >
+                                  {isExpanded ? '▲ Hide' : `▼ View ${count}`}
+                                </button>
+                              </div>
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right' }}>
+                              <span style={{ color: '#16a34a', fontWeight: 700 }}>
+                                +{Number(grn.totalQty || grn.items?.reduce((s, it) => s + parseFloat(it.received_qty || 0), 0) || 0).toFixed(3)}
+                              </span>
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right' }}>
+                              ₹{Number(grn.total_taxable || grn.items?.reduce((s, it) => s + parseFloat(it.taxable_amount || 0), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right' }}>
+                              ₹{Number(grn.total_gst || grn.items?.reduce((s, it) => s + (parseFloat(it.cgst_amount || 0) + parseFloat(it.sgst_amount || 0) + parseFloat(it.igst_amount || 0)), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'right' }}>
+                              <b style={{ color: '#0f766e', fontSize: 13 }}>
+                                ₹{Number(grn.grand_total || grn.total_value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                              </b>
+                            </td>
+                            <td style={{ ...S.td, textAlign: 'center' }}>
+                              <span style={{ ...S.badge, background: '#ccfbf1', color: '#0f766e' }}>
+                                {grn.status || 'Received'}
+                              </span>
+                            </td>
+                            <td style={S.td}>
+                              <div style={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'center' }}>
+                                <button
+                                  style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '4px 8px', fontSize: 11 }}
+                                  onClick={() => openA3Invoice(grn)}
+                                  title={`Print Official A3 GST Commercial Invoice with all ${count} items on one slip`}
+                                >
+                                  🖨️ A3
+                                </button>
+                                <button
+                                  style={{ ...S.btnSm, background: '#0284c7', color: '#fff', padding: '4px 8px', fontSize: 11 }}
+                                  onClick={() => openMasterGrn(grn)}
+                                  title="View Master GRN details"
+                                >
+                                  📄
+                                </button>
+                                <button
+                                  style={{ ...S.btnSm, background: '#2563eb', color: '#fff', padding: '4px 7px', fontSize: 11 }}
+                                  onClick={() => setAppendGrnModal(grn)}
+                                  title="Append Line Item to this GRN"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+
+                          {/* ── EXPANDED ACCORDION: INLINE ITEM BREAKDOWN ── */}
+                          {isExpanded && (
+                            <tr>
+                              <td colSpan={12} style={{ background: '#f8fafc', padding: '10px 14px', borderBottom: '2px solid #cbd5e1' }}>
+                                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                  <div style={{ padding: '8px 12px', background: '#f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+                                    <span style={{ fontWeight: 700, fontSize: 12, color: '#0f172a' }}>
+                                      📦 Consolidated Items under GRN: <strong>{grn.grn_number}</strong> ({grn.items?.length || count} Line Items)
+                                    </span>
+                                    <div style={{ display: 'flex', gap: 6 }}>
+                                      <button
+                                        style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontSize: 11, fontWeight: 700 }}
+                                        onClick={() => openA3Invoice(grn)}
+                                      >
+                                        🖨️ Print Single A3 Slip ({grn.items?.length || count} Items)
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11.5 }}>
+                                    <thead>
+                                      <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', textAlign: 'left' }}>
+                                        <th style={{ padding: '6px 10px', width: 30 }}>#</th>
+                                        <th style={{ padding: '6px 10px', width: 110 }}>Item Code</th>
+                                        <th style={{ padding: '6px 10px' }}>Material Description</th>
+                                        <th style={{ padding: '6px 10px', width: 90 }}>Category</th>
+                                        <th style={{ padding: '6px 10px', width: 75 }}>HSN Code</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: 90 }}>Received Qty</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: 85 }}>Unit Price</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: 95 }}>Taxable (₹)</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'center', width: 60 }}>GST %</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: 85 }}>GST (₹)</th>
+                                        <th style={{ padding: '6px 10px', textAlign: 'right', width: 100 }}>Total (₹)</th>
+                                        <th style={{ padding: '6px 10px', width: 90 }}>Batch / Rack</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {grn.items && grn.items.map((it, idx) => (
+                                        <tr key={it.id || idx} style={{ borderBottom: '1px solid #f1f5f9', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                                          <td style={{ padding: '6px 10px', color: '#64748b' }}>{idx + 1}</td>
+                                          <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0f766e' }}>{it.materialCode || it.code}</td>
+                                          <td style={{ padding: '6px 10px', fontWeight: 600 }}>{it.materialName || it.name}</td>
+                                          <td style={{ padding: '6px 10px', color: '#64748b' }}>{it.categoryName || '—'}</td>
+                                          <td style={{ padding: '6px 10px', color: '#64748b' }}>{it.hsnCode || '—'}</td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>
+                                            {Number(it.received_qty || 0).toFixed(3)} {it.uom || 'NOS'}
+                                          </td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'right' }}>₹{Number(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'right' }}>₹{Number(it.taxable_amount || ((it.received_qty || 0) * (it.unit_price || 0))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'right' }}>₹{Number((it.cgst_amount || 0) + (it.sgst_amount || 0) + (it.igst_amount || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                          <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 700, color: '#0f172a' }}>
+                                            ₹{Number(it.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                          </td>
+                                          <td style={{ padding: '6px 10px', color: '#64748b', fontSize: 10.5 }}>
+                                            {it.batch_number ? `B: ${it.batch_number}` : ''} {it.bin_location ? `· ${it.bin_location}` : ''}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                    <tfoot>
+                                      <tr style={{ background: '#f1f5f9', fontWeight: 800, borderTop: '2px solid #cbd5e1' }}>
+                                        <td colSpan={5} style={{ padding: '8px 10px', textAlign: 'right' }}>Total ({grn.items?.length || count} Items):</td>
+                                        <td style={{ padding: '8px 10px', textAlign: 'right', color: '#16a34a' }}>
+                                          {grn.items?.reduce((s, it) => s + parseFloat(it.received_qty || 0), 0).toFixed(3)}
+                                        </td>
+                                        <td></td>
+                                        <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                                          ₹{Number(grn.total_taxable || grn.items?.reduce((s, it) => s + parseFloat(it.taxable_amount || 0), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                        </td>
+                                        <td></td>
+                                        <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                                          ₹{Number(grn.total_gst || grn.items?.reduce((s, it) => s + (parseFloat(it.cgst_amount || 0) + parseFloat(it.sgst_amount || 0) + parseFloat(it.igst_amount || 0)), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                        </td>
+                                        <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f766e', fontSize: 12.5 }}>
+                                          ₹{Number(grn.grand_total || grn.total_value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                        </td>
+                                        <td></td>
+                                      </tr>
+                                    </tfoot>
+                                  </table>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      )
+                    })}
+                  </tbody>
+                </>
+              ) : (
+                /* ── 2. ITEM LEDGER DETAILED VIEW ── */
+                <>
+                  <thead>
+                    <tr style={S.thead}>
+                      <SortableTh label="Date" columnKey="date" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={95} />
+                      <SortableTh label="Type" columnKey="transaction_type" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} width={90} />
+                      <SortableTh label="Ref / PO / Invoice" columnKey="reference_id" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Vendor / Supplier" columnKey="vendorName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Material" columnKey="materialName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Category" columnKey="categoryName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Inward Qty" columnKey="in_qty" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                      <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                      <SortableTh label="Total Value" columnKey="value" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} align="right" />
+                      <SortableTh label="Batch / Serial" columnKey="batch_number" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Bin / Rack" columnKey="bin_location" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Remarks" columnKey="remarks" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <SortableTh label="Received By" columnKey="createdByName" currentSortKey={inwardSortBy} currentSortOrder={inwardSortOrder} onSort={(k, o) => { setInwardSortBy(k); setInwardSortOrder(o) }} />
+                      <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Voucher</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inwardLoading ? (
+                      <tr><td colSpan={14} style={S.loading}>Loading inward entries...</td></tr>
+                    ) : inwardList.length === 0 ? (
+                      <tr><td colSpan={14} style={S.empty}>No inward records found. Click "+ Fast Inward Entry" to record receipts.</td></tr>
+                    ) : sortTableData(inwardList, inwardSortBy, inwardSortOrder).map(inw => (
+                      <tr key={inw.id} style={S.tr}>
+                        <td style={S.td}><span style={S.code}>{new Date(inw.date).toLocaleDateString('en-IN')}</span></td>
+                        <td style={S.td}>
+                          <span style={{ ...S.badge, background: inw.transaction_type === 'return' ? '#fef3c7' : '#ccfbf1', color: inw.transaction_type === 'return' ? '#92400e' : '#0f766e' }}>
+                            {inw.transaction_type === 'return' ? 'Dept Return' : 'GRN'}
+                          </span>
+                        </td>
+                        <td style={S.td}>
+                          <div>
+                            <span
+                              onClick={() => openMasterGrn(inw.grnId || inw.grnNumber || inw.reference_id || inw.id)}
+                              style={{
+                                fontWeight: 700,
+                                color: '#0284c7',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                              title="Click to view complete Master GRN with all clubbed items"
+                            >
+                              {inw.grnNumber || inw.reference_id || `GRN-${inw.id}`}
+                              <ExternalLink size={11} color="#0284c7" />
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                              {inw.grnItemCount > 1 && (
+                                <span style={{ fontSize: 9.5, background: '#e0f2fe', color: '#0369a1', padding: '1px 5px', borderRadius: 4, fontWeight: 800 }}>
+                                  {inw.grnItemCount} items
+                                </span>
+                              )}
+                              {inw.grnInvoiceNumber && (
+                                <span style={{ fontSize: 10, color: '#64748b' }}>
+                                  Inv: <strong>{inw.grnInvoiceNumber}</strong>
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <span style={S.muted}>—</span>
-                      )}
-                    </td>
-                    <td style={S.td}>
-                      <div
-                        onClick={() => (inw.material_id || inw.materialId) && setSelectedProductModalId(inw.material_id || inw.materialId)}
-                        style={{ fontWeight: 600, color: '#0f766e', cursor: (inw.material_id || inw.materialId) ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4 }}
-                        title="Click to open Product Form"
-                      >
-                        <span>{inw.materialName}</span>
-                        {(inw.material_id || inw.materialId) && <ExternalLink size={12} color="#0f766e" />}
-                      </div>
-                      <div style={S.muted}>{inw.materialCode}</div>
-                    </td>
-                    <td style={S.td}><span style={S.muted}>{inw.categoryName || '—'}</span></td>
-                    <td style={S.td}><span style={{ color: '#16a34a', fontWeight: 700 }}>+{Number(inw.in_qty).toFixed(3)} {inw.uom}</span></td>
-                    <td style={S.td}>₹{Number(inw.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    <td style={S.td}><b>₹{Number(inw.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></td>
-                    <td style={S.td}><span style={S.code}>{inw.batch_number || '—'}</span></td>
-                    <td style={S.td}>{inw.bin_location || '—'}</td>
-                    <td style={{ ...S.td, maxWidth: 200, fontSize: 12 }}>{inw.remarks || '—'}</td>
-                    <td style={S.td}><span style={S.muted}>{inw.createdByName || 'Store Keeper'}</span></td>
-                    <td style={S.td}>
-                      <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                        <button
-                          style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '3px 7px', fontSize: 11 }}
-                          onClick={() => openA3Invoice(inw)}
-                          title="Print Official A3 GST Commercial Invoice"
-                        >
-                          🖨️ A3
-                        </button>
-                        <button style={S.btnSm} onClick={() => setInwardVoucher(inw)} title="View Voucher Slip">📄</button>
-                        <button style={{ ...S.btnSm, background: '#2563eb' }} onClick={() => {
-                          setEditInwardForm({
-                            in_qty: inw.in_qty,
-                            unit_price: inw.unit_price || 0,
-                            reference_type: inw.reference_type || 'PO',
-                            reference_id: inw.reference_id || '',
-                            bin_location: inw.bin_location || '',
-                            batch_number: inw.batch_number || '',
-                            remarks: inw.remarks || '',
-                            date: inw.date ? inw.date.slice(0, 10) : '',
-                            grn_vehicle_number: inw.grnVehicleNumber || '',
-                            grn_challan_number: inw.grnChallanNumber || '',
-                            grn_invoice_number: inw.grnInvoiceNumber || ''
-                          })
-                          setEditInwardModal(inw)
-                        }} title="Edit Inward Record">✏️</button>
-                        <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)} title="Delete & Reverse Stock">🗑️</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        </td>
+                        <td style={S.td}>
+                          {inw.vendorName ? (
+                            <div>
+                              <div style={{ fontWeight: 600, color: '#1b1b1d' }}>{inw.vendorName}</div>
+                              <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 4, marginTop: 1 }}>
+                                {inw.vendorCode && <span>Code: <code>{inw.vendorCode}</code></span>}
+                                {inw.vendorGstin && <span>· GSTIN: <strong>{inw.vendorGstin}</strong></span>}
+                              </div>
+                            </div>
+                          ) : (
+                            <span style={S.muted}>—</span>
+                          )}
+                        </td>
+                        <td style={S.td}>
+                          <div
+                            onClick={() => (inw.material_id || inw.materialId) && setSelectedProductModalId(inw.material_id || inw.materialId)}
+                            style={{ fontWeight: 600, color: '#0f766e', cursor: (inw.material_id || inw.materialId) ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4 }}
+                            title="Click to open Product Form"
+                          >
+                            <span>{inw.materialName}</span>
+                            {(inw.material_id || inw.materialId) && <ExternalLink size={12} color="#0f766e" />}
+                          </div>
+                          <div style={S.muted}>{inw.materialCode}</div>
+                        </td>
+                        <td style={S.td}><span style={S.muted}>{inw.categoryName || '—'}</span></td>
+                        <td style={S.td}><span style={{ color: '#16a34a', fontWeight: 700 }}>+{Number(inw.in_qty).toFixed(3)} {inw.uom}</span></td>
+                        <td style={S.td}>₹{Number(inw.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={S.td}><b>₹{Number(inw.value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</b></td>
+                        <td style={S.td}><span style={S.code}>{inw.batch_number || '—'}</span></td>
+                        <td style={S.td}>{inw.bin_location || '—'}</td>
+                        <td style={{ ...S.td, maxWidth: 200, fontSize: 12 }}>{inw.remarks || '—'}</td>
+                        <td style={S.td}><span style={S.muted}>{inw.createdByName || 'Store Keeper'}</span></td>
+                        <td style={S.td}>
+                          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                            <button
+                              style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '3px 7px', fontSize: 11 }}
+                              onClick={() => openA3Invoice(inw)}
+                              title="Print Official A3 GST Commercial Invoice"
+                            >
+                              🖨️ A3
+                            </button>
+                            <button style={S.btnSm} onClick={() => setInwardVoucher(inw)} title="View Voucher Slip">📄</button>
+                            <button style={{ ...S.btnSm, background: '#2563eb' }} onClick={() => {
+                              setEditInwardForm({
+                                in_qty: inw.in_qty,
+                                unit_price: inw.unit_price || 0,
+                                reference_type: inw.reference_type || 'PO',
+                                reference_id: inw.reference_id || '',
+                                bin_location: inw.bin_location || '',
+                                batch_number: inw.batch_number || '',
+                                remarks: inw.remarks || '',
+                                date: inw.date ? inw.date.slice(0, 10) : '',
+                                grn_vehicle_number: inw.grnVehicleNumber || '',
+                                grn_challan_number: inw.grnChallanNumber || '',
+                                grn_invoice_number: inw.grnInvoiceNumber || ''
+                              })
+                              setEditInwardModal(inw)
+                            }} title="Edit Inward Record">✏️</button>
+                            <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)} title="Delete & Reverse Stock">🗑️</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </>
+              )}
             </table>
           </TableScrollWrapper>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
@@ -2354,6 +2706,13 @@ export default function Store({ onNavigate }) {
               </tbody>
             </table>
           </TableScrollWrapper>
+        </div>
+      )}
+
+      {/* ── 10. STORE REPORTS & ANALYTICS TAB ── */}
+      {tab === 'reports' && (
+        <div style={{ marginTop: 10 }}>
+          <StoreDeptReports onNavigate={onNavigate} />
         </div>
       )}
 
@@ -4257,6 +4616,124 @@ export default function Store({ onNavigate }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: MASTER CONSOLIDATED GRN DETAILS ── */}
+      {masterGrnModal && (
+        <div style={S.overlay} onClick={() => setMasterGrnModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 980, color: '#0f172a' }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHdr}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <b style={{ fontSize: 17, color: '#0f766e' }}>
+                    📦 Master Goods Receipt Note: {masterGrnModal.grn_number || masterGrnModal.grnNumber}
+                  </b>
+                  <span style={{ ...S.badge, background: '#ccfbf1', color: '#0f766e', fontWeight: 700 }}>
+                    {masterGrnModal.items?.length || masterGrnModal.itemCount || 1} Items Clubbed
+                  </span>
+                </div>
+                <div style={{ ...S.muted, marginTop: 4, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <span><b>Vendor:</b> {masterGrnModal.vendorName || masterGrnModal.partyName || '—'} {masterGrnModal.vendorCode ? `(${masterGrnModal.vendorCode})` : ''}</span>
+                  {masterGrnModal.vendorGstin && <span><b>GSTIN:</b> {masterGrnModal.vendorGstin}</span>}
+                  {masterGrnModal.invoice_number && <span><b>Invoice:</b> {masterGrnModal.invoice_number}</span>}
+                  <span><b>Date:</b> {masterGrnModal.date ? new Date(masterGrnModal.date).toLocaleDateString('en-IN') : '—'}</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button
+                  style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '6px 12px', fontSize: 12 }}
+                  onClick={() => openA3Invoice(masterGrnModal)}
+                  title="Print Official A3 GST Commercial Invoice with all items"
+                >
+                  🖨️ Print A3 Slip ({masterGrnModal.items?.length || masterGrnModal.itemCount || 1} Items)
+                </button>
+                <button
+                  style={{ ...S.btnSm, background: '#2563eb', color: '#fff', padding: '6px 12px', fontSize: 12 }}
+                  onClick={() => setAppendGrnModal(masterGrnModal)}
+                >
+                  + Append Line Item
+                </button>
+                <button style={S.x} onClick={() => setMasterGrnModal(null)}>✕</button>
+              </div>
+            </div>
+
+            {/* Items Table */}
+            <div style={{ maxHeight: '55vh', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8, marginTop: 10 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', textAlign: 'left' }}>
+                    <th style={{ padding: '8px 10px', width: 35 }}>#</th>
+                    <th style={{ padding: '8px 10px', width: 120 }}>Item Code</th>
+                    <th style={{ padding: '8px 10px' }}>Material Description</th>
+                    <th style={{ padding: '8px 10px', width: 80 }}>HSN</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'right', width: 90 }}>Received Qty</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'right', width: 90 }}>Unit Rate</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'right', width: 100 }}>Taxable (₹)</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'center', width: 65 }}>GST %</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'right', width: 90 }}>GST (₹)</th>
+                    <th style={{ padding: '8px 10px', textAlign: 'right', width: 110 }}>Total (₹)</th>
+                    <th style={{ padding: '8px 10px', width: 100 }}>Batch / Rack</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {masterGrnModal.items && masterGrnModal.items.map((it, idx) => (
+                    <tr key={it.id || idx} style={{ borderBottom: '1px solid #f1f5f9', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                      <td style={{ padding: '8px 10px', color: '#64748b' }}>{idx + 1}</td>
+                      <td style={{ padding: '8px 10px', fontWeight: 700, color: '#0f766e' }}>{it.materialCode || it.code}</td>
+                      <td style={{ padding: '8px 10px', fontWeight: 600 }}>{it.materialName || it.name}</td>
+                      <td style={{ padding: '8px 10px', color: '#64748b' }}>{it.hsnCode || it.hsn_code || '—'}</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>
+                        {Number(it.received_qty || it.in_qty || 0).toFixed(3)} {it.uom || it.matUom || 'NOS'}
+                      </td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right' }}>₹{Number(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right' }}>₹{Number(it.taxable_amount || ((it.received_qty || it.in_qty || 0) * (it.unit_price || 0))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right' }}>₹{Number((it.cgst_amount || 0) + (it.sgst_amount || 0) + (it.igst_amount || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700, color: '#0f172a' }}>
+                        ₹{Number(it.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '8px 10px', color: '#64748b', fontSize: 11 }}>
+                        {it.batch_number ? `B: ${it.batch_number}` : ''} {it.bin_location ? `· ${it.bin_location}` : ''}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background: '#f1f5f9', fontWeight: 800, borderTop: '2px solid #cbd5e1' }}>
+                    <td colSpan={4} style={{ padding: '10px 10px', textAlign: 'right' }}>Grand Total ({masterGrnModal.items?.length || 0} Items):</td>
+                    <td style={{ padding: '10px 10px', textAlign: 'right', color: '#16a34a' }}>
+                      {masterGrnModal.items?.reduce((s, it) => s + parseFloat(it.received_qty || it.in_qty || 0), 0).toFixed(3)}
+                    </td>
+                    <td></td>
+                    <td style={{ padding: '10px 10px', textAlign: 'right' }}>
+                      ₹{Number(masterGrnModal.total_taxable || masterGrnModal.items?.reduce((s, it) => s + parseFloat(it.taxable_amount || 0), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td></td>
+                    <td style={{ padding: '10px 10px', textAlign: 'right' }}>
+                      ₹{Number(masterGrnModal.total_gst || masterGrnModal.items?.reduce((s, it) => s + (parseFloat(it.cgst_amount || 0) + parseFloat(it.sgst_amount || 0) + parseFloat(it.igst_amount || 0)), 0) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ padding: '10px 10px', textAlign: 'right', color: '#0f766e', fontSize: 14 }}>
+                      ₹{Number(masterGrnModal.grand_total || masterGrnModal.total_value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
+              <div style={{ fontSize: 11, color: '#64748b' }}>
+                {masterGrnModal.remarks && <span><b>Remarks:</b> {masterGrnModal.remarks}</span>}
+              </div>
+              <button
+                style={{ ...S.btn, background: '#0f766e', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                onClick={() => openA3Invoice(masterGrnModal)}
+              >
+                🖨️ Print Single Official Slip with All {masterGrnModal.items?.length || 0} Items
+              </button>
+            </div>
           </div>
         </div>
       )}

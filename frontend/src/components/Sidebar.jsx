@@ -32,6 +32,7 @@ const NAV = [
 
   { key: 'store', label: 'Store Management', icon: StoreIcon, group: 'Store & Indent' },
   { key: 'store-dashboard', label: 'Store Dashboard', icon: BarChart3, group: 'Store & Indent' },
+  { key: 'store-reports', label: 'Store Analytics & Reports', icon: FileText, group: 'Store & Indent' },
   { key: 'indent', label: 'Indent / PIIMAS', icon: ClipboardList, group: 'Store & Indent' },
 
   // Commercial

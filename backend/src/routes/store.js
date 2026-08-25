@@ -1182,95 +1182,217 @@ router.get('/admin/progress', requireAuth, requireLevel(4), ar(async (req, res) 
 }))
 
 // ── INWARD DESK ─────────────────────────────────────────────────────────────
-// GET /api/store/inward
+// GET /api/store/inward — Supports Master GRN Consolidated view (default) and Item Ledger view
 router.get('/inward', requireAuth, ar(async (req, res) => {
-  const { from, to, store_type, category_id, search, limit = 100, page = 1 } = req.query;
-  const where = ["sl.transaction_type IN ('grn', 'return', 'in')"];
+  const { from, to, store_type, category_id, search, limit = 100, page = 1, view = 'master' } = req.query;
+
+  if (view === 'items') {
+    // Detailed Item Ledger View (per stock ledger line mutation)
+    const where = ["sl.transaction_type IN ('grn', 'return', 'in')"];
+    const vals = [];
+
+    if (from) { vals.push(from); where.push(`sl.date >= $${vals.length}`); }
+    if (to)   { vals.push(to);   where.push(`sl.date <= $${vals.length}`); }
+    if (category_id) {
+      vals.push(category_id);
+      where.push(`m.category_id IN (SELECT id FROM material_categories WHERE id = $${vals.length} OR parent_id = $${vals.length})`);
+    }
+    if (store_type) {
+      if (store_type === 'mechanical') {
+        where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
+      } else if (store_type === 'electrical') {
+        where.push(`(mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical'))`);
+      } else if (store_type === 'chemical' || store_type === 'raw' || store_type === 'rawmaterial') {
+        where.push(`(mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
+      } else if (store_type === 'consumable') {
+        where.push(`(mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing'))`);
+      }
+    }
+    if (search) {
+      vals.push(`%${search}%`);
+      where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length} OR v.name ILIKE $${vals.length} OR po_v.name ILIKE $${vals.length} OR g_v.name ILIKE $${vals.length})`);
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const whereClause = where.join(' AND ');
+
+    const { rows } = await pool.query(`
+      SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
+             sl.in_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
+             sl.remarks, sl.created_at, sl.vendor_id,
+             m.name AS "materialName", m.code AS "materialCode", m.uom, m.hsn_code AS "hsnCode",
+             mc.name AS "categoryName",
+             u.name AS "createdByName",
+             COALESCE(v.name, po_v.name, g_v.name) AS "vendorName",
+             COALESCE(v.code, po_v.code, g_v.code) AS "vendorCode",
+             COALESCE(v.gstin, po_v.gstin, g_v.gstin) AS "vendorGstin",
+             COALESCE(v.state, po_v.state, g_v.state) AS "vendorState",
+             g.id AS "grnId", g.grn_number AS "grnNumber", g.status AS "grnStatus",
+             g.vehicle_number AS "grnVehicleNumber", g.challan_number AS "grnChallanNumber",
+             g.invoice_number AS "grnInvoiceNumber",
+             COALESCE((SELECT COUNT(*) FROM grn_items gi WHERE gi.grn_id = g.id), 1)::int AS "grnItemCount"
+      FROM stock_ledger sl
+      JOIN materials m ON sl.material_id = m.id
+      LEFT JOIN material_categories mc ON m.category_id = mc.id
+      LEFT JOIN users u ON sl.created_by = u.id
+      LEFT JOIN vendors v ON sl.vendor_id = v.id
+      LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
+      LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
+      LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
+      LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
+      WHERE ${whereClause}
+      ORDER BY sl.id DESC
+      LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
+    `, [...vals, parseInt(limit), offset]);
+
+    const countRes = await pool.query(`
+      SELECT COUNT(*) as total_count, COALESCE(SUM(sl.in_qty), 0) as total_qty, COALESCE(SUM(sl.value), 0) as total_value
+      FROM stock_ledger sl
+      JOIN materials m ON sl.material_id = m.id
+      LEFT JOIN material_categories mc ON m.category_id = mc.id
+      LEFT JOIN vendors v ON sl.vendor_id = v.id
+      LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
+      LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
+      LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
+      LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
+      WHERE ${whereClause}
+    `, vals);
+
+    const todayRes = await pool.query(`
+      SELECT COUNT(*) as today_count, COALESCE(SUM(sl.in_qty), 0) as today_qty, COALESCE(SUM(sl.value), 0) as today_value
+      FROM stock_ledger sl
+      WHERE sl.transaction_type IN ('grn', 'return', 'in') AND sl.date = CURRENT_DATE
+    `);
+
+    return res.json({
+      success: true,
+      view: 'items',
+      data: rows,
+      total: parseInt(countRes.rows[0].total_count),
+      summary: {
+        totalCount: parseInt(countRes.rows[0].total_count),
+        totalQty: parseFloat(countRes.rows[0].total_qty),
+        totalValue: parseFloat(countRes.rows[0].total_value),
+        todayCount: parseInt(todayRes.rows[0]?.today_count || 0),
+        todayQty: parseFloat(todayRes.rows[0]?.today_qty || 0),
+        todayValue: parseFloat(todayRes.rows[0]?.today_value || 0),
+      }
+    });
+  }
+
+  // Consolidated Master GRN View (1 row per GRN with all child items pre-aggregated)
+  const where = ['g.id IS NOT NULL'];
   const vals = [];
 
-  if (from) { vals.push(from); where.push(`sl.date >= $${vals.length}`); }
-  if (to)   { vals.push(to);   where.push(`sl.date <= $${vals.length}`); }
+  if (from) { vals.push(from); where.push(`g.date >= $${vals.length}`); }
+  if (to)   { vals.push(to);   where.push(`g.date <= $${vals.length}`); }
   if (category_id) {
     vals.push(category_id);
-    where.push(`m.category_id IN (SELECT id FROM material_categories WHERE id = $${vals.length} OR parent_id = $${vals.length})`);
+    where.push(`EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id WHERE gi.grn_id = g.id AND m.category_id IN (SELECT id FROM material_categories WHERE id = $${vals.length} OR parent_id = $${vals.length}))`);
   }
   if (store_type) {
     if (store_type === 'mechanical') {
-      where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
+      where.push(`EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id LEFT JOIN material_categories mc ON m.category_id = mc.id WHERE gi.grn_id = g.id AND (mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical')))`);
     } else if (store_type === 'electrical') {
-      where.push(`(mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical'))`);
+      where.push(`EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id LEFT JOIN material_categories mc ON m.category_id = mc.id WHERE gi.grn_id = g.id AND (mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical')))`);
     } else if (store_type === 'chemical' || store_type === 'raw' || store_type === 'rawmaterial') {
-      where.push(`(mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
+      where.push(`EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id LEFT JOIN material_categories mc ON m.category_id = mc.id WHERE gi.grn_id = g.id AND (mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%'))`);
     } else if (store_type === 'consumable') {
-      where.push(`(mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing'))`);
+      where.push(`EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id LEFT JOIN material_categories mc ON m.category_id = mc.id WHERE gi.grn_id = g.id AND (mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing')))`);
     }
   }
   if (search) {
     vals.push(`%${search}%`);
-    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length} OR v.name ILIKE $${vals.length} OR po_v.name ILIKE $${vals.length} OR g_v.name ILIKE $${vals.length})`);
+    where.push(`(g.grn_number ILIKE $${vals.length} OR g.invoice_number ILIKE $${vals.length} OR g.challan_number ILIKE $${vals.length} OR g.remarks ILIKE $${vals.length} OR v.name ILIKE $${vals.length} OR v.code ILIKE $${vals.length} OR v.gstin ILIKE $${vals.length} OR EXISTS (SELECT 1 FROM grn_items gi JOIN materials m ON gi.material_id = m.id WHERE gi.grn_id = g.id AND (m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR gi.batch_number ILIKE $${vals.length})))`);
   }
 
   const offset = (parseInt(page) - 1) * parseInt(limit);
   const whereClause = where.join(' AND ');
 
   const { rows } = await pool.query(`
-    SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
-           sl.in_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
-           sl.remarks, sl.created_at, sl.vendor_id,
-           m.name AS "materialName", m.code AS "materialCode", m.uom, m.hsn_code AS "hsnCode",
-           mc.name AS "categoryName",
+    SELECT g.id, g.grn_number, g.date, g.status, g.vehicle_number, g.challan_number,
+           g.invoice_number, g.order_number, g.order_date, g.remarks, g.created_at,
+           COALESCE(g.total_taxable, (SELECT SUM(taxable_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0) AS total_taxable,
+           COALESCE(g.total_gst, (SELECT SUM(cgst_amount + sgst_amount + igst_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0) AS total_gst,
+           COALESCE(g.grand_total, (SELECT SUM(total_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0) AS grand_total,
+           v.id AS "vendorId", v.name AS "vendorName", v.code AS "vendorCode",
+           v.gstin AS "vendorGstin", v.state AS "vendorState", v.city AS "vendorCity",
+           v.address AS "vendorAddress", v.mobile AS "vendorMobile",
            u.name AS "createdByName",
-           COALESCE(v.name, po_v.name, g_v.name) AS "vendorName",
-           COALESCE(v.code, po_v.code, g_v.code) AS "vendorCode",
-           COALESCE(v.gstin, po_v.gstin, g_v.gstin) AS "vendorGstin",
-           COALESCE(v.state, po_v.state, g_v.state) AS "vendorState",
-           g.id AS "grnId", g.grn_number AS "grnNumber", g.status AS "grnStatus",
-           g.vehicle_number AS "grnVehicleNumber", g.challan_number AS "grnChallanNumber",
-           g.invoice_number AS "grnInvoiceNumber"
-    FROM stock_ledger sl
-    JOIN materials m ON sl.material_id = m.id
-    LEFT JOIN material_categories mc ON m.category_id = mc.id
-    LEFT JOIN users u ON sl.created_by = u.id
-    LEFT JOIN vendors v ON sl.vendor_id = v.id
-    LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
-    LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
-    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
-    LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
+           COALESCE((SELECT COUNT(*) FROM grn_items gi WHERE gi.grn_id = g.id), 0)::int AS "itemCount",
+           COALESCE((SELECT SUM(gi.received_qty) FROM grn_items gi WHERE gi.grn_id = g.id), 0)::numeric(12,3) AS "totalQty",
+           COALESCE(
+             (SELECT json_agg(
+               json_build_object(
+                 'id', gi.id,
+                 'material_id', gi.material_id,
+                 'materialCode', m.code,
+                 'materialName', m.name,
+                 'uom', gi.uom,
+                 'hsnCode', m.hsn_code,
+                 'categoryName', mc.name,
+                 'received_qty', gi.received_qty,
+                 'unit_price', gi.unit_price,
+                 'discount_pct', gi.discount_pct,
+                 'taxable_amount', gi.taxable_amount,
+                 'gst_pct', gi.gst_pct,
+                 'cgst_amount', gi.cgst_amount,
+                 'sgst_amount', gi.sgst_amount,
+                 'igst_amount', gi.igst_amount,
+                 'total_amount', gi.total_amount,
+                 'batch_number', gi.batch_number,
+                 'bin_location', gi.bin_location,
+                 'remarks', gi.remarks
+               ) ORDER BY gi.id ASC
+             ) FROM grn_items gi
+               JOIN materials m ON gi.material_id = m.id
+               LEFT JOIN material_categories mc ON m.category_id = mc.id
+               WHERE gi.grn_id = g.id
+             ), '[]'::json
+           ) AS items
+    FROM grn g
+    LEFT JOIN vendors v ON g.vendor_id = v.id
+    LEFT JOIN users u ON g.received_by = u.id
     WHERE ${whereClause}
-    ORDER BY sl.id DESC
+    ORDER BY g.id DESC
     LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
   `, [...vals, parseInt(limit), offset]);
 
   const countRes = await pool.query(`
-    SELECT COUNT(*) as total_count, COALESCE(SUM(sl.in_qty), 0) as total_qty, COALESCE(SUM(sl.value), 0) as total_value
-    FROM stock_ledger sl
-    JOIN materials m ON sl.material_id = m.id
-    LEFT JOIN material_categories mc ON m.category_id = mc.id
-    LEFT JOIN vendors v ON sl.vendor_id = v.id
-    LEFT JOIN purchase_orders po ON (sl.reference_type = 'PO' AND (sl.reference_id = po.id OR (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = po.id ELSE FALSE END)))
-    LEFT JOIN vendors po_v ON po.vendor_id = po_v.id
-    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
-    LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
+    SELECT COUNT(*) as total_count,
+           COALESCE(SUM((SELECT SUM(gi.received_qty) FROM grn_items gi WHERE gi.grn_id = g.id)), 0) as total_qty,
+           COALESCE(SUM(COALESCE(g.total_taxable, (SELECT SUM(taxable_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0)), 0) as total_taxable,
+           COALESCE(SUM(COALESCE(g.total_gst, (SELECT SUM(cgst_amount + sgst_amount + igst_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0)), 0) as total_gst,
+           COALESCE(SUM(COALESCE(g.grand_total, (SELECT SUM(total_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0)), 0) as total_value,
+           COALESCE(SUM((SELECT COUNT(*) FROM grn_items gi WHERE gi.grn_id = g.id)), 0)::int as total_items
+    FROM grn g
+    LEFT JOIN vendors v ON g.vendor_id = v.id
     WHERE ${whereClause}
   `, vals);
 
   const todayRes = await pool.query(`
-    SELECT COUNT(*) as today_count, COALESCE(SUM(sl.in_qty), 0) as today_qty, COALESCE(SUM(sl.value), 0) as today_value
-    FROM stock_ledger sl
-    WHERE sl.transaction_type IN ('grn', 'return', 'in') AND sl.date = CURRENT_DATE
+    SELECT COUNT(*) as today_count,
+           COALESCE(SUM((SELECT SUM(gi.received_qty) FROM grn_items gi WHERE gi.grn_id = g.id)), 0) as today_qty,
+           COALESCE(SUM(COALESCE(g.grand_total, (SELECT SUM(total_amount) FROM grn_items gi WHERE gi.grn_id = g.id), 0)), 0) as today_value
+    FROM grn g
+    WHERE g.date = CURRENT_DATE
   `);
 
   res.json({
     success: true,
+    view: 'master',
     data: rows,
-    total: parseInt(countRes.rows[0].total_count),
+    total: parseInt(countRes.rows[0].total_count || 0),
     summary: {
-      totalCount: parseInt(countRes.rows[0].total_count),
-      totalQty: parseFloat(countRes.rows[0].total_qty),
-      totalValue: parseFloat(countRes.rows[0].total_value),
-      todayCount: parseInt(todayRes.rows[0].today_count),
-      todayQty: parseFloat(todayRes.rows[0].today_qty),
-      todayValue: parseFloat(todayRes.rows[0].today_value),
+      totalCount: parseInt(countRes.rows[0].total_count || 0),
+      totalItems: parseInt(countRes.rows[0].total_items || 0),
+      totalQty: parseFloat(countRes.rows[0].total_qty || 0),
+      totalTaxable: parseFloat(countRes.rows[0].total_taxable || 0),
+      totalGst: parseFloat(countRes.rows[0].total_gst || 0),
+      totalValue: parseFloat(countRes.rows[0].total_value || 0),
+      todayCount: parseInt(todayRes.rows[0]?.today_count || 0),
+      todayQty: parseFloat(todayRes.rows[0]?.today_qty || 0),
+      todayValue: parseFloat(todayRes.rows[0]?.today_value || 0),
     }
   });
 }));
@@ -1873,10 +1995,8 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
 
 // GET /api/store/grn/:id — Fetch Single Master GRN with all consolidated line items & vendor details
 router.get('/grn/:id', requireAuth, ar(async (req, res) => {
-  const grnId = req.params.id;
-  const isNum = /^\d+$/.test(String(grnId));
-  const where = isNum ? `WHERE g.id = $1` : `WHERE g.grn_number = $1 OR g.grn_number ILIKE $1`;
-  const paramVal = isNum ? parseInt(grnId) : grnId;
+  const grnId = String(req.params.id || '').trim();
+  const where = `WHERE g.id::text = $1 OR g.grn_number = $1 OR g.grn_number ILIKE $1 OR g.invoice_number = $1 OR g.invoice_number ILIKE $1 OR g.challan_number = $1 OR g.challan_number ILIKE $1`;
 
   const { rows } = await pool.query(`
     SELECT g.*, g.grn_number AS "grnNumber",
@@ -1893,7 +2013,9 @@ router.get('/grn/:id', requireAuth, ar(async (req, res) => {
     LEFT JOIN vendors v ON v.id = g.vendor_id
     LEFT JOIN users u ON u.id = g.received_by
     ${where}
-  `, [paramVal]);
+    ORDER BY g.id DESC
+    LIMIT 1
+  `, [grnId]);
 
   if (!rows.length) {
     return res.status(404).json({ success: false, message: 'GRN not found' });
@@ -1904,7 +2026,9 @@ router.get('/grn/:id', requireAuth, ar(async (req, res) => {
     SELECT gi.*,
            m.name AS "materialName", m.code AS "materialCode", m.uom AS "matUom",
            m.hsn_code AS "hsnCode", mc.name AS "categoryName",
-           COALESCE(gi.gst_pct, 18) AS gst_pct
+           COALESCE(gi.gst_pct, 18) AS gst_pct,
+           COALESCE(gi.taxable_amount, gi.received_qty * gi.unit_price) AS taxable_amount,
+           COALESCE(gi.total_amount, gi.received_qty * gi.unit_price) AS total_amount
     FROM grn_items gi
     JOIN materials m ON m.id = gi.material_id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
