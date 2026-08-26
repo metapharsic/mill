@@ -637,7 +637,9 @@ router.put('/:id', auth, ar(async (req, res) => {
       await client.query(`DELETE FROM indent_items WHERE indent_id=$1`, [req.params.id]);
       for (const it of items) {
         const { rows: mat } = await client.query(`SELECT current_stock, unit_price, uom FROM materials WHERE id=$1`, [it.material_id]);
-        const price = parseFloat(mat[0]?.unit_price || 0);
+        const price = (it.unit_price !== undefined && it.unit_price !== '' && it.unit_price !== null)
+          ? parseFloat(it.unit_price)
+          : parseFloat(mat[0]?.unit_price || 0);
         const qty = parseFloat(it.required_qty || 0);
         const lVal = qty * price;
         totalVal += lVal;
@@ -660,7 +662,7 @@ router.put('/:id', auth, ar(async (req, res) => {
 
 // APPEND ITEM TO EXISTING INDENT
 router.post('/:id/items', auth, ar(async (req, res) => {
-  const { material_id, required_qty, uom, purpose, component_position, reason_code, maintenance_log_id } = req.body;
+  const { material_id, required_qty, uom, purpose, component_position, reason_code, unit_price: reqUnitPrice, maintenance_log_id } = req.body;
   if (!material_id || !required_qty || Number(required_qty) <= 0) {
     return res.status(400).json({ success: false, message: 'Material and valid required_qty are required' });
   }
@@ -675,7 +677,9 @@ router.post('/:id/items', auth, ar(async (req, res) => {
     }
 
     const { rows: mat } = await client.query('SELECT current_stock, unit_price, uom FROM materials WHERE id=$1', [material_id]);
-    const price = parseFloat(mat[0]?.unit_price || 0);
+    const price = (reqUnitPrice !== undefined && reqUnitPrice !== '' && reqUnitPrice !== null)
+      ? parseFloat(reqUnitPrice)
+      : parseFloat(mat[0]?.unit_price || 0);
     const qty = parseFloat(required_qty || 0);
     const finalUom = mat[0]?.uom || uom || 'NOS';
     const lVal = qty * price;

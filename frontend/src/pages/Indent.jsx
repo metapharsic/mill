@@ -162,6 +162,7 @@ export default function Indent() {
     material_id: '',
     required_qty: '1',
     uom: 'NOS',
+    unit_price: '',
     component_position: '',
     reason_code: 'Routine Replacement',
     purpose: ''
@@ -410,7 +411,11 @@ export default function Indent() {
   const setItem = (i, k, v) => setForm(f => ({ ...f, items: f.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }))
   const matByID = id => mats.find(m => String(m.id) === String(id))
   const matPrice = mat => parseFloat(mat?.unit_price || mat?.unitPrice || 0)
-  const lineTotal = it => (parseFloat(it.required_qty) || 0) * matPrice(matByID(it.material_id))
+  const lineTotal = it => {
+    const hasOverride = it.unit_price !== '' && it.unit_price !== undefined && it.unit_price !== null
+    const price = hasOverride ? (parseFloat(it.unit_price) || 0) : matPrice(matByID(it.material_id))
+    return (parseFloat(it.required_qty) || 0) * price
+  }
   const grandTotal = form.items.reduce((s, it) => s + lineTotal(it), 0)
 
   // ── Append Item in Detail View ──────────────────────────────────────────────
@@ -430,7 +435,7 @@ export default function Indent() {
     setAppendSaving(false)
     if (res.success) {
       setAppendOpen(false)
-      setAppendForm({ material_id: '', required_qty: '1', uom: 'NOS', component_position: '', reason_code: 'Routine Replacement', purpose: '' })
+      setAppendForm({ material_id: '', required_qty: '1', uom: 'NOS', unit_price: '', component_position: '', reason_code: 'Routine Replacement', purpose: '' })
       setAppendSearch('')
       openDetail(detail.id)
       load()
@@ -1883,7 +1888,7 @@ export default function Indent() {
                                 onMouseDown={() => {
                                   setItem(i, 'material_id', m.id)
                                   setItem(i, 'uom', m.uom || 'NOS')
-                                  setItem(i, 'unit_price', m.unit_price || '')
+                                  setItem(i, 'unit_price', m.unit_price != null ? parseFloat(m.unit_price) : '')
                                   setMatSearch(s => ({ ...s, [i]: `${m.name} [${m.code}]` }))
                                   setMatDropOpen(d => ({ ...d, [i]: false }))
 
@@ -2626,7 +2631,7 @@ export default function Indent() {
                             <div
                               key={m.id}
                               onMouseDown={() => {
-                                setAppendForm(f => ({ ...f, material_id: m.id, uom: m.uom }))
+                                setAppendForm(f => ({ ...f, material_id: m.id, uom: m.uom, unit_price: m.unit_price != null ? parseFloat(m.unit_price) : '' }))
                                 setAppendSearch('')
                                 setAppendDrop(false)
                               }}
@@ -2648,7 +2653,18 @@ export default function Indent() {
                     </select>
                   </label>
                 </div>
-                <div style={{ ...S.grid2, marginTop: 8 }}>
+                <div style={{ ...S.grid3, marginTop: 8 }}>
+                  <label style={S.lbl}>Unit Rate (INR)
+                    <input
+                      style={S.inp}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="Auto-filled from catalog (editable)"
+                      value={appendForm.unit_price !== '' ? appendForm.unit_price : (matByID(appendForm.material_id)?.unit_price || '')}
+                      onChange={e => setAppendForm(f => ({ ...f, unit_price: e.target.value }))}
+                    />
+                  </label>
                   <label style={S.lbl}>Position / Location
                     <input style={S.inp} placeholder="e.g. Drive Side, Press Section..." value={appendForm.component_position} onChange={e => setAppendForm(f => ({ ...f, component_position: e.target.value }))} />
                   </label>
@@ -3675,7 +3691,7 @@ export default function Indent() {
         </div>
       )}
 
-      {/* ── DEDICATED A3 GST INVOICE & SIV PRINT MODAL (Pic 1 Exact Format) ── */}
+      {/* ── DEDICATED A3 GRN INVOICE & SIV PRINT MODAL (Pic 1 Exact Format) ── */}
       {a3PrintDoc && (
         <A3InvoicePrintModal
           docData={a3PrintDoc}
