@@ -3679,7 +3679,7 @@ export default function Store({ onNavigate }) {
       {/* ── MODAL: PRINTABLE OUTWARD VOUCHER ── */}
       {outwardVoucher && (
         <div style={S.overlay}>
-          <div className="print-watermark-container" style={{ ...S.modal, maxWidth: 550, background: '#fff', position: 'relative', overflow: 'hidden' }}>
+          <div id="print-document" className="print-watermark-container" style={{ ...S.modal, maxWidth: 550, background: '#fff', position: 'relative', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, borderBottom: '2px dashed #e7e6df', paddingBottom: 12, marginBottom: 14, position: 'relative', zIndex: 1 }}>
               <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 38, width: 'auto', maxWidth: 120, objectFit: 'contain', borderRadius: 4, background: '#fff', padding: 2 }} />
               <div style={{ textAlign: 'left' }}>
@@ -3697,7 +3697,7 @@ export default function Store({ onNavigate }) {
               <div><b>Issued For / Remarks:</b> {outwardVoucher.remarks || '—'}</div>
               <div><b>Issued By:</b> {outwardVoucher.createdByName || 'Store Keeper'}</div>
             </div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 }}>
+            <div className="no-print" style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 }}>
               <button style={S.btnGhost} onClick={() => setOutwardVoucher(null)}>Close</button>
               <button style={S.btn} onClick={() => window.print()}>🖨️ Print SIV Slip</button>
             </div>

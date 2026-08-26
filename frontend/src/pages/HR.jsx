@@ -420,13 +420,18 @@ function MyPayslip() {
 
         {/* Slip detail */}
         {selected && emp && (
-          <div style={{ ...S.card }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+          <div id="print-document" style={{ ...S.card }}>
+            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: '#1b1b1d' }}>Pay Slip — {fmt.month(selected.month)}</div>
                 <div style={{ fontSize: 12, color: '#a0a0a6', marginTop: 2 }}>{emp.name} · {emp.employee_code || 'No code'}</div>
               </div>
               <button style={S.btnPrimary} onClick={() => window.print()}>🖨 Print</button>
+            </div>
+            {/* Print-only heading (shown only when the no-print bar above is hidden) */}
+            <div className="print-only-heading" style={{ display: 'none', marginBottom: 16 }}>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>Pay Slip — {fmt.month(selected.month)}</div>
+              <div style={{ fontSize: 12, color: '#475569' }}>{emp.name} · {emp.employee_code || 'No code'}</div>
             </div>
 
             {/* Employee info strip */}
