@@ -112,17 +112,17 @@ export default function AgentStatusBanner({ currentModule = 'indent' }) {
       name: 'Finance & Tax AP Agent',
       icon: '🧾',
       stepNum: 'AP',
-      role: 'A3 GST Invoice 3-Way Matching',
+      role: 'A3 GRN Invoice 3-Way Matching',
       status: 'Active',
       color: '#059669',
       bg: '#ecfdf5',
       responsibilities: [
         'Performs automated 3-way matching: PO vs GRN vs Commercial Vendor Invoice',
-        'Renders full A3 Landscape GST commercial invoices with 12-column line items & tax breakdowns',
+        'Renders full A3 Landscape GRN commercial invoices with 12-column line items & tax breakdowns',
         'Syncs payable ledgers with bank accounts and verifies TCS/Roundoff calculations'
       ],
       makerChecker: 'Audits commercial invoices and updates accounts payable vouchers.',
-      telemetry: 'Enforcing 100% A3 landscape commercial GST invoice printing'
+      telemetry: 'Enforcing 100% A3 landscape commercial GRN invoice printing'
     }
   ]
 

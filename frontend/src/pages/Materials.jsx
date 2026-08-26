@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import InventoryExportModal from '../components/InventoryExportModal'
 import SortableTh from '../components/SortableTh'
@@ -57,6 +59,17 @@ const emptyForm = {
 }
 
 export default function Materials() {
+  const { user } = useAuth()
+  const { addToast } = useToast()
+
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material'))) ||
+    roleLevel >= 4
+  )
+
   const [materials, setMaterials] = useState([])
   const [categories, setCategories] = useState([])
   const [sections, setSections] = useState([])
@@ -363,10 +376,16 @@ export default function Materials() {
   }
 
   const del = async m => {
-    if (!window.confirm(`Deactivate "${m.name}"?`)) return
+    if (!window.confirm(`Are you sure you want to delete / deactivate Material "${m.name}" (${m.code})?`)) return
     const res = await API(`/api/master/materials/${m.id}`, { method: 'DELETE' })
-    if (res.success) load()
-    else alert(res.message || 'Deactivate failed')
+    if (res.success) {
+      if (addToast) addToast(res.message || `Material ${m.name} deactivated successfully`, 'info')
+      else alert(res.message || `Material ${m.name} deactivated successfully`)
+      load()
+    } else {
+      if (addToast) addToast(res.message || 'Deactivation failed', 'error')
+      else alert(res.message || 'Deactivation failed')
+    }
   }
 
   const restore = async m => {
@@ -1530,6 +1549,11 @@ export default function Materials() {
                             <button style={S.btnIcon} title={m.is_active ? 'Deactivate Material' : 'Activate Material'} onClick={() => toggleActive(m)}>
                               {m.is_active ? '⏸' : '▶'}
                             </button>
+                            {isStoreManager && (
+                              <button style={{ ...S.btnIcon, color: '#dc2626' }} title="Store Manager: Delete / Deactivate Material" onClick={() => del(m)}>
+                                🗑️
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

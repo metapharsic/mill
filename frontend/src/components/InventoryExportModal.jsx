@@ -64,8 +64,8 @@ export default function InventoryExportModal({
       if (storeType === 'mechanical') return c.type === 'Mechanical' || c.name?.toLowerCase().includes('mech') || c.code?.startsWith('MECH') || [31,36,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55].includes(c.id)
       if (storeType === 'electrical') return c.type === 'Electrical' || c.name?.toLowerCase().includes('elec') || c.code?.startsWith('ELEC') || [30,56,57,58,59,60].includes(c.id)
       if (storeType === 'consumable') return c.type === 'Consumable' || [29,33,34,35].includes(c.id)
-      if (storeType === 'chemical') return c.type === 'Raw Material' || c.id === 28 || c.name?.toLowerCase().includes('chem')
-      if (storeType === 'store') return ['Mechanical', 'Electrical', 'Consumable', 'Spare Part'].includes(c.type) || (c.id >= 29 && c.id <= 60)
+      if (storeType === 'chemical') return c.id === 28 || c.code?.startsWith('CHEM') || c.name?.toLowerCase().includes('chem')
+      if (storeType === 'store') return ['Mechanical', 'Electrical', 'Consumable', 'Spare Part', 'Raw Material'].includes(c.type) || (c.id >= 28 && c.id <= 64)
       return true
     })
   }, [catList, categories, storeType])

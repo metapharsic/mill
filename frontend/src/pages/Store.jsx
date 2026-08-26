@@ -94,6 +94,15 @@ function Msg({ msg, ok }) {
 export default function Store({ onNavigate }) {
   const { user } = useAuth()
   const { addToast } = useToast()
+
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material'))) ||
+    roleLevel >= 4
+  )
+
   const [tab, setTab] = useState('inward')
   const [exportModal, setExportModal] = useState(false)
   const [mats, setMats] = useState([])
@@ -542,6 +551,10 @@ export default function Store({ onNavigate }) {
         addToast('Authentication session expired or invalid token. Please log in again.', 'error')
         return
       }
+      if (res.status === 403) {
+        addToast('Store Manager or Administrator authorization required to delete inward entries.', 'error')
+        return
+      }
       const r = await res.json()
       if (r.success) {
         addToast(r.message || 'Inward record removed and stock reversed', 'info')
@@ -552,6 +565,34 @@ export default function Store({ onNavigate }) {
       }
     } catch (err) {
       addToast('Error deleting inward record: ' + err.message, 'error')
+    }
+  }
+
+  const handleDeleteGrn = async (grn) => {
+    if (!window.confirm(`Are you sure you want to void / delete entire Master GRN ${grn.grn_number}? This will delete all linked line items and reverse stock from the store.`)) return
+    try {
+      const res = await fetch(`${API}/store/grn/${grn.id}`, {
+        method: 'DELETE',
+        headers: h()
+      })
+      if (res.status === 401) {
+        addToast('Authentication session expired. Please log in again.', 'error')
+        return
+      }
+      if (res.status === 403) {
+        addToast('Store Manager or Administrator authorization required to delete GRN.', 'error')
+        return
+      }
+      const r = await res.json()
+      if (r.success) {
+        addToast(r.message || 'GRN deleted and stock reversed', 'info')
+        loadInward()
+        loadBaseData()
+      } else {
+        addToast(r.message || 'Failed to delete GRN', 'error')
+      }
+    } catch (err) {
+      addToast('Error deleting GRN: ' + err.message, 'error')
     }
   }
 
@@ -1688,6 +1729,15 @@ export default function Store({ onNavigate }) {
                                 >
                                   +
                                 </button>
+                                {isStoreManager && (
+                                  <button
+                                    style={{ ...S.btnSm, background: '#ef4444', color: '#fff', padding: '4px 7px', fontSize: 11 }}
+                                    onClick={() => handleDeleteGrn(grn)}
+                                    title="Store Manager: Void & Delete entire Master GRN"
+                                  >
+                                    🗑️
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -1905,7 +1955,9 @@ export default function Store({ onNavigate }) {
                               })
                               setEditInwardModal(inw)
                             }} title="Edit Inward Record">✏️</button>
-                            <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)} title="Delete & Reverse Stock">🗑️</button>
+                            {isStoreManager && (
+                              <button style={{ ...S.btnSm, background: '#ef4444' }} onClick={() => handleDeleteInward(inw)} title="Store Manager: Delete & Reverse Stock">🗑️</button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -4288,7 +4340,7 @@ export default function Store({ onNavigate }) {
                   onClick={() => openA3Invoice(masterGrnModal)}
                   style={{ background: '#0f766e', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
                 >
-                  🖨️ Print Official A3 GST Invoice
+                  🖨️ Print Official A3 GRN Invoice
                 </button>
                 <button
                   type="button"
@@ -4738,12 +4790,12 @@ export default function Store({ onNavigate }) {
         </div>
       )}
 
-      {/* ── MODAL: DEDICATED A3 GST COMMERCIAL INVOICE PRINT MODAL (Pic 1 Exact Layout) ── */}
+      {/* ── MODAL: DEDICATED A3 GRN COMMERCIAL INVOICE PRINT MODAL (Pic 1 Exact Layout) ── */}
       {a3PrintDoc && (
         <A3InvoicePrintModal
           docData={a3PrintDoc}
           onClose={() => setA3PrintDoc(null)}
-          title={a3PrintDoc.title || 'GST INVOICE'}
+          title={a3PrintDoc.title || 'GRN INVOICE'}
         />
       )}
 

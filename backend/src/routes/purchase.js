@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
-const { auth, requireLevel } = require('../middleware/auth');
+const { auth, requireLevel, requireStoreManager } = require('../middleware/auth');
 const { getVendors } = require('../middleware/helpers');
 const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -944,8 +944,8 @@ router.put('/grn/:id', auth, requireLevel(2), ar(async (req, res) => {
   }
 }));
 
-// DELETE /api/purchase/grn/:id — Void / Delete GRN with atomic stock reversal
-router.delete('/grn/:id', auth, requireLevel(3), ar(async (req, res) => {
+// DELETE /api/purchase/grn/:id — Void / Delete GRN with atomic stock reversal (Store Manager Only)
+router.delete('/grn/:id', auth, requireStoreManager, ar(async (req, res) => {
   const isNum = /^\d+$/.test(String(req.params.id));
   const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
   const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
@@ -1006,6 +1006,49 @@ router.delete('/grn/:id', auth, requireLevel(3), ar(async (req, res) => {
 
     await client.query('COMMIT');
     res.json({ success: true, message: `GRN ${grn.grn_number} successfully voided and stock balances reversed` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/purchase/bills/:id — Delete vendor bill / invoice (Store Manager Only)
+router.delete('/bills/:id', auth, requireStoreManager, ar(async (req, res) => {
+  const isNum = /^\d+$/.test(String(req.params.id));
+  const where = isNum ? `WHERE id=$1` : `WHERE bill_number=$1`;
+  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [bill] } = await client.query(`SELECT * FROM vendor_bills ${where} FOR UPDATE`, [paramVal]);
+    if (!bill) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Vendor bill not found' });
+    }
+
+    if (bill.status === 'Paid') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Cannot delete invoice: bill has already been paid in full. Reverse payments first.' });
+    }
+
+    await client.query(`DELETE FROM vendor_payments WHERE bill_id = $1`, [bill.id]);
+    await client.query(`DELETE FROM vendor_bills WHERE id = $1`, [bill.id]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'purchase.bill.delete',
+      module: 'purchase',
+      recordId: bill.id,
+      oldData: { bill_number: bill.bill_number, vendor_invoice_number: bill.vendor_invoice_number, total_amount: bill.total_amount },
+      newData: { deleted: true },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Vendor invoice / bill ${bill.bill_number} successfully removed.` });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });

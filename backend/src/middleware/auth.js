@@ -63,4 +63,17 @@ const requireStore = (req, res, next) => {
   return res.status(403).json({ success: false, message: 'Store staff, inventory manager or administrator only' });
 };
 
-module.exports = { auth, requireLevel, requireStore };
+const requireStoreManager = (req, res, next) => {
+  if (!req.user) return res.status(401).json({ success: false, message: 'Authentication required' });
+  const roleLevel = req.user.role_level || 0;
+  const deptCode = (req.user.dept_code || '').toUpperCase();
+  const deptName = (req.user.department || '').toLowerCase();
+  const isStoreDept = ['STORE', 'INV', 'RMS', 'MATERIALS'].includes(deptCode) ||
+                      deptName.includes('store') || deptName.includes('inventory') || deptName.includes('raw material');
+  if ((isStoreDept && roleLevel >= 3) || roleLevel >= 4) {
+    return next();
+  }
+  return res.status(403).json({ success: false, message: 'Store Manager or Administrator authorization required for deletion' });
+};
+
+module.exports = { auth, requireLevel, requireStore, requireStoreManager };

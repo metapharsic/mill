@@ -9,7 +9,7 @@ const pool = require('../db/pool');
 
 function getStoreTypeFilter(storeType, prefix = 'mc') {
   if (!storeType || storeType === 'all_store' || storeType === 'store') {
-    return `(${prefix}.type IN ('Mechanical', 'Electrical', 'Consumable', 'Spare Part') OR ${prefix}.id IN (29,30,31,32,33,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60))`;
+    return `(${prefix}.type IN ('Mechanical', 'Electrical', 'Consumable', 'Spare Part', 'Raw Material') OR ${prefix}.id IN (28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64))`;
   }
   if (storeType === 'mechanical') {
     return `(${prefix}.type = 'Mechanical' OR ${prefix}.name ILIKE '%Mech%' OR ${prefix}.code LIKE 'MECH%' OR ${prefix}.id IN (31,36,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55))`;
@@ -21,7 +21,7 @@ function getStoreTypeFilter(storeType, prefix = 'mc') {
     return `(${prefix}.type = 'Consumable' OR ${prefix}.id IN (29,33,34,35))`;
   }
   if (storeType === 'chemical') {
-    return `(${prefix}.type = 'Raw Material' OR ${prefix}.id = 28 OR ${prefix}.name ILIKE '%Chem%')`;
+    return `(${prefix}.id = 28 OR ${prefix}.code LIKE 'CHEM%' OR ${prefix}.name ILIKE '%Chem%' OR ${prefix}.name ILIKE '%Chemical%')`;
   }
   if (storeType === 'all') {
     return '1=1';
@@ -82,13 +82,11 @@ async function generateInventoryExcel(options = {}) {
   const params = [];
   let p = 1;
 
-  if (store_type && store_type !== 'all') {
-    conditions.push(getStoreTypeFilter(store_type, 'mc'));
-  }
-
   if (category_id) {
     conditions.push(`m.category_id = $${p++}`);
     params.push(parseInt(category_id));
+  } else if (store_type && store_type !== 'all') {
+    conditions.push(getStoreTypeFilter(store_type, 'mc'));
   }
 
   if (stock_status === 'in_stock') {

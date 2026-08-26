@@ -1,4 +1,4 @@
-﻿# Production Module — Full Workflow & Rules
+# Production Module — Full Workflow & Rules
 
 ## Overview
 Core paper manufacturing data entry: shifts, reels (paper rolls), downtime events, OEE calculation,
@@ -160,6 +160,20 @@ Mechanical | Electrical | Process | Quality | Break | Changeover
 
 Note: chemical consumption and DPR routes use direct DB only. Kafka publish is in store/indent routes.
 
+## 2-Stage Manufacturing Architecture (PPC & Slitting-Rewinding)
+
+> Detailed Master Architecture & Roadmap: See [`PPC_SLITTING_ARCHITECTURE_AND_PHASES.md`](./PPC_SLITTING_ARCHITECTURE_AND_PHASES.md) and DDL migration [`db/migration_ppc_slitting_foundation.sql`](../../../db/migration_ppc_slitting_foundation.sql).
+
+### Overview
+1. **Stage 1: Production Planning (PPC)** — Translates Sales Order MT to required finished reels ($G_w$), builds cutting patterns ($N$-cuts) across machine deckle, and calculates set multipliers ($K_w$).
+2. **Stage 2: Slitting-Rewinding (Shopfloor Execution)** — Mounts parent `jumbo_reels` on rewinder, sets dynamic knife positions (`ppc_pattern_cuts`), captures physical scale authority weights for finished `slit_reels` ($H$), and reconciles edge trim/broke ($T$) within $\pm 0.5\%$ mass balance tolerance.
+
+### Implementation Phasing
+- **Phase 1:** Database Foundation & Genealogy Tracking (`jumbo_reels`, `slit_reels`, `slitting_waste_log`).
+- **Phase 2:** Shopfloor Slitting Touchscreen Console, Scale Authority & Mass Balance ACID Gate ($\pm 0.5\%$).
+- **Phase 3:** PPC Planning Studio, Order Backlog Aggregation & Dynamic Cutting Pattern Builder ($K_w$ sets).
+- **Phase 4:** Algorithmic 1D-CSP Deckle Optimizer & DPR/WhatsApp Yield Variance Analytics.
+
 ## Common Query Patterns
 ```sql
 -- Today's total production
@@ -178,3 +192,4 @@ SELECT category, SUM(duration_min) AS total_min
 FROM downtime_entries WHERE DATE(start_time) BETWEEN $1 AND $2
 GROUP BY category ORDER BY total_min DESC;
 ```
+

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 
 const API = async (p, o = {}) => {
@@ -24,6 +26,17 @@ const API = async (p, o = {}) => {
 const fmt = v => v != null ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'
 
 export default function Finance() {
+  const { user } = useAuth()
+  const { addToast } = useToast()
+
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS', 'FIN', 'PUR'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material') || dept.includes('finance') || dept.includes('purchase'))) ||
+    roleLevel >= 4
+  )
+
   const [tab, setTab] = useState('summary')
   const [summary, setSummary] = useState(null)
   const [ar, setAr] = useState(null)
@@ -123,6 +136,20 @@ export default function Finance() {
       load('summary')
     } else {
       alert(r.message || 'Failed to approve bill')
+    }
+  }
+
+  const handleDeleteBill = async (b) => {
+    if (!window.confirm(`Are you sure you want to delete Vendor Bill ${b.billNumber} (${b.vendorInvoiceNumber || ''})?`)) return
+    const r = await API(`/api/finance/bills/${b.id}`, { method: 'DELETE' })
+    if (r.success) {
+      if (addToast) addToast(r.message || `Bill ${b.billNumber} removed successfully`, 'info')
+      else alert(r.message || `Bill ${b.billNumber} removed successfully`)
+      load('vendor_bills')
+      load('summary')
+    } else {
+      if (addToast) addToast(r.message || 'Failed to delete vendor bill', 'error')
+      else alert(r.message || 'Failed to delete vendor bill')
     }
   }
 
@@ -393,6 +420,15 @@ export default function Finance() {
                           )}
                           {b.status === 'Paid' && (
                             <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>✨ Settled</span>
+                          )}
+                          {isStoreManager && b.status !== 'Paid' && (
+                            <button
+                              style={{ ...S.btn, width: 'auto', padding: '4px 8px', fontSize: 11, background: '#ef4444', marginTop: 0 }}
+                              onClick={() => handleDeleteBill(b)}
+                              title="Delete Vendor Invoice / Bill"
+                            >
+                              🗑️ Delete
+                            </button>
                           )}
                         </div>
                       </td>

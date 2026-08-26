@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
-const { auth, requireLevel, requireStore } = require('../middleware/auth');
+const { auth, requireLevel, requireStore, requireStoreManager } = require('../middleware/auth');
 const { publish, TOPICS } = require('../kafka');
 const { generateInventoryExcel } = require('../services/inventoryExcelExporter');
 
@@ -53,7 +53,7 @@ const buildSequenceNumber = async (client, prefix) => {
 
 function getStoreTypeFilter(storeType, prefix = 'mc') {
   if (!storeType || storeType === 'all_store' || storeType === 'store') {
-    return `(${prefix}.type IN ('Mechanical', 'Electrical', 'Consumable', 'Spare Part') OR ${prefix}.id IN (29,30,31,32,33,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60))`;
+    return `(${prefix}.type IN ('Mechanical', 'Electrical', 'Consumable', 'Spare Part', 'Raw Material') OR ${prefix}.id IN (28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64))`;
   }
   if (storeType === 'mechanical') {
     return `(${prefix}.type = 'Mechanical' OR ${prefix}.name ILIKE '%Mech%' OR ${prefix}.code LIKE 'MECH%' OR ${prefix}.id IN (31,36,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55))`;
@@ -65,7 +65,7 @@ function getStoreTypeFilter(storeType, prefix = 'mc') {
     return `(${prefix}.type = 'Consumable' OR ${prefix}.id IN (29,33,34,35))`;
   }
   if (storeType === 'chemical') {
-    return `(${prefix}.type = 'Raw Material' OR ${prefix}.id = 28 OR ${prefix}.name ILIKE '%Chem%')`;
+    return `(${prefix}.id = 28 OR ${prefix}.code LIKE 'CHEM%' OR ${prefix}.name ILIKE '%Chem%' OR ${prefix}.name ILIKE '%Chemical%')`;
   }
   if (storeType === 'all') {
     return '1=1';
@@ -89,16 +89,14 @@ router.get('/materials', auth, asyncRoute(async (req, res) => {
   const params = [];
   let p = 1;
 
-  if (store_type && store_type !== 'all') {
+  if (categoryId) {
+    conditions.push(`m.category_id = $${p++}`);
+    params.push(categoryId);
+  } else if (store_type && store_type !== 'all') {
     conditions.push(getStoreTypeFilter(store_type, 'mc'));
   } else if (!store_type) {
     // Default to store inventory for store management
     conditions.push(getStoreTypeFilter('store', 'mc'));
-  }
-
-  if (categoryId) {
-    conditions.push(`m.category_id = $${p++}`);
-    params.push(categoryId);
   }
 
   if (low_stock === 'true') {
@@ -1050,6 +1048,69 @@ router.post('/issue', auth, requireStore, asyncRoute(async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/inventory/materials/:id — Soft delete inventory item (Store Manager Only)
+router.delete('/materials/:id', auth, requireStoreManager, asyncRoute(async (req, res) => {
+  const { rows } = await pool.query('UPDATE materials SET is_active = false, deleted_by = $2 WHERE id = $1 RETURNING id, name', [req.params.id, req.user?.id || null]);
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Material item not found' });
+  res.json({ success: true, message: `Material ${rows[0].name} deactivated successfully` });
+}));
+
+// DELETE /api/inventory/grn/:id — Void / Delete GRN and atomically rollback stock (Store Manager Only)
+router.delete('/grn/:id', auth, requireStoreManager, asyncRoute(async (req, res) => {
+  const isNum = /^\d+$/.test(String(req.params.id));
+  const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
+  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [grn] } = await client.query(`SELECT * FROM grn ${where} FOR UPDATE`, [paramVal]);
+    if (!grn) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'GRN record not found' });
+    }
+
+    const grnId = grn.id;
+    const { rows: items } = await client.query(`SELECT * FROM grn_items WHERE grn_id = $1 FOR UPDATE`, [grnId]);
+
+    for (const it of items) {
+      const accQty = parseFloat(it.accepted_qty || 0);
+      if (accQty <= 0) continue;
+
+      const { rows: [mat] } = await client.query(`SELECT id, name, uom, current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+      if (mat) {
+        const curStock = parseFloat(mat.current_stock || 0);
+        const newStock = curStock - accQty;
+        if (newStock < 0) {
+          throw new Error(`Cannot void GRN ${grn.grn_number}: stock for '${mat.name}' already consumed (Remaining: ${curStock} ${mat.uom})`);
+        }
+        await client.query(`UPDATE materials SET current_stock = $1 WHERE id = $2`, [newStock, mat.id]);
+      }
+
+      if (grn.po_id) {
+        const recQty = parseFloat(it.received_qty || accQty);
+        await client.query(
+          `UPDATE po_items SET received_qty = GREATEST(0, COALESCE(received_qty, 0) - $1) WHERE po_id = $2 AND material_id = $3`,
+          [recQty, grn.po_id, it.material_id]
+        );
+      }
+    }
+
+    await client.query(`DELETE FROM stock_ledger WHERE (reference_type = 'GRN' AND (reference_id = $1 OR reference_id = $2)) OR remarks ILIKE $3`, [grnId, String(grnId), `%${grn.grn_number}%`]);
+    await client.query(`DELETE FROM vendor_bills WHERE grn_id = $1 AND status = 'Draft'`, [grnId]);
+    await client.query(`DELETE FROM grn_items WHERE grn_id = $1`, [grnId]);
+    await client.query(`DELETE FROM grn WHERE id = $1`, [grnId]);
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `GRN ${grn.grn_number} successfully removed and stock reversed.` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
   } finally {
     client.release();
   }

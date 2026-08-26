@@ -297,6 +297,10 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
     }
   })
 
+  const resolvedTitle = (title === 'GST INVOICE' || title === 'GST Invoice' || (!title && isSupplierOrGrn))
+    ? 'GRN INVOICE'
+    : (title || (isSupplierOrGrn ? 'GRN INVOICE' : 'STORE INDENT / ISSUE VOUCHER'))
+
   const rawGrandTotal = docData.grand_total !== undefined && docData.grand_total !== null && parseFloat(docData.grand_total) > 0
     ? parseFloat(docData.grand_total)
     : (totalTaxable + totalGst)
@@ -340,7 +344,7 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
             A3 OFFICIAL FORMAT
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: 14 }}>{title}</div>
+            <div style={{ fontWeight: 800, fontSize: 14 }}>{resolvedTitle}</div>
             <div style={{ fontSize: 11, color: '#94a3b8' }}>A3 Landscape 420mm × 297mm · Real Database Calculations · Sri M.K. Paper Mills Official Slip</div>
           </div>
         </div>
@@ -432,7 +436,7 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
               ORIGINAL FOR RECIPIENT
             </div>
             <div style={{ background: '#000000', color: '#ffffff', textAlign: 'center', fontSize: 14, fontWeight: 900, letterSpacing: 1.2, padding: '4px 6px', textTransform: 'uppercase' }}>
-              {title}
+              {resolvedTitle}
             </div>
             <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 800, padding: '2px 0', borderBottom: '1px solid #000000', color: '#0f766e' }}>
               {paymentMode}
@@ -442,12 +446,12 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
             <div style={{ padding: '6px 8px', fontSize: 9.5, display: 'grid', gridTemplateColumns: '80px 1fr 65px 1fr', gap: '3px 4px', flex: 1, alignItems: 'center' }}>
               <span style={{ fontWeight: 700 }}>Voucher No</span>
               <span style={{ fontWeight: 800 }}>: {invoiceNo}</span>
-              <span style={{ fontWeight: 700 }}>GNR / Ref</span>
+              <span style={{ fontWeight: 700 }}>GRN / Ref</span>
               <span style={{ fontWeight: 800 }}>: {grnNo}</span>
 
               <span style={{ fontWeight: 700 }}>Voucher Date</span>
               <span>: {invoiceDate}</span>
-              <span style={{ fontWeight: 700 }}>GNR Date</span>
+              <span style={{ fontWeight: 700 }}>GRN Date</span>
               <span>: {grnDate}</span>
 
               <span style={{ fontWeight: 700 }}>Order / PO</span>

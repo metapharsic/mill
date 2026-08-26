@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const API = (path, opts) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(opts?.headers || {}) },
@@ -6,6 +7,15 @@ const API = (path, opts) => fetch(path, {
 }).then(r => r.json())
 
 export default function MasterData() {
+  const { user } = useAuth()
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS', 'MAINT', 'ADMIN'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material') || dept.includes('maintenance') || dept.includes('admin'))) ||
+    roleLevel >= 4
+  )
+
   const [tab, setTab] = useState('summary')
   const [sections, setSections] = useState([])
   const [departments, setDepartments] = useState([])
@@ -571,7 +581,9 @@ export default function MasterData() {
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0f766e', borderColor: '#0f766e', background: '#f0fdfa' }} onClick={() => openMachineMaterialsModal(mcn)}>📦 Mapped Spares</button>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditMachine(mcn)}>✏️ Edit</button>
-                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteMachine(mcn)}>🗑️ Deactivate</button>
+                          {isStoreManager && (
+                            <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteMachine(mcn)}>🗑️ Deactivate</button>
+                          )}
                         </div>
                       </td>
                       <td style={S.td}><strong>{mcn.code}</strong></td>
@@ -620,7 +632,9 @@ export default function MasterData() {
                       <td style={S.td}>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', borderColor: '#0284c7' }} onClick={() => openEditCategory(cat)}>✏️ Edit</button>
-                          <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteCategory(cat)}>🗑️ Delete</button>
+                          {isStoreManager && (
+                            <button style={{ ...S.btnSecondary, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#dc2626', borderColor: '#dc2626', background: '#fef2f2' }} onClick={() => deleteCategory(cat)}>🗑️ Delete</button>
+                          )}
                         </div>
                       </td>
                       <td style={S.td}><strong>{cat.name}</strong></td>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
@@ -147,6 +149,17 @@ function PrintFrame({ content, onClose }) {
 }
 
 export default function Purchase() {
+  const { user } = useAuth()
+  const { addToast } = useToast()
+
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS', 'FIN', 'PUR'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material'))) ||
+    roleLevel >= 4
+  )
+
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[loading,setLoading]=useState(true)
   const [fStatus,setFStatus]=useState(''),[page,setPage]=useState(1)
   const [modal,setModal]=useState(false),[detail,setDetail]=useState(null)
@@ -226,6 +239,43 @@ export default function Purchase() {
     }
     setPipeLoading(false)
   }, [pipeSearch])
+
+  const handleDeleteGrn = async (g) => {
+    if (!window.confirm(`Are you sure you want to void / delete GRN ${g.grnNumber}? This will reverse stock from inventory and sync PO receipt lines.`)) return
+    try {
+      const res = await API(`/api/purchase/grn/${g.id}`, { method: 'DELETE' })
+      if (res.success) {
+        if (addToast) addToast(res.message || `GRN ${g.grnNumber} deleted and stock reversed`, 'info')
+        else alert(res.message || `GRN ${g.grnNumber} deleted and stock reversed`)
+        loadGRNs()
+        loadOrders()
+      } else {
+        if (addToast) addToast(res.message || 'Failed to delete GRN', 'error')
+        else alert(res.message || 'Failed to delete GRN')
+      }
+    } catch (err) {
+      if (addToast) addToast('Error deleting GRN: ' + err.message, 'error')
+      else alert('Error deleting GRN: ' + err.message)
+    }
+  }
+
+  const handleDeleteBill = async (b) => {
+    if (!window.confirm(`Are you sure you want to delete Vendor Bill / Invoice ${b.billNumber} (${b.vendorInvoiceNumber || ''})?`)) return
+    try {
+      const res = await API(`/api/purchase/bills/${b.id}`, { method: 'DELETE' })
+      if (res.success) {
+        if (addToast) addToast(res.message || `Bill ${b.billNumber} removed`, 'info')
+        else alert(res.message || `Bill ${b.billNumber} removed`)
+        loadBills()
+      } else {
+        if (addToast) addToast(res.message || 'Failed to delete invoice bill', 'error')
+        else alert(res.message || 'Failed to delete invoice bill')
+      }
+    } catch (err) {
+      if (addToast) addToast('Error deleting bill: ' + err.message, 'error')
+      else alert('Error deleting bill: ' + err.message)
+    }
+  }
 
   const [prList, setPrList] = useState([])
   const [prLoading, setPrLoading] = useState(false)
@@ -2351,6 +2401,15 @@ export default function Purchase() {
                           >
                             🧾 Bill
                           </button>
+                          {isStoreManager && (
+                            <button
+                              style={{ ...S.btnIcon, color: '#dc2626', fontWeight: 600, fontSize: 12 }}
+                              onClick={() => handleDeleteGrn(g)}
+                              title="Store Manager: Void & Delete GRN with Stock Rollback"
+                            >
+                              🗑️ Delete
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -2420,13 +2479,24 @@ export default function Purchase() {
                         </span>
                       </td>
                       <td style={S.td}>
-                        <button
-                          style={{ ...S.btnIcon, color: '#0369a1', fontWeight: 600, fontSize: 12 }}
-                          onClick={() => printBillDocument(b)}
-                          title="View & Print Official Commercial Bill"
-                        >
-                          🖨️ Tax Invoice
-                        </button>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <button
+                            style={{ ...S.btnIcon, color: '#0369a1', fontWeight: 600, fontSize: 12 }}
+                            onClick={() => printBillDocument(b)}
+                            title="View & Print Official Commercial Bill"
+                          >
+                            🖨️ Tax Invoice
+                          </button>
+                          {isStoreManager && b.status !== 'Paid' && (
+                            <button
+                              style={{ ...S.btnIcon, color: '#dc2626', fontWeight: 600, fontSize: 12 }}
+                              onClick={() => handleDeleteBill(b)}
+                              title="Store Manager: Delete Unpaid Vendor Invoice / Bill"
+                            >
+                              🗑️ Delete
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

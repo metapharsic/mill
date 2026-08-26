@@ -390,6 +390,8 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
          VALUES ($1, 'create_po', 'Submitted', 'PO Created', $2, $3)`,
         [id, req.user.id, `Direct Purchase Order ${poNum} created with Vendor ID ${vendor_id}`]
       );
+
+      await logStoreIndent(client, id, 'Direct PO Generated', 'Draft', 'PO Created', req.user.id, req.user.name, req.user.role, `Direct Purchase Order ${poNum} created`);
     }
 
     // ── Fulfillment Branch 2: DIRECT DELIVERY CHALLAN (DC / GATE PASS) ──
@@ -420,6 +422,8 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
          VALUES ($1, 'create_dc', 'Submitted', 'DC Generated', $2, $3)`,
         [id, req.user.id, `Outward Delivery Challan / Gate Pass ${gpNum} generated`]
       );
+
+      await logStoreIndent(client, id, 'Delivery Challan Generated', 'Draft', 'DC Generated', req.user.id, req.user.name, req.user.role, `Outward Gate Pass ${gpNum} generated`);
     }
 
     // ── Fulfillment Branch 3: IMMEDIATE STORE ISSUANCE (SIV) ──
@@ -438,7 +442,9 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
         await client.query(`UPDATE materials SET current_stock = current_stock - $1 WHERE id = $2`, [qty, it.material_id]);
 
         const { rows: [matAfter] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id = $1`, [it.material_id]);
-        const price = parseFloat(matAfter?.unit_price || it.unit_price || 0);
+        const price = (it.unit_price !== undefined && it.unit_price !== '' && it.unit_price !== null)
+          ? parseFloat(it.unit_price)
+          : parseFloat(matAfter?.unit_price || 0);
 
         await client.query(
           `INSERT INTO stock_ledger (material_id, transaction_type, out_qty, balance, unit_price, value, date, reference_type, reference_id, remarks, created_by)
@@ -462,6 +468,8 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
          VALUES ($1, 'issue', 'Submitted', 'Issued', $2, $3)`,
         [id, req.user.id, `Immediate store issuance executed on indent creation`]
       );
+
+      await logStoreIndent(client, id, 'Immediate Store Issuance', 'Draft', 'Issued', req.user.id, req.user.name, req.user.role, 'Immediate store issuance executed on creation');
     }
 
     // ── Fulfillment Branch 4: DIRECT CASH PURCHASE (SPOT PROCUREMENT) ──
@@ -533,6 +541,8 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
         [id, req.user.id, `Direct Cash Purchase ${cpNum} generated and stock incremented`]
       );
 
+      await logStoreIndent(client, id, 'Cash Purchased', 'Draft', 'Cash Purchased', req.user.id, req.user.name, req.user.role, `Direct Cash Purchase ${cpNum} generated`);
+
       // Auto-record paid vendor bill for Finance synchronization (mirrors /convert-to-cash-purchase)
       try {
         await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`bill-${stamp}`]);
@@ -552,6 +562,11 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
           ]
         );
       } catch(err) { /* non-blocking */ }
+    }
+
+    // ── Fulfillment Branch 5: STANDARD PR / INDENT WORKFLOW ──
+    else {
+      await logStoreIndent(client, id, 'Submitted', 'Draft', 'Submitted', req.user.id, req.user.name, req.user.role, 'Indent submitted for multi-tier approval');
     }
 
     await client.query('COMMIT');
@@ -653,6 +668,8 @@ router.put('/:id', auth, ar(async (req, res) => {
       }
       await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, req.params.id]);
     }
+
+    await logStoreIndent(client, req.params.id, 'Edited', ind.status, ind.status, req.user.id, req.user.name, req.user.role, 'Indent line items and details updated');
 
     await client.query('COMMIT');
     res.json({ success:true, data:rows[0] });

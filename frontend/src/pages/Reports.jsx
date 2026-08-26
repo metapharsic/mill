@@ -17,34 +17,27 @@ function WhatsAppIcon({ size = 16, color = 'currentColor' }) {
   )
 }
 
-export const DEFAULT_WA_CONFIG = {
-  template: 'full', // 'full' | 'item_movement' | 'store_focus' | 'indents_focus' | 'procurement_focus' | 'emergency_alert' | 'custom'
-  showScorecard: true,
-  showProductionPower: true,
-  showIndentsSummary: true,
-  showIndentsDetailed: true,
-  showTopItemIssues: true,
-  showCriticalLowStock: true,
-  showCategoryStore: true,
-  showPurchaseOrders: true,
-  showInwardGRN: true,
-  showOutwardIssues: true,
-  showDowntime: true,
-  showCustomRemarks: true,
-  showFooter: true,
-  customRemarks: '',
-  senderSignOff: 'Store & Mill Operations Desk · MK Paper Mill',
-  phone: '',
-}
+import {
+  generateMasterWhatsAppReport,
+  generateGrnWhatsAppReport,
+  generateIndentWhatsAppReport,
+  generateItemWiseWhatsAppReport,
+  generateInventoryValuationReport,
+  generateWhatsAppReportByType,
+  WA_TEMPLATES,
+  DEFAULT_WA_CONFIG
+} from '../utils/whatsappTemplates'
+
+export { DEFAULT_WA_CONFIG }
 
 export const WA_PRESETS = [
   {
-    id: 'full',
-    label: '⚡ Full Executive EOD',
-    desc: 'Complete 8-section digest: KPIs, Production, Indents, Top Spares, Stock Alerts & Procurement',
+    id: 'master',
+    label: '🌟 Master Executive Digest',
+    desc: 'Full mill-wide scorecard, production, indents, inward receipts & store movements',
     apply: (curr) => ({
       ...curr,
-      template: 'full',
+      template: 'master',
       showScorecard: true,
       showProductionPower: true,
       showIndentsSummary: true,
@@ -61,56 +54,34 @@ export const WA_PRESETS = [
     })
   },
   {
-    id: 'item_movement',
-    label: '📦 Item Movement & Spares',
-    desc: 'Focus on high-value item issues, department destinations & critical stock replenishment',
+    id: 'grn',
+    label: '📥 GRN Receipts & Inwards',
+    desc: 'Descriptive GRN register with itemized receipts, vendors, rates, accepted qty & PO refs',
     apply: (curr) => ({
       ...curr,
-      template: 'item_movement',
-      showScorecard: true,
+      template: 'grn',
+      showScorecard: false,
       showProductionPower: false,
       showIndentsSummary: false,
       showIndentsDetailed: false,
-      showTopItemIssues: true,
-      showCriticalLowStock: true,
-      showCategoryStore: true,
+      showTopItemIssues: false,
+      showCriticalLowStock: false,
+      showCategoryStore: false,
       showPurchaseOrders: false,
       showInwardGRN: true,
-      showOutwardIssues: true,
+      showOutwardIssues: false,
       showDowntime: false,
       showCustomRemarks: true,
       showFooter: true,
     })
   },
   {
-    id: 'store_focus',
-    label: '🏷️ Store Valuation & Inventory',
-    desc: 'Category movements, inward receipts, outward consumption & total store valuation',
+    id: 'indent',
+    label: '📑 Department Indents & Requisitions',
+    desc: 'Department-wise requisition spend, item fulfillment status & pending approvals',
     apply: (curr) => ({
       ...curr,
-      template: 'store_focus',
-      showScorecard: true,
-      showProductionPower: false,
-      showIndentsSummary: true,
-      showIndentsDetailed: false,
-      showTopItemIssues: true,
-      showCriticalLowStock: true,
-      showCategoryStore: true,
-      showPurchaseOrders: true,
-      showInwardGRN: true,
-      showOutwardIssues: true,
-      showDowntime: false,
-      showCustomRemarks: true,
-      showFooter: true,
-    })
-  },
-  {
-    id: 'indents_focus',
-    label: '📑 Indents & Requisitions',
-    desc: 'Department-wise store indents, approvals status & individual requisition details',
-    apply: (curr) => ({
-      ...curr,
-      template: 'indents_focus',
+      template: 'indent',
       showScorecard: false,
       showProductionPower: false,
       showIndentsSummary: true,
@@ -127,22 +98,44 @@ export const WA_PRESETS = [
     })
   },
   {
-    id: 'procurement_focus',
-    label: '🛒 Procurement & GRNs',
-    desc: 'Purchase orders released, supplier terms & inward GRN receipts against POs',
+    id: 'item',
+    label: '📦 Item & Material Movements',
+    desc: 'Itemized consumption ledger, destination departments, unit rates & balance stock on hand',
     apply: (curr) => ({
       ...curr,
-      template: 'procurement_focus',
-      showScorecard: false,
+      template: 'item',
+      showScorecard: true,
+      showProductionPower: false,
+      showIndentsSummary: false,
+      showIndentsDetailed: false,
+      showTopItemIssues: true,
+      showCriticalLowStock: true,
+      showCategoryStore: false,
+      showPurchaseOrders: false,
+      showInwardGRN: true,
+      showOutwardIssues: true,
+      showDowntime: false,
+      showCustomRemarks: true,
+      showFooter: true,
+    })
+  },
+  {
+    id: 'inventory',
+    label: '🏷️ Inventory & Store Valuations',
+    desc: 'Store category breakdown (Mech, Elec, Chem, Consumables) & total issued vs received',
+    apply: (curr) => ({
+      ...curr,
+      template: 'inventory',
+      showScorecard: true,
       showProductionPower: false,
       showIndentsSummary: false,
       showIndentsDetailed: false,
       showTopItemIssues: false,
       showCriticalLowStock: true,
-      showCategoryStore: false,
-      showPurchaseOrders: true,
+      showCategoryStore: true,
+      showPurchaseOrders: false,
       showInwardGRN: true,
-      showOutwardIssues: false,
+      showOutwardIssues: true,
       showDowntime: false,
       showCustomRemarks: true,
       showFooter: true,
@@ -150,8 +143,8 @@ export const WA_PRESETS = [
   },
   {
     id: 'emergency_alert',
-    label: '🚨 Critical Alerts & Downtime',
-    desc: 'Critical safety stock shortages, machine breakdowns & urgent technical indents',
+    label: '🚨 Critical Alerts & Shortages',
+    desc: 'Critical safety stock shortages, machine breakdowns & urgent technical alerts',
     apply: (curr) => ({
       ...curr,
       template: 'emergency_alert',
@@ -183,192 +176,7 @@ export const DEFAULT_CONTACTS = [
 ]
 
 export function generateWhatsAppEodText(data, config = DEFAULT_WA_CONFIG) {
-  if (!data) return ''
-  const cfg = { ...DEFAULT_WA_CONFIG, ...(config || {}) }
-  const d = data.date || today
-  const p = data.production || {}
-  const u = data.utility || {}
-  const c = data.commercial || {}
-  const s = data.storeAndIndents || {}
-  const m = data.maintenance || {}
-  const q = data.quality || {}
-  const indentsByDept = data.indentsByDept || []
-  const indentsList = data.indentsList || []
-  const categoryWise = data.categoryWiseStore || []
-  const purchases = data.purchases || []
-  const inwardGRNs = data.inwardGRNs || []
-  const outwardIssues = data.outwardIssues || []
-  const topItemIssues = data.topItemIssues || outwardIssues.slice(0, 5)
-  const criticalLowStock = data.criticalLowStock || []
-
-  const fmtCur = v => `₹${Number(v || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-  const fmtN = (v, dec = 1) => Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec })
-
-  const lines = [
-    `╔══════════════════════════════════╗`,
-    `🏭 *MK PAPER MILL — EXECUTIVE EOD DIGEST*`,
-    `📅 *Date:* ${d} | ⏱️ *Time:* ${new Date(data.compiledAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-    `╚══════════════════════════════════╝`,
-  ]
-
-  // Executive Scorecard Callout
-  if (cfg.showScorecard) {
-    const spPower = u.specificPowerKwhPerMt ? `${fmtN(u.specificPowerKwhPerMt, 0)} kWh/MT` : '—'
-    lines.push(``)
-    lines.push(`⚡ *EXECUTIVE SCORECARD:*`)
-    lines.push(`• Production: *${fmtN(p.totalMt, 2)} MT* (${p.totalReels || 0} Reels · Eff: *${fmtN(p.avgEfficiency, 1)}%*)`)
-    lines.push(`• Specific Energy: *${spPower}* | Quality Pass: *${fmtN(q.passRate, 1)}%*`)
-    lines.push(`• Indents: *${s.indentsRaised || 0}* (${fmtCur(s.indentsValue)}) | Issued Out: *${fmtCur(s.stockIssueValue)}*`)
-  }
-
-  // Section 1: Plant Production & Power
-  if (cfg.showProductionPower) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`📊 *1. PLANT PRODUCTION & POWER EFFICIENCY*`)
-    lines.push(`• Net Production: *${fmtN(p.totalMt, 2)} MT* | Avg GSM: *${fmtN(p.avgGsm, 1)}* | Moisture: *${fmtN(p.avgMoisture, 1)}%*`)
-    lines.push(`• Power Consumed: *${fmtN(u.powerUnits, 0)} kWh* | Steam: *${fmtN(u.steamMt, 1)} MT* | Coal: *${fmtN(u.coalKg, 0)} kg*`)
-    lines.push(`• Dispatches: *${fmtN(c.dispatchedMt, 2)} MT* | New Orders Booked: *${c.ordersBooked || 0}* (${fmtCur(c.bookedValue)})`)
-    lines.push(`• Machine Downtime: *${m.downtimeMin || 0} mins* (${m.breakdowns || 0} breakdown events)`)
-  }
-
-  // Section 2: Department Indents
-  if (cfg.showIndentsSummary) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`📑 *2. DEPARTMENT STORE REQUISITIONS (${s.indentsRaised || 0} Indents · ${fmtCur(s.indentsValue)})*`)
-    if (indentsByDept.length > 0) {
-      indentsByDept.forEach(dept => {
-        lines.push(`• *${dept.dept_name}:* ${dept.total_indents} indents (${fmtCur(dept.total_indent_value)}) — ${dept.issued_count} Issued, ${dept.approved_count} Approved, ${dept.pending_count} Pending`)
-      })
-    } else {
-      lines.push(`• No new indents raised today.`)
-    }
-
-    if (cfg.showIndentsDetailed && indentsList.length > 0) {
-      lines.push(``)
-      lines.push(`📋 *Key Requisition Highlights:*`)
-      indentsList.slice(0, 5).forEach(ind => {
-        lines.push(`  ▫️ *${ind.indent_number}* (${ind.dept_name}): ${fmtCur(ind.total_value)} [${ind.status}]`)
-      })
-      if (indentsList.length > 5) lines.push(`  _...and ${indentsList.length - 5} more indents_`)
-    }
-  }
-
-  // Section 3: Top 5 High-Value Material Movements (Item-Wise Focus)
-  if (cfg.showTopItemIssues && topItemIssues.length > 0) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`💎 *3. HIGH-VALUE ITEM ISSUES & CONSUMPTION*`)
-    topItemIssues.forEach((it, idx) => {
-      const remarksText = it.remarks ? ` — _${it.remarks.slice(0, 45)}_` : ''
-      const secTag = it.section_name ? ` [🏭 ${it.section_name}${it.machine_name ? ` › ${it.machine_name}` : ''}]` : ''
-      lines.push(`  ${idx + 1}. *${it.mat_name}* [${it.mat_code}]${secTag}`)
-      lines.push(`     ↳ Qty: *${fmtN(it.out_qty, 1)} ${it.uom}* | Value: *${fmtCur(it.value)}* | Dest: *${it.dept_name}*${remarksText}`)
-    })
-  }
-
-  // Section 4: Critical Low-Stock Alerts
-  if (cfg.showCriticalLowStock && criticalLowStock.length > 0) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`🚨 *4. CRITICAL LOW STOCK & SAFETY SHORTAGES*`)
-    criticalLowStock.slice(0, 5).forEach(mat => {
-      const shortage = Number(mat.reorder_level || 0) - Number(mat.current_stock || 0)
-      const secTag = mat.section_name ? ` | 🏭 ${mat.section_name}${mat.machine_name ? ` › ${mat.machine_name}` : ''}` : ''
-      lines.push(`• *${mat.name}* [${mat.code}]: Stock: *${fmtN(mat.current_stock, 1)} ${mat.uom}* (Reorder: ${mat.reorder_level} | Shortage: *-${fmtN(shortage, 1)}*)${secTag} [${mat.store_name || mat.category_name}]`)
-    })
-  }
-
-  // Section 5: Category-Wise Store Movement
-  if (cfg.showCategoryStore) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`🏷️ *5. CATEGORY-WISE STORE VALUATIONS & MOVEMENT*`)
-    if (categoryWise.length > 0) {
-      categoryWise.forEach(cat => {
-        lines.push(`• *${cat.category_name} (${cat.store_type || 'Store'}):* Outward: ${fmtN(cat.outward_qty, 1)} (${fmtCur(cat.outward_value)}) | Inward: ${fmtN(cat.inward_qty, 1)} (${fmtCur(cat.inward_value)})`)
-      })
-    } else {
-      lines.push(`• No store movement recorded today.`)
-    }
-  }
-
-  // Section 6: Purchase Orders Done
-  if (cfg.showPurchaseOrders) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`🛒 *6. PURCHASE ORDERS RELEASED (${purchases.length} POs)*`)
-    if (purchases.length > 0) {
-      purchases.forEach(po => {
-        lines.push(`• *${po.po_number}*: ${po.vendor_name || 'Vendor'} — *${fmtCur(po.grand_total || po.total_value)}* [${po.status}] (${po.items_count} items)`)
-      })
-    } else {
-      lines.push(`• No purchase orders raised today.`)
-    }
-  }
-
-  // Section 7: Inward GRNs Received Against PO
-  if (cfg.showInwardGRN) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`📥 *7. INWARD GRN RECEIPTS AGAINST PO (${inwardGRNs.length} GRNs)*`)
-    if (inwardGRNs.length > 0) {
-      inwardGRNs.slice(0, 6).forEach(grn => {
-        const poRef = grn.po_number ? ` [PO: ${grn.po_number}]` : (grn.remarks?.includes('Ref:') ? ` [${grn.remarks.split('|')[1]?.trim() || ''}]` : '')
-        const secTag = grn.section_name ? ` [🏭 ${grn.section_name}${grn.machine_name ? ` › ${grn.machine_name}` : ''}]` : ''
-        lines.push(`• *${grn.mat_name}* (${fmtN(grn.in_qty, 1)} ${grn.uom}) from *${grn.vendor_name || 'Vendor'}*${secTag} — *${fmtCur(grn.value)}*${poRef}`)
-      })
-      if (inwardGRNs.length > 6) lines.push(`  _...and ${inwardGRNs.length - 6} more inward receipts_`)
-    } else {
-      lines.push(`• No inward GRN receipts recorded today.`)
-    }
-  }
-
-  // Section 8: Outward Store Issues
-  if (cfg.showOutwardIssues) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`📤 *8. OUTWARD MATERIAL ISSUES (${outwardIssues.length} Items · ${fmtCur(s.stockIssueValue)})*`)
-    if (outwardIssues.length > 0) {
-      outwardIssues.slice(0, 6).forEach(iss => {
-        const secTag = iss.section_name ? ` [🏭 ${iss.section_name}${iss.machine_name ? ` › ${iss.machine_name}` : ''}]` : ''
-        lines.push(`• *${iss.mat_name}* (${fmtN(iss.out_qty, 1)} ${iss.uom}) ➔ *${iss.dept_name}*${secTag} (${fmtCur(iss.value)})`)
-      })
-      if (outwardIssues.length > 6) lines.push(`  _...and ${outwardIssues.length - 6} more outward items_`)
-    } else {
-      lines.push(`• No outward material issues recorded today.`)
-    }
-  }
-
-  // Section 9: Maintenance & Downtime
-  if (cfg.showDowntime && m.downtimeMin > 0) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`🔧 *9. MAINTENANCE & DOWNTIME SUMMARY*`)
-    lines.push(`• Total Downtime: *${m.downtimeMin} mins* | Breakdowns: *${m.breakdowns || 0}*`)
-    lines.push(`• Affected Machinery: *${m.affectedMachines || 'None'}*`)
-  }
-
-  // Section 10: Custom Store Manager Remarks
-  if (cfg.showCustomRemarks && cfg.customRemarks && cfg.customRemarks.trim()) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    lines.push(`💬 *STORE MANAGER OPERATIONAL NOTES*`)
-    lines.push(`${cfg.customRemarks.trim()}`)
-  }
-
-  // Section 11: Sign-off & System Footer
-  if (cfg.showFooter) {
-    lines.push(``)
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    if (cfg.senderSignOff && cfg.senderSignOff.trim()) {
-      lines.push(`✍️ _Dispatched by: ${cfg.senderSignOff.trim()}_`)
-    }
-    lines.push(`_MK Paper Mill ERP · Enterprise Automated Dispatch_`)
-  }
-
-  return lines.join('\n')
+  return generateWhatsAppReportByType(config?.template || 'master', data, config)
 }
 
 const API = (p, o) => fetch(p, {
@@ -1123,13 +931,16 @@ export default function Reports() {
                   </div>
                   <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
-                      { key: 'showProductionPower', label: 'Plant Production & Power Units', count: `${data?.production?.totalMt || 0} MT`, icon: '📊' },
-                      { key: 'showIndentsSummary', label: 'Department Indents Raised & ₹ Values', count: `${data?.indentsByDept?.length || 0} depts`, icon: '📑' },
-                      { key: 'showIndentsDetailed', label: 'Itemized Key Indents List', count: `${data?.indentsList?.length || 0} indents`, icon: '📋', indent: true },
-                      { key: 'showCategoryStore', label: 'Category-Wise Store Movements (Valuations)', count: `${data?.categoryWiseStore?.length || 0} cats`, icon: '🏷️' },
-                      { key: 'showPurchaseOrders', label: 'Purchase Orders Done (POs & Vendors)', count: `${data?.purchases?.length || 0} POs`, icon: '🛒' },
-                      { key: 'showInwardGRN', label: 'Inward GRN Received Against POs', count: `${data?.inwardGRNs?.length || 0} GRNs`, icon: '📥' },
-                      { key: 'showOutwardIssues', label: 'Store Outward Material Issuance', count: `${data?.outwardIssues?.length || 0} items`, icon: '📤' },
+                      { key: 'showScorecard', label: 'Executive Store & Production Scorecard', count: 'KPIs', icon: '⚡' },
+                      { key: 'showInwardGRN', label: 'Inward GRN Receipts Against POs', count: `${data?.detailedGrns?.length || data?.inwardGRNs?.length || 0} GRNs`, icon: '📥' },
+                      { key: 'showIndentsSummary', label: 'Department Indents Raised & Requisition Spend', count: `${data?.indentsByDept?.length || 0} depts`, icon: '📑' },
+                      { key: 'showIndentsDetailed', label: 'Itemized Requisition & Indent Items', count: `${data?.indentsList?.length || 0} indents`, icon: '📋', indent: true },
+                      { key: 'showTopItemIssues', label: 'High-Value Material Issues & Consumption', count: `${data?.outwardIssues?.length || 0} items`, icon: '💎' },
+                      { key: 'showCategoryStore', label: 'Category & Store Valuations (Mech, Elec, Chem)', count: `${data?.categoryWiseStore?.length || 0} cats`, icon: '🏷️' },
+                      { key: 'showCriticalLowStock', label: 'Critical Safety Stock Shortages & Alerts', count: `${data?.criticalLowStock?.length || 0} items`, icon: '🚨' },
+                      { key: 'showProductionPower', label: 'Plant Production, GSM & Power Units', count: `${data?.production?.totalMt || 0} MT`, icon: '📊' },
+                      { key: 'showPurchaseOrders', label: 'Purchase Orders Released (POs & Vendors)', count: `${data?.purchases?.length || 0} POs`, icon: '🛒' },
+                      { key: 'showDowntime', label: 'Machine Breakdowns & Maintenance Downtime', count: `${data?.maintenance?.downtimeMin || 0} min`, icon: '🔧' },
                       { key: 'showFooter', label: 'Sign-off & System Timestamp Footer', count: 'ERP', icon: '✍️' },
                     ].map(sec => (
                       <label

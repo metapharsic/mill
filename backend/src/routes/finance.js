@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
-const { auth, requireLevel } = require('../middleware/auth');
+const { auth, requireLevel, requireStoreManager } = require('../middleware/auth');
 const { publish, TOPICS } = require('../kafka');
 const ar = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -296,6 +296,53 @@ router.put('/bills/:id/approve', auth, requireLevel(3), ar(async (req, res) => {
   );
   await auditLog(pool, { userId: req.user.id, action: 'VENDOR_BILL_APPROVED', module: 'Finance', recordId: updated.id, newData: updated, ip: req.ip });
   res.json({ success: true, data: updated, message: `Vendor Bill ${updated.bill_number} approved for payment` });
+}));
+
+// DELETE /api/finance/bills/:id — Delete vendor bill / invoice (Store Manager or Finance Level 3+ Only)
+router.delete('/bills/:id', auth, ar(async (req, res) => {
+  const roleLevel = req.user.role_level || 0;
+  const deptCode = (req.user.dept_code || '').toUpperCase();
+  const deptName = (req.user.department || '').toLowerCase();
+  const isAuthorized = (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'FIN', 'PUR'].includes(deptCode) || deptName.includes('store') || deptName.includes('finance') || deptName.includes('inventory'))) || roleLevel >= 4;
+  if (!isAuthorized) {
+    return res.status(403).json({ success: false, message: 'Store Manager or Finance Manager authorization required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [bill] } = await client.query(`SELECT * FROM vendor_bills WHERE id=$1 FOR UPDATE`, [req.params.id]);
+    if (!bill) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Vendor bill not found' });
+    }
+
+    if (bill.status === 'Paid') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Cannot delete invoice: bill has already been paid in full. Reverse payments first.' });
+    }
+
+    await client.query(`DELETE FROM vendor_payments WHERE bill_id = $1`, [bill.id]);
+    await client.query(`DELETE FROM vendor_bills WHERE id = $1`, [bill.id]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'finance.bill.delete',
+      module: 'Finance',
+      recordId: bill.id,
+      oldData: { bill_number: bill.bill_number, vendor_invoice_number: bill.vendor_invoice_number, total_amount: bill.total_amount },
+      newData: { deleted: true },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: `Vendor bill / invoice ${bill.bill_number} removed successfully.` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
 }));
 
 // ── VENDOR PAYMENTS (DISBURSEMENTS) ────────────────────────────────────────

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const pool = require('../db/pool');
 const { auth, requireLevel } = require('../middleware/auth');
 const { publish } = require('../kafka');
+const waGen = require('../services/whatsappReportGenerator');
 const ar = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // ── CSV helper ────────────────────────────────────────────────────────────────
@@ -46,7 +47,10 @@ async function compileEOD(targetDate) {
     inwardGrnRes,
     outwardIssuesRes,
     topItemIssuesRes,
-    criticalLowStockRes
+    criticalLowStockRes,
+    detailedGrnRes,
+    detailedIndentsRes,
+    catalogTotalsRes
   ] = await Promise.all([
     // Production summary for date
     pool.query(`
@@ -130,6 +134,7 @@ async function compileEOD(targetDate) {
     // Stock Ledger movement on date
     pool.query(`
       SELECT COALESCE(SUM(in_qty), 0) AS total_received_qty,
+             COALESCE(SUM(value) FILTER (WHERE in_qty > 0), 0) AS total_received_value,
              COALESCE(SUM(out_qty), 0) AS total_issued_qty,
              COALESCE(SUM(value) FILTER (WHERE out_qty > 0), 0) AS total_issue_value
       FROM stock_ledger WHERE date = $1
@@ -179,21 +184,24 @@ async function compileEOD(targetDate) {
       ORDER BY i.id DESC
     `, [d]),
 
-    // Category-Wise Store Movements
+    // Category-Wise Store Movements with Valuation
     pool.query(`
       SELECT COALESCE(mc.name, 'General / Consumables') AS category_name,
-             COALESCE(mc.type, 'Store') AS store_type,
+             COALESCE(parent.name, mc.name, 'Store') AS store_type,
+             COUNT(DISTINCT m.id) AS total_materials_count,
+             COALESCE(SUM(m.current_stock * m.unit_price), 0) AS total_stock_valuation,
+             COALESCE(SUM(m.current_stock), 0) AS total_stock_qty,
              COUNT(sl.id) FILTER (WHERE sl.out_qty > 0) AS items_issued_count,
              COALESCE(SUM(sl.out_qty), 0) AS outward_qty,
              COALESCE(SUM(sl.value) FILTER (WHERE sl.out_qty > 0), 0) AS outward_value,
              COUNT(sl.id) FILTER (WHERE sl.in_qty > 0) AS items_received_count,
              COALESCE(SUM(sl.in_qty), 0) AS inward_qty,
              COALESCE(SUM(sl.value) FILTER (WHERE sl.in_qty > 0), 0) AS inward_value
-      FROM stock_ledger sl
-      JOIN materials m ON sl.material_id = m.id
-      LEFT JOIN material_categories mc ON m.category_id = mc.id
-      WHERE sl.date = $1
-      GROUP BY mc.name, mc.type
+      FROM material_categories mc
+      LEFT JOIN material_categories parent ON parent.id = mc.parent_id
+      LEFT JOIN materials m ON mc.id = m.category_id AND m.is_active = true
+      LEFT JOIN stock_ledger sl ON m.id = sl.material_id AND sl.date = $1
+      GROUP BY mc.name, parent.name, mc.type
       ORDER BY outward_value DESC, inward_value DESC
     `, [d]),
 
@@ -231,7 +239,7 @@ async function compileEOD(targetDate) {
     // Outward Issues
     pool.query(`
       SELECT sl.id, sl.date, sl.out_qty, sl.value, sl.remarks,
-             m.code AS mat_code, m.name AS mat_name, m.uom,
+             m.code AS mat_code, m.name AS mat_name, m.uom, m.current_stock, m.reorder_level,
              ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
@@ -251,7 +259,7 @@ async function compileEOD(targetDate) {
     // Top 5 High-Value Item Issues on Date
     pool.query(`
       SELECT sl.id, sl.out_qty, sl.value, sl.remarks,
-             m.code AS mat_code, m.name AS mat_name, m.uom, m.unit_price,
+             m.code AS mat_code, m.name AS mat_name, m.uom, m.unit_price, m.current_stock, m.reorder_level,
              ps.name AS section_name, COALESCE(se.equipment_name, mac.name) AS machine_name,
              COALESCE(d.name, (
                SELECT d2.name FROM indents ind JOIN departments d2 ON ind.department_id = d2.id
@@ -266,7 +274,7 @@ async function compileEOD(targetDate) {
       LEFT JOIN departments d ON si.department_id = d.id
       WHERE sl.date = $1 AND sl.transaction_type IN ('issue', 'out') AND sl.out_qty > 0
       ORDER BY sl.value DESC
-      LIMIT 5
+      LIMIT 8
     `, [d]),
 
     // Critical Low Stock Alerts (Stock <= Reorder Level)
@@ -284,7 +292,86 @@ async function compileEOD(targetDate) {
       LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
       WHERE m.is_active = true AND m.current_stock <= m.reorder_level
       ORDER BY (m.reorder_level - m.current_stock) DESC, (m.current_stock * m.unit_price) DESC
-      LIMIT 8
+      LIMIT 10
+    `),
+
+    // Detailed GRN records with line items
+    pool.query(`
+      SELECT g.id, g.grn_number, g.date, g.total_value, g.grand_total, g.status, g.invoice_number,
+             v.name AS vendor_name, v.code AS vendor_code,
+             po.po_number,
+             COALESCE(
+               json_agg(
+                 json_build_object(
+                   'material_id', gi.material_id,
+                   'mat_code', m.code,
+                   'mat_name', m.name,
+                   'uom', m.uom,
+                   'received_qty', gi.received_qty,
+                   'accepted_qty', gi.accepted_qty,
+                   'rejected_qty', gi.rejected_qty,
+                   'unit_price', gi.unit_price,
+                   'total_amount', gi.total_amount,
+                   'section_name', ps.name,
+                   'machine_name', COALESCE(se.equipment_name, mac.name)
+                 )
+               ) FILTER (WHERE gi.id IS NOT NULL), '[]'::json
+             ) AS items
+      FROM grn g
+      LEFT JOIN vendors v ON g.vendor_id = v.id
+      LEFT JOIN purchase_orders po ON g.po_id = po.id
+      LEFT JOIN grn_items gi ON g.id = gi.grn_id
+      LEFT JOIN materials m ON gi.material_id = m.id
+      LEFT JOIN plant_sections ps ON ps.id = m.section_id
+      LEFT JOIN machines mac ON mac.id = m.machine_id
+      LEFT JOIN section_equipment se ON se.id = m.section_equipment_id
+      WHERE DATE(g.date) = $1 OR DATE(g.created_at) = $1
+      GROUP BY g.id, g.grn_number, g.date, g.total_value, g.grand_total, g.status, g.invoice_number, v.name, v.code, po.po_number
+      ORDER BY g.id DESC
+    `, [d]),
+
+    // Detailed Indents with line items
+    pool.query(`
+      SELECT i.id, i.indent_number, i.date, i.required_date, i.priority, i.status, i.total_value,
+             d.name AS dept_name, d.code AS dept_code,
+             u.name AS raised_by_name,
+             COALESCE(
+               json_agg(
+                 json_build_object(
+                   'material_id', ii.material_id,
+                   'mat_code', m.code,
+                   'mat_name', m.name,
+                   'uom', ii.uom,
+                   'required_qty', ii.required_qty,
+                   'approved_qty', ii.approved_qty,
+                   'issued_qty', ii.issued_qty,
+                   'pending_qty', GREATEST(0, (COALESCE(ii.required_qty, 0) - COALESCE(ii.issued_qty, 0))),
+                   'unit_price', ii.unit_price,
+                   'line_value', ii.line_value,
+                   'section_name', ps.name,
+                   'machine_name', mac.name
+                 )
+               ) FILTER (WHERE ii.id IS NOT NULL), '[]'::json
+             ) AS items
+      FROM indents i
+      JOIN departments d ON i.department_id = d.id
+      LEFT JOIN users u ON i.raised_by = u.id
+      LEFT JOIN indent_items ii ON i.id = ii.indent_id
+      LEFT JOIN materials m ON ii.material_id = m.id
+      LEFT JOIN plant_sections ps ON ps.id = ii.section_id OR (ii.section_id IS NULL AND ps.id = m.section_id)
+      LEFT JOIN machines mac ON mac.id = ii.machine_id OR (ii.machine_id IS NULL AND mac.id = m.machine_id)
+      WHERE DATE(i.date) = $1 OR DATE(i.created_at) = $1
+      GROUP BY i.id, i.indent_number, i.date, i.required_date, i.priority, i.status, i.total_value, d.name, d.code, u.name
+      ORDER BY i.id DESC
+    `, [d]),
+
+    // Mill active catalog totals
+    pool.query(`
+      SELECT COUNT(id) AS total_active_materials,
+             COALESCE(SUM(current_stock * unit_price), 0) AS total_inventory_valuation,
+             COALESCE(SUM(current_stock), 0) AS total_stock_units
+      FROM materials
+      WHERE is_active = true
     `)
   ]);
 
@@ -298,6 +385,7 @@ async function compileEOD(targetDate) {
   const st = stockMoveRes.rows[0] || {};
   const hr = hrRes.rows[0] || {};
   const al = alarmsRes.rows[0] || {};
+  const catTotals = catalogTotalsRes.rows[0] || {};
 
   const indentsByDept = indentsByDeptRes.rows || [];
   const indentsList = indentsListRes.rows || [];
@@ -305,14 +393,19 @@ async function compileEOD(targetDate) {
   const purchases = purchaseOrdersRes.rows || [];
   const inwardGRNs = inwardGrnRes.rows || [];
   const outwardIssues = outwardIssuesRes.rows || [];
-  const topItemIssues = arguments[0]?.topItemIssues || (arguments ? [] : []);
-  const topIssuesList = (typeof topItemIssuesRes !== 'undefined' ? topItemIssuesRes.rows : []) || [];
-  const criticalLowStock = (typeof criticalLowStockRes !== 'undefined' ? criticalLowStockRes.rows : []) || [];
+  const topItemIssues = (topItemIssuesRes?.rows?.length ? topItemIssuesRes.rows : outwardIssues.slice(0, 8));
+  const criticalLowStock = criticalLowStockRes?.rows || [];
+  const detailedGrns = detailedGrnRes?.rows || [];
+  const detailedIndents = detailedIndentsRes?.rows || [];
 
   const totalMtVal = Number(prod.total_mt || 0);
   const totalPowerUnits = Number(util.total_power_units || 0);
   const specificPower = totalMtVal > 0 ? (totalPowerUnits / totalMtVal) : 0;
   const specificSteam = totalMtVal > 0 ? (Number(util.total_steam_mt || 0) / totalMtVal) : 0;
+
+  const totalReceivedVal = Number(st.total_received_value || inwardGRNs.reduce((a, b) => a + Number(b.value || 0), 0));
+  const totalIssuedVal = Number(st.total_issue_value || outwardIssues.reduce((a, b) => a + Number(b.value || 0), 0));
+  const totalMillVal = Number(catTotals.total_inventory_valuation || 0);
 
   const compiled = {
     date: d,
@@ -362,17 +455,24 @@ async function compileEOD(targetDate) {
       indentsIssued: Number(ind.indents_issued || 0),
       indentsValue: Number(ind.indents_value || 0),
       stockReceivedQty: Number(st.total_received_qty || 0),
+      stockReceivedValue: totalReceivedVal,
       stockIssuedQty: Number(st.total_issued_qty || 0),
-      stockIssueValue: Number(st.total_issue_value || 0)
+      stockIssueValue: totalIssuedVal
     },
+    totalReceivedValue: totalReceivedVal,
+    totalReceivedQty: Number(st.total_received_qty || 0),
+    totalMillInventoryValuation: totalMillVal,
+    totalActiveMaterials: Number(catTotals.total_active_materials || 0),
     indentsByDept,
     indentsList,
+    detailedIndents,
     categoryWiseStore,
     purchases,
     inwardGRNs,
+    detailedGrns,
     outwardIssues,
-    topItemIssues: (topItemIssuesRes?.rows?.length ? topItemIssuesRes.rows : outwardIssues.slice(0, 5)),
-    criticalLowStock: criticalLowStockRes?.rows || [],
+    topItemIssues,
+    criticalLowStock,
     hr: {
       present: Number(hr.present || 0),
       absent: Number(hr.absent || 0),
@@ -386,6 +486,80 @@ async function compileEOD(targetDate) {
 
   return compiled;
 }
+
+// GET /api/reports/whatsapp-digest — Get compiled data + pre-formatted WhatsApp text
+router.get('/whatsapp-digest', auth, ar(async (req, res) => {
+  const { date, type = 'master', remarks = '', signOff = '' } = req.query;
+  const targetDate = date || new Date().toISOString().slice(0, 10);
+  const data = await compileEOD(targetDate);
+
+  const cfg = {
+    customRemarks: remarks,
+    senderSignOff: signOff
+  };
+
+  let whatsappText = '';
+  switch (type) {
+    case 'grn':
+      whatsappText = waGen.generateGrnWhatsAppReport(data, cfg);
+      break;
+    case 'indent':
+      whatsappText = waGen.generateIndentWhatsAppReport(data, cfg);
+      break;
+    case 'item':
+      whatsappText = waGen.generateItemWiseWhatsAppReport(data, cfg);
+      break;
+    case 'inventory':
+      whatsappText = waGen.generateInventoryValuationReport(data, cfg);
+      break;
+    case 'master':
+    default:
+      whatsappText = waGen.generateMasterWhatsAppReport(data, cfg);
+      break;
+  }
+
+  res.json({
+    success: true,
+    type,
+    date: targetDate,
+    data,
+    whatsappText
+  });
+}));
+
+// POST /api/reports/whatsapp-digest/preview — Dynamic WhatsApp Formatter
+router.post('/whatsapp-digest/preview', auth, ar(async (req, res) => {
+  const { date, type = 'master', config = {} } = req.body || {};
+  const targetDate = date || new Date().toISOString().slice(0, 10);
+  const data = await compileEOD(targetDate);
+
+  let whatsappText = '';
+  switch (type) {
+    case 'grn':
+      whatsappText = waGen.generateGrnWhatsAppReport(data, config);
+      break;
+    case 'indent':
+      whatsappText = waGen.generateIndentWhatsAppReport(data, config);
+      break;
+    case 'item':
+      whatsappText = waGen.generateItemWiseWhatsAppReport(data, config);
+      break;
+    case 'inventory':
+      whatsappText = waGen.generateInventoryValuationReport(data, config);
+      break;
+    case 'master':
+    default:
+      whatsappText = waGen.generateMasterWhatsAppReport(data, config);
+      break;
+  }
+
+  res.json({
+    success: true,
+    type,
+    date: targetDate,
+    whatsappText
+  });
+}));
 
 // GET /api/reports/eod — Get compiled EOD Mill Digest
 router.get('/eod', auth, ar(async (req, res) => {

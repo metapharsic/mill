@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../context/AuthContext'
 import {
   Package, FileText, ArrowDownRight, ArrowUpRight, X,
   Save, AlertTriangle, CheckCircle2, Clock, MapPin, Tag,
@@ -19,6 +20,15 @@ export default function ProductDetailModal({
   onOpenInward,
   onOpenIssue
 }) {
+  const { user } = useAuth()
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material'))) ||
+    roleLevel >= 4
+  )
+
   const [activeTab, setActiveTab] = useState('specs') // 'specs' | 'ledger' | 'quick_ops'
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -224,6 +234,26 @@ export default function ProductDetailModal({
       showToast('Network error saving specifications', 'error')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDeleteMaterial = async () => {
+    if (!window.confirm(`Are you sure you want to delete / deactivate "${form.name}" (${form.code})?`)) return
+    try {
+      const res = await fetch(`${API}/master/materials/${materialId}`, {
+        method: 'DELETE',
+        headers: h()
+      })
+      const r = await res.json()
+      if (r.success) {
+        showToast('Material deactivated successfully', 'success')
+        if (onUpdated) onUpdated()
+        setTimeout(() => onClose(), 600)
+      } else {
+        showToast(r.message || 'Failed to delete material', 'error')
+      }
+    } catch (err) {
+      showToast('Error deleting material: ' + err.message, 'error')
     }
   }
 
@@ -622,15 +652,28 @@ export default function ProductDetailModal({
             />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={form.is_active}
-                  onChange={e => setForm({ ...form, is_active: e.target.checked })}
-                  style={{ accentColor: '#0f172a', cursor: 'pointer' }}
-                />
-                Active in Store Catalog
-              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.is_active}
+                    onChange={e => setForm({ ...form, is_active: e.target.checked })}
+                    style={{ accentColor: '#0f172a', cursor: 'pointer' }}
+                  />
+                  Active in Store Catalog
+                </label>
+
+                {isStoreManager && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteMaterial}
+                    style={{ background: '#fef2f2', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 6, padding: '5px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                    title="Store Manager: Deactivate / Delete this material item"
+                  >
+                    🗑️ Delete Item
+                  </button>
+                )}
+              </div>
 
               <button
                 type="submit"

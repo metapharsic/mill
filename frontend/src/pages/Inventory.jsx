@@ -24,14 +24,14 @@ const API = (path, opts = {}) => fetch(path, {
 })
 
 const STORE_TABS = [
-  { id: 'store', label: 'All Store Inventory', icon: Boxes, desc: 'Mechanical, Electrical, Spares & Consumables' },
+  { id: 'store', label: 'All Store Inventory', icon: Boxes, desc: 'Mechanical, Electrical, Chemical, Spares & Consumables' },
   { id: 'mechanical', label: 'Mechanical Store', icon: Factory, desc: 'Bearings, Oil Seals, Valves, Belts, Couplings, Pipes' },
   { id: 'electrical', label: 'Electrical Store', icon: Zap, desc: 'Contactors, Relays, MCBs, VFDs, Fuses, Cables' },
+  { id: 'chemical', label: 'Chemical Store', icon: Layers, desc: 'Alum, Rosin, PAC, Dyes, Sizing Chemicals' },
   { id: 'consumable', label: 'Consumables & General', icon: Package, desc: 'Stationery, General Hardware, Clothing, Tools' },
 ]
 
 const ADMIN_EXTRA_TABS = [
-  { id: 'chemical', label: 'Chemical Store', icon: Layers, desc: 'Alum, Rosin, PAC, Dyes, Sizing Chemicals' },
   { id: 'all', label: 'All Organization', icon: ShieldCheck, desc: 'Complete mill-wide inventory' },
 ]
 

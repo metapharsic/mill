@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { pool, requireAuth, requireLevel, requireStore, ar } = require('../middleware/helpers')
+const { pool, requireAuth, requireLevel, requireStore, requireStoreManager, ar } = require('../middleware/helpers')
 const { publish, TOPICS } = require('../kafka')
 
 // Helper: insert audit log row (inside a client transaction)
@@ -2443,8 +2443,8 @@ router.put('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
   }
 }));
 
-// DELETE /api/store/inward/:id — DML Delete / Void Inward GRN
-router.delete('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
+// DELETE /api/store/inward/:id — DML Delete / Void Inward GRN Line (Store Manager Only)
+router.delete('/inward/:id', requireAuth, requireStoreManager, ar(async (req, res) => {
   const { id } = req.params;
 
   const client = await pool.connect();
@@ -2490,6 +2490,96 @@ router.delete('/inward/:id', requireAuth, requireStore, ar(async (req, res) => {
     publish(TOPICS.EVENTS_ALL, `inward-${id}`, { event: 'store.inward.deleted', id, materialId: mat.id, newStock, userId: req.user.id });
 
     res.json({ success: true, message: `Inward record removed. Restored balance: ${newStock} ${mat.uom}` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ success: false, message: e.message });
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /api/store/grn/:id — Void / Delete entire Master GRN with atomic multi-item rollback (Store Manager Only)
+router.delete('/grn/:id', requireAuth, requireStoreManager, ar(async (req, res) => {
+  const isNum = /^\d+$/.test(String(req.params.id));
+  const where = isNum ? `WHERE id=$1` : `WHERE grn_number=$1`;
+  const paramVal = isNum ? parseInt(req.params.id) : req.params.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: [grn] } = await client.query(`SELECT * FROM grn ${where} FOR UPDATE`, [paramVal]);
+    if (!grn) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'GRN record not found' });
+    }
+
+    const grnId = grn.id;
+    const { rows: items } = await client.query(`SELECT * FROM grn_items WHERE grn_id = $1 FOR UPDATE`, [grnId]);
+
+    // Check stock for all items before rollback
+    for (const it of items) {
+      const accQty = parseFloat(it.accepted_qty || 0);
+      if (accQty <= 0) continue;
+
+      const { rows: [mat] } = await client.query(`SELECT id, name, uom, current_stock FROM materials WHERE id = $1 FOR UPDATE`, [it.material_id]);
+      if (mat) {
+        const curStock = parseFloat(mat.current_stock || 0);
+        const newStock = curStock - accQty;
+        if (newStock < 0) {
+          throw new Error(`Cannot void GRN ${grn.grn_number}: stock for '${mat.name}' already consumed (Remaining: ${curStock} ${mat.uom})`);
+        }
+        await client.query(`UPDATE materials SET current_stock = $1 WHERE id = $2`, [newStock, mat.id]);
+      }
+
+      // Revert PO received count
+      if (grn.po_id) {
+        const recQty = parseFloat(it.received_qty || accQty);
+        await client.query(
+          `UPDATE po_items SET received_qty = GREATEST(0, COALESCE(received_qty, 0) - $1) WHERE po_id = $2 AND material_id = $3`,
+          [recQty, grn.po_id, it.material_id]
+        );
+      }
+    }
+
+    // Revert PO status if all items received were 0
+    if (grn.po_id) {
+      const { rows: poCheck } = await client.query(
+        `SELECT COALESCE(SUM(received_qty), 0) as tot_rec, COALESCE(SUM(qty), 0) as tot_qty FROM po_items WHERE po_id = $1`,
+        [grn.po_id]
+      );
+      const totRec = parseFloat(poCheck[0]?.tot_rec || 0);
+      const newPoStatus = totRec <= 0 ? 'Approved' : 'Partial';
+      await client.query(`UPDATE purchase_orders SET status = $1 WHERE id = $2`, [newPoStatus, grn.po_id]);
+    }
+
+    // Remove stock ledger entries linked to this GRN
+    await client.query(
+      `DELETE FROM stock_ledger WHERE (reference_type = 'GRN' AND (reference_id = $1 OR reference_id = $2)) OR remarks ILIKE $3`,
+      [grnId, String(grnId), `%${grn.grn_number}%`]
+    );
+
+    // Delete or void draft vendor bills linked to this GRN
+    await client.query(`DELETE FROM vendor_bills WHERE grn_id = $1 AND status = 'Draft'`, [grnId]);
+
+    // Delete GRN items & header
+    await client.query(`DELETE FROM grn_items WHERE grn_id = $1`, [grnId]);
+    await client.query(`DELETE FROM grn WHERE id = $1`, [grnId]);
+
+    await auditLog(client, {
+      userId: req.user.id,
+      action: 'store.grn.delete',
+      module: 'store',
+      recordId: grnId,
+      oldData: { grn_number: grn.grn_number, itemCount: items.length },
+      newData: { deleted: true },
+      ip: req.ip
+    });
+
+    await client.query('COMMIT');
+    publish(TOPICS.EVENTS_ALL, `grn-${grnId}`, { event: 'store.grn.deleted', id: grnId, grnNumber: grn.grn_number, userId: req.user.id });
+
+    res.json({ success: true, message: `GRN ${grn.grn_number} successfully deleted and stock reversed.` });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });

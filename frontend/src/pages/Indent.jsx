@@ -302,6 +302,7 @@ export default function Indent() {
   const [editId, setEditId] = useState(null)
   const [reviewMode, setReviewMode] = useState(false)
   const [formErrors, setFormErrors] = useState({})
+  const [reviewError, setReviewError] = useState(null)
 
   useEffect(() => {
     if (user && !form.department_id) {
@@ -733,6 +734,7 @@ export default function Indent() {
 
   const goToReview = e => {
     e.preventDefault()
+    setReviewError(null)
     const errs = validateForm()
     setFormErrors(errs)
     if (Object.keys(errs).length) { flash(false, 'Fix the highlighted fields before review'); return }
@@ -741,6 +743,7 @@ export default function Indent() {
 
   const save = async () => {
     setSaving(true)
+    setReviewError(null)
     const items = form.items.map(it => {
       const m = matByID(it.material_id)
       return {
@@ -755,9 +758,10 @@ export default function Indent() {
       : await API('/indent', { method: 'POST', body: JSON.stringify({ ...form, items }) })
     setSaving(false)
     if (r.success) {
-      setForm(blankForm()); setEditId(null); setTabKey('list'); setReviewMode(false); setFormErrors({}); load()
+      setForm(blankForm()); setEditId(null); setTabKey('list'); setReviewMode(false); setFormErrors({}); setReviewError(null); load()
       flash(true, r.message || (editId ? `Indent updated: ${r.data?.indent_number || editId}` : `Indent created: ${r.data?.indent_number}`))
     } else {
+      setReviewError(r.message || 'Failed to save indent')
       flash(false, r.message || 'Failed to save indent')
     }
   }
@@ -2360,8 +2364,17 @@ export default function Indent() {
               <div style={{ fontSize: 14, color: '#0f172a' }}>Grand Total Valuation: <strong style={{ color: '#0f766e', fontSize: 18 }}>{fmt(grandTotal)}</strong></div>
             </div>
 
+            {reviewError && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 14px', borderRadius: 6, marginTop: 14, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16 }}>⚠️</span>
+                <div>
+                  <strong>Submission Error:</strong> {reviewError}
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 18 }}>
-              <button type="button" style={S.btnSecondary} onClick={() => setReviewMode(false)}>← Back &amp; Edit</button>
+              <button type="button" style={S.btnSecondary} onClick={() => { setReviewMode(false); setReviewError(null) }}>← Back &amp; Edit</button>
               <button type="button" style={S.btnPrimary} disabled={saving} onClick={save}>
                 {saving ? 'Processing...' : (editId ? '✓ Save Changes' : `✓ Confirm & Submit (${form.fulfillment_mode.toUpperCase()})`)}
               </button>

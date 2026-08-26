@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const API = (path, opts) => fetch(path, {
   headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(opts?.headers || {}) },
@@ -25,6 +26,15 @@ const TYPE_BY_CODE = {
 const ALL_SECTIONS_OPTION = { name: 'All Sections', code: 'ALL', type: 'All', icon: '🌐' }
 
 export default function Machines() {
+  const { user } = useAuth()
+  const roleLevel = user?.role_level ?? 1
+  const dept = (user?.department || '').toLowerCase()
+  const deptCode = (user?.dept_code || '').toUpperCase()
+  const isStoreManager = (
+    (roleLevel >= 3 && (['STORE', 'INV', 'RMS', 'MATERIALS', 'MAINT', 'ADMIN'].includes(deptCode) || dept.includes('store') || dept.includes('inventory') || dept.includes('raw material') || dept.includes('maintenance') || dept.includes('admin'))) ||
+    roleLevel >= 4
+  )
+
   const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -205,7 +215,7 @@ export default function Machines() {
                         <button style={S.btnIcon} onClick={() => openEdit(m)} title="Edit">✏️</button>
                         <button style={{ ...S.btnIcon, color: '#3b82f6' }} onClick={() => openPositions(m)} title="Positions">📍</button>
                         {m.is_active
-                          ? <button style={{ ...S.btnIcon, color: '#ef4444' }} onClick={() => del(m)} title="Deactivate">🗑️</button>
+                          ? (isStoreManager && <button style={{ ...S.btnIcon, color: '#ef4444' }} onClick={() => del(m)} title="Deactivate">🗑️</button>)
                           : <button style={{ ...S.btnIcon, color: '#22c55e' }} onClick={() => restore(m)} title="Restore">♻️</button>
                         }
                       </td>

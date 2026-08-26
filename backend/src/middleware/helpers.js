@@ -1,5 +1,5 @@
 const pool = require('../db/pool');
-const { auth: requireAuth, requireLevel, requireStore } = require('./auth');
+const { auth: requireAuth, requireLevel, requireStore, requireStoreManager } = require('./auth');
 
 // IMPORTANT: forward to next(err) — do NOT respond here. Several routers that import this ar()
 // (master.js, store.js) define their own `router.use((err,req,res,next) => ...)` error middleware
@@ -62,4 +62,4 @@ async function countVendors(filters = {}) {
   return parseInt(rows[0].count);
 }
 
-module.exports = { pool, requireAuth, requireLevel, requireStore, ar, audit, getVendors, countVendors };
+module.exports = { pool, requireAuth, requireLevel, requireStore, requireStoreManager, ar, audit, getVendors, countVendors };

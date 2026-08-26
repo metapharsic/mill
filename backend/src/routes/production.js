@@ -1178,4 +1178,425 @@ async function checkChemicalAlerts(reportId, client) {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// ─── PPC & SLITTING-REWINDING (2-STAGE MANUFACTURING ENGINE) ───────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Helper: Sequence generator for PPC plans and Jumbo Rolls ──────────────────
+async function getPpcSequenceNum(client, table, col, prefix) {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const { rows } = await client.query(
+    `SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM ${table} WHERE ${col} LIKE $1`,
+    [`${prefix}-${stamp}-%`]
+  );
+  return `${prefix}-${stamp}-${rows[0].seq}`;
+}
+
+// ─── 1. GET /api/production/ppc/orders-pending — Open Sales Order Backlog ─────
+router.get('/ppc/orders-pending', auth, asyncRoute(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT so.id, so.so_number AS "soNumber", so.date, so.delivery_date AS "deliveryDate",
+            so.customer_id AS "customerId", c.name AS "customerName",
+            so.grade_id AS "gradeId", g.name AS "gradeName", g.code AS "gradeCode",
+            so.gsm, so.width_mm AS "widthMm", so.qty_mt AS "qtyMt",
+            COALESCE(so.fulfilled_mt, 0) AS "fulfilledMt",
+            (so.qty_mt - COALESCE(so.fulfilled_mt, 0)) AS "pendingMt",
+            so.status
+     FROM sales_orders so
+     LEFT JOIN customers c ON c.id = so.customer_id
+     LEFT JOIN grades g ON g.id = so.grade_id
+     WHERE so.status IN ('Confirmed', 'In Production', 'Pending')
+       AND (so.qty_mt - COALESCE(so.fulfilled_mt, 0)) > 0
+     ORDER BY so.delivery_date ASC NULLS LAST, so.id ASC`
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 2. GET /api/production/ppc/plans — Master Production Plans List ──────────
+router.get('/ppc/plans', auth, asyncRoute(async (req, res) => {
+  const { date, machine_id, status } = req.query;
+  const conditions = ['1=1'];
+  const params = [];
+  let p = 1;
+
+  if (date)       { conditions.push(`p.target_date = $${p++}`); params.push(date); }
+  if (machine_id) { conditions.push(`p.machine_id = $${p++}`);  params.push(machine_id); }
+  if (status)     { conditions.push(`p.status = $${p++}`);      params.push(status); }
+
+  const { rows } = await pool.query(
+    `SELECT p.id, p.plan_number AS "planNumber", p.machine_id AS "machineId", m.name AS "machineName",
+            p.target_date AS "targetDate", p.grade_id AS "gradeId", g.name AS "gradeName", g.code AS "gradeCode",
+            p.target_gsm AS "targetGsm", p.target_bf AS "targetBf", p.usable_deckle_mm AS "usableDeckleMm",
+            p.planned_tonnage_mt AS "plannedTonnageMt", p.status, p.created_at AS "createdAt",
+            u.name AS "createdByName",
+            COALESCE(json_agg(
+              json_build_object(
+                'id', sp.id,
+                'patternNumber', sp.pattern_number,
+                'totalCutWidthMm', sp.total_cut_width_mm,
+                'plannedTrimMm', sp.planned_trim_mm,
+                'trimPercentage', sp.trim_percentage,
+                'setsPlanned', sp.sets_planned,
+                'setsCompleted', sp.sets_completed,
+                'status', sp.status,
+                'cuts', (
+                  SELECT COALESCE(json_agg(
+                    json_build_object(
+                      'id', pc.id,
+                      'cutPosition', pc.cut_position,
+                      'widthMm', pc.width_mm,
+                      'salesOrderId', pc.sales_order_id,
+                      'soNumber', so.so_number,
+                      'customerName', c.name,
+                      'remarks', pc.remarks
+                    ) ORDER BY pc.cut_position
+                  ), '[]'::json)
+                  FROM ppc_pattern_cuts pc
+                  LEFT JOIN sales_orders so ON so.id = pc.sales_order_id
+                  LEFT JOIN customers c ON c.id = so.customer_id
+                  WHERE pc.pattern_id = sp.id
+                )
+              ) ORDER BY sp.pattern_number
+            ) FILTER (WHERE sp.id IS NOT NULL), '[]'::json) AS patterns
+     FROM ppc_production_plans p
+     LEFT JOIN machines m ON m.id = p.machine_id
+     LEFT JOIN grades g ON g.id = p.grade_id
+     LEFT JOIN users u ON u.id = p.created_by
+     LEFT JOIN ppc_slitting_patterns sp ON sp.plan_id = p.id
+     WHERE ${conditions.join(' AND ')}
+     GROUP BY p.id, m.name, g.name, g.code, u.name
+     ORDER BY p.target_date DESC, p.id DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 3. POST /api/production/ppc/plans — Create Master Plan & Patterns ─────────
+router.post('/ppc/plans', auth, requireLevel(2), asyncRoute(async (req, res) => {
+  const { machine_id, target_date, grade_id, target_gsm, target_bf, usable_deckle_mm, planned_tonnage_mt, patterns } = req.body;
+  if (!machine_id || !target_date || !grade_id || !target_gsm || !usable_deckle_mm || !planned_tonnage_mt) {
+    return res.status(400).json({ success: false, message: 'Missing required plan header parameters' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const planNumber = await getPpcSequenceNum(client, 'ppc_production_plans', 'plan_number', 'PPC');
+
+    const { rows: planRows } = await client.query(
+      `INSERT INTO ppc_production_plans 
+         (plan_number, machine_id, target_date, grade_id, target_gsm, target_bf, usable_deckle_mm, planned_tonnage_mt, status, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'SCHEDULED', $9)
+       RETURNING *`,
+      [planNumber, machine_id, target_date, grade_id, target_gsm, target_bf || 0, usable_deckle_mm, planned_tonnage_mt, req.user.id]
+    );
+    const plan = planRows[0];
+
+    // Insert patterns if provided
+    if (Array.isArray(patterns) && patterns.length > 0) {
+      for (let i = 0; i < patterns.length; i++) {
+        const pat = patterns[i];
+        const patNumber = pat.pattern_number || (i + 1);
+        const cuts = pat.cuts || [];
+        const totalCutWidth = cuts.reduce((sum, c) => sum + (parseFloat(c.width_mm) || 0), 0);
+        const plannedTrimMm = Math.max(0, parseFloat(usable_deckle_mm) - totalCutWidth);
+        const trimPct = parseFloat(usable_deckle_mm) > 0 ? (plannedTrimMm / parseFloat(usable_deckle_mm)) * 100 : 0;
+        const setsPlanned = parseInt(pat.sets_planned) || 1;
+
+        const { rows: patRows } = await client.query(
+          `INSERT INTO ppc_slitting_patterns 
+             (plan_id, pattern_number, total_cut_width_mm, planned_trim_mm, trim_percentage, sets_planned, status)
+           VALUES ($1, $2, $3, $4, $5, $6, 'QUEUED')
+           RETURNING *`,
+          [plan.id, patNumber, totalCutWidth, plannedTrimMm, trimPct, setsPlanned]
+        );
+        const pattern = patRows[0];
+
+        // Insert child cuts
+        for (let j = 0; j < cuts.length; j++) {
+          const cut = cuts[j];
+          await client.query(
+            `INSERT INTO ppc_pattern_cuts (pattern_id, cut_position, width_mm, sales_order_id, remarks)
+             VALUES ($1, $2, $3, $4, $5)`,
+            [pattern.id, cut.cut_position || (j + 1), cut.width_mm, cut.sales_order_id || null, cut.remarks || null]
+          );
+        }
+      }
+    }
+
+    await auditLog(client, { userId: req.user.id, action: 'PPC_PLAN_CREATED', module: 'Production', recordId: plan.id, newData: plan, ip: req.ip });
+    await client.query('COMMIT');
+    res.status(201).json({ success: true, data: plan });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally { client.release(); }
+}));
+
+// ─── 4. PUT /api/production/ppc/plans/:id/status — Advance Plan Status ────────
+router.put('/ppc/plans/:id/status', auth, requireLevel(2), asyncRoute(async (req, res) => {
+  const { status } = req.body;
+  if (!['DRAFT', 'OPTIMIZED', 'SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Invalid plan status' });
+  }
+  const { rows } = await pool.query(
+    `UPDATE ppc_production_plans SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+    [status, req.params.id]
+  );
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Plan not found' });
+  res.json({ success: true, data: rows[0] });
+}));
+
+// ─── 5. GET /api/production/jumbo-reels — Mother Rolls List ───────────────────
+router.get('/jumbo-reels', auth, asyncRoute(async (req, res) => {
+  const { date, machine_id, status, reconciliation_status } = req.query;
+  const conditions = ['1=1'];
+  const params = [];
+  let p = 1;
+
+  if (date)                  { conditions.push(`DATE(j.created_at) = $${p++}`); params.push(date); }
+  if (machine_id)            { conditions.push(`j.machine_id = $${p++}`);       params.push(machine_id); }
+  if (status)                { conditions.push(`j.status = $${p++}`);           params.push(status); }
+  if (reconciliation_status) { conditions.push(`j.reconciliation_status = $${p++}`); params.push(reconciliation_status); }
+
+  const { rows } = await pool.query(
+    `SELECT j.id, j.jumbo_number AS "jumboNumber", j.machine_id AS "machineId", m.name AS "machineName",
+            j.shift_id AS "shiftId", s.shift_type AS "shiftType", s.date AS "shiftDate",
+            j.grade_id AS "gradeId", g.name AS "gradeName", g.code AS "gradeCode",
+            j.gsm_actual AS "gsmActual", j.bf_actual AS "bfActual", j.deckle_width_mm AS "deckleWidthMm",
+            j.gross_weight_kg AS "grossWeightKg", j.core_tare_weight_kg AS "coreTareWeightKg",
+            j.net_weight_kg AS "netWeightKg", j.speed_mpm AS "speedMpm", j.moisture_pct AS "moisturePct",
+            j.status, j.reconciliation_status AS "reconciliationStatus", j.variance_pct AS "variancePct",
+            j.override_reason AS "overrideReason", j.override_by AS "overrideBy", j.created_at AS "createdAt",
+            w.edge_trim_kg AS "edgeTrimKg", w.rewinder_broke_kg AS "rewinderBrokeKg", w.core_waste_kg AS "coreWasteKg",
+            w.total_waste_kg AS "totalWasteKg", w.credited_to_scrap AS "creditedToScrap",
+            COUNT(sr.id)::int AS "slitReelCount",
+            COALESCE(SUM(sr.actual_weight_kg), 0)::numeric AS "slitActualWeightKg",
+            COALESCE(SUM(sr.planned_weight_kg), 0)::numeric AS "slitPlannedWeightKg"
+     FROM jumbo_reels j
+     LEFT JOIN machines m ON m.id = j.machine_id
+     LEFT JOIN grades g ON g.id = j.grade_id
+     LEFT JOIN shifts s ON s.id = j.shift_id
+     LEFT JOIN slitting_waste_log w ON w.jumbo_reel_id = j.id
+     LEFT JOIN slit_reels sr ON sr.jumbo_reel_id = j.id
+     WHERE ${conditions.join(' AND ')}
+     GROUP BY j.id, m.name, g.name, g.code, s.shift_type, s.date, w.edge_trim_kg, w.rewinder_broke_kg, w.core_waste_kg, w.total_waste_kg, w.credited_to_scrap
+     ORDER BY j.created_at DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 6. POST /api/production/jumbo-reels — Log Mother Roll Off PM01 ───────────
+router.post('/jumbo-reels', auth, requireLevel(1), asyncRoute(async (req, res) => {
+  const { machine_id, shift_id, grade_id, gsm_actual, bf_actual, deckle_width_mm, gross_weight_kg, core_tare_weight_kg, speed_mpm, moisture_pct } = req.body;
+  if (!machine_id || !grade_id || !gsm_actual || !deckle_width_mm || !gross_weight_kg) {
+    return res.status(400).json({ success: false, message: 'machine_id, grade_id, gsm_actual, deckle_width_mm, gross_weight_kg required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const jumboNumber = await getPpcSequenceNum(client, 'jumbo_reels', 'jumbo_number', 'MK-JMB');
+
+    const { rows } = await client.query(
+      `INSERT INTO jumbo_reels 
+         (jumbo_number, machine_id, shift_id, grade_id, gsm_actual, bf_actual, deckle_width_mm, gross_weight_kg, core_tare_weight_kg, speed_mpm, moisture_pct, status, reconciliation_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'PRODUCED', 'OPEN')
+       RETURNING *`,
+      [jumboNumber, machine_id, shift_id || null, grade_id, gsm_actual, bf_actual || 0, deckle_width_mm, gross_weight_kg, core_tare_weight_kg || 0, speed_mpm || null, moisture_pct || null]
+    );
+    const jumbo = rows[0];
+    await auditLog(client, { userId: req.user.id, action: 'JUMBO_REEL_PRODUCED', module: 'Production', recordId: jumbo.id, newData: jumbo, ip: req.ip });
+    await client.query('COMMIT');
+    res.status(201).json({ success: true, data: jumbo });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally { client.release(); }
+}));
+
+// ─── 7. GET /api/production/slitting/patterns-active — Active Slitting Knives ─
+router.get('/slitting/patterns-active', auth, asyncRoute(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT sp.id, sp.plan_id AS "planId", sp.pattern_number AS "patternNumber",
+            sp.total_cut_width_mm AS "totalCutWidthMm", sp.planned_trim_mm AS "plannedTrimMm",
+            sp.trim_percentage AS "trimPercentage", sp.sets_planned AS "setsPlanned",
+            sp.sets_completed AS "setsCompleted", sp.status,
+            p.plan_number AS "planNumber", p.usable_deckle_mm AS "usableDeckleMm",
+            g.name AS "gradeName", g.code AS "gradeCode", p.target_gsm AS "targetGsm",
+            (
+              SELECT COALESCE(json_agg(
+                json_build_object(
+                  'id', pc.id,
+                  'cutPosition', pc.cut_position,
+                  'widthMm', pc.width_mm,
+                  'salesOrderId', pc.sales_order_id,
+                  'soNumber', so.so_number,
+                  'customerName', c.name,
+                  'remarks', pc.remarks
+                ) ORDER BY pc.cut_position
+              ), '[]'::json)
+              FROM ppc_pattern_cuts pc
+              LEFT JOIN sales_orders so ON so.id = pc.sales_order_id
+              LEFT JOIN customers c ON c.id = so.customer_id
+              WHERE pc.pattern_id = sp.id
+            ) AS cuts
+     FROM ppc_slitting_patterns sp
+     JOIN ppc_production_plans p ON p.id = sp.plan_id
+     JOIN grades g ON g.id = p.grade_id
+     WHERE sp.status IN ('QUEUED', 'ACTIVE')
+     ORDER BY sp.id ASC`
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 8. GET /api/production/slitting/slit-reels — Finished Slit Reels by Jumbo ─
+router.get('/slitting/slit-reels', auth, asyncRoute(async (req, res) => {
+  const { jumbo_reel_id } = req.query;
+  const cond = jumbo_reel_id ? `WHERE sr.jumbo_reel_id = $1` : '';
+  const params = jumbo_reel_id ? [jumbo_reel_id] : [];
+
+  const { rows } = await pool.query(
+    `SELECT sr.id, sr.reel_number AS "reelNumber", sr.jumbo_reel_id AS "jumboReelId",
+            sr.pattern_id AS "patternId", sr.cut_position AS "cutPosition",
+            sr.sales_order_id AS "salesOrderId", so.so_number AS "soNumber", c.name AS "customerName",
+            sr.width_mm AS "widthMm", sr.diameter_cm AS "diameterCm",
+            sr.planned_weight_kg AS "plannedWeightKg", sr.actual_weight_kg AS "actualWeightKg",
+            sr.weight_variance_kg AS "weightVarianceKg", sr.barcode,
+            sr.quality_status AS "qualityStatus", sr.rack_location AS "rackLocation",
+            sr.dispatched, sr.created_at AS "createdAt"
+     FROM slit_reels sr
+     LEFT JOIN sales_orders so ON so.id = sr.sales_order_id
+     LEFT JOIN customers c ON c.id = so.customer_id
+     ${cond}
+     ORDER BY sr.cut_position ASC, sr.id ASC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 9. POST /api/production/slitting/slit-reels — Scale Authority Log ────────
+router.post('/slitting/slit-reels', auth, requireLevel(1), asyncRoute(async (req, res) => {
+  const { jumbo_reel_id, pattern_id, cut_position, sales_order_id, width_mm, diameter_cm, planned_weight_kg, actual_weight_kg } = req.body;
+  if (!jumbo_reel_id || !cut_position || !width_mm || !actual_weight_kg) {
+    return res.status(400).json({ success: false, message: 'jumbo_reel_id, cut_position, width_mm, actual_weight_kg required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Fetch jumbo reel
+    const { rows: jRows } = await client.query('SELECT * FROM jumbo_reels WHERE id = $1 FOR UPDATE', [jumbo_reel_id]);
+    if (!jRows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Jumbo reel not found' });
+    }
+    const jumbo = jRows[0];
+
+    // Generate unique child barcode
+    const posLetter = String.fromCharCode(64 + parseInt(cut_position)); // 1->A, 2->B, etc.
+    const reelNumber = `${jumbo.jumbo_number.replace('MK-JMB', 'MK-FIN')}-${posLetter}`;
+    const barcode = `MK-BAR-${reelNumber}-${Date.now()}`;
+
+    // Compute planned weight fallback if not provided: (Width_m * Length_m * GSM / 1000)
+    let planKg = planned_weight_kg;
+    if (!planKg && jumbo.gsm_actual && jumbo.net_weight_kg && jumbo.deckle_width_mm) {
+      planKg = (parseFloat(width_mm) / parseFloat(jumbo.deckle_width_mm)) * parseFloat(jumbo.net_weight_kg);
+    }
+
+    const { rows } = await client.query(
+      `INSERT INTO slit_reels 
+         (reel_number, jumbo_reel_id, pattern_id, cut_position, sales_order_id, width_mm, diameter_cm, planned_weight_kg, actual_weight_kg, barcode, quality_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'APPROVED')
+       ON CONFLICT (reel_number) DO UPDATE 
+       SET actual_weight_kg = EXCLUDED.actual_weight_kg, planned_weight_kg = EXCLUDED.planned_weight_kg
+       RETURNING *`,
+      [reelNumber, jumbo_reel_id, pattern_id || null, cut_position, sales_order_id || null, width_mm, diameter_cm || null, planKg || actual_weight_kg, actual_weight_kg, barcode]
+    );
+    const slitReel = rows[0];
+
+    // Update Sales Order fulfilled_mt if sales_order_id linked
+    if (sales_order_id) {
+      const addedMt = parseFloat(actual_weight_kg) / 1000;
+      await client.query(
+        `UPDATE sales_orders 
+         SET fulfilled_mt = COALESCE(fulfilled_mt, 0) + $1,
+             status = CASE WHEN (COALESCE(fulfilled_mt, 0) + $1) >= qty_mt THEN 'Ready' ELSE 'In Production' END
+         WHERE id = $2`,
+        [addedMt, sales_order_id]
+      );
+    }
+
+    // Update Jumbo status to MOUNTED_ON_REWINDER if PRODUCED
+    if (jumbo.status === 'PRODUCED') {
+      await client.query(`UPDATE jumbo_reels SET status = 'MOUNTED_ON_REWINDER' WHERE id = $1`, [jumbo_reel_id]);
+    }
+
+    await auditLog(client, { userId: req.user.id, action: 'SLIT_REEL_WEIGHED', module: 'Production', recordId: slitReel.id, newData: slitReel, ip: req.ip });
+    await client.query('COMMIT');
+    res.status(201).json({ success: true, data: slitReel });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally { client.release(); }
+}));
+
+// ─── 10. POST /api/production/slitting/waste-log — Log Edge Trim & Reconcile ──
+router.post('/slitting/waste-log', auth, requireLevel(1), asyncRoute(async (req, res) => {
+  const { jumbo_reel_id, edge_trim_kg, rewinder_broke_kg, core_waste_kg } = req.body;
+  if (!jumbo_reel_id) {
+    return res.status(400).json({ success: false, message: 'jumbo_reel_id required' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query(
+      `INSERT INTO slitting_waste_log (jumbo_reel_id, edge_trim_kg, rewinder_broke_kg, core_waste_kg, logged_by)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (jumbo_reel_id) DO UPDATE
+       SET edge_trim_kg = EXCLUDED.edge_trim_kg,
+           rewinder_broke_kg = EXCLUDED.rewinder_broke_kg,
+           core_waste_kg = EXCLUDED.core_waste_kg,
+           logged_by = EXCLUDED.logged_by,
+           logged_at = NOW()
+       RETURNING *`,
+      [jumbo_reel_id, edge_trim_kg || 0, rewinder_broke_kg || 0, core_waste_kg || 0, req.user.id]
+    );
+
+    // Fetch updated jumbo status after trigger execution
+    const { rows: jRows } = await client.query('SELECT * FROM jumbo_reels WHERE id = $1', [jumbo_reel_id]);
+    await client.query('COMMIT');
+    res.json({ success: true, data: rows[0], jumbo: jRows[0] });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally { client.release(); }
+}));
+
+// ─── 11. POST /api/production/jumbo-reels/:id/override — Supervisor Override ──
+router.post('/jumbo-reels/:id/override', auth, requireLevel(4), asyncRoute(async (req, res) => {
+  const { override_reason } = req.body;
+  if (!override_reason) {
+    return res.status(400).json({ success: false, message: 'override_reason required for Plant Head approval' });
+  }
+
+  const { rows } = await pool.query(
+    `UPDATE jumbo_reels 
+     SET reconciliation_status = 'OVERRIDDEN',
+         status = 'SLIT_COMPLETED',
+         override_reason = $1,
+         override_by = $2
+     WHERE id = $3
+     RETURNING *`,
+    [override_reason, req.user.id, req.params.id]
+  );
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Jumbo reel not found' });
+  res.json({ success: true, data: rows[0] });
+}));
+
 module.exports = router;
+

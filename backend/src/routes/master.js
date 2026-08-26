@@ -4,7 +4,7 @@ const pool = require('../db/pool');
 const multer = require('multer');
 const xlsx = require('xlsx');
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 30 * 1024 * 1024 } });
-const { auth, requireLevel } = require('../middleware/auth');
+const { auth, requireLevel, requireStoreManager } = require('../middleware/auth');
 const { publish, TOPICS } = require('../kafka');
 const { runImport: runMechImport, DEFAULT_FILE: DEFAULT_MECH_FILE } = require('../../scripts/import_mechanical_store');
 const { runImport: runElecImport, DEFAULT_FILE: DEFAULT_ELEC_FILE } = require('../../scripts/import_electrical_store');
@@ -868,12 +868,11 @@ router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
 }));
 
 // Soft-delete: marks material as inactive instead of hard-deleting (stock history preserved).
-// Level 3 matches every other master-data soft delete in this file (vendors, customers, sections)
-// and matches PUT /materials/:id/restore, which is also requireLevel(3).
-router.delete('/materials/:id', auth, requireLevel(3), ar(async (req, res) => {
-  const { rows } = await pool.query('UPDATE materials SET is_active=false, deleted_by=$2 WHERE id=$1 RETURNING id', [req.params.id, req.user?.id || null]);
+// Restricted to Store Managers and Administrators (requireStoreManager).
+router.delete('/materials/:id', auth, requireStoreManager, ar(async (req, res) => {
+  const { rows } = await pool.query('UPDATE materials SET is_active=false, deleted_by=$2 WHERE id=$1 RETURNING id, name', [req.params.id, req.user?.id || null]);
   if (!rows.length) return res.status(404).json({ success: false, message: 'Material not found' });
-  res.json({ success: true });
+  res.json({ success: true, message: `Material ${rows[0].name} deleted/deactivated successfully` });
 }));
 
 // Read-only stock movement summary — BALANCE/RECEIVED/ISSUE/OPENING for the Add/Edit item form.
@@ -1495,7 +1494,7 @@ router.put('/customers/:id', auth, requireLevel(3), ar(async (req, res) => {
 }));
 
 // ── SOFT DELETE (is_active = false) ──────────────────────────────────────────
-router.delete('/machines/:id', auth, requireLevel(3), ar(async (req, res) => {
+router.delete('/machines/:id', auth, requireStoreManager, ar(async (req, res) => {
   await pool.query('UPDATE machines SET is_active=false, deleted_by=$1 WHERE id=$2', [req.user.id, req.params.id]);
   res.json({ success: true, message: 'Machine deactivated successfully' });
 }));
@@ -1505,9 +1504,8 @@ router.delete('/grades/:id', auth, requireLevel(4), ar(async (req, res) => {
   res.json({ success: true });
 }));
 
-// NOTE: DELETE /materials/:id lives with the other material routes above (requireLevel(3),
-// returns 404 when no row matches). A duplicate definition used to sit here — it was dead code,
-// because Express matches in registration order, and it silently documented a different tier.
+// NOTE: DELETE /materials/:id lives with the other material routes above (requireStoreManager,
+// returns 404 when no row matches).
 
 router.delete('/vendors/:id', auth, requireLevel(3), ar(async (req, res) => {
   await pool.query('UPDATE vendors SET is_active=false, deleted_by=$1 WHERE id=$2', [req.user.id, req.params.id]);
@@ -1520,7 +1518,7 @@ router.delete('/customers/:id', auth, requireLevel(3), ar(async (req, res) => {
   res.json({ success: true });
 }));
 
-router.delete('/categories/:id', auth, requireLevel(3), ar(async (req, res) => {
+router.delete('/categories/:id', auth, requireStoreManager, ar(async (req, res) => {
   const catId = req.params.id;
   const { rows: childCats } = await pool.query('SELECT COUNT(*) FROM material_categories WHERE parent_id=$1', [catId]);
   if (parseInt(childCats[0].count) > 0) {
