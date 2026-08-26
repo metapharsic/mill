@@ -420,5 +420,37 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   }
   .no-print { display: none !important; }
   .print-only-heading { display: block !important; }
+
+  /* Invoice tables were printing borderless (component inline styles either omitted
+     borders or set them too faint to reproduce on paper), and item/amount figures used
+     whatever proportional font the on-screen theme set — hard to line up columns and
+     doesn't read as a formal document. Force real grid lines and a monospace figure
+     font on every invoice/voucher surface (#print-document = GRN/SIV/payslip/PO,
+     #a3-print-wrapper = the A3 indent invoice) so numbers align and totals are easy
+     to audit at a glance, matching standard printed-invoice convention. */
+  #print-document table, #a3-print-wrapper table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  #print-document th, #print-document td,
+  #a3-print-wrapper th, #a3-print-wrapper td {
+    border: 1px solid #000 !important;
+  }
+  #print-document td, #a3-print-wrapper td {
+    font-family: 'Courier New', Courier, monospace !important;
+  }
+
+  /* Not every invoice line item is a <table> row — HR.jsx's payslip and Store.jsx's
+     SIV voucher render item/amount lines as plain <div> rows. Give those the same
+     border + monospace figure treatment via a shared "invoice-line" class so ALL
+     invoices look consistent on paper, not just the table-based ones. */
+  #print-document .invoice-line {
+    border: 1px solid #000 !important;
+    border-collapse: collapse !important;
+    padding: 4px 8px !important;
+  }
+  #print-document .invoice-line-value {
+    font-family: 'Courier New', Courier, monospace !important;
+  }
 }
 

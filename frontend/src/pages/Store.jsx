@@ -3689,13 +3689,13 @@ export default function Store({ onNavigate }) {
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
-              <div><b>Material:</b> {outwardVoucher.materialName} ({outwardVoucher.materialCode})</div>
-              <div><b>Category:</b> {outwardVoucher.categoryName || 'General'}</div>
-              <div><b>Issued Quantity:</b> <span style={{ color: '#dc2626', fontWeight: 700 }}>{outwardVoucher.out_qty} {outwardVoucher.uom}</span></div>
-              <div><b>Store Balance Remaining:</b> {outwardVoucher.balance} {outwardVoucher.uom}</div>
-              <div><b>Valuation:</b> ₹{Number(outwardVoucher.value || 0).toLocaleString('en-IN')}</div>
-              <div><b>Issued For / Remarks:</b> {outwardVoucher.remarks || '—'}</div>
-              <div><b>Issued By:</b> {outwardVoucher.createdByName || 'Store Keeper'}</div>
+              <div className="invoice-line"><b>Material:</b> {outwardVoucher.materialName} ({outwardVoucher.materialCode})</div>
+              <div className="invoice-line"><b>Category:</b> {outwardVoucher.categoryName || 'General'}</div>
+              <div className="invoice-line"><b>Issued Quantity:</b> <span className="invoice-line-value" style={{ color: '#dc2626', fontWeight: 700 }}>{outwardVoucher.out_qty} {outwardVoucher.uom}</span></div>
+              <div className="invoice-line"><b>Store Balance Remaining:</b> <span className="invoice-line-value">{outwardVoucher.balance} {outwardVoucher.uom}</span></div>
+              <div className="invoice-line"><b>Valuation:</b> <span className="invoice-line-value">₹{Number(outwardVoucher.value || 0).toLocaleString('en-IN')}</span></div>
+              <div className="invoice-line"><b>Issued For / Remarks:</b> {outwardVoucher.remarks || '—'}</div>
+              <div className="invoice-line"><b>Issued By:</b> {outwardVoucher.createdByName || 'Store Keeper'}</div>
             </div>
             <div className="no-print" style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 }}>
               <button style={S.btnGhost} onClick={() => setOutwardVoucher(null)}>Close</button>

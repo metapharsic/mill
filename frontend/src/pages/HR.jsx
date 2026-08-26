@@ -523,9 +523,9 @@ function MyPayslip() {
 }
 
 const SlipRow = ({ label, value, muted, color }) => (
-  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13, color: muted ? '#a0a0a6' : '#1b1b1d', borderBottom: '1px solid #f6f5f0' }}>
+  <div className="invoice-line" style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13, color: muted ? '#a0a0a6' : '#1b1b1d', borderBottom: '1px solid #f6f5f0' }}>
     <span>{label}</span>
-    <span style={{ color: color || '#1b1b1d', fontWeight: 500 }}>{fmt.money(value || 0)}</span>
+    <span className="invoice-line-value" style={{ color: color || '#1b1b1d', fontWeight: 500 }}>{fmt.money(value || 0)}</span>
   </div>
 )
 
