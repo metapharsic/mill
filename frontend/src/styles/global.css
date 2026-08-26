@@ -438,6 +438,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   }
   #print-document td, #a3-print-wrapper td {
     font-family: 'Courier New', Courier, monospace !important;
+    font-size: 12px !important;
   }
 
   /* Not every invoice line item is a <table> row — HR.jsx's payslip and Store.jsx's
@@ -451,6 +452,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   }
   #print-document .invoice-line-value {
     font-family: 'Courier New', Courier, monospace !important;
+    font-size: 12px !important;
   }
 }
 
