@@ -21,11 +21,20 @@ const logStoreIndent = async (clientOrPool, indentId, action, fromStatus, toStat
 
 // Doc31 #8: advisory lock serializes concurrent seqNum calls within same date+prefix — prevents
 // two simultaneous submits landing on the same IND-YYYYMMDD-NNNN number. Caller must already be in a transaction.
+//
+// IMPORTANT: this MUST derive the next number from the highest suffix actually in use
+// (MAX), never from a row COUNT. Indents can be hard-deleted (see the force-delete route
+// in this file and the delete route in store.js), which leaves a gap in the sequence —
+// COUNT(*)+1 then reissues a number that's already taken by a surviving later row and
+// the INSERT fails with "duplicate key value violates unique constraint
+// indents_indent_number_key". store.js's own indent-creation route already used the
+// correct MAX-based approach; this one didn't, which is why the two could disagree.
 const seqNum = async (client) => {
   const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
   await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`indent-${stamp}`]);
   const { rows } = await client.query(
-    `SELECT LPAD((COUNT(*)+1)::text,4,'0') AS seq FROM indents WHERE indent_number LIKE $1`,
+    `SELECT LPAD((COALESCE(MAX(NULLIF(regexp_replace(indent_number, '^IND-[0-9]+-', ''), '')), '0')::int + 1)::text, 4, '0') AS seq
+     FROM indents WHERE indent_number LIKE $1`,
     [`IND-${stamp}-%`]
   );
   return `IND-${stamp}-${rows[0].seq}`;
