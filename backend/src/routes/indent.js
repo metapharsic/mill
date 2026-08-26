@@ -1694,5 +1694,10 @@ router.post('/:id/convert-to-cash-purchase', auth, requireLevel(2), ar(async (re
 }));
 
 module.exports = router;
+// Exported so scripts (tests, migrations) generate indent numbers via the one real
+// implementation instead of reimplementing their own copy that can drift out of sync
+// with the fix above — that drift is exactly how test_indent_issue_wiring.js ended up
+// with its own inline COUNT(*)-based generator carrying the same bug this file just fixed.
+module.exports.seqNum = seqNum;
 
 

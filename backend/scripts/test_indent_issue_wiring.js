@@ -1,4 +1,5 @@
 const pool = require('../src/db/pool');
+const { seqNum } = require('../src/routes/indent');
 
 async function testIndentIssue() {
   console.log('═══════════════════════════════════════════════════════');
@@ -50,11 +51,9 @@ async function testIndentIssue() {
     console.log('\n2. Testing Execution of Issue Flow Logic in Transaction...');
     await client.query('BEGIN');
 
-    // Simulate backend sequence generator
-    const d = new Date();
-    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    const seq = await client.query('SELECT COUNT(*)+1 AS n FROM indents WHERE date::date = CURRENT_DATE');
-    const num = `IND-${stamp}-${String(seq.rows[0].n).padStart(4,'0')}`;
+    // Use the REAL backend sequence generator (not a reimplementation) so this test
+    // actually exercises the fixed code path instead of carrying its own separate bug.
+    const num = await seqNum(client);
 
     let secId = null;
     if (testPayload.section) {
