@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { Search, ChevronDown, X, Check } from 'lucide-react'
 
 /**
@@ -31,6 +32,42 @@ export default function SearchableSelect({
   const containerRef = useRef(null)
   const inputRef = useRef(null)
   const listRef = useRef(null)
+  const menuRef = useRef(null)
+
+  // Menu is rendered via a portal at document.body so it is never clipped by a
+  // scrollable ancestor (e.g. a modal body with overflowY:auto) — previously the
+  // dropdown was position:absolute inside the field, so on long lists (vendors,
+  // materials, etc.) the options below the fold were physically cut off by the
+  // parent's overflow instead of being scrollable/visible. Position is computed
+  // from the field's live bounding box, and flips upward if there isn't enough
+  // room below in the viewport.
+  const [menuPos, setMenuPos] = useState(null)
+
+  const updateMenuPos = useCallback(() => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const estMenuHeight = 288 // search bar (~40) + options list maxHeight (240) + borders/shadow
+    const spaceBelow = window.innerHeight - rect.bottom
+    const openUpward = spaceBelow < estMenuHeight && rect.top > spaceBelow
+    setMenuPos({
+      left: rect.left,
+      width: rect.width,
+      top: openUpward ? undefined : rect.bottom + 4,
+      bottom: openUpward ? (window.innerHeight - rect.top + 4) : undefined
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!isOpen) return
+    updateMenuPos()
+    const onReposition = () => updateMenuPos()
+    window.addEventListener('scroll', onReposition, true)
+    window.addEventListener('resize', onReposition)
+    return () => {
+      window.removeEventListener('scroll', onReposition, true)
+      window.removeEventListener('resize', onReposition)
+    }
+  }, [isOpen, updateMenuPos])
 
   // Normalize options from props or children
   const normalizedOptions = useMemo(() => {
@@ -93,7 +130,9 @@ export default function SearchableSelect({
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
+      const inField = containerRef.current && containerRef.current.contains(e.target)
+      const inMenu = menuRef.current && menuRef.current.contains(e.target)
+      if (!inField && !inMenu) {
         setIsOpen(false)
         setSearchQuery('')
       }
@@ -295,15 +334,18 @@ export default function SearchableSelect({
         </div>
       </div>
 
-      {/* Dropdown Floating Menu */}
-      {isOpen && (
+      {/* Dropdown Floating Menu — portaled to document.body + position:fixed so a
+          scrollable modal/panel ancestor can never clip the option list. */}
+      {isOpen && menuPos && createPortal(
         <div
+          ref={menuRef}
           style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            zIndex: 1000,
+            position: 'fixed',
+            top: menuPos.top,
+            bottom: menuPos.bottom,
+            left: menuPos.left,
+            width: menuPos.width,
+            zIndex: 10000,
             background: '#ffffff',
             border: '1px solid #cbd5e1',
             borderRadius: 8,
@@ -444,7 +486,8 @@ export default function SearchableSelect({
               })
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

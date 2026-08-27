@@ -1668,17 +1668,19 @@ export default function Indent() {
                 {formErrors.required_date && <span style={{ fontSize: 10, color: '#ef4444' }}>{formErrors.required_date}</span>}
               </div>
 
-              <div>
-                <label style={S.lbl}>General Remarks / Work Order Ref
-                  <input
-                    id="raise-remarks"
-                    style={S.inp}
-                    placeholder="e.g. WO-2026-0815: Breakdown / Emergency repair"
-                    value={form.remarks}
-                    onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))}
-                  />
-                </label>
-              </div>
+            </div>
+
+            <div style={{ marginTop: 14 }}>
+              <label style={S.lbl}>General Remarks / Work Order Ref (Complete Remark)
+                <textarea
+                  id="raise-remarks"
+                  style={{ ...S.inp, minHeight: 72, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.4 }}
+                  placeholder="e.g. WO-2026-0815: Breakdown / Emergency repair — describe the full context, urgency, and any special instructions here..."
+                  value={form.remarks}
+                  onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))}
+                  rows={3}
+                />
+              </label>
             </div>
 
             {/* ── Synchronized Plant Section & Machinery Allocation (Digital Twin Context) ── */}
