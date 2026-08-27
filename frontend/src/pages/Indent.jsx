@@ -3285,21 +3285,19 @@ export default function Indent() {
             </div>
 
             <form onSubmit={handleConvertPoSubmit}>
-              <label style={S.lbl}>Assign Vendor / Supplier *
-                <select
-                  style={{ ...S.sel, fontSize: 13, fontWeight: 600 }}
-                  value={poModal.vendor_id}
-                  onChange={e => setPoModal(m => ({ ...m, vendor_id: e.target.value }))}
-                  required
-                >
-                  <option value="">-- Select Registered Vendor --</option>
-                  {vendors.map(v => (
-                    <option key={v.id} value={v.id}>
-                      {v.name} {v.gstin ? `[GSTIN: ${v.gstin}]` : ''} ({v.city || 'Supplier'})
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <label style={S.lbl}>Assign Vendor / Supplier *</label>
+              <SearchableSelect
+                value={String(poModal.vendor_id || '')}
+                onChange={v => setPoModal(m => ({ ...m, vendor_id: v }))}
+                placeholder="-- Select Registered Vendor --"
+                searchPlaceholder="Type vendor name, GSTIN, city..."
+                required
+                options={vendors.map(v => ({
+                  value: String(v.id),
+                  label: `${v.name} ${v.gstin ? `[GSTIN: ${v.gstin}]` : ''} (${v.city || 'Supplier'})`,
+                  subtext: v.city || 'Supplier'
+                }))}
+              />
 
               <div style={{ ...S.grid2, marginTop: 12 }}>
                 <label style={S.lbl}>Payment Terms
