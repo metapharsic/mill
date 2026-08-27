@@ -333,7 +333,7 @@ export default function Indent() {
     API('/sections').then(r => { if (r.success) setSections(r.data || []) })
     API('/master/machines').then(r => { if (r.success) setMachines(r.data || []) })
     API('/master/section-equipment').then(r => { if (r.success) setSectionEquipment(r.data || []) })
-    API('/master/vendors').then(r => { if (r.success) setVendors(r.data || []) })
+    API('/master/vendors?limit=2500').then(r => { if (r.success) setVendors(r.data || []) })
 
     // Check URL params for direct tab / detail routing
     const params = new URLSearchParams(window.location.search)
@@ -538,6 +538,139 @@ export default function Indent() {
   // ── Company Invoice & Voucher Export & Printing (Unified A3 Landscape) ──────
   const printCompanyInvoice = async (indentId) => {
     openA3IndentPrint(indentId)
+  }
+
+  // ── Official Company "Purchase Request" Print Format ────────────────────────
+  // Matches the mill's own paper format exactly (Projects_Requirement/Purchase_recipt.pdf):
+  // S.NO | Item Code | Product Name | Requirement Qty | Dept | Remarks, footer
+  // signature row (Stores / Head Of The Deport / Approval).
+  const printPRFormat = (ind) => {
+    const items = ind.items || []
+    const rowsNeeded = Math.max(items.length, 10)
+    const rows = Array.from({ length: rowsNeeded }, (_, i) => {
+      const it = items[i]
+      return `
+        <tr>
+          <td class="c">${i + 1}</td>
+          <td>${it ? (it.materialCode || it.material_id || '') : ''}</td>
+          <td>${it ? (it.materialName || '') : ''}</td>
+          <td class="c">${it ? `${it.required_qty ?? ''} ${it.uom || it.matUom || ''}` : ''}</td>
+          <td class="c">${it ? (ind.deptName || '') : ''}</td>
+          <td>${it ? (it.purpose || it.reason_code || '') : ''}</td>
+        </tr>`
+    }).join('')
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Purchase Request ${ind.indent_number || ''}</title>
+      <style>
+        @page { size: A4; margin: 14mm; }
+        body { font-family: Arial, Helvetica, sans-serif; color: #000; margin: 0; }
+        .hdr { display: flex; align-items: center; gap: 14px; }
+        .hdr img { height: 60px; width: auto; }
+        .hdr h1 { font-size: 20px; margin: 0; }
+        .hdr .addr { font-size: 11px; color: #0369a1; margin-top: 2px; }
+        .title { text-align: center; font-size: 14px; font-weight: 700; color: #0369a1; margin: 8px 0 14px; }
+        .meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #000; padding: 5px 6px; font-family: 'Courier New', Courier, monospace; }
+        th { background: #f1f5f9; font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-align: center; }
+        td.c { text-align: center; }
+        .sign { display: flex; justify-content: space-between; margin-top: 60px; font-size: 12px; font-weight: 600; }
+      </style></head>
+      <body onload="window.print()">
+        <div class="hdr">
+          <img src="${LOGO_DATA_URI}" alt="logo" />
+          <div>
+            <h1>Sri M.K. Paper Mills Pvt. Ltd</h1>
+            <div class="addr">Fatory: Gundaram Road, GUNDARAM (VIII), Dist. Nizamabad-503002 (TS)</div>
+          </div>
+        </div>
+        <div class="title">Purchase Request</div>
+        <div class="meta">
+          <div>P.Request No: <strong>${ind.indent_number || ''}</strong></div>
+          <div>Date: <strong>${(ind.date || '').slice(0, 10)}</strong></div>
+        </div>
+        <table>
+          <thead><tr><th>S.NO</th><th>Item Code</th><th>Product Name</th><th>Requirement Qty</th><th>Dept</th><th>Remarks</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="sign">
+          <div>Stores</div>
+          <div>Head Of The Deport</div>
+          <div>Approval</div>
+        </div>
+      </body></html>`
+
+    const w = window.open('', '_blank', 'width=900,height=1000')
+    if (!w) { alert('Please allow popups to print the Purchase Request.'); return }
+    w.document.open()
+    w.document.write(html)
+    w.document.close()
+  }
+
+  // ── Official Company "Issue Slip" Print Format ───────────────────────────────
+  // Matches Projects_Requirement/issue_invoice.pdf: S.NO | Item Code | Product Name |
+  // Depot | Issue Qty | Total Value | Remarks, footer (Stores / Head Of The Deport / Received Sign).
+  const printIssueSlipFormat = (ind) => {
+    const items = ind.items || []
+    const rowsNeeded = Math.max(items.length, 10)
+    const rows = Array.from({ length: rowsNeeded }, (_, i) => {
+      const it = items[i]
+      const qty = it ? `${it.issued_qty ?? it.required_qty ?? ''} ${it.uom || it.matUom || ''}` : ''
+      const value = it ? fmt(it.lineValue ?? it.line_value ?? 0) : ''
+      return `
+        <tr>
+          <td class="c">${i + 1}</td>
+          <td>${it ? (it.materialCode || it.material_id || '') : ''}</td>
+          <td>${it ? (it.materialName || '') : ''}</td>
+          <td class="c">${it ? (ind.deptName || '') : ''}</td>
+          <td class="c">${qty}</td>
+          <td class="c">${value}</td>
+          <td>${it ? (it.purpose || it.reason_code || '') : ''}</td>
+        </tr>`
+    }).join('')
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Issue Slip ${ind.indent_number || ''}</title>
+      <style>
+        @page { size: A4; margin: 14mm; }
+        body { font-family: Arial, Helvetica, sans-serif; color: #000; margin: 0; }
+        .hdr { display: flex; align-items: center; gap: 14px; }
+        .hdr img { height: 60px; width: auto; }
+        .hdr h1 { font-size: 20px; margin: 0; }
+        .hdr .addr { font-size: 11px; color: #0369a1; margin-top: 2px; }
+        .title { text-align: center; font-size: 14px; font-weight: 700; color: #0369a1; margin: 8px 0 14px; }
+        .meta { font-size: 12px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #000; padding: 5px 6px; font-family: 'Courier New', Courier, monospace; }
+        th { background: #f1f5f9; font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-align: center; }
+        td.c { text-align: center; }
+        .sign { display: flex; justify-content: space-between; margin-top: 60px; font-size: 12px; font-weight: 600; }
+      </style></head>
+      <body onload="window.print()">
+        <div class="hdr">
+          <img src="${LOGO_DATA_URI}" alt="logo" />
+          <div>
+            <h1>Sri M.K. Paper Mills Pvt. Ltd</h1>
+            <div class="addr">Fatory: Gundaram Road, GUNDARAM (VIII), Dist. Nizamabad-503002 (TS)</div>
+          </div>
+        </div>
+        <div class="title">Issue Slip</div>
+        <div class="meta">S.I.No: <strong>${ind.indent_number || ''}</strong></div>
+        <table>
+          <thead><tr><th>S.NO</th><th>Item Code</th><th>Product Name</th><th>Depot</th><th>Issue Qty</th><th>Total Value</th><th>Remarks</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="sign">
+          <div>Stores</div>
+          <div>Head Of The Deport</div>
+          <div>Recived Sing</div>
+        </div>
+      </body></html>`
+
+    const w = window.open('', '_blank', 'width=900,height=1000')
+    if (!w) { alert('Please allow popups to print the Issue Slip.'); return }
+    w.document.open()
+    w.document.write(html)
+    w.document.close()
   }
 
   // ── 1-Click PO, DC & Cash Conversion Handlers ─────────────────────────────
@@ -2413,6 +2546,20 @@ export default function Indent() {
                   onClick={() => printCompanyInvoice(detail.id)}
                 >
                   📄 Slip
+                </button>
+                <button
+                  style={{ ...S.btnSecondary, padding: '6px 10px', fontSize: 11 }}
+                  onClick={() => printPRFormat(detail)}
+                  title="Print in the mill's official Purchase Request paper format"
+                >
+                  🧾 PR Format
+                </button>
+                <button
+                  style={{ ...S.btnSecondary, padding: '6px 10px', fontSize: 11 }}
+                  onClick={() => printIssueSlipFormat(detail)}
+                  title="Print in the mill's official Issue Slip paper format"
+                >
+                  🧾 Issue Slip
                 </button>
                 <button style={S.close} onClick={() => { setDetail(null); setTier(null); setAppendOpen(false) }}>✕</button>
               </div>

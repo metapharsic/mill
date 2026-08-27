@@ -101,7 +101,7 @@ export default function ProductDetailModal({
         !isNew ? fetch(`${API}/master/materials/${materialId}`, { headers: h() }).then(r => r.json()) : Promise.resolve({ success: true, data: null }),
         fetch(`${API}/master/categories`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`${API}/admin/departments`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
-        fetch(`${API}/master/vendors`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
+        fetch(`${API}/master/vendors?limit=2500`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`${API}/master/sections`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`${API}/master/section-equipment`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`${API}/master/machines`, { headers: h() }).then(r => r.json()).catch(() => ({ data: [] }))
