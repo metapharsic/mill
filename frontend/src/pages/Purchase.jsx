@@ -1731,13 +1731,13 @@ export default function Purchase() {
               <span><strong style={{ color: '#0f766e', fontSize: 12 }}>{po.po_number || po.poNumber}</strong></span>
 
               <span style={{ color: '#475569', fontWeight: 700 }}>P.O. Date:</span>
-              <span><strong>{po.date ? new Date(po.date).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong></span>
+              <span><strong>{po.date || po.po_date || po.created_at ? new Date(po.date || po.po_date || po.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong></span>
 
               <span style={{ color: '#475569', fontWeight: 700 }}>P.R. No:</span>
               <span><strong>{po.indentNumber || po.indent_number || 'Direct PO'}</strong></span>
 
               <span style={{ color: '#475569', fontWeight: 700 }}>P.R. Date:</span>
-              <span>{po.indentDate ? new Date(po.indentDate).toLocaleDateString('en-IN') : (po.date ? new Date(po.date).toLocaleDateString('en-IN') : '—')}</span>
+              <span><strong>{po.indentDate || po.indent_date || po.date || po.created_at ? new Date(po.indentDate || po.indent_date || po.date || po.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong></span>
 
               <span style={{ color: '#475569', fontWeight: 700 }}>Department:</span>
               <span><strong>{po.deptName || 'Plant & Operations'}</strong></span>

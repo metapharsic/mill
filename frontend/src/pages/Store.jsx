@@ -341,10 +341,11 @@ export default function Store({ onNavigate }) {
 
     setA3PrintDoc({
       invoiceNumber: row.invoice_number || row.grnNumber || row.reference_id || `GRN-${row.id}`,
-      invoiceDate: row.date || new Date().toISOString(),
+      invoiceDate: row.date || row.inward_date || row.created_at || new Date().toISOString(),
       orderNumber: row.po_number || row.reference_id || '',
+      orderDate: row.po_date || row.poDate || row.date || row.created_at || new Date().toISOString(),
       grnNumber: row.grnNumber || row.reference_id || `GRN-${row.id}`,
-      grnDate: row.date,
+      grnDate: row.date || row.inward_date || row.created_at || new Date().toISOString(),
       partyName: row.vendorName || row.partyName || 'Registered Vendor',
       partyAddress: row.vendorAddress || 'Industrial Area, Plant Supply Hub',
       partyGstin: row.vendorGstin || '29AAAAA0000A1Z5',
@@ -382,10 +383,11 @@ export default function Store({ onNavigate }) {
 
     setA3PrintDoc({
       invoiceNumber: row.issue_number || `SIV-${row.id}`,
-      invoiceDate: row.date || new Date().toISOString(),
+      invoiceDate: row.date || row.outward_date || row.created_at || new Date().toISOString(),
       orderNumber: row.reference_id || '',
+      orderDate: row.date || row.outward_date || row.created_at || new Date().toISOString(),
       grnNumber: row.issue_number || `SIV-${row.id}`,
-      grnDate: row.date,
+      grnDate: row.date || row.outward_date || row.created_at || new Date().toISOString(),
       partyName: row.deptName || 'Plant Department',
       partyAddress: row.machineName ? `Machine: ${row.machineName}` : 'Mill Operations Floor',
       items: [{
@@ -3499,7 +3501,7 @@ export default function Store({ onNavigate }) {
                       GRN #: {grnDisplayNum}
                     </div>
                     <div style={{ fontSize: 11, color: '#64748b' }}>
-                      Date: <strong>{new Date(inwardVoucher.date).toLocaleDateString('en-IN')}</strong>
+                      Date: <strong>{inwardVoucher.date || inwardVoucher.inward_date || inwardVoucher.created_at ? new Date(inwardVoucher.date || inwardVoucher.inward_date || inwardVoucher.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong>
                     </div>
                     <div style={{ fontSize: 11, color: '#059669', fontWeight: 700 }}>
                       ✓ ORIGINAL FOR STORE & ACCOUNTS
@@ -3685,7 +3687,7 @@ export default function Store({ onNavigate }) {
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: 16, fontWeight: 800, color: '#0f766e' }}>SRI M.K. PAPER MILLS PVT LTD</div>
                 <div style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>STORE ISSUE VOUCHER (SIV SLIP)</div>
-                <div style={{ fontSize: 11, color: '#64748b' }}>Date: {new Date(outwardVoucher.date).toLocaleDateString('en-IN')} | Ref: {outwardVoucher.reference_id || 'SIV-'+outwardVoucher.id}</div>
+                <div style={{ fontSize: 11, color: '#64748b' }}>Date: {outwardVoucher.date || outwardVoucher.outward_date || outwardVoucher.created_at ? new Date(outwardVoucher.date || outwardVoucher.outward_date || outwardVoucher.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')} | Ref: {outwardVoucher.reference_id || 'SIV-'+outwardVoucher.id}</div>
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>

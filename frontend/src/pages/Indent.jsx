@@ -589,7 +589,7 @@ export default function Indent() {
         <div class="title">Purchase Request</div>
         <div class="meta">
           <div>P.Request No: <strong>${ind.indent_number || ''}</strong></div>
-          <div>Date: <strong>${(ind.date || '').slice(0, 10)}</strong></div>
+          <div>Date: <strong>${ind.date ? new Date(ind.date).toLocaleDateString('en-IN') : (ind.created_at ? new Date(ind.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN'))}</strong></div>
         </div>
         <table>
           <thead><tr><th>S.NO</th><th>Item Code</th><th>Product Name</th><th>Requirement Qty</th><th>Dept</th><th>Remarks</th></tr></thead>
@@ -631,6 +631,8 @@ export default function Indent() {
         </tr>`
     }).join('')
 
+    const formattedDate = ind.date ? new Date(ind.date).toLocaleDateString('en-IN') : (ind.created_at ? new Date(ind.created_at).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN'))
+
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Issue Slip ${ind.indent_number || ''}</title>
       <style>
         @page { size: A4; margin: 14mm; }
@@ -640,7 +642,7 @@ export default function Indent() {
         .hdr h1 { font-size: 20px; margin: 0; }
         .hdr .addr { font-size: 11px; color: #0369a1; margin-top: 2px; }
         .title { text-align: center; font-size: 14px; font-weight: 700; color: #0369a1; margin: 8px 0 14px; }
-        .meta { font-size: 12px; margin-bottom: 10px; }
+        .meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { border: 1px solid #000; padding: 5px 6px; font-family: 'Courier New', Courier, monospace; }
         th { background: #f1f5f9; font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-align: center; }
@@ -656,7 +658,10 @@ export default function Indent() {
           </div>
         </div>
         <div class="title">Issue Slip</div>
-        <div class="meta">S.I.No: <strong>${ind.indent_number || ''}</strong></div>
+        <div class="meta">
+          <div>S.I.No: <strong>${ind.indent_number || ''}</strong></div>
+          <div>Date: <strong>${formattedDate}</strong></div>
+        </div>
         <table>
           <thead><tr><th>S.NO</th><th>Item Code</th><th>Product Name</th><th>Depot</th><th>Issue Qty</th><th>Total Value</th><th>Remarks</th></tr></thead>
           <tbody>${rows}</tbody>

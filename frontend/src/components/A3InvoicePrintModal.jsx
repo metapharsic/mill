@@ -181,16 +181,27 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
     purpose: docData.itemPurpose || docData.purpose || docData.remarks || 'Plant Operations & Regular Maintenance'
   }
 
-  // Metadata details
+  // Metadata details — robust date parsing with guaranteed valid format
+  const safeDate = (raw, fallback = new Date()) => {
+    if (!raw) return fallback ? new Date(fallback).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'
+    const d = new Date(raw)
+    return isNaN(d.getTime()) ? (fallback ? new Date(fallback).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—') : d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  }
+
+  const rawInvoiceDate = docData.invoice_date || docData.invoiceDate || docData.order_date || docData.orderDate || docData.date || docData.inward_date || docData.inwardDate || docData.outward_date || docData.outwardDate || docData.created_at || docData.createdAt || new Date().toISOString()
+  const rawGrnDate = docData.grnDate || docData.grn_date || docData.inward_date || docData.inwardDate || docData.date || docData.created_at || rawInvoiceDate
+  const rawOrderDate = docData.poDate || docData.po_date || docData.order_date || docData.orderDate || docData.indentDate || docData.indent_date || docData.date || rawInvoiceDate
+  const rawDueDate = docData.due_date || docData.dueDate || docData.delivery_date || docData.deliveryDate || docData.requiredDate || docData.required_date || rawInvoiceDate
+
   const invoiceNo = docData.invoice_number || docData.invoiceNumber || docData.indent_number || docData.indentNumber || docData.grnNumber || docData.grn_number || `SIV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}001`
-  const invoiceDate = docData.order_date || docData.invoiceDate || docData.invoice_date || docData.date ? new Date(docData.order_date || docData.invoiceDate || docData.invoice_date || docData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('en-GB')
+  const invoiceDate = safeDate(rawInvoiceDate)
   const grnNo = docData.grnNumber || docData.grn_number || (docData.reference_type === 'GRN' ? docData.reference_id : invoiceNo)
-  const grnDate = docData.date ? new Date(docData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : invoiceDate
-  const orderNo = docData.poNumber || docData.order_number || docData.reference_id || '—'
-  const orderDate = docData.poDate ? new Date(docData.poDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'
+  const grnDate = safeDate(rawGrnDate, rawInvoiceDate)
+  const orderNo = docData.poNumber || docData.order_number || docData.reference_id || (docData.indent_number ? `PR-${docData.indent_number}` : '—')
+  const orderDate = safeDate(rawOrderDate, rawInvoiceDate)
   const ewaybillNo = docData.eway_bill_no || docData.ewaybill || '—'
   const casesCount = docData.cases_count || docData.cases || items.length
-  const dueDate = docData.due_date || docData.requiredDate ? new Date(docData.due_date || docData.requiredDate).toLocaleDateString('en-GB') : invoiceDate
+  const dueDate = safeDate(rawDueDate, rawInvoiceDate)
   const transport = docData.transport_name || docData.transport || (isIndentOrIssue ? 'Store Forklift / Manual Overhead Crane' : 'Direct Mill Inward')
   const weight = docData.vehicle_weight || docData.weight || '—'
   const paymentMode = docData.payment_mode || (isIndentOrIssue ? 'Internal Store Allocation' : 'Credit / Net 30')
