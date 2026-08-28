@@ -1,0 +1,90 @@
+name: 🎭 Playwright E2E Regression & Quality Assurance
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test-e2e:
+    name: 🧪 Run UKHO Standard Playwright E2E Suite
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: mk_paper_mill
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Root Dependencies
+        run: npm ci || npm install
+
+      - name: 📦 Install Frontend Dependencies
+        run: cd frontend && (npm ci || npm install)
+
+      - name: 📦 Install Backend Dependencies
+        run: cd backend && (npm ci || npm install)
+
+      - name: 🎭 Install Playwright Browsers & OS Dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: 🗄️ Run Database Migrations & Seed Data
+        env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/mk_paper_mill
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: mk_paper_mill
+          DB_USER: postgres
+          DB_PASS: password
+          JWT_SECRET: mk_mill_jwt_secret_ci_2026
+        run: |
+          cd backend
+          npm run db:init || true
+          npm run db:migrate || true
+
+      - name: 🚀 Run Playwright End-to-End Test Suite
+        env:
+          CI: true
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/mk_paper_mill
+          JWT_SECRET: mk_mill_jwt_secret_ci_2026
+          PORT: 5000
+          VITE_API_URL: http://localhost:5000
+        run: npx playwright test
+
+      - name: 📊 Upload Playwright HTML Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: 📸 Upload Failure Traces & Screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 14
