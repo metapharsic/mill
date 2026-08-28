@@ -578,7 +578,20 @@ export default function Purchase() {
     } else setErr(r.message)
   }
 
-  const approve=async id=>{const r=await API(`/api/purchase/po/${id}/approve`,{method:'PUT'});if(r.success){load();if(detail)openDetail(id)}}
+  const approve = async (id) => {
+    try {
+      const r = await API(`/api/purchase/po/${id}/approve`, { method: 'PUT' })
+      if (r && r.success) {
+        load()
+        if (detail) openDetail(id)
+        alert(r.message || 'Purchase Order approved successfully')
+      } else {
+        alert(r?.message || 'Failed to approve PO. Ensure you have the required approver privileges.')
+      }
+    } catch (err) {
+      alert('Error approving PO: ' + (err.message || 'Network error'))
+    }
+  }
 
   const cancelPO=async id=>{
     if(!window.confirm('Cancel this Purchase Order? This will mark the PO as Cancelled.')) return

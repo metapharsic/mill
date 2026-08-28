@@ -510,18 +510,22 @@ router.put('/po/:id/submit', auth, requireLevel(2), ar(async (req, res) => {
   res.json({ success: true, data: rows[0], message: `PO ${rows[0].po_number} submitted for approval` });
 }));
 
-// APPROVE PO — value-tiered per approval_matrix, maker != checker unless admin
+// APPROVE PO — value-tiered per approval_matrix, maker != checker unless admin / director
 router.put('/po/:id/approve', auth, requireLevel(2), ar(async (req, res) => {
-  const { rows: [po] } = await pool.query(`SELECT grand_total, created_by, status FROM purchase_orders WHERE id=$1`, [req.params.id]);
+  const { rows: [po] } = await pool.query(`SELECT id, po_number, grand_total, created_by, status FROM purchase_orders WHERE id=$1`, [req.params.id]);
   if (!po) return res.status(404).json({ success: false, message: 'Purchase Order not found' });
   if (po.status === 'Approved') return res.json({ success: true, message: 'PO is already Approved', data: po });
+
+  const userRole = (req.user.role || '').toLowerCase();
+  const isAdmin = userRole.includes('admin') || userRole.includes('director') || userRole.includes('md') || (req.user.role_level || 1) >= 4;
 
   const { rows: matrix } = await pool.query(
     `SELECT required_level FROM approval_matrix WHERE min_value <= $1 AND (max_value IS NULL OR max_value > $1) ORDER BY tier ASC LIMIT 1`,
     [po.grand_total]
   );
   const requiredLevel = matrix[0]?.required_level || 3;
-  if ((req.user.role_level || 1) < requiredLevel) {
+
+  if (!isAdmin && (req.user.role_level || 1) < requiredLevel) {
     return res.status(403).json({ success: false, message: `PO value ₹${po.grand_total} requires level ${requiredLevel}+ approver (your level is ${req.user.role_level || 1})` });
   }
 
@@ -531,6 +535,42 @@ router.put('/po/:id/approve', auth, requireLevel(2), ar(async (req, res) => {
     [req.user.id, req.params.id]
   );
   res.json({ success: !!rows.length, data: rows[0], message: `Purchase Order ${rows[0].po_number} approved successfully` });
+}));
+
+// UPDATE PO STATUS (Draft / Submitted / Approved / Rejected / Cancelled)
+router.put('/po/:id/status', auth, requireLevel(2), ar(async (req, res) => {
+  const { status, remarks } = req.body;
+  if (!status) return res.status(400).json({ success: false, message: 'Status is required' });
+
+  const { rows: [po] } = await pool.query(`SELECT id, po_number, status, grand_total FROM purchase_orders WHERE id=$1`, [req.params.id]);
+  if (!po) return res.status(404).json({ success: false, message: 'Purchase Order not found' });
+
+  const userRole = (req.user.role || '').toLowerCase();
+  const isAdmin = userRole.includes('admin') || userRole.includes('director') || userRole.includes('md') || (req.user.role_level || 1) >= 4;
+
+  let approvedBy = null;
+  if (status === 'Approved') {
+    const { rows: matrix } = await pool.query(
+      `SELECT required_level FROM approval_matrix WHERE min_value <= $1 AND (max_value IS NULL OR max_value > $1) ORDER BY tier ASC LIMIT 1`,
+      [po.grand_total]
+    );
+    const requiredLevel = matrix[0]?.required_level || 3;
+    if (!isAdmin && (req.user.role_level || 1) < requiredLevel) {
+      return res.status(403).json({ success: false, message: `PO value ₹${po.grand_total} requires level ${requiredLevel}+ approver` });
+    }
+    approvedBy = req.user.id;
+  }
+
+  const { rows } = await pool.query(
+    `UPDATE purchase_orders SET 
+       status = $1, 
+       approved_by = COALESCE($2, approved_by),
+       remarks = COALESCE($3, remarks)
+     WHERE id = $4 RETURNING *`,
+    [status, approvedBy, remarks || null, req.params.id]
+  );
+
+  res.json({ success: !!rows.length, data: rows[0], message: `Purchase Order ${rows[0].po_number} status updated to ${status}` });
 }));
 
 // REJECT PO

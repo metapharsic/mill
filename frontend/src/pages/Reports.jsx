@@ -190,6 +190,16 @@ const API = (p, o) => fetch(p, {
 
 const fmt = v => v != null ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'
 const fmtNum = (v, d = 2) => v != null && !isNaN(v) ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—'
+const fmtDate = (d, fallback = '—') => {
+  if (!d) return fallback
+  const dt = new Date(d)
+  return isNaN(dt.getTime()) ? fallback : dt.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+const fmtDateTime = (d, fallback = '—') => {
+  if (!d) return fallback
+  const dt = new Date(d)
+  return isNaN(dt.getTime()) ? fallback : dt.toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+}
 
 const today = new Date().toISOString().slice(0, 10)
 const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
@@ -1715,8 +1725,8 @@ function EodReportView({ data, history, onOpenSend, onOpenWhatsApp, onCopyWhatsA
             <tbody>
               {history.slice(0, 5).map(h => (
                 <tr key={h.id} style={S.tr}>
-                  <td style={S.td}><strong>{new Date(h.reportDate).toLocaleDateString()}</strong></td>
-                  <td style={S.td}>{new Date(h.sentAt).toLocaleString()}</td>
+                  <td style={S.td}><strong>{fmtDate(h.reportDate)}</strong></td>
+                  <td style={S.td}>{fmtDateTime(h.sentAt)}</td>
                   <td style={S.td}>{h.sentByName || 'System'}</td>
                   <td style={S.td}>{h.recipients}</td>
                   <td style={S.td}>{fmtNum(h.totalMt, 2)} MT</td>
@@ -1904,7 +1914,7 @@ function QualityReportView({ data, search }) {
               <tr key={i} style={S.tr}>
                 <td style={{ ...S.td, fontFamily: 'monospace' }}>{t.testNumber}</td>
                 <td style={S.td}>{t.testType}</td>
-                <td style={S.td}>{t.testDate ? new Date(t.testDate).toLocaleDateString() : '—'}</td>
+                <td style={S.td}>{fmtDate(t.testDate)}</td>
                 <td style={S.td}>{t.gsm || '—'}</td>
                 <td style={S.td}>{t.moisturePct ? `${t.moisturePct}%` : '—'}</td>
                 <td style={S.td}>{t.burstFactor || '—'}</td>
@@ -1952,7 +1962,7 @@ function UtilityReportView({ data }) {
           <tbody>
             {readings.map((r, i) => (
               <tr key={i} style={S.tr}>
-                <td style={S.td}>{r.date ? new Date(r.date).toLocaleDateString() : '—'}</td>
+                <td style={S.td}>{fmtDate(r.date)}</td>
                 <td style={S.td}><strong>{r.shift_type || 'Shift A'}</strong></td>
                 <td style={S.td}>{fmtNum(r.power, 0)}</td>
                 <td style={S.td}>{fmtNum(r.steam, 2)}</td>
@@ -1996,8 +2006,8 @@ function DowntimeReportView({ data, search }) {
             {entries.map((e, i) => (
               <tr key={i} style={S.tr}>
                 <td style={S.td}><strong>{e.machine}</strong></td>
-                <td style={S.td}>{e.startTime ? new Date(e.startTime).toLocaleString() : '—'}</td>
-                <td style={S.td}>{e.endTime ? new Date(e.endTime).toLocaleString() : 'Ongoing'}</td>
+                <td style={S.td}>{fmtDateTime(e.startTime)}</td>
+                <td style={S.td}>{e.endTime ? fmtDateTime(e.endTime) : 'Ongoing'}</td>
                 <td style={{ ...S.td, fontWeight: 700, color: '#ef4444' }}>{e.durationMin} Min</td>
                 <td style={S.td}><span style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>{e.reasonCategory || 'General'}</span></td>
                 <td style={S.td}>{e.reason}</td>
@@ -2041,7 +2051,7 @@ function IndentsReportView({ data, search }) {
             {indents.map((ind, i) => (
               <tr key={i} style={S.tr}>
                 <td style={{ ...S.td, fontFamily: 'monospace', fontWeight: 600 }}>{ind.indentNumber}</td>
-                <td style={S.td}>{ind.date ? new Date(ind.date).toLocaleDateString() : '—'}</td>
+                <td style={S.td}>{fmtDate(ind.date)}</td>
                 <td style={S.td}><strong>{ind.department || 'Plant Store'}</strong></td>
                 <td style={S.td}>{ind.raisedBy || 'Staff'}</td>
                 <td style={S.td}>{ind.priority || 'Normal'}</td>
@@ -2092,7 +2102,7 @@ function SalesReportView({ data, search }) {
             {orders.map((o, i) => (
               <tr key={i} style={S.tr}>
                 <td style={{ ...S.td, fontFamily: 'monospace', fontWeight: 600 }}>{o.soNumber}</td>
-                <td style={S.td}>{o.date ? new Date(o.date).toLocaleDateString() : '—'}</td>
+                <td style={S.td}>{fmtDate(o.date)}</td>
                 <td style={S.td}><strong>{o.customer}</strong></td>
                 <td style={S.td}>{o.grade}</td>
                 <td style={S.td}>{fmtNum(o.qtyMt, 2)}</td>
@@ -2330,7 +2340,7 @@ function MaintenanceDetailedReportView({ data, search }) {
       <DrillTable
         title="Spares Consumption (tied to Maintenance Jobs)"
         columns={[
-          { key: 'date', label: 'Date', render: r => r.date ? new Date(r.date).toLocaleDateString() : '—' },
+          { key: 'date', label: 'Date', render: r => fmtDate(r.date) },
           { key: 'machine', label: 'Machine' },
           { key: 'spareName', label: 'Spare Part' },
           { key: 'qty', label: 'Qty' },
@@ -2342,7 +2352,7 @@ function MaintenanceDetailedReportView({ data, search }) {
       <DrillTable
         title="Maintenance Job Log (transaction-level)"
         columns={[
-          { key: 'date', label: 'Date', render: r => r.date ? new Date(r.date).toLocaleDateString() : '—' },
+          { key: 'date', label: 'Date', render: r => fmtDate(r.date) },
           { key: 'machine', label: 'Machine' },
           { key: 'maintenanceType', label: 'Type' },
           { key: 'description', label: 'Description' },
@@ -2419,9 +2429,9 @@ function PurchaseDetailedReportView({ data, search }) {
         title="PO Cycle Time — Raise → Approve → GRN"
         columns={[
           { key: 'poNumber', label: 'PO No' },
-          { key: 'indentDate', label: 'Indent Date', render: r => r.indentDate ? new Date(r.indentDate).toLocaleDateString() : '—' },
-          { key: 'poDate', label: 'PO Date', render: r => r.poDate ? new Date(r.poDate).toLocaleDateString() : '—' },
-          { key: 'firstGrnDate', label: 'First GRN', render: r => r.firstGrnDate ? new Date(r.firstGrnDate).toLocaleDateString() : 'Pending' },
+          { key: 'indentDate', label: 'Indent Date', render: r => fmtDate(r.indentDate) },
+          { key: 'poDate', label: 'PO Date', render: r => fmtDate(r.poDate) },
+          { key: 'firstGrnDate', label: 'First GRN', render: r => r.firstGrnDate ? fmtDate(r.firstGrnDate) : 'Pending' },
           { key: 'raiseToApproveDays', label: 'Raise→Approve (days)' },
           { key: 'approveToGrnDays', label: 'Approve→GRN (days)' },
           { key: 'totalCycleDays', label: 'Total Cycle (days)' },
@@ -2433,7 +2443,7 @@ function PurchaseDetailedReportView({ data, search }) {
         title="Purchase Order Register (transaction-level)"
         columns={[
           { key: 'poNumber', label: 'PO No' },
-          { key: 'date', label: 'Date', render: r => r.date ? new Date(r.date).toLocaleDateString() : '—' },
+          { key: 'date', label: 'Date', render: r => fmtDate(r.date) },
           { key: 'vendor', label: 'Vendor' },
           { key: 'status', label: 'Status' },
           { key: 'grandTotal', label: 'Grand Total', render: r => fmt(r.grandTotal) },
@@ -2506,7 +2516,7 @@ function FinanceDetailedReportView({ data, search }) {
         title="Payment Register (transaction-level)"
         columns={[
           { key: 'paymentNumber', label: 'Payment No' },
-          { key: 'paymentDate', label: 'Date', render: r => r.paymentDate ? new Date(r.paymentDate).toLocaleDateString() : '—' },
+          { key: 'paymentDate', label: 'Date', render: r => fmtDate(r.paymentDate) },
           { key: 'customer', label: 'Customer' },
           { key: 'amount', label: 'Amount', render: r => fmt(r.amount) },
           { key: 'paymentMode', label: 'Mode' },
@@ -2555,7 +2565,7 @@ function EhsDetailedReportView({ data, search }) {
       <DrillTable
         title="Specific Power Consumption Trend (Units / MT)"
         columns={[
-          { key: 'date', label: 'Date', render: r => r.date ? new Date(r.date).toLocaleDateString() : '—' },
+          { key: 'date', label: 'Date', render: r => fmtDate(r.date) },
           { key: 'powerUnits', label: 'Power Units' },
           { key: 'producedMt', label: 'Produced (MT)', render: r => fmtNum(r.producedMt, 2) },
           { key: 'specificPowerPerMt', label: 'Units / MT' },
@@ -2567,7 +2577,7 @@ function EhsDetailedReportView({ data, search }) {
         title="EHS Incident Register (transaction-level)"
         columns={[
           { key: 'incidentNumber', label: 'Incident No' },
-          { key: 'date', label: 'Date', render: r => r.date ? new Date(r.date).toLocaleDateString() : '—' },
+          { key: 'date', label: 'Date', render: r => fmtDate(r.date) },
           { key: 'incidentType', label: 'Type' },
           { key: 'severity', label: 'Severity' },
           { key: 'department', label: 'Department' },
