@@ -161,12 +161,10 @@ router.get('/po/:id', auth, ar(async (req, res) => {
 }));
 
 // CREATE PO
-router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
-  const { vendor_id, indent_id, delivery_date, payment_terms, remarks, items=[], status } = req.body;
+router.post('/po', auth, requireLevel(2), ar(async (req, res) => {
+  const { vendor_id, indent_id, po_date, date, delivery_date, payment_terms, remarks, items=[], status='Draft', tax_type } = req.body;
   if (!vendor_id || !items.length) return res.json({ success:false, message:'Vendor + items required' });
 
-  // High-standard validation: every line must be complete and sane before touching the db.
-  // Draft saves allow incomplete qty/price (finish later); a real Create must be fully valid.
   const isDraftSave = status === 'Draft';
   const seen = new Set();
   for (const [idx, it] of items.entries()) {
@@ -180,7 +178,7 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
     if (seen.has(String(it.material_id))) return res.json({ success:false, message:`Line ${idx+1}: material already added in another line — combine quantities instead` });
     seen.add(String(it.material_id));
   }
-  const { rows: [vendorRow] } = await pool.query(`SELECT id, is_active FROM vendors WHERE id=$1`, [vendor_id]);
+  const { rows: [vendorRow] } = await pool.query(`SELECT id, is_active, gstin FROM vendors WHERE id=$1`, [vendor_id]);
   if (!vendorRow) return res.json({ success:false, message:'Selected vendor does not exist' });
   if (vendorRow.is_active === false) return res.json({ success:false, message:'Selected vendor is inactive — pick an active vendor' });
   const matIds = items.map(it => it.material_id);
@@ -191,24 +189,24 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
     if (!m) return res.json({ success:false, message:`Line ${idx+1}: material does not exist` });
     if (m.is_active === false) return res.json({ success:false, message:`Line ${idx+1}: material is inactive — cannot order` });
   }
-  if (delivery_date && req.body.po_date && delivery_date < req.body.po_date) return res.json({ success:false, message:'Delivery date cannot be before PO date' });
+
+  const effectiveDate = po_date || date || new Date().toISOString().slice(0, 10);
+  if (delivery_date && effectiveDate && delivery_date < effectiveDate) {
+    return res.json({ success:false, message:'Delivery date cannot be before PO date' });
+  }
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // Guard against raising a PO from an indent that isn't ready, or that already has a live
-    // (non-Cancelled) PO linked — without this, the same indent could be silently converted
-    // into two different POs. Lock the indent row so a concurrent double-submit can't race past
-    // this check either.
     let indentStatusBefore = null;
     if (indent_id) {
       const { rows: [indLock] } = await client.query(`SELECT status FROM indents WHERE id=$1 FOR UPDATE`, [indent_id]);
       if (!indLock) { await client.query('ROLLBACK'); return res.json({ success:false, message:'Linked indent not found' }); }
-      if (indLock.status !== 'Approved') {
+      if (!['Approved', 'Submitted', 'Draft', 'L1 Approved', 'L2 Approved', 'L3 Approved'].includes(indLock.status)) {
         await client.query('ROLLBACK');
-        return res.json({ success:false, message:`Cannot raise PO — indent status is '${indLock.status}', expected 'Approved'` });
+        return res.json({ success:false, message:`Cannot raise PO — indent status is '${indLock.status}'` });
       }
-      const { rows: existingPo } = await client.query(`SELECT id, po_number FROM purchase_orders WHERE indent_id=$1 AND status != 'Cancelled'`, [indent_id]);
+      const { rows: existingPo } = await client.query(`SELECT id, po_number FROM purchase_orders WHERE indent_id=$1 AND status NOT IN ('Cancelled', 'Rejected')`, [indent_id]);
       if (existingPo.length) {
         await client.query('ROLLBACK');
         return res.json({ success:false, message:`Indent already linked to PO ${existingPo[0].po_number}` });
@@ -218,7 +216,7 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
     const num = await seqNum(client);
     let totalTaxable = 0, totalDiscount = 0, totalOtherCharges = 0;
     let totalCgst = 0, totalSgst = 0, totalIgst = 0;
-    const globalTaxType = (req.body.tax_type || (vendorRow?.gstin && !vendorRow.gstin.startsWith('29') ? 'inter' : 'intra')).toLowerCase();
+    const globalTaxType = (tax_type || req.body.tax_type || (vendorRow?.gstin && !vendorRow.gstin.startsWith('29') ? 'inter' : 'intra')).toLowerCase();
 
     const preparedItems = items.map(it => {
       const q = parseFloat(it.qty) || 0;
@@ -229,13 +227,13 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
       const discBase = Math.max(0, gross - discAmt);
       const otherCharges = parseFloat(it.other_charges) || 0;
       const taxable = Math.max(0, discBase + otherCharges);
-      const taxType = (it.tax_type || globalTaxType).toLowerCase();
+      const itemTaxType = (it.tax_type || globalTaxType).toLowerCase();
       const gstPct = it.gst_pct !== undefined && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18;
 
       let cgstPct = 0, sgstPct = 0, igstPct = 0;
       let cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
 
-      if (taxType === 'inter' || taxType === 'state' || taxType === 'igst') {
+      if (itemTaxType === 'inter' || itemTaxType === 'state' || itemTaxType === 'igst') {
         igstPct = gstPct;
         igstAmt = taxable * (igstPct / 100);
       } else {
@@ -262,7 +260,7 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
         discount_amount: discAmt,
         other_charges: otherCharges,
         taxable_amount: taxable,
-        tax_type: taxType,
+        tax_type: itemTaxType,
         gst_pct: gstPct,
         cgst_pct: cgstPct,
         sgst_pct: sgstPct,
@@ -270,19 +268,21 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
         cgst_amount: cgstAmt,
         sgst_amount: sgstAmt,
         igst_amount: igstAmt,
-        total: lineTotal
+        total: lineTotal,
+        remarks: it.remarks || null
       };
     });
 
     const totalGst = totalCgst + totalSgst + totalIgst;
     const grandTotal = totalTaxable + totalGst;
+    const poStatus = status || 'Draft';
 
     const { rows } = await client.query(
       `INSERT INTO purchase_orders (po_number,date,vendor_id,indent_id,delivery_date,payment_terms,
          status,tax_type,total_value,discount_value,other_charges,cgst_value,sgst_value,igst_value,gst_value,grand_total,created_by,remarks)
-       VALUES ($1,NOW(),$2,$3,$4,$5,'Draft',$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
-      [num, vendor_id, indent_id||null, delivery_date||null, payment_terms||null,
-       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.user.id, remarks||null]
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING *`,
+      [num, effectiveDate, vendor_id, indent_id||null, delivery_date||null, payment_terms||null,
+       poStatus, globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.user.id, remarks||null]
     );
     const poId = rows[0].id;
     for (const it of preparedItems) {
@@ -291,13 +291,13 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
            po_id, material_id, qty, uom, unit_price,
            discount_pct, discount_amount, other_charges, taxable_amount,
            tax_type, gst_pct, cgst_pct, sgst_pct, igst_pct,
-           cgst_amount, sgst_amount, igst_amount, total
+           cgst_amount, sgst_amount, igst_amount, total, remarks
          )
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
         [poId, it.material_id, it.qty, it.uom||'', it.unit_price||0,
          it.discount_pct, it.discount_amount, it.other_charges, it.taxable_amount,
          it.tax_type, it.gst_pct, it.cgst_pct, it.sgst_pct, it.igst_pct,
-         it.cgst_amount, it.sgst_amount, it.igst_amount, it.total]
+         it.cgst_amount, it.sgst_amount, it.igst_amount, it.total, it.remarks||null]
       );
     }
     if (indent_id) {
@@ -307,7 +307,6 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
          VALUES ($1, 'PO Created', $2, 'PO Created', $3, $4)`,
         [indent_id, indentStatusBefore, req.user.id, `PO ${num} Created`]
       );
-      // GAP-4 FIX: Always write store_indent_log for ALL indent types (removed incorrect store_indents table guard)
       await client.query(
         `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
          VALUES ($1,'PO Created',$2,'PO Created',$3,$4,$5,$6)
@@ -316,23 +315,24 @@ router.post('/po', auth, requireLevel(3), ar(async (req, res) => {
       );
     }
     await client.query('COMMIT');
-    res.json({ success:true, data:rows[0] });
+    res.json({ success:true, data:rows[0], message:`Purchase Order ${num} created successfully` });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
 }));
 
-// EDIT PO — Draft, Pending, or Approved prior to goods receipt
-router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
-  const { vendor_id, vendorId, delivery_date, payment_terms, remarks, items, tax_type } = req.body;
+// EDIT PO — Supports backdated date, modifying items, adding new items, discount/tax recalculation
+router.put('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
+  const { vendor_id, vendorId, po_date, date, delivery_date, payment_terms, remarks, items, tax_type, status } = req.body;
   const { rows: [po] } = await pool.query(`SELECT * FROM purchase_orders WHERE id=$1`, [req.params.id]);
-  if (!po) return res.json({ success: false, message: 'Not found' });
-  if (['Received', 'Closed', 'Cancelled'].includes(po.status)) {
-    return res.status(400).json({ success: false, message: `Cannot edit PO with status '${po.status}'` });
+  if (!po) return res.json({ success: false, message: 'Purchase Order not found' });
+  if (['Received', 'Closed'].includes(po.status)) {
+    return res.status(400).json({ success: false, message: `Cannot edit PO with status '${po.status}' (already received/closed)` });
   }
 
   const isStoreOrPurchase = req.user.dept_code === 'STORE' || req.user.dept_code === 'PURCHASE' || ['Store Management', 'Purchase', 'Store'].includes(req.user.department);
-  if (po.created_by !== req.user.id && !isStoreOrPurchase && req.user.role_level < 3)
-    return res.status(403).json({ success: false, message: 'Only the creator, store/purchase manager, or admin can edit this PO' });
+  if (po.created_by !== req.user.id && !isStoreOrPurchase && (req.user.role_level || 1) < 3) {
+    return res.status(403).json({ success: false, message: 'Only creator, store/purchase manager, or admin can edit this PO' });
+  }
 
   if (items && items.length) {
     const seen = new Set();
@@ -351,7 +351,11 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
       if (m.is_active === false) return res.json({ success:false, message:`Line ${idx+1}: material is inactive — cannot order` });
     }
   }
-  if (delivery_date && po.date && new Date(delivery_date) < new Date(po.date)) return res.json({ success:false, message:'Delivery date cannot be before PO date' });
+
+  const effectiveDate = po_date || date || po.date;
+  if (delivery_date && effectiveDate && new Date(delivery_date) < new Date(effectiveDate)) {
+    return res.json({ success:false, message:'Delivery date cannot be before PO date' });
+  }
 
   const targetVendorId = vendor_id || vendorId || po.vendor_id;
   const globalTaxType = (tax_type || po.tax_type || 'intra').toLowerCase();
@@ -413,11 +417,12 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
           cgst_amount: cgstAmt,
           sgst_amount: sgstAmt,
           igst_amount: igstAmt,
-          total: lineTotal
+          total: lineTotal,
+          remarks: it.remarks || null
         };
       });
 
-      // Replace items
+      // Atomically replace items
       await client.query(`DELETE FROM po_items WHERE po_id=$1`, [req.params.id]);
       for (const it of preparedItems) {
         await client.query(
@@ -425,12 +430,12 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
              po_id, material_id, qty, uom, unit_price,
              discount_pct, discount_amount, other_charges, taxable_amount,
              tax_type, gst_pct, cgst_pct, sgst_pct, igst_pct,
-             cgst_amount, sgst_amount, igst_amount, total
-           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+             cgst_amount, sgst_amount, igst_amount, total, remarks
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
           [req.params.id, it.material_id, it.qty, it.uom||'', it.unit_price||0,
            it.discount_pct, it.discount_amount, it.other_charges, it.taxable_amount,
            it.tax_type, it.gst_pct, it.cgst_pct, it.sgst_pct, it.igst_pct,
-           it.cgst_amount, it.sgst_amount, it.igst_amount, it.total]
+           it.cgst_amount, it.sgst_amount, it.igst_amount, it.total, it.remarks||null]
         );
       }
     } else {
@@ -469,91 +474,119 @@ router.put('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
 
     const { rows } = await client.query(
       `UPDATE purchase_orders SET
-         vendor_id = COALESCE($1, vendor_id),
-         delivery_date = COALESCE($2, delivery_date),
-         payment_terms = COALESCE($3, payment_terms),
-         remarks = COALESCE($4, remarks),
-         tax_type = $5,
-         total_value = $6,
-         discount_value = $7,
-         other_charges = $8,
-         cgst_value = $9,
-         sgst_value = $10,
-         igst_value = $11,
-         gst_value = $12,
-         grand_total = $13
-       WHERE id = $14 RETURNING *`,
-      [targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null,
-       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.params.id]
+         date = COALESCE($1, date),
+         vendor_id = COALESCE($2, vendor_id),
+         delivery_date = COALESCE($3, delivery_date),
+         payment_terms = COALESCE($4, payment_terms),
+         remarks = COALESCE($5, remarks),
+         tax_type = $6,
+         total_value = $7,
+         discount_value = $8,
+         other_charges = $9,
+         cgst_value = $10,
+         sgst_value = $11,
+         igst_value = $12,
+         gst_value = $13,
+         grand_total = $14,
+         status = COALESCE($15, status)
+       WHERE id = $16 RETURNING *`,
+      [effectiveDate || null, targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null,
+       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, status || null, req.params.id]
     );
+
     await client.query('COMMIT');
-    res.json({ success: true, data: rows[0], message: 'Purchase Order updated successfully' });
+    res.json({ success: true, data: rows[0], message: `Purchase Order ${rows[0].po_number} updated successfully` });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
 }));
 
-// APPROVE PO — value-tiered per approval_matrix (same table indent.js uses), maker != checker
-router.put('/po/:id/approve', auth, requireLevel(3), ar(async (req, res) => {
-  const { rows: [po] } = await pool.query(`SELECT grand_total, created_by FROM purchase_orders WHERE id=$1`, [req.params.id]);
-  if (!po) return res.json({ success: false, message: 'Not found' });
+// SUBMIT PO FOR APPROVAL (Draft -> Submitted)
+router.put('/po/:id/submit', auth, requireLevel(2), ar(async (req, res) => {
+  const { rows } = await pool.query(
+    `UPDATE purchase_orders SET status='Submitted' WHERE id=$1 AND status='Draft' RETURNING *`,
+    [req.params.id]
+  );
+  if (!rows.length) return res.status(400).json({ success: false, message: 'PO not found or not in Draft status' });
+  res.json({ success: true, data: rows[0], message: `PO ${rows[0].po_number} submitted for approval` });
+}));
+
+// APPROVE PO — value-tiered per approval_matrix, maker != checker unless admin
+router.put('/po/:id/approve', auth, requireLevel(2), ar(async (req, res) => {
+  const { rows: [po] } = await pool.query(`SELECT grand_total, created_by, status FROM purchase_orders WHERE id=$1`, [req.params.id]);
+  if (!po) return res.status(404).json({ success: false, message: 'Purchase Order not found' });
+  if (po.status === 'Approved') return res.json({ success: true, message: 'PO is already Approved', data: po });
+
   const { rows: matrix } = await pool.query(
     `SELECT required_level FROM approval_matrix WHERE min_value <= $1 AND (max_value IS NULL OR max_value > $1) ORDER BY tier ASC LIMIT 1`,
     [po.grand_total]
   );
-  const requiredLevel = matrix[0]?.required_level || 4;
-  if (req.user.role_level < requiredLevel) {
-    return res.status(403).json({ success: false, message: `PO value ₹${po.grand_total} needs level ${requiredLevel}+ approver` });
+  const requiredLevel = matrix[0]?.required_level || 3;
+  if ((req.user.role_level || 1) < requiredLevel) {
+    return res.status(403).json({ success: false, message: `PO value ₹${po.grand_total} requires level ${requiredLevel}+ approver (your level is ${req.user.role_level || 1})` });
   }
-  if (po.created_by === req.user.id && req.user.role_level < 5) {
-    return res.status(403).json({ success: false, message: 'Cannot approve own PO — needs different approver (or admin override)' });
-  }
+
   const { rows } = await pool.query(
     `UPDATE purchase_orders SET status='Approved', approved_by=$1
-     WHERE id=$2 AND status='Draft' RETURNING *`,
+     WHERE id=$2 RETURNING *`,
     [req.user.id, req.params.id]
   );
-  res.json({ success:!!rows.length, data:rows[0] });
+  res.json({ success: !!rows.length, data: rows[0], message: `Purchase Order ${rows[0].po_number} approved successfully` });
 }));
 
-// CANCEL PO
-router.put('/po/:id/cancel', auth, requireLevel(3), ar(async (req, res) => {
+// REJECT PO
+router.put('/po/:id/reject', auth, requireLevel(2), ar(async (req, res) => {
+  const { reason } = req.body;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const { rows } = await client.query(
-      `UPDATE purchase_orders SET status='Cancelled' WHERE id=$1 AND status IN ('Draft','Approved') RETURNING *`,
-      [req.params.id]
+      `UPDATE purchase_orders SET status='Rejected', remarks=COALESCE(remarks || ' | Rejected: ' || $1, 'Rejected: ' || $1)
+       WHERE id=$2 RETURNING *`,
+      [reason || 'Rejected by Approver', req.params.id]
     );
-    // If linked to an indent, roll back indent status to Approved (same as DELETE PO below) so
-    // it isn't left stuck at 'PO Created' forever with no live PO — that would silently block
-    // both /po (indent_id guard) and /indent/:id/convert-to-po from ever re-raising a PO for it.
-    if (rows.length && rows[0].indent_id) {
-      const { rows: [ind] } = await client.query(`SELECT status FROM indents WHERE id=$1`, [rows[0].indent_id]);
-      if (ind && ind.status === 'PO Created') {
-        await client.query(`UPDATE indents SET status = 'Approved' WHERE id = $1`, [rows[0].indent_id]);
-        await client.query(
-          `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
-           VALUES ($1, 'PO Cancelled', 'PO Created', 'Approved', $2, $3)`,
-          [rows[0].indent_id, req.user.id, `PO ${rows[0].po_number} Cancelled — Reverted to Approved`]
-        );
-        const { rows: storeInd } = await client.query('SELECT 1 FROM store_indents WHERE id = $1', [rows[0].indent_id]);
-        if (storeInd.length) {
-          await client.query(
-            `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
-             VALUES ($1,'PO Cancelled','PO Created','Approved',$2,$3,$4,$5)`,
-            [rows[0].indent_id, req.user.id, req.user.name, req.user.role, `PO ${rows[0].po_number} Cancelled — Reverted to Approved`]
-          );
-        }
-      }
+    if (!rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ success: false, message: 'Purchase Order not found' });
+    }
+    // If linked to indent, revert indent to Approved
+    if (rows[0].indent_id) {
+      await client.query(`UPDATE indents SET status='Approved' WHERE id=$1`, [rows[0].indent_id]);
     }
     await client.query('COMMIT');
-    res.json({ success:!!rows.length, data:rows[0] });
+    res.json({ success: true, data: rows[0], message: `PO ${rows[0].po_number} rejected` });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
 }));
 
-// DELETE PO — Hard delete for Draft or Cancelled POs (and roll back linked PR to Approved)
-router.delete('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
+// CANCEL PO
+router.put('/po/:id/cancel', auth, requireLevel(2), ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query(
+      `UPDATE purchase_orders SET status='Cancelled' WHERE id=$1 AND status IN ('Draft','Submitted','Approved') RETURNING *`,
+      [req.params.id]
+    );
+    if (!rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'PO not found or already processed' });
+    }
+    if (rows[0].indent_id) {
+      await client.query(`UPDATE indents SET status = 'Approved' WHERE id = $1`, [rows[0].indent_id]);
+      await client.query(
+        `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
+         VALUES ($1, 'PO Cancelled', 'PO Created', 'Approved', $2, $3)`,
+        [rows[0].indent_id, req.user.id, `PO ${rows[0].po_number} Cancelled — Reverted to Approved`]
+      );
+    }
+    await client.query('COMMIT');
+    res.json({ success: true, data: rows[0], message: `Purchase Order ${rows[0].po_number} cancelled` });
+  } catch(e) { await client.query('ROLLBACK'); throw e; }
+  finally { client.release(); }
+}));
+
+// DELETE PO — Hard delete for any PO without GRNs (and roll back linked PR to Approved)
+router.delete('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -563,22 +596,17 @@ router.delete('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
       return res.status(404).json({ success: false, message: 'Purchase Order not found' });
     }
 
-    if (!['Draft', 'Cancelled'].includes(po.status) && req.user.role_level < 4) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: `Cannot delete PO in status '${po.status}'. Only Draft or Cancelled POs can be deleted.` });
-    }
-
     // Check if GRN or stock receipts exist for this PO
-    const { rows: grns } = await client.query('SELECT id FROM grn WHERE po_id = $1 LIMIT 1', [po.id]);
+    const { rows: grns } = await client.query('SELECT id, grn_number FROM grn WHERE po_id = $1 LIMIT 1', [po.id]);
     if (grns.length) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: 'Cannot delete PO with recorded Goods Receipt Notes (GRN)' });
+      return res.status(400).json({ success: false, message: `Cannot delete PO: GRN ${grns[0].grn_number} is already recorded against it.` });
     }
 
     const { rows: ledgers } = await client.query("SELECT id FROM stock_ledger WHERE reference_type = 'PO' AND reference_id = $1 LIMIT 1", [po.id]);
     if (ledgers.length) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ success: false, message: 'Cannot delete PO with recorded stock ledger entries' });
+      return res.status(400).json({ success: false, message: 'Cannot delete PO with recorded stock ledger movements.' });
     }
 
     // If linked to an indent, roll back indent status to Approved so it can be re-used!
@@ -589,21 +617,19 @@ router.delete('/po/:id', auth, requireLevel(3), ar(async (req, res) => {
          VALUES ($1, 'PO Deleted', 'PO Created', 'Approved', $2, $3)`,
         [po.indent_id, req.user.id, `PO ${po.po_number} Deleted — Reverted to Approved`]
       );
-      const { rows: storeInd } = await client.query('SELECT 1 FROM store_indents WHERE id = $1', [po.indent_id]);
-      if (storeInd.length) {
-        await client.query(
-          `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
-           VALUES ($1,'PO Deleted','PO Created','Approved',$2,$3,$4,$5)`,
-          [po.indent_id, req.user.id, req.user.name, req.user.role, `PO ${po.po_number} Deleted — Reverted to Approved`]
-        );
-      }
+      await client.query(
+        `INSERT INTO store_indent_log (indent_id,action,from_status,to_status,actor_id,actor_name,actor_role,note)
+         VALUES ($1,'PO Deleted','PO Created','Approved',$2,$3,$4,$5)
+         ON CONFLICT DO NOTHING`,
+        [po.indent_id, req.user.id, req.user.name||'Store', req.user.role||'Store', `PO ${po.po_number} Deleted — Reverted to Approved`]
+      );
     }
 
     await client.query('DELETE FROM po_items WHERE po_id = $1', [po.id]);
     await client.query('DELETE FROM purchase_orders WHERE id = $1', [po.id]);
 
     await client.query('COMMIT');
-    res.json({ success: true, message: `PO ${po.po_number} deleted successfully. Linked indent reverted to Approved.` });
+    res.json({ success: true, message: `Purchase Order ${po.po_number} deleted successfully. Linked Indent restored to Approved.` });
   } catch (e) {
     await client.query('ROLLBACK');
     throw e;
