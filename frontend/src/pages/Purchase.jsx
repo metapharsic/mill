@@ -1846,6 +1846,12 @@ export default function Purchase() {
                     <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700, color: '#b45309' }}>-₹{totalDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                   </tr>
                 )}
+                {totalOtherCharges > 0 && (
+                  <tr>
+                    <td style={{ padding: '3px 4px', color: '#0369a1', fontWeight: 600 }}>Freight / Other Charges:</td>
+                    <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700, color: '#0369a1' }}>+₹{totalOtherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                )}
                 <tr style={{ borderTop: '1px solid #e2e8f0' }}>
                   <td style={{ padding: '3px 4px', color: '#0f172a', fontWeight: 700 }}>Net Taxable Sub Total:</td>
                   <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700 }}>₹{totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
@@ -1865,12 +1871,6 @@ export default function Purchase() {
                   <tr>
                     <td style={{ padding: '3px 4px', color: '#d97706' }}>IGST (Interstate Tax):</td>
                     <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 600, color: '#d97706' }}>₹{totalIgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  </tr>
-                )}
-                {totalOtherCharges > 0 && (
-                  <tr>
-                    <td style={{ padding: '3px 4px', color: '#0369a1' }}>Freight / Other Charges:</td>
-                    <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 600, color: '#0369a1' }}>+₹{totalOtherCharges.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                   </tr>
                 )}
                 <tr style={{ borderTop: '2px solid #0f766e', background: '#f0fdf4' }}>
