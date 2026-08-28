@@ -973,18 +973,6 @@ router.put('/:id/status', auth, requireLevel(2), ar(async (req, res) => {
   );
   res.json({ success: !!rows.length, data: rows[0], message: `Indent ${rows[0]?.indent_number} status updated to ${status}` });
 }));
-  if (rows.length) {
-    publish('mkpm.indent.events', String(req.params.id), {
-      event: 'indent.approved',
-      id: rows[0].id,
-      indentNumber: rows[0].indent_number,
-      status: 'Approved',
-      userId: req.user.id,
-      timestamp: new Date()
-    });
-  }
-  res.json({ success: !!rows.length, data: rows[0] });
-}));
 
 // REJECT — approver (level 2+) in the SAME department as the indent, or level4+ org-wide
 router.put('/:id/reject', auth, requireLevel(2), ar(async (req, res) => {
