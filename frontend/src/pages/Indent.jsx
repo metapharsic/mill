@@ -38,6 +38,8 @@ const SC = {
   'L2 Approved':    '#7c3aed',
   Approved:         '#0f766e',
   'PO Created':     '#6366f1',
+  'DC Generated':   '#d97706',
+  'Cash Purchased': '#059669',
   'Partially Issued':'#f97316',
   Issued:           '#16a34a',
   Closed:           '#22c55e',
@@ -2413,7 +2415,7 @@ export default function Indent() {
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#0f766e' }}>
-                Review Indent &amp; {form.fulfillment_mode === 'po' ? 'Direct Purchase Order' : (form.fulfillment_mode === 'dc' ? 'Delivery Challan' : (form.fulfillment_mode === 'issue' ? 'Immediate Store Issuance' : 'Standard Requisition'))}
+                Review Indent &amp; {form.fulfillment_mode === 'po' ? 'Direct Purchase Order' : (form.fulfillment_mode === 'dc' ? 'Delivery Challan' : (form.fulfillment_mode === 'issue' ? 'Immediate Store Issuance' : (form.fulfillment_mode === 'cash' ? 'Direct Cash Purchase' : 'Standard Requisition')))}
               </div>
               <button style={S.close} onClick={() => setReviewMode(false)}>✕</button>
             </div>
@@ -2423,6 +2425,7 @@ export default function Indent() {
               {form.fulfillment_mode === 'po' && ' This will auto-approve the indent and generate a formal Purchase Order.'}
               {form.fulfillment_mode === 'dc' && ' This will generate a Delivery Challan / Gate Pass for outward material dispatch.'}
               {form.fulfillment_mode === 'issue' && ' This will immediately deduct stock and generate an official SIV issue voucher.'}
+              {form.fulfillment_mode === 'cash' && ' This will immediately record a Spot Cash Purchase, increment material stock, and sync vendor bills.'}
               {form.fulfillment_mode === 'pr' && ' This will submit the indent into the plant multi-tier approval matrix.'}
             </div>
 

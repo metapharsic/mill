@@ -320,6 +320,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
     if (fulfillment_mode === 'po') initialStatus = 'PO Created';
     else if (fulfillment_mode === 'dc') initialStatus = 'DC Generated';
     else if (fulfillment_mode === 'issue') initialStatus = 'Issued';
+    else if (fulfillment_mode === 'cash') initialStatus = 'Cash Purchased';
 
     const { rows } = await client.query(
       `INSERT INTO indents (indent_number,date,department_id,required_date,priority,status,raised_by,remarks,section_id,machine_id)
@@ -349,6 +350,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
 
     let createdPo = null;
     let createdGp = null;
+    let createdCp = null;
 
     // ── Fulfillment Branch 1: DIRECT PURCHASE ORDER (PO) ──
     if (fulfillment_mode === 'po') {
@@ -513,6 +515,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
           cpTaxable, cpTax / 2, cpTax, cpGrandTotal, remarks || `Direct Cash Purchase for Indent ${num}`, req.user.id
         ]
       );
+      createdCp = cp;
 
       for (const it of items) {
         const p = parseFloat(it.unit_price || 0);
@@ -595,6 +598,7 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
       data: rows[0],
       po: createdPo,
       gatePass: createdGp,
+      cashPurchase: createdCp,
       fulfillmentMode: fulfillment_mode,
       message: fulfillment_mode === 'po'
         ? `Indent ${num} created & Purchase Order ${createdPo?.po_number} generated successfully!`
@@ -602,7 +606,9 @@ router.post('/', auth, requireLevel(1), ar(async (req, res) => {
             ? `Indent ${num} created & Delivery Challan ${createdGp?.gp_number} generated!`
             : (fulfillment_mode === 'issue'
                 ? `Indent ${num} created & immediate stock issuance recorded!`
-                : `Indent ${num} submitted for approval workflow!`))
+                : (fulfillment_mode === 'cash'
+                    ? `Indent ${num} created & Cash Purchase Voucher ${createdCp?.voucher_number} generated!`
+                    : `Indent ${num} submitted for approval workflow!`)))
     });
   } catch(e) { await client.query('ROLLBACK'); throw e; }
   finally { client.release(); }
