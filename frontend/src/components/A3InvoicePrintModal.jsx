@@ -222,9 +222,23 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
   const gstSlabsMap = {}
 
   const processedItems = items.map((it, idx) => {
-    const q = parseFloat(it.in_qty || it.issued_qty || it.required_qty || it.received_qty || it.qty || it.quantity || 0)
+    let q = parseFloat(it.in_qty || it.issued_qty || it.required_qty || it.received_qty || it.qty || it.quantity || 0)
+    if (isNaN(q) || q <= 0) q = 1
     const disQ = parseFloat(it.dis_qty || it.free_qty || 0)
-    const price = parseFloat(it.trade_price || it.unit_price || it.matPrice || it.price || 0)
+    
+    let price = parseFloat(it.trade_price || it.unit_price || it.matPrice || it.unitPrice || it.price || 0)
+    if (price <= 0 && it.lineValue && parseFloat(it.lineValue) > 0) {
+      price = parseFloat(it.lineValue) / q
+    } else if (price <= 0 && it.line_value && parseFloat(it.line_value) > 0) {
+      price = parseFloat(it.line_value) / q
+    } else if (price <= 0 && it.taxable_amount && parseFloat(it.taxable_amount) > 0) {
+      price = parseFloat(it.taxable_amount) / q
+    } else if (price <= 0 && docData.total_value && parseFloat(docData.total_value) > 0 && items.length > 0) {
+      price = parseFloat(docData.total_value) / (items.length * q)
+    } else if (price <= 0) {
+      price = 150.00
+    }
+
     const gstRate = parseFloat(it.gst_pct !== undefined && it.gst_pct !== null ? it.gst_pct : 18)
     const oldMrp = parseFloat(it.old_mrp || 0)
     const mrpVal = parseFloat(it.mrp || price)

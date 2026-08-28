@@ -236,19 +236,27 @@ export default function Indent() {
       if (res.success && res.data) fullDoc = res.data
     }
     if (!fullDoc) return
-    const formattedItems = (fullDoc.items || []).map((it, idx) => ({
-      materialName: it.materialName || it.material_name,
-      materialCode: it.materialCode || it.material_code,
-      uom: it.uom || it.matUom || 'NOS',
-      in_qty: it.issued_qty || it.required_qty || 1,
-      unit_price: it.matPrice || it.unit_price || 0,
-      hsnCode: it.hsnCode || it.hsn_code || '84399900',
-      gst_pct: it.gst_pct != null ? it.gst_pct : 18,
-      batch_number: it.batch_no || it.batch_number || '—',
-      pack_size: it.uom || it.matUom || 'NOS',
-      mrp: it.matPrice || it.unit_price || 0,
-      trade_price: it.matPrice || it.unit_price || 0
-    }))
+    const formattedItems = (fullDoc.items || []).map((it, idx) => {
+      const q = parseFloat(it.issued_qty || it.required_qty || it.qty || 1)
+      const p = parseFloat(it.matPrice || it.unit_price || it.trade_price || it.price || (it.lineValue ? it.lineValue / q : 150))
+      const lineVal = parseFloat(it.lineValue || it.line_value || (q * p))
+      return {
+        materialName: it.materialName || it.material_name || `Store Item #${idx + 1}`,
+        materialCode: it.materialCode || it.material_code || 'ITM-001',
+        uom: it.uom || it.matUom || 'NOS',
+        in_qty: q,
+        unit_price: p,
+        hsnCode: it.hsnCode || it.hsn_code || '84399900',
+        gst_pct: it.gst_pct != null ? it.gst_pct : 18,
+        batch_number: it.batch_no || it.batch_number || '—',
+        pack_size: it.uom || it.matUom || 'NOS',
+        mrp: p,
+        trade_price: p,
+        taxable_amount: lineVal,
+        total_amount: lineVal * 1.18,
+        lineValue: lineVal
+      }
+    })
     setA3PrintDoc({
       ...fullDoc,
       invoiceNumber: fullDoc.indent_number || fullDoc.indentNumber,

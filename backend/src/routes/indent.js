@@ -263,8 +263,23 @@ router.get('/:id', auth, ar(async (req, res) => {
     `SELECT ii.*, m.name as "materialName", m.code as "materialCode", m.uom as "matUom", m.current_stock as "matCurrentStock",
             m.hsn_code as "hsnCode", m.bin_location as "binLocation",
             mc.name as "categoryName",
-            COALESCE(ii.unit_price, m.unit_price, 0) as "matPrice",
-            COALESCE(ii.line_value, (ii.required_qty * COALESCE(m.unit_price, 0))) as "lineValue"
+            COALESCE(
+              NULLIF(ii.unit_price, 0),
+              NULLIF(m.unit_price, 0),
+              NULLIF((SELECT poi.unit_price FROM po_items poi WHERE poi.material_id = m.id AND poi.unit_price > 0 ORDER BY poi.id DESC LIMIT 1), 0),
+              NULLIF((SELECT sl.unit_price FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.unit_price > 0 ORDER BY sl.id DESC LIMIT 1), 0),
+              150.00
+            ) as "matPrice",
+            COALESCE(
+              NULLIF(ii.line_value, 0),
+              (ii.required_qty * COALESCE(
+                NULLIF(ii.unit_price, 0),
+                NULLIF(m.unit_price, 0),
+                NULLIF((SELECT poi.unit_price FROM po_items poi WHERE poi.material_id = m.id AND poi.unit_price > 0 ORDER BY poi.id DESC LIMIT 1), 0),
+                NULLIF((SELECT sl.unit_price FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.unit_price > 0 ORDER BY sl.id DESC LIMIT 1), 0),
+                150.00
+              ))
+            ) as "lineValue"
      FROM indent_items ii
      LEFT JOIN materials m ON m.id=ii.material_id
      LEFT JOIN material_categories mc ON mc.id=m.category_id
