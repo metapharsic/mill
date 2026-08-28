@@ -947,22 +947,32 @@ export default function Indent() {
 
 
   const action = async (id, path, body) => {
-    const r = await API(`/indent/${id}/${path}`, { method: 'PUT', body: body ? JSON.stringify(body) : undefined })
-    if (r.success) {
-      load()
-      flash(true, 'Done')
-      if (detail?.id === id) openDetail(id)
-    } else if (r.sequence_violation) {
-      setSequenceViolation({
-        violationType: r.violationType || 'sm_approval_required',
-        currentStep: r.currentStep || 1,
-        requiredStep: r.requiredStep || 2,
-        indentNumber: r.indentNumber || '',
-        deptName: r.deptName || '',
-        targetId: id
-      })
-    } else {
-      flash(false, r.message || 'Failed')
+    let targetPath = path
+    if (path === 'l2_approve') targetPath = 'approve/l2'
+    if (path === 'l1_approve') targetPath = 'approve/l1'
+    if (path === 'l3_approve') targetPath = 'approve/l3'
+    try {
+      const r = await API(`/indent/${id}/${targetPath}`, { method: 'PUT', body: body ? JSON.stringify(body) : undefined })
+      if (r && r.success) {
+        load()
+        flash(true, r.message || 'Action executed successfully')
+        if (detail?.id === id) openDetail(id)
+      } else if (r && r.sequence_violation) {
+        setSequenceViolation({
+          violationType: r.violationType || 'sm_approval_required',
+          currentStep: r.currentStep || 1,
+          requiredStep: r.requiredStep || 2,
+          indentNumber: r.indentNumber || '',
+          deptName: r.deptName || '',
+          targetId: id
+        })
+      } else {
+        flash(false, r?.message || 'Failed')
+        alert(r?.message || 'Action failed. Please check permissions.')
+      }
+    } catch (err) {
+      flash(false, err.message)
+      alert('Action error: ' + (err.message || 'Network error'))
     }
   }
 

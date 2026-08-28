@@ -887,69 +887,41 @@ router.put('/:id/approve/l1', auth, requireLevel(3), ar(async (req, res) => {
 }));
 
 // APPROVE L2 — Store Manager (level 3+) or Admin/PlantHead (level 4+)
-// L1 Approved → Approved (ready to issue). GAP-2 FIX: was requireLevel(4), now requireLevel(3).
-router.put('/:id/approve/l2', auth, requireLevel(3), ar(async (req, res) => {
-  const client0 = await pool.connect();
-  let tier;
-  try { tier = await getIndentTier(client0, req.params.id); } finally { client0.release(); }
-  if (req.user.role_level < tier.requiredLevel) {
-    return res.status(403).json({ success: false, message: `Indent value ₹${tier.totalValue} needs level ${tier.requiredLevel}+ approver (Tier ${tier.tier})` });
-  }
-  const { rows: [ind] } = await pool.query(`SELECT raised_by, l1_approved_by FROM indents WHERE id=$1`, [req.params.id]);
-  if (ind && (ind.raised_by === req.user.id || ind.l1_approved_by === req.user.id) && req.user.role_level < 5) {
-    return res.status(403).json({ success: false, message: 'Cannot L2-approve own indent or your own L1 approval — needs different approver (or admin override)' });
-  }
-  const { rows } = await pool.query(
-    `UPDATE indents SET status='Approved', l2_approved_by=$1, l2_approved_at=NOW()
-     WHERE id=$2 AND status='L1 Approved' RETURNING *`,
-    [req.user.id, req.params.id]
-  );
-  if (rows.length) {
-    await logStoreIndent(pool, rows[0].id, 'Approved', 'L1 Approved', 'Approved', req.user.id, req.user.name, req.user.role);
-    publish('mkpm.indent.events', String(req.params.id), {
-      event: 'indent.approved',
-      id: rows[0].id,
-      indentNumber: rows[0].indent_number,
-      status: 'Approved',
-      userId: req.user.id,
-      timestamp: new Date()
-    });
-  }
-  res.json({ success: !!rows.length, data: rows[0], message: rows.length ? undefined : 'Indent must be L1 Approved' });
-}));
-
-// APPROVE DIRECT — general approval route for indents (supports L1/L2/Admin direct approval)
-router.put('/:id/approve', auth, requireLevel(2), ar(async (req, res) => {
-  const { rows: [ind] } = await pool.query(
-    `SELECT id, indent_number, status, raised_by, department_id FROM indents WHERE id=$1`,
-    [req.params.id]
-  );
+// Direct or L1 Approved → Approved (ready to issue / convert to PO)
+const l2ApproveHandler = ar(async (req, res) => {
+  const { rows: [ind] } = await pool.query(`SELECT id, indent_number, status, raised_by, l1_approved_by, department_id FROM indents WHERE id=$1`, [req.params.id]);
   if (!ind) return res.status(404).json({ success: false, message: 'Indent not found' });
   if (ind.status === 'Approved') return res.json({ success: true, message: 'Indent is already Approved', data: ind });
 
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin') || userRole.includes('director') || userRole.includes('md') || (req.user.role_level || 1) >= 4;
 
-  if (!isAdmin && ind.raised_by === req.user.id && (req.user.role_level || 1) < 4) {
+  const client0 = await pool.connect();
+  let tier;
+  try { tier = await getIndentTier(client0, req.params.id); } finally { client0.release(); }
+  if (!isAdmin && req.user.role_level < tier.requiredLevel) {
+    return res.status(403).json({ success: false, message: `Indent value ₹${tier.totalValue} needs level ${tier.requiredLevel}+ approver (Tier ${tier.tier})` });
+  }
+
+  if (!isAdmin && (ind.raised_by === req.user.id || ind.l1_approved_by === req.user.id) && req.user.role_level < 5) {
     return res.status(403).json({ success: false, message: 'Cannot approve own indent — approver must be different from requester' });
   }
 
   const { rows } = await pool.query(
     `UPDATE indents SET 
-       status = 'Approved',
+       status = 'Approved', 
        l1_approved_by = COALESCE(l1_approved_by, $1),
        l1_approved_at = COALESCE(l1_approved_at, NOW()),
-       l2_approved_by = $1,
+       l2_approved_by = $1, 
        l2_approved_at = NOW()
      WHERE id = $2 RETURNING *`,
     [req.user.id, req.params.id]
   );
-
   if (rows.length) {
-    await logStoreIndent(pool, rows[0].id, 'Approved', ind.status, 'Approved', req.user.id, req.user.name, req.user.role, 'Indent approved');
+    await logStoreIndent(pool, rows[0].id, 'Approved', ind.status, 'Approved', req.user.id, req.user.name, req.user.role, 'Store Manager / Level 2 Approved');
     await pool.query(
       `INSERT INTO indent_audit_log (indent_id, action, old_status, new_status, user_id, remarks)
-       VALUES ($1, 'approve', $2, 'Approved', $3, 'Indent approved')`,
+       VALUES ($1, 'approve_l2', $2, 'Approved', $3, 'Approved by Store Manager')`,
       [rows[0].id, ind.status, req.user.id]
     ).catch(() => {});
 
@@ -962,17 +934,45 @@ router.put('/:id/approve', auth, requireLevel(2), ar(async (req, res) => {
       timestamp: new Date()
     });
   }
-
   res.json({ success: !!rows.length, data: rows[0], message: `Indent ${rows[0]?.indent_number} approved successfully` });
-}));
+});
 
-// APPROVE L3 — kept for compatibility (no-op redirect to L2)
-router.put('/:id/approve/l3', auth, requireLevel(4), ar(async (req, res) => {
+router.put('/:id/approve/l2', auth, requireLevel(2), l2ApproveHandler);
+router.put('/:id/l2_approve', auth, requireLevel(2), l2ApproveHandler);
+router.put('/:id/l1_approve', auth, requireLevel(2), ar(async (req, res) => {
+  // Alias to l1 approve
+  const { rows: [ind] } = await pool.query(`SELECT status FROM indents WHERE id=$1`, [req.params.id]);
+  if (!ind) return res.status(404).json({ success: false, message: 'Indent not found' });
   const { rows } = await pool.query(
-    `UPDATE indents SET status='Approved', l2_approved_by=$1, l2_approved_at=NOW()
-     WHERE id=$2 AND status IN ('L1 Approved','L2 Approved') RETURNING *`,
+    `UPDATE indents SET status='L1 Approved', l1_approved_by=$1, l1_approved_at=NOW()
+     WHERE id=$2 RETURNING *`,
     [req.user.id, req.params.id]
   );
+  res.json({ success: !!rows.length, data: rows[0] });
+}));
+router.put('/:id/l3_approve', auth, requireLevel(2), l2ApproveHandler);
+
+// APPROVE DIRECT — general approval route for indents (supports L1/L2/Admin direct approval)
+router.put('/:id/approve', auth, requireLevel(2), l2ApproveHandler);
+
+// UPDATE INDENT STATUS DIRECTLY
+router.put('/:id/status', auth, requireLevel(2), ar(async (req, res) => {
+  const { status, remarks } = req.body;
+  if (!status) return res.status(400).json({ success: false, message: 'Status is required' });
+  const { rows: [ind] } = await pool.query(`SELECT id, indent_number, status FROM indents WHERE id=$1`, [req.params.id]);
+  if (!ind) return res.status(404).json({ success: false, message: 'Indent not found' });
+
+  const { rows } = await pool.query(
+    `UPDATE indents SET 
+       status = $1,
+       remarks = COALESCE($2, remarks),
+       l2_approved_by = CASE WHEN $1 = 'Approved' THEN $3 ELSE l2_approved_by END,
+       l2_approved_at = CASE WHEN $1 = 'Approved' THEN NOW() ELSE l2_approved_at END
+     WHERE id = $4 RETURNING *`,
+    [status, remarks || null, req.user.id, req.params.id]
+  );
+  res.json({ success: !!rows.length, data: rows[0], message: `Indent ${rows[0]?.indent_number} status updated to ${status}` });
+}));
   if (rows.length) {
     publish('mkpm.indent.events', String(req.params.id), {
       event: 'indent.approved',
