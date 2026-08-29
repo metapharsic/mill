@@ -1599,7 +1599,7 @@ export default function Materials() {
       {/* ── UNIVERSAL EXCEL UPLOAD & PREVIEW / SYNC MODAL ─────────────────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {excelModal && (
-        <div style={S.overlay} onClick={() => setExcelModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 860 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -1750,7 +1750,7 @@ export default function Materials() {
       {/* ── MASTER MATERIAL MODAL (100% Identical Parity for Add and Edit) ── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -2076,7 +2076,7 @@ export default function Materials() {
 
       {/* ── Category Modal ── */}
       {catModal && (
-        <div style={S.overlay} onClick={() => setCatModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 420 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>+ Add Material Category / Subcategory</div>
@@ -2111,7 +2111,7 @@ export default function Materials() {
 
       {/* ── ADD PLANT SECTION MODAL ── */}
       {secModal && (
-        <div style={S.overlay} onClick={() => setSecModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 540 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2215,7 +2215,7 @@ export default function Materials() {
 
       {/* ── ADD MACHINE / EQUIPMENT / ROLL MODAL ── */}
       {equipModal && (
-        <div style={S.overlay} onClick={() => setEquipModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 680 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -490,7 +490,7 @@ export default function Maintenance() {
       )}
 
       {modal==='motor'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:520}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>{form.id?'Edit':'Add'} Motor Electrical Spec</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveMotor} style={S.form}>
@@ -518,7 +518,7 @@ export default function Maintenance() {
       )}
 
       {modal==='schedule'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:560}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Schedule Preventive Maintenance</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveSchedule} style={S.form}>
@@ -559,7 +559,7 @@ export default function Maintenance() {
       )}
 
       {modal==='log'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:600}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Log Maintenance Work</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveLog} style={S.form}>
@@ -588,7 +588,7 @@ export default function Maintenance() {
       )}
 
       {modal==='breakdown'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:480}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={{...S.modalTitle,color:'#ef4444'}}>⚠ Mark Breakdown</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveBreakdown} style={S.form}>
@@ -608,7 +608,7 @@ export default function Maintenance() {
       )}
 
       {modal==='equipment'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:480}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>{form.id ? 'Edit Equipment' : 'Add Plant Equipment (Motors/Pumps)'}</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveEquipment} style={S.form}>
@@ -636,7 +636,7 @@ export default function Maintenance() {
       )}
 
       {modal==='inspection'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:480}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Log Equipment Inspection Log (F1)</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveInspection} style={S.form}>

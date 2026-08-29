@@ -655,7 +655,7 @@ export default function RawMaterial({ onNavigate }) {
 
       {/* ── FAST INWARD MODAL (GRN / RETURN) ── */}
       {inwardModal && (
-        <div style={S.overlay} onClick={() => setInwardModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHdr}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -819,7 +819,7 @@ export default function RawMaterial({ onNavigate }) {
 
       {/* ── FAST OUTWARD / ISSUE MODAL ── */}
       {issueModal && (
-        <div style={S.overlay} onClick={() => setIssueModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHdr}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

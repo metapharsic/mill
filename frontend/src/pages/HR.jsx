@@ -709,7 +709,7 @@ function EmployeesAdmin() {
       )}
 
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 660 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{edit ? `Edit: ${edit.name}` : 'Add Employee'}</div>
@@ -1388,7 +1388,7 @@ function Training({ user, canAdmin, canSupervise }) {
       </div>
 
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth:540 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>New Training Program</div><button style={S.close} onClick={() => setModal(false)}>✕</button></div>
             <form onSubmit={saveProgram} style={S.form}>
@@ -1518,7 +1518,7 @@ function MyDocuments({ user, canAdmin }) {
       </div>
 
       {modal && (
-        <div style={S.overlay} onClick={() => { setModal(false); setFileObj(null); setUploadStatus('') }}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth:480 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Upload Document</div><button style={S.close} onClick={() => { setModal(false); setFileObj(null); setUploadStatus('') }}>✕</button></div>
             <form onSubmit={uploadDoc} style={S.form}>
@@ -1737,7 +1737,7 @@ function Separation({ user, canAdmin }) {
       </div>
 
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth:460 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Initiate Separation</div><button style={S.close} onClick={() => setModal(false)}>✕</button></div>
             <form onSubmit={submit} style={S.form}>
@@ -1917,7 +1917,7 @@ function LoansAdvance({ user, canAdmin }) {
       </div>
 
       {modal === 'new' && (
-        <div style={S.overlay} onClick={() => setModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth:480 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>New Loan / Advance</div><button style={S.close} onClick={() => setModal(null)}>✕</button></div>
             {err && <div style={{ ...S.error, marginBottom:10 }}>{err}</div>}
@@ -1942,7 +1942,7 @@ function LoansAdvance({ user, canAdmin }) {
       )}
 
       {modal && modal !== 'new' && (
-        <div style={S.overlay} onClick={() => setModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth:380 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Record Payment</div><button style={S.close} onClick={() => setModal(null)}>✕</button></div>
             <div style={{ marginBottom:12, fontSize:13 }}>

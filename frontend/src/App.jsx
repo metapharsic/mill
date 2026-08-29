@@ -43,6 +43,9 @@ import ChemicalStore from './pages/ChemicalStore'
 import StoreDashboard from './pages/StoreDashboard'
 import StoreDeptReports from './pages/StoreDeptReports'
 import MultiAgentCheckpoint from './pages/MultiAgentCheckpoint'
+import DigitalClock from './components/DigitalClock'
+import MinimizedTabsBar from './components/MinimizedTabsBar'
+import { MinimizedModalsProvider } from './contexts/MinimizedModalsContext'
 
 // Plant-section keys — must stay in sync with the 'Plant Sections' group in Sidebar.jsx.
 // They are routed as /sections/<code> and rendered by AllSections / PlantSection.
@@ -289,6 +292,8 @@ function AppShell() {
         onCloseMobile={() => setMobileOpen(false)}
       />
       <div style={styles.main}>
+        <DigitalClock />
+        <MinimizedTabsBar />
         <header style={styles.topbar} className="glass">
           <div style={styles.crumb}>
             <button className="mobile-only" style={{ ...styles.iconBtn, width: 34, height: 34, marginRight: 6 }} title="Toggle menu" onClick={() => setMobileOpen(o => !o)}>
@@ -399,7 +404,9 @@ function AppShell() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppShell />
+      <MinimizedModalsProvider>
+        <AppShell />
+      </MinimizedModalsProvider>
     </AuthProvider>
   )
 }

@@ -163,7 +163,7 @@ export default function Sales() {
       )}
 
       {modal==='order'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:600}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>New Sales Order</div><button style={S.close} onClick={()=>setModal(null)}>✕</button></div>
             <form onSubmit={saveOrder} style={{display:'flex',flexDirection:'column',gap:12}}>
@@ -200,7 +200,7 @@ export default function Sales() {
       )}
 
       {modal==='dispatch'&&(
-        <div style={S.overlay} onClick={()=>setModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:720}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>Create Dispatch Order</div>

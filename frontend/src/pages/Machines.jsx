@@ -230,7 +230,7 @@ export default function Machines() {
       </div>
 
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(null)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{edit ? `Edit: ${edit.name}` : 'Add Machine'}</div>
@@ -274,7 +274,7 @@ export default function Machines() {
       )}
 
       {posModal && (
-        <div style={S.overlay} onClick={() => setPosModal(null)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>Positions: {posModal.name}</div>

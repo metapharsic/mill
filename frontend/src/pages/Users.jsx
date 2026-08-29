@@ -271,7 +271,7 @@ export default function Users() {
 
       {/* Add/Edit Modal */}
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(null)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{modal === 'add' ? 'Add New User / Store Operator' : `Edit: ${editUser?.name}`}</div>
@@ -352,7 +352,7 @@ export default function Users() {
 
       {/* Reset Password Modal */}
       {pwModal && (
-        <div style={S.overlay} onClick={() => setPwModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 400 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>Reset Password — {pwModal.name}</div>

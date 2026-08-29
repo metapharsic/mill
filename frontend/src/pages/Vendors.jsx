@@ -228,7 +228,7 @@ export default function Vendors() {
 
       {/* ── View Vendor Details Modal ── */}
       {detailModal && (
-        <div style={S.overlay} onClick={() => setDetailModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 580 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -274,7 +274,7 @@ export default function Vendors() {
 
       {/* ── Add / Edit Vendor Modal ── */}
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{edit ? `Edit Vendor: ${edit.name}` : 'Add New Vendor'}</div>

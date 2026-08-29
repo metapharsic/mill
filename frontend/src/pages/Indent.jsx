@@ -6,6 +6,7 @@ import { LOGO_DATA_URI } from '../utils/logo'
 import { ExternalLink } from 'lucide-react'
 import A3InvoicePrintModal from '../components/A3InvoicePrintModal'
 import SequenceEnforcementModal from '../components/SequenceEnforcementModal'
+import { useMinimizedModals } from '../contexts/MinimizedModalsContext'
 
 const API = async (path, opts = {}) => {
   try {
@@ -146,6 +147,8 @@ export default function Indent() {
   const [sectionEquipment, setSectionEquipment] = useState([])
   const [expandedRow, setExpandedRow] = useState(null)
   const [detail, setDetail] = useState(null)
+  const [detailMinimized, setDetailMinimized] = useState(false)
+  const { minimize: mmMinimize, close: mmClose } = useMinimizedModals()
   const [tier, setTier] = useState(null)
   const [analytics, setAnalytics] = useState(null)
   const [calendar, setCalendar] = useState([])
@@ -2434,7 +2437,7 @@ export default function Indent() {
       {/* ── REVIEW & CONFIRM MODAL ─────────────────────────────────────────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {reviewMode && (
-        <div style={S.ovl} onClick={() => setReviewMode(false)}>
+        <div style={S.ovl}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#0f766e' }}>
@@ -2549,7 +2552,7 @@ export default function Indent() {
       {/* ── DETAIL MODAL (With Full Indentor Profile & Append Spares) ───────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {detail && tabKey !== 'issue' && (
-        <div style={S.ovl} onClick={() => { setDetail(null); setTier(null); setAppendOpen(false) }}>
+        <div style={{ ...S.ovl, display: detailMinimized ? 'none' : 'flex' }}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div>
@@ -2587,7 +2590,15 @@ export default function Indent() {
                 >
                   🧾 Issue Slip
                 </button>
-                <button style={S.close} onClick={() => { setDetail(null); setTier(null); setAppendOpen(false) }}>✕</button>
+                <button
+                  style={{ ...S.btnSecondary, padding: '6px 10px', fontSize: 13, fontWeight: 800 }}
+                  title="Minimize"
+                  onClick={() => {
+                    setDetailMinimized(true)
+                    mmMinimize('indent-detail', `Indent: ${detail.indent_number || ''}`, () => setDetailMinimized(false))
+                  }}
+                >─</button>
+                <button style={S.close} onClick={() => { mmClose('indent-detail'); setDetailMinimized(false); setDetail(null); setTier(null); setAppendOpen(false) }}>✕</button>
               </div>
             </div>
 
@@ -3233,7 +3244,7 @@ export default function Indent() {
 
       {/* ── Fitment Ack Modal ── */}
       {ackItem && (
-        <div style={S.ovl} onClick={() => setAckItem(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 520 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#0f766e' }}>Acknowledge Fitment: {ackItem.part_name}</div>
@@ -3379,7 +3390,7 @@ export default function Indent() {
       {/* ── STORE MANAGER / ADMIN INDENT CANCELLATION & DELETION MODAL ─────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {cancelModal && (
-        <div style={S.ovl} onClick={() => setCancelModal(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 540 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#dc2626' }}>
@@ -3444,7 +3455,7 @@ export default function Indent() {
       {/* ── 1-CLICK CONVERT TO PURCHASE ORDER (PO) MODAL ───────────────────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {poModal && (
-        <div style={S.ovl} onClick={() => setPoModal(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#0369a1', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -3580,7 +3591,7 @@ export default function Indent() {
       {/* ── 1-CLICK GENERATE DELIVERY CHALLAN (DC / GATE PASS) MODAL ───────── */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {dcModal && (
-        <div style={S.ovl} onClick={() => setDcModal(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#b45309', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -3689,7 +3700,7 @@ export default function Indent() {
 
       {/* ── 1-CLICK CONVERT TO CASH PURCHASE MODAL ── */}
       {cashModal && (
-        <div style={S.ovl} onClick={() => setCashModal(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 640 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#16a34a', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -3784,7 +3795,7 @@ export default function Indent() {
 
       {/* ── MODAL: DEPARTMENT RECEIVER SIGN & HANDOVER ── */}
       {receiverSignModal && (
-        <div style={S.ovl} onClick={() => setReceiverSignModal(null)}>
+        <div style={S.ovl}>
           <div style={{ ...S.modal, maxWidth: 550 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div>

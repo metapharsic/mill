@@ -378,7 +378,7 @@ export default function ProductDetailModal({
   const fmtN = (v, dec = 2) => Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec })
 
   return (
-    <div style={S.overlay} onClick={onClose}>
+    <div style={S.overlay}>
       <div style={S.card} onClick={e => e.stopPropagation()}>
         {/* ── Modal Header ── */}
         <div style={S.header}>

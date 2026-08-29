@@ -6,6 +6,7 @@ import { FormField } from '../components/ui/FormField'
 import ProductDetailModal from '../components/ProductDetailModal'
 import InventoryExportModal from '../components/InventoryExportModal'
 import SearchableSelect from '../components/SearchableSelect'
+import { useMinimizedModals } from '../contexts/MinimizedModalsContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
 import SortableTh from '../components/SortableTh'
 import TableScrollWrapper from '../components/TableScrollWrapper'
@@ -224,6 +225,8 @@ export default function Store({ onNavigate }) {
   const [assetSortOrder, setAssetSortOrder] = useState('desc')
   const OUTWARD_LIMIT = 20
   const [outwardModal, setOutwardModal] = useState(false)
+  const [outwardModalMinimized, setOutwardModalMinimized] = useState(false)
+  const { minimize: mmMinimize, close: mmClose } = useMinimizedModals()
   const [outwardForm, setOutwardForm] = useState({
     material_id: '',
     out_qty: '',
@@ -3304,14 +3307,24 @@ export default function Store({ onNavigate }) {
 
       {/* ── MODAL: FAST OUTWARD (ISSUE) ── */}
       {outwardModal && (
-        <div style={S.overlay}>
+        <div style={{ ...S.overlay, display: outwardModalMinimized ? 'none' : 'flex' }}>
           <div style={{ ...S.modal, maxWidth: 680 }}>
             <div style={S.modalHdr}>
               <div>
                 <b>📤 Fast Outward Issue (Plant Requisition / RTV)</b>
                 <div style={S.muted}>Direct stock deduction with audit logging</div>
               </div>
-              <button style={S.x} onClick={() => setOutwardModal(false)}>✕</button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  style={{ ...S.x, fontWeight: 800 }}
+                  title="Minimize"
+                  onClick={() => {
+                    setOutwardModalMinimized(true)
+                    mmMinimize('store-outward', 'Outward Issue (SIV)', () => setOutwardModalMinimized(false))
+                  }}
+                >─</button>
+                <button style={S.x} onClick={() => { mmClose('store-outward'); setOutwardModalMinimized(false); setOutwardModal(false) }}>✕</button>
+              </div>
             </div>
             <form onSubmit={handleCreateOutward} style={S.form}>
               <div style={S.grid2}>
@@ -3446,7 +3459,7 @@ export default function Store({ onNavigate }) {
         const grnDisplayNum = inwardVoucher.grnNumber || inwardVoucher.reference_id || `GRN-${inwardVoucher.id}`
 
         return (
-          <div style={S.overlay} onClick={() => setInwardVoucher(null)}>
+          <div style={S.overlay}>
             <div style={{ ...S.modal, maxWidth: 900, background: '#ffffff', padding: 36, position: 'relative', overflow: 'hidden', color: '#1b1b1d' }} onClick={e => e.stopPropagation()}>
               
               {/* Top Floating Control Bar */}
@@ -4322,7 +4335,7 @@ export default function Store({ onNavigate }) {
 
       {/* ── MODAL: MASTER CONSOLIDATED MULTI-ITEM GRN VIEWER ── */}
       {masterGrnModal && (
-        <div style={S.overlay} onClick={() => setMasterGrnModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 1000, background: '#ffffff', color: '#0f172a', padding: 24 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #0f766e', paddingBottom: 12, marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -4467,7 +4480,7 @@ export default function Store({ onNavigate }) {
 
       {/* ── MODAL: APPEND LINE ITEM TO ACTIVE GRN ── */}
       {appendGrnModal && (
-        <div style={S.overlay} onClick={() => setAppendGrnModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 650 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHdr}>
               <b>＋ Append New Line Item to GRN #{appendGrnModal.grnNumber || appendGrnModal.grn_number}</b>
@@ -4591,7 +4604,7 @@ export default function Store({ onNavigate }) {
 
       {/* ── MODAL: DEPARTMENT RECEIVER SIGN & HANDOVER ── */}
       {receiverModal && (
-        <div style={S.overlay} onClick={() => setReceiverModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 550, color: '#0f172a' }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHdr}>
               <div>
@@ -4676,7 +4689,7 @@ export default function Store({ onNavigate }) {
 
       {/* ── MODAL: MASTER CONSOLIDATED GRN DETAILS ── */}
       {masterGrnModal && (
-        <div style={S.overlay} onClick={() => setMasterGrnModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 980, color: '#0f172a' }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHdr}>
               <div>

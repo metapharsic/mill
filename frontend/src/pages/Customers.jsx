@@ -130,7 +130,7 @@ export default function Customers() {
       </div>
 
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{edit ? `Edit: ${edit.name}` : 'Add Customer'}</div>

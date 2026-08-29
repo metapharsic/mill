@@ -5,6 +5,7 @@ import AgentStatusBanner from '../components/AgentStatusBanner'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
 import SearchableSelect from '../components/SearchableSelect'
+import { useMinimizedModals } from '../contexts/MinimizedModalsContext'
 import { LOGO_DATA_URI, LOGO_SRC } from '../utils/logo'
 const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
 const STATUS_COLOR = { Draft: '#8a8a90', Approved: '#22c55e', Sent: '#6366f1', Partial: '#f97316', Received: '#0ea5e9', Closed: '#64748b', Cancelled: '#ef4444' }
@@ -163,6 +164,8 @@ export default function Purchase() {
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[loading,setLoading]=useState(true)
   const [fStatus,setFStatus]=useState(''),[page,setPage]=useState(1)
   const [modal,setModal]=useState(false),[detail,setDetail]=useState(null)
+  const [poModalMinimized, setPoModalMinimized] = useState(false)
+  const { minimize: mmMinimize, close: mmClose } = useMinimizedModals()
   const [vendors,setVendors]=useState([]),[mats,setMats]=useState([]),[warehouses,setWarehouses]=useState([])
   const [form,setForm]=useState({vendor_id:'',po_date:'',delivery_date:'',delivery_address:'',payment_terms:'',payment_terms_custom:'',remarks:'',items:[]})
   const [formErrors,setFormErrors]=useState({})
@@ -2592,10 +2595,14 @@ export default function Purchase() {
         const PAYMENT_PRESETS = ['Net 15', 'Net 30', 'Net 45', 'Advance', 'COD', 'Custom']
         const dupIds = form.items.map(it => it.material_id).filter((id, i, arr) => id && arr.indexOf(id) !== i)
         const isDirty = form.vendor_id || form.items.some(it => it.material_id)
-        const handleClose = () => { if (isDirty && !window.confirm('Discard changes to this PO?')) return; setModal(false) }
+        const handleClose = () => { if (isDirty && !window.confirm('Discard changes to this PO?')) return; mmClose('purchase-po'); setPoModalMinimized(false); setModal(false) }
+        const handleMinimize = () => {
+          setPoModalMinimized(true)
+          mmMinimize('purchase-po', 'Purchase Order (draft)', () => setPoModalMinimized(false))
+        }
 
         return (
-          <div style={S.overlay} onClick={handleClose}>
+          <div style={{ ...S.overlay, display: poModalMinimized ? 'none' : 'flex' }}>
             <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e7e6df', width: '98vw', maxWidth: 1240, height: '94vh', maxHeight: '94vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
 
               {/* ── Sticky Header ── */}
@@ -2610,7 +2617,10 @@ export default function Purchase() {
                     <span style={{ fontSize: 11, color: '#c0c0c8' }}>PO# auto-assigned on save</span>
                   </div>
                 </div>
-                <button style={S.close} onClick={handleClose}>✕</button>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button style={{ ...S.close, fontWeight: 800 }} title="Minimize" onClick={handleMinimize}>─</button>
+                  <button style={S.close} onClick={handleClose}>✕</button>
+                </div>
               </div>
 
               {/* ── Scrollable Body ── */}
@@ -3120,7 +3130,7 @@ export default function Purchase() {
 
       {/* PO Detail Modal */}
       {detail && (
-        <div style={S.overlay} onClick={() => setDetail(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 760, maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -3325,7 +3335,7 @@ export default function Purchase() {
         const dupEditIds = touchedEditIds.filter((id, idx) => touchedEditIds.indexOf(id) !== idx)
 
         return (
-          <div style={S.overlay} onClick={() => setEditModal(null)}>
+          <div style={S.overlay}>
             <div style={{ ...S.modal, maxWidth: 1220, padding: 24 }} onClick={e => e.stopPropagation()}>
               
               {/* Modal Header with Tax Type Selector */}
@@ -3799,7 +3809,7 @@ export default function Purchase() {
 
       {/* GRN RECEIVE MODAL */}
       {grnModal && (
-        <div style={S.overlay} onClick={() => setGrnModal(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 960 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -3897,7 +3907,7 @@ export default function Purchase() {
         const grandTotal = totTaxable + totTax
 
         return (
-          <div style={S.overlay} onClick={() => setEditGrnModal(null)}>
+          <div style={S.overlay}>
             <div style={{ ...S.modal, maxWidth: 1200, maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
               <div style={S.modalHeader}>
                 <div>
@@ -4076,7 +4086,7 @@ export default function Purchase() {
 
       {/* ═══════ BOOK VENDOR BILL MODAL ═══════ */}
       {billModal && (
-        <div style={S.overlay} onClick={()=>setBillModal(null)}>
+        <div style={S.overlay}>
           <div style={{...S.modal, maxWidth: 560}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -4166,7 +4176,7 @@ export default function Purchase() {
         const setCpItem = (i, k, v) => setCashForm(f => ({ ...f, items: f.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }))
 
         return (
-          <div style={S.overlay} onClick={() => setCashModal(false)}>
+          <div style={S.overlay}>
             <div style={{ ...S.modal, maxWidth: 900, maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
               <div style={S.modalHeader}>
                 <div>

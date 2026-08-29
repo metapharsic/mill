@@ -656,7 +656,7 @@ export default function MasterData() {
 
       {/* ── SECTION MAPPED MATERIALS MODAL ── */}
       {activeSecMap && (
-        <div style={S.overlay} onClick={() => setActiveSecMap(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 850 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -708,7 +708,7 @@ export default function MasterData() {
 
       {/* ── SUB-MODAL: MAP ITEM TO SECTION ── */}
       {secAddMapModal && (
-        <div style={{ ...S.overlay, zIndex: 6100 }} onClick={() => setSecAddMapModal(false)}>
+        <div style={{ ...S.overlay, zIndex: 6100 }}>
           <div style={{ ...S.modal, maxWidth: 500 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>+ Map Material to {activeSecMap?.name}</div>
@@ -739,7 +739,7 @@ export default function MasterData() {
 
       {/* ── MACHINE MAPPED MATERIALS MODAL ── */}
       {activeMcnMap && (
-        <div style={S.overlay} onClick={() => setActiveMcnMap(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 850 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div>
@@ -787,7 +787,7 @@ export default function MasterData() {
 
       {/* ── SUB-MODAL: MAP ITEM TO MACHINE ── */}
       {mcnAddMapModal && (
-        <div style={{ ...S.overlay, zIndex: 6100 }} onClick={() => setMcnAddMapModal(false)}>
+        <div style={{ ...S.overlay, zIndex: 6100 }}>
           <div style={{ ...S.modal, maxWidth: 500 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>+ Map Spare to {activeMcnMap?.name}</div>
@@ -817,7 +817,7 @@ export default function MasterData() {
 
       {/* SECTION MODAL */}
       {modal && (
-        <div style={S.overlay} onClick={() => setModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{form.id ? 'Edit Plant Section' : 'Add Plant Section'}</div>
@@ -848,7 +848,7 @@ export default function MasterData() {
 
       {/* MACHINE MODAL */}
       {mcnModal && (
-        <div style={S.overlay} onClick={() => setMcnModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{mcnForm.id ? 'Edit Machine Unit' : 'Add Machine Unit'}</div>
@@ -887,7 +887,7 @@ export default function MasterData() {
 
       {/* CATEGORY MODAL */}
       {catModal && (
-        <div style={S.overlay} onClick={() => setCatModal(false)}>
+        <div style={S.overlay}>
           <div style={S.modal} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>{catForm.id ? 'Edit Category' : 'Add Category'}</div>
@@ -923,7 +923,7 @@ export default function MasterData() {
 
       {/* EQUIPMENT MODAL */}
       {equipModal && (
-        <div style={S.overlay} onClick={() => setEquipModal(false)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 600 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>⚙️ {equipForm.id ? 'Edit' : 'Add'} Machinery / Roll Component</div>

@@ -353,7 +353,7 @@ export default function AllSections({ onNavigate }) {
 
       {/* ── MODAL: SECTION MAPPED MATERIALS MANAGER ── */}
       {activeSectionMaterials && (
-        <div style={S.overlay} onClick={() => setActiveSectionMaterials(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 850 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -435,7 +435,7 @@ export default function AllSections({ onNavigate }) {
 
       {/* ── SUB-MODAL: ADD MATERIAL MAPPING SELECTOR ── */}
       {mapModal && (
-        <div style={{ ...S.overlay, zIndex: 6100 }} onClick={() => setMapModal(false)}>
+        <div style={{ ...S.overlay, zIndex: 6100 }}>
           <div style={{ ...S.modal, maxWidth: 520 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={S.modalTitle}>+ Map Item to {activeSectionMaterials?.name}</div>
@@ -483,7 +483,7 @@ export default function AllSections({ onNavigate }) {
 
       {/* ── MODAL: SECTION MACHINERY & SPARES DRAWER ── */}
       {activeSectionEquip && (
-        <div style={S.overlay} onClick={() => setActiveSectionEquip(null)}>
+        <div style={S.overlay}>
           <div style={{ ...S.modal, maxWidth: 900 }} onClick={e => e.stopPropagation()}>
             <div style={S.modalHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

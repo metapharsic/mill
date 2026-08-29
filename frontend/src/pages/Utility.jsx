@@ -285,7 +285,7 @@ export default function Utility() {
       })()}
 
       {modal === 'utility' && (
-        <div style={S.overlay} onClick={()=>setModal(false)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:700}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>{form.id?'Edit':'Log'} Utility Reading</div><button style={S.close} onClick={()=>setModal(false)}>✕</button></div>
             <form onSubmit={save} style={S.form}>
@@ -324,7 +324,7 @@ export default function Utility() {
       )}
 
       {modal === 'etp' && (
-        <div style={S.overlay} onClick={()=>setModal(false)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:520}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Log ETP Effluent Readings (F6)</div><button style={S.close} onClick={()=>setModal(false)}>✕</button></div>
             <form onSubmit={saveETP} style={S.form}>
@@ -354,7 +354,7 @@ export default function Utility() {
       )}
 
       {modal === 'boiler' && (
-        <div style={S.overlay} onClick={()=>setModal(false)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:550}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Log Boiler Stats (Hourly)</div><button style={S.close} onClick={()=>setModal(false)}>✕</button></div>
             <form onSubmit={saveBoiler} style={S.form}>
@@ -382,7 +382,7 @@ export default function Utility() {
       )}
 
       {modal === 'energy' && (
-        <div style={S.overlay} onClick={()=>setModal(false)}>
+        <div style={S.overlay}>
           <div style={{...S.modal,maxWidth:520}} onClick={e=>e.stopPropagation()}>
             <div style={S.modalHeader}><div style={S.modalTitle}>Allocate Daily Section Energy</div><button style={S.close} onClick={()=>setModal(false)}>✕</button></div>
             <form onSubmit={saveEnergy} style={S.form}>

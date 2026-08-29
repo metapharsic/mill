@@ -58,7 +58,6 @@ export function Modal({ open, onClose, title, width = 520, children, footer, clo
   return (
     <div
       style={S.overlay}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose?.() }}
       aria-modal="true"
       role="dialog"
       aria-label={title}

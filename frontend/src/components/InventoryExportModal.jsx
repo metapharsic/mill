@@ -280,7 +280,7 @@ export default function InventoryExportModal({
   if (!isOpen) return null
 
   return (
-    <div style={S.overlay} onClick={onClose}>
+    <div style={S.overlay}>
       <div style={S.modal} onClick={e => e.stopPropagation()}>
         {/* Modal Header */}
         <div style={S.header}>
