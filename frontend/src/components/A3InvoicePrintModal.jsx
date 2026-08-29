@@ -56,6 +56,7 @@ const A3_PRINT_STYLE = `
     border: none !important;
   }
   .a3-no-print { display: none !important; }
+  .a3-print-only { display: inline !important; }
   @page {
     size: A3 landscape;
     margin: 8mm 10mm;
@@ -93,6 +94,8 @@ function injectA3PrintStyle() {
 
 export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE INDENT / ISSUE VOUCHER' }) {
   const [companyProfile, setCompanyProfile] = useState(null)
+  const [roundOffInput, setRoundOffInput] = useState(null)
+  const prevDocDataRef = React.useRef(docData)
 
   useEffect(() => {
     injectA3PrintStyle()
@@ -326,11 +329,24 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
     ? 'GRN INVOICE'
     : (title || (isSupplierOrGrn ? 'GRN INVOICE' : 'STORE INDENT / ISSUE VOUCHER'))
 
+  const computedSubTotal = totalTaxable + totalGst
   const rawGrandTotal = docData.grand_total !== undefined && docData.grand_total !== null && parseFloat(docData.grand_total) > 0
     ? parseFloat(docData.grand_total)
-    : (totalTaxable + totalGst)
-  const grandTotal = Math.round(rawGrandTotal)
-  const roundOff = (grandTotal - (totalTaxable + totalGst)).toFixed(2)
+    : computedSubTotal
+  // Smart suggested round-off (auto-computed) — used only as the starting/default value.
+  const suggestedRoundOff = Math.round(rawGrandTotal) - computedSubTotal
+
+  // Seed / re-seed the editable round-off whenever a different document is loaded into this modal.
+  if (docData !== prevDocDataRef.current) {
+    prevDocDataRef.current = docData
+    setRoundOffInput(suggestedRoundOff.toFixed(2))
+  }
+
+  const roundOffNum = (roundOffInput === null || roundOffInput === '' || isNaN(parseFloat(roundOffInput)))
+    ? suggestedRoundOff
+    : parseFloat(roundOffInput)
+  const roundOff = roundOffNum.toFixed(2)
+  const grandTotal = computedSubTotal + roundOffNum
   const words = amountInWords(grandTotal)
   const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
 
@@ -676,7 +692,19 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
 
                 <tr style={{ borderBottom: '1px solid #cbd5e1' }}>
                   <td style={{ padding: '3px 6px', textAlign: 'left', fontWeight: 700 }}>R.off</td>
-                  <td style={{ padding: '3px 6px', textAlign: 'right' }}>{roundOff}</td>
+                  <td style={{ padding: '3px 6px', textAlign: 'right' }}>
+                    <span className="a3-no-print" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={roundOffInput === null ? roundOff : roundOffInput}
+                        onChange={e => setRoundOffInput(e.target.value)}
+                        style={{ width: 60, textAlign: 'right', fontSize: 9.5, padding: '1px 3px', border: '1px solid #94a3b8', borderRadius: 3 }}
+                        title="Manually enter Round Off amount"
+                      />
+                    </span>
+                    <span className="a3-print-only" style={{ display: 'none' }}>{roundOff}</span>
+                  </td>
                   <td style={{ padding: '3px 6px', textAlign: 'left', fontWeight: 700 }}>TCS%</td>
                   <td style={{ padding: '3px 6px', textAlign: 'right' }}>0.000</td>
                   <td style={{ padding: '3px 6px', textAlign: 'left', fontWeight: 700 }}>Cr/Db No</td>

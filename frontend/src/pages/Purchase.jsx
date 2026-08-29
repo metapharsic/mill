@@ -4130,6 +4130,12 @@ export default function Purchase() {
                 </label>
               </div>
 
+              <div style={S.grid2}>
+                <label style={S.label}>Round Off (₹)
+                  <input style={S.input} type="number" step="0.01" value={billForm.roundoff} onChange={e=>setBillForm({...billForm, roundoff: e.target.value})} />
+                </label>
+              </div>
+
               <div style={{background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <span style={{fontSize: 13, fontWeight: 600, color: '#334155'}}>Total Invoice Amount to Pay:</span>
                 <span style={{fontSize: 18, fontWeight: 700, color: '#0369a1'}}>
