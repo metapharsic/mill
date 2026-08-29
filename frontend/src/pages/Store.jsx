@@ -120,6 +120,16 @@ export default function Store({ onNavigate }) {
   const [batchSaving, setBatchSaving] = useState(false)
   const [batchVendorInvoiceNumber, setBatchVendorInvoiceNumber] = useState('')
   const [batchRemarks, setBatchRemarks] = useState('')
+
+  // Inbound DC -> Invoice Match (tick-mark reconciliation flow)
+  const [inboundDcs, setInboundDcs] = useState([])
+  const [dcDetails, setDcDetails] = useState({})
+  const [dcTicked, setDcTicked] = useState({})
+  const [dcLineEdits, setDcLineEdits] = useState({})
+  const [dcPartyName, setDcPartyName] = useState('')
+  const [dcInvoiceNumber, setDcInvoiceNumber] = useState('')
+  const [dcInvoiceTotal, setDcInvoiceTotal] = useState('')
+  const [dcMatching, setDcMatching] = useState(false)
   const [inwardMatSearch, setInwardMatSearch] = useState('')
   const [inwardMatDropOpen, setInwardMatDropOpen] = useState(false)
   const [searchLot, setSearchLot] = useState('')
@@ -912,6 +922,106 @@ export default function Store({ onNavigate }) {
   }
 
   // Batch Inward submit for multi-item PO
+  // Load DCs received but not yet invoice-matched, for tick-mark selection
+  const loadOpenInbounDcs = async () => {
+    try {
+      const r = await fetch(`${API}/inbound-dc?status=received`, { headers: h() }).then(res => res.json())
+      if (r.success) {
+        setInboundDcs(r.data || [])
+        const details = await Promise.all((r.data || []).map(dc =>
+          fetch(`${API}/inbound-dc/${dc.id}`, { headers: h() }).then(res => res.json()).then(res => res.success ? res.data : null)
+        ))
+        const map = {}
+        const edits = {}
+        details.filter(Boolean).forEach(dc => {
+          map[dc.id] = dc
+          ;(dc.items || []).forEach(it => {
+            const mat = mats.find(m => String(m.id) === String(it.material_id))
+            edits[it.id] = {
+              unit_price: mat?.unit_price != null ? String(mat.unit_price) : '0',
+              discount_pct: '0',
+              gst_amount: '0'
+            }
+          })
+        })
+        setDcDetails(map)
+        setDcLineEdits(prev => ({ ...edits, ...prev }))
+      }
+    } catch (e) {
+      console.error('Failed to load open Inbound DCs', e)
+    }
+  }
+
+  useEffect(() => {
+    if (inwardModal && inwardForm.reference_type === 'DC') {
+      loadOpenInboundDcs()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inwardModal, inwardForm.reference_type])
+
+  const dcLineTotal = (dcId, itemId, qty) => {
+    const e = dcLineEdits[itemId] || {}
+    const rate = parseFloat(e.unit_price || 0)
+    const disc = parseFloat(e.discount_pct || 0)
+    const gstAmt = parseFloat(e.gst_amount || 0)
+    const taxable = parseFloat(qty || 0) * rate * (1 - disc / 100)
+    return taxable + gstAmt
+  }
+
+  const dcSelectedTotal = Object.keys(dcTicked)
+    .filter(id => dcTicked[id])
+    .reduce((sum, id) => {
+      const dc = dcDetails[id]
+      if (!dc) return sum
+      return sum + (dc.items || []).reduce((s, it) => s + dcLineTotal(id, it.id, it.qty), 0)
+    }, 0)
+
+  const handleMatchAndCreateGrn = async () => {
+    const ids = Object.keys(dcTicked).filter(id => dcTicked[id])
+    if (!ids.length) return addToast('Tick at least one received DC to match against the invoice', 'warning')
+    if (!dcPartyName.trim()) return addToast('Party Name is required', 'warning')
+    if (!dcInvoiceNumber.trim()) return addToast('Vendor Invoice Number is required', 'warning')
+    setDcMatching(true)
+    try {
+      for (const id of ids) {
+        const dc = dcDetails[id]
+        const itemsOverride = (dc?.items || []).map(it => {
+          const e = dcLineEdits[it.id] || {}
+          return {
+            id: it.id,
+            unit_price: parseFloat(e.unit_price || 0),
+            discount_pct: parseFloat(e.discount_pct || 0),
+            gst_amount: parseFloat(e.gst_amount || 0)
+          }
+        })
+        const mRes = await fetch(`${API}/inbound-dc/${id}/match-invoice`, {
+          method: 'POST', headers: json(),
+          body: JSON.stringify({ invoice_number: dcInvoiceNumber, party_name_confirmed: true, party_name: dcPartyName })
+        }).then(res => res.json())
+        if (!mRes.success) throw new Error(mRes.message || `Invoice match failed for DC ${dc?.dc_no || id}`)
+        const gRes = await fetch(`${API}/inbound-dc/${id}/grn`, {
+          method: 'POST', headers: json(),
+          body: JSON.stringify({ party_name: dcPartyName, items: itemsOverride })
+        }).then(res => res.json())
+        if (!gRes.success) throw new Error(gRes.message || `GRN creation failed for DC ${dc?.dc_no || id}`)
+      }
+      addToast('Invoice matched & GRN created from selected DC(s)', 'success')
+      setInwardModal(false)
+      setDcTicked({})
+      setDcLineEdits({})
+      setDcPartyName('')
+      setDcInvoiceNumber('')
+      setDcInvoiceTotal('')
+      setInboundDcs([])
+      setDcDetails({})
+      loadInward()
+    } catch (err) {
+      addToast(err.message || 'Failed to match invoice / create GRN', 'error')
+    } finally {
+      setDcMatching(false)
+    }
+  }
+
   const handleCreateBatchInward = async (e) => {
     if (e) e.preventDefault()
     if (!activePoDetails || !activePoDetails.items?.length) return
@@ -2884,6 +2994,137 @@ export default function Store({ onNavigate }) {
                 </div>
               </div>
             </div>
+
+            {/* ═══════ DC# INVOICE MATCH: tick DCs received, qty view-only, rate/disc/tax editable ═══════ */}
+            {inwardForm.reference_type === 'DC' && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', padding: 16, borderRadius: 10, marginBottom: 16 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>
+                  🧾 Match Vendor Invoice Against Received DC(s)
+                </div>
+                <div style={{ fontSize: 12, color: '#78350f', marginBottom: 12 }}>
+                  Tick every DC covered by this invoice. Qty is view-only (as received) — enter Rate, Disc% and GST/Tax Amount from the invoice to match its value.
+                </div>
+
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Party Name *</label>
+                    <input style={{ ...S.input, borderColor: '#fde68a' }} placeholder="Party / vendor name as on invoice" value={dcPartyName} onChange={e => setDcPartyName(e.target.value)} />
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Vendor Invoice Number *</label>
+                    <input style={{ ...S.input, borderColor: '#fde68a' }} placeholder="e.g. INV-8902" value={dcInvoiceNumber} onChange={e => setDcInvoiceNumber(e.target.value)} />
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Invoice Total (₹) — to match</label>
+                    <input type="number" step="0.01" style={{ ...S.input, borderColor: '#fde68a' }} placeholder="0.00" value={dcInvoiceTotal} onChange={e => setDcInvoiceTotal(e.target.value)} />
+                  </div>
+                </div>
+
+                {inboundDcs.length === 0 ? (
+                  <div style={{ fontSize: 12, color: '#92400e', fontStyle: 'italic' }}>No DCs are pending invoice match. Receive stock against a DC first.</div>
+                ) : (
+                  <div style={{ overflowX: 'auto', background: '#ffffff', borderRadius: 8, border: '1px solid #fde68a' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                      <thead>
+                        <tr style={{ background: '#fffbeb', borderBottom: '1px solid #fde68a', textAlign: 'left', color: '#92400e', fontWeight: 700 }}>
+                          <th style={{ padding: '8px 10px', width: 30 }}>✓</th>
+                          <th style={{ padding: '8px 10px' }}>DC # / Date / Vehicle</th>
+                          <th style={{ padding: '8px 10px' }}>Material</th>
+                          <th style={{ padding: '8px 10px', textAlign: 'right' }}>Qty (view-only)</th>
+                          <th style={{ padding: '8px 10px', textAlign: 'right' }}>Rate</th>
+                          <th style={{ padding: '8px 10px', textAlign: 'right' }}>Disc %</th>
+                          <th style={{ padding: '8px 10px', textAlign: 'right' }}>Tax Amount</th>
+                          <th style={{ padding: '8px 10px', textAlign: 'right' }}>Line Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inboundDcs.map(dcRow => {
+                          const dc = dcDetails[dcRow.id]
+                          const ticked = !!dcTicked[dcRow.id]
+                          if (!dc) return null
+                          return (dc.items || []).map((it, idx) => {
+                            const e = dcLineEdits[it.id] || { unit_price: '0', discount_pct: '0', gst_amount: '0' }
+                            const lineVal = dcLineTotal(dcRow.id, it.id, it.qty)
+                            return (
+                              <tr key={it.id} style={{ borderBottom: '1px solid #fffbeb', background: ticked ? '#fef3c7' : '#fff' }}>
+                                {idx === 0 && (
+                                  <td rowSpan={dc.items.length} style={{ padding: '8px 10px', verticalAlign: 'top' }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={ticked}
+                                      onChange={e2 => setDcTicked(prev => ({ ...prev, [dcRow.id]: e2.target.checked }))}
+                                    style={{ width: 16, height: 16, cursor: 'pointer' }}
+                                  />
+                                  </td>
+                                )}
+                                {idx === 0 && (
+                                  <td rowSpan={dc.items.length} style={{ padding: '8px 10px', verticalAlign: 'top' }}>
+                                    <div style={{ fontWeight: 700, color: '#92400e' }}>{dc.dc_no}</div>
+                                    <div style={{ fontSize: 11, color: '#78350f' }}>{dc.dc_date ? String(dc.dc_date).slice(0, 10) : ''} {dc.vehicle_number ? `· ${dc.vehicle_number}` : ''}</div>
+                                    <div style={{ fontSize: 11, color: '#78350f' }}>{dc.vendor_name || ''}</div>
+                                  </td>
+                                )}
+                                <td style={{ padding: '8px 10px' }}>{it.material_name || it.material_id} {it.material_code ? `[${it.material_code}]` : ''}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 600, color: '#64748b' }}>{parseFloat(it.qty || 0).toFixed(3)} {it.unit || ''}</td>
+                                <td style={{ padding: '4px 6px', textAlign: 'right' }}>
+                                  <input
+                                    type="number" step="0.01"
+                                    style={{ ...S.input, width: 90, padding: '4px 6px', textAlign: 'right', borderColor: '#fde68a' }}
+                                    value={e.unit_price}
+                                    onChange={ev => setDcLineEdits(prev => ({ ...prev, [it.id]: { ...(prev[it.id] || {}), unit_price: ev.target.value } }))}
+                                  />
+                                </td>
+                                <td style={{ padding: '4px 6px', textAlign: 'right' }}>
+                                  <input
+                                    type="number" step="0.01"
+                                    style={{ ...S.input, width: 70, padding: '4px 6px', textAlign: 'right', borderColor: '#fde68a' }}
+                                    value={e.discount_pct}
+                                    onChange={ev => setDcLineEdits(prev => ({ ...prev, [it.id]: { ...(prev[it.id] || {}), discount_pct: ev.target.value } }))}
+                                  />
+                                </td>
+                                <td style={{ padding: '4px 6px', textAlign: 'right' }}>
+                                  <input
+                                    type="number" step="0.01"
+                                    style={{ ...S.input, width: 90, padding: '4px 6px', textAlign: 'right', borderColor: '#fde68a' }}
+                                    value={e.gst_amount}
+                                    onChange={ev => setDcLineEdits(prev => ({ ...prev, [it.id]: { ...(prev[it.id] || {}), gst_amount: ev.target.value } }))}
+                                  />
+                                </td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700, color: '#0f766e' }}>₹{lineVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                              </tr>
+                            )
+                          })
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Live running total + match indicator against entered Invoice Total */}
+                <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fef3c7', padding: '10px 14px', borderRadius: 8, border: '1px solid #fde68a', flexWrap: 'wrap', gap: 8 }}>
+                  <div style={{ fontSize: 13, color: '#78350f' }}>
+                    <strong>Computed Total (ticked lines):</strong> ₹{dcSelectedTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    {dcInvoiceTotal !== '' && (
+                      <span style={{
+                        marginLeft: 10, padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 700,
+                        background: Math.abs(dcSelectedTotal - parseFloat(dcInvoiceTotal || 0)) < 1 ? '#dcfce7' : '#fee2e2',
+                        color: Math.abs(dcSelectedTotal - parseFloat(dcInvoiceTotal || 0)) < 1 ? '#15803d' : '#b91c1c'
+                      }}>
+                        {Math.abs(dcSelectedTotal - parseFloat(dcInvoiceTotal || 0)) < 1 ? '✓ Matches Invoice' : '✑ Mismatch vs Invoice'}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleMatchAndCreateGrn}
+                    disabled={dcMatching}
+                    style={{ ...S.btn, background: '#b45309', padding: '8px 18px', fontWeight: 700 }}
+                  >
+                    {dcMatching ? 'Processing₦' : '🧾 Match Invoice & Create GRN'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* ═══════ TOTAL PO CONTENT BREAKDOWN & LINE ITEM PICKER ═══════ */}
             {activePoDetails && activePoDetails.items && activePoDetails.items.length > 0 && (

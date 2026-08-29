@@ -29,6 +29,12 @@ async function migrate() {
         invoice_date DATE,
         matched_by INTEGER,
         matched_at TIMESTAMP,
+        -- Added for the Store.jsx tick-mark invoice-match refinement (2026-08-29):
+        -- store manager keys the party name off the paper invoice, and the
+        -- invoice's stated total, for a match/mismatch check against the
+        -- computed (edited rate/disc/tax) line totals.
+        party_name TEXT,
+        invoice_total NUMERIC(14,2),
         grn_id INTEGER,
         created_by INTEGER,
         created_at TIMESTAMP DEFAULT NOW()
@@ -51,6 +57,8 @@ async function migrate() {
     await client.query(`ALTER TABLE inbound_dc ADD COLUMN IF NOT EXISTS grn_id INTEGER;`);
     await client.query(`ALTER TABLE inbound_dc ADD COLUMN IF NOT EXISTS matched_by INTEGER;`);
     await client.query(`ALTER TABLE inbound_dc ADD COLUMN IF NOT EXISTS matched_at TIMESTAMP;`);
+    await client.query(`ALTER TABLE inbound_dc ADD COLUMN IF NOT EXISTS party_name TEXT;`);
+    await client.query(`ALTER TABLE inbound_dc ADD COLUMN IF NOT EXISTS invoice_total NUMERIC(14,2);`);
 
     await client.query('COMMIT');
     console.log('Inbound DC migration committed successfully.');

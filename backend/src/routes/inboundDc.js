@@ -126,7 +126,7 @@ router.get('/:id', auth, ar(async (req, res) => {
 // Kept deliberately simple per spec: no fuzzy matching, just records what the
 // user confirms (including their explicit confirmation that the party name matches).
 router.post('/:id/match-invoice', auth, requireStore, ar(async (req, res) => {
-  const { invoice_number, invoice_date, party_name_confirmed } = req.body;
+  const { invoice_number, invoice_date, party_name_confirmed, party_name, invoice_total } = req.body;
   if (!invoice_number || !String(invoice_number).trim()) {
     return res.status(400).json({ success: false, message: 'invoice_number is required' });
   }
@@ -139,11 +139,15 @@ router.post('/:id/match-invoice', auth, requireStore, ar(async (req, res) => {
     return res.status(400).json({ success: false, message: `Cannot match invoice: DC status is '${dc.status}', expected 'received'` });
   }
 
+  // party_name / invoice_total are captured from the paper invoice at match
+  // time (Store.jsx tick-mark reconciliation UI) so the store manager's keyed
+  // value + tax figures can be checked against the computed line totals.
   const { rows: [updated] } = await pool.query(
     `UPDATE inbound_dc
-     SET invoice_number = $1, invoice_date = $2, status = 'invoice_matched', matched_by = $3, matched_at = NOW()
+     SET invoice_number = $1, invoice_date = $2, status = 'invoice_matched', matched_by = $3, matched_at = NOW(),
+         party_name = COALESCE($5, party_name), invoice_total = COALESCE($6, invoice_total)
      WHERE id = $4 RETURNING *`,
-    [invoice_number, invoice_date || null, req.user.id, req.params.id]
+    [invoice_number, invoice_date || null, req.user.id, req.params.id, party_name || null, invoice_total != null && invoice_total !== '' ? Number(invoice_total) : null]
   );
   res.json({ success: true, data: updated, message: 'Invoice matched. DC is now ready for GRN creation.' });
 }));
@@ -162,6 +166,19 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
     const { rows: items } = await client.query(`SELECT * FROM inbound_dc_items WHERE inbound_dc_id = $1`, [dc.id]);
     if (!items.length) throw new Error('DC has no items');
 
+    // Per-line overrides keyed by inbound_dc_items.id, entered by the store
+    // manager in the Store.jsx tick-mark invoice-match UI: qty stays whatever
+    // was physically received (view-only there), but rate/disc%/tax amount
+    // are authoritative as keyed against the paper invoice -- NOT the stale
+    // catalog price, which is only the fallback when no override is sent.
+    const { items: itemOverrides, party_name: partyNameFromReq } = req.body || {};
+    const overrideMap = {};
+    if (Array.isArray(itemOverrides)) {
+      for (const o of itemOverrides) {
+        if (o && o.id != null) overrideMap[o.id] = o;
+      }
+    }
+
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`grn-${stamp}`]);
     const { rows: seqRows } = await client.query(`SELECT LPAD((COUNT(*)+1)::text, 4, '0') as seq FROM grn WHERE grn_number LIKE $1`, [`GRN-${stamp}-%`]);
@@ -169,22 +186,41 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
 
     // po_id is nullable on grn (confirmed live: truncate_test_pos.js sets it
     // to NULL), so this DC-originated GRN has no PO -- fully PO-optional.
+    // party_name has no dedicated column on grn (checked live schema before
+    // writing this -- not present), so it is folded into remarks rather than
+    // inventing an unverified column; inbound_dc.party_name (additive,
+    // migration not yet run) is the durable place it is actually stored.
+    const partyName = partyNameFromReq || dc.party_name || null;
+    const grnRemarks = partyName ? `Party Name: ${partyName}${dc.remarks ? ` | ${dc.remarks}` : ''}` : (dc.remarks || null);
     const { rows: [head] } = await client.query(
       `INSERT INTO grn (grn_number, date, vendor_id, po_id, vehicle_number, challan_number, invoice_number, status, received_by, remarks)
        VALUES ($1, CURRENT_DATE, $2, NULL, $3, $4, $5, 'Received', $6, $7) RETURNING *`,
-      [grnNum, dc.vendor_id, dc.vehicle_number || null, dc.dc_no || null, dc.invoice_number || null, req.user.id, dc.remarks || null]
+      [grnNum, dc.vendor_id, dc.vehicle_number || null, dc.dc_no || null, dc.invoice_number || null, req.user.id, grnRemarks]
     );
     const grnId = head.id;
 
     for (const it of items) {
-      const { rows: [mat] } = await client.query(`SELECT unit_price FROM materials WHERE id=$1`, [it.material_id]);
-      const uPrice = Number(mat?.unit_price || 0);
+      const override = overrideMap[it.id];
+      let uPrice, discPct, gstAmt;
+      if (override) {
+        uPrice = Number(override.unit_price) || 0;
+        discPct = Math.max(0, Math.min(100, Number(override.discount_pct) || 0));
+        gstAmt = Number(override.gst_amount) || 0;
+      } else {
+        const { rows: [mat] } = await client.query(`SELECT unit_price FROM materials WHERE id=$1`, [it.material_id]);
+        uPrice = Number(mat?.unit_price || 0);
+        discPct = 0;
+        gstAmt = 0;
+      }
       const qty = Number(it.qty);
-      const taxableVal = qty * uPrice;
+      const taxableVal = qty * uPrice * (1 - discPct / 100);
+      const totalVal = taxableVal + gstAmt;
       await client.query(
-        `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, taxable_amount, total_amount)
-         VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9)`,
-        [grnId, it.material_id, qty, qty, qty, it.unit || null, uPrice, taxableVal, taxableVal]
+        `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, discount_pct, taxable_amount, total_amount, gst_pct, remarks)
+         VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, $10, $11, $12)`,
+        [grnId, it.material_id, qty, qty, qty, it.unit || null, uPrice, discPct, taxableVal, totalVal,
+         taxableVal > 0 ? Number(((gstAmt / taxableVal) * 100).toFixed(2)) : 0,
+         `Invoice-matched via Store.jsx DC tick-mark flow (DC ${dc.dc_no})`]
       );
 
       // Re-tag the earlier provisional ledger entry for this DC/material as a
