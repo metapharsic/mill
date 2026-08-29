@@ -132,6 +132,31 @@ export default function StoreDashboard({ onNavigate }) {
     loadAnalytics()
   }, [loadAnalytics])
 
+  // ── Inbound DC + Invoice Match reporting block ──
+  // Fetched from a dedicated live-SQL summary endpoint (no caching layer on
+  // the backend), and re-fetched here on mount plus via an explicit manual
+  // "Refresh" control -- this pairing is the "accurate sync option": the
+  // numbers always reflect current DB state, never a stale snapshot.
+  const [dcSummary, setDcSummary] = useState(null)
+  const [dcSummaryLoading, setDcSummaryLoading] = useState(true)
+  const loadDcSummary = useCallback(async () => {
+    setDcSummaryLoading(true)
+    try {
+      const res = await fetch(`${API}/inbound-dc/summary`, { headers: h() })
+      const json = await res.json()
+      if (json.success) setDcSummary(json.data)
+    } catch (e) {
+      console.error('Inbound DC summary load error:', e)
+    } finally {
+      setDcSummaryLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadDcSummary()
+  }, [loadDcSummary])
+
+
   // Auto refresh timer
   useEffect(() => {
     if (!config.autoRefreshInterval || config.autoRefreshInterval <= 0) return
@@ -500,6 +525,106 @@ export default function StoreDashboard({ onNavigate }) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ── INBOUND DC + INVOICE MATCH REPORTING ── */}
+      <div style={S.card}>
+        <div style={S.cardHeader}>
+          <div>
+            <div style={S.cardTitle}>Inbound DC & Invoice Match</div>
+            <div style={S.cardSub}>Live status of goods received before invoice, provisional stock pending reconciliation</div>
+          </div>
+          <button
+            style={S.btnSecondary}
+            onClick={loadDcSummary}
+            disabled={dcSummaryLoading}
+            title="Re-fetch live Inbound DC numbers from the database (accurate sync)"
+          >
+            <RefreshCw size={14} className={dcSummaryLoading ? 'spin' : ''} />
+            <span>{dcSummaryLoading ? 'Syncing...' : 'Refresh'}</span>
+          </button>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+          gap: 14,
+          padding: '16px 4px 4px'
+        }}>
+          <div
+            style={{ ...S.kpiCard, cursor: 'pointer' }}
+            onClick={() => handleNav('/inbound-dc')}
+            title="Click to open Inbound DC list"
+          >
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Pending Match</span>
+              <div style={{ ...S.kpiIcon, background: '#fff7ed', color: '#c2410c' }}>
+                <Clock size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: '#c2410c' }}>
+              {dcSummary?.pendingMatch ?? 0} <span style={{ fontSize: 13, fontWeight: 600 }}>DCs</span>
+            </div>
+            <div style={S.kpiSub}>Received, awaiting vendor invoice</div>
+          </div>
+
+          <div
+            style={{ ...S.kpiCard, cursor: 'pointer' }}
+            onClick={() => handleNav('/inbound-dc')}
+            title="Click to open Inbound DC list"
+          >
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Matched, Ready for GRN</span>
+              <div style={{ ...S.kpiIcon, background: '#eff6ff', color: '#2563eb' }}>
+                <CheckCircle2 size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: '#1d4ed8' }}>
+              {dcSummary?.matchedAwaitingGrn ?? 0} <span style={{ fontSize: 13, fontWeight: 600 }}>DCs</span>
+            </div>
+            <div style={S.kpiSub}>Invoice matched, GRN not yet raised</div>
+          </div>
+
+          <div
+            style={S.kpiCard}
+          >
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Converted to GRN</span>
+              <div style={{ ...S.kpiIcon, background: '#f0fdf4', color: '#16a34a' }}>
+                <Package size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: '#15803d' }}>
+              {dcSummary?.convertedToGrn ?? 0} <span style={{ fontSize: 13, fontWeight: 600 }}>DCs</span>
+            </div>
+            <div style={S.kpiSub}>Fully reconciled into inventory GRNs</div>
+          </div>
+
+          <div style={S.kpiCard}>
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Provisional Value Pending</span>
+              <div style={{ ...S.kpiIcon, background: '#faf5ff', color: '#7c3aed' }}>
+                <DollarSign size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: '#7c3aed' }}>
+              {fmtCur(dcSummary?.provisionalValuePending)}
+            </div>
+            <div style={S.kpiSub}>Stock value added but not yet invoice-reconciled</div>
+          </div>
+
+          <div style={{ ...S.kpiCard, borderLeft: (dcSummary?.mismatchCount || 0) > 0 ? '4px solid #dc2626' : undefined }}>
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Invoice Mismatches</span>
+              <div style={{ ...S.kpiIcon, background: '#fef2f2', color: '#dc2626' }}>
+                <AlertTriangle size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: (dcSummary?.mismatchCount || 0) > 0 ? '#dc2626' : '#16a34a' }}>
+              {dcSummary?.mismatchCount ?? 0} <span style={{ fontSize: 13, fontWeight: 600 }}>Flagged</span>
+            </div>
+            <div style={S.kpiSub}>Invoice total vs computed line total disagree</div>
+          </div>
+        </div>
       </div>
 
       {/* ── MAIN CHARTS & ANALYTICS WORKSPACE ── */}

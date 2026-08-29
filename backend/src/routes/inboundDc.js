@@ -106,6 +106,80 @@ router.get('/', auth, ar(async (req, res) => {
   );
   res.json({ success: true, data: rows });
 }));
+// GET /summary — live reporting/analytics rollup for Inbound DC + Invoice Match.
+// -----------------------------------------------------------------------
+// INTENTIONALLY NOT CACHED: every call runs a fresh aggregate SQL query
+// against inbound_dc / inbound_dc_items so the numbers always reflect the
+// current DB state (this is the "accurate sync" requirement -- the
+// dashboard widget that calls this also exposes an explicit manual
+// Refresh button that re-hits this endpoint rather than relying on any
+// client-side cached snapshot).
+router.get('/summary', auth, ar(async (req, res) => {
+  const { rows: [counts] } = await pool.query(`
+    SELECT
+      COUNT(*)::int AS total_dcs,
+      COUNT(*) FILTER (WHERE status = 'received')::int AS pending_match,
+      COUNT(*) FILTER (WHERE status = 'invoice_matched')::int AS matched_awaiting_grn,
+      COUNT(*) FILTER (WHERE status = 'grn_done')::int AS converted_to_grn,
+      COUNT(*) FILTER (WHERE status = 'cancelled')::int AS cancelled
+    FROM inbound_dc
+  `);
+
+  // Provisional stock value still pending reconciliation = the ledger value
+  // recorded at DC-receipt time for DCs not yet converted to a GRN
+  // (status IN ('received','invoice_matched')).
+  const { rows: [provisional] } = await pool.query(`
+    SELECT COALESCE(SUM(sl.value), 0)::numeric AS provisional_value
+    FROM stock_ledger sl
+    JOIN inbound_dc d ON d.id = sl.reference_id AND sl.reference_type = 'INBOUND_DC'
+    WHERE sl.transaction_type = 'provisional_grn'
+      AND d.status IN ('received', 'invoice_matched')
+  `);
+
+  const { rows: [matchedValue] } = await pool.query(`
+    SELECT COALESCE(SUM(invoice_total), 0)::numeric AS matched_value
+    FROM inbound_dc
+    WHERE status IN ('invoice_matched', 'grn_done') AND invoice_total IS NOT NULL
+  `);
+
+  // Mismatch flag: invoice_total keyed by the store manager vs the computed
+  // total of the DC's items at catalog unit_price (sanity check only -- the
+  // authoritative per-line rate/disc/tax overrides are keyed later at GRN
+  // time, so this is a coarse "does the paper invoice total roughly agree
+  // with what we'd expect" signal, not a hard validation).
+  const { rows: mismatchRows } = await pool.query(`
+    SELECT d.id, d.dc_no, d.invoice_total,
+           COALESCE(SUM(i.qty * COALESCE(m.unit_price, 0)), 0)::numeric AS computed_total
+    FROM inbound_dc d
+    JOIN inbound_dc_items i ON i.inbound_dc_id = d.id
+    LEFT JOIN materials m ON m.id = i.material_id
+    WHERE d.status IN ('invoice_matched', 'grn_done') AND d.invoice_total IS NOT NULL
+    GROUP BY d.id, d.dc_no, d.invoice_total
+    HAVING ABS(d.invoice_total - COALESCE(SUM(i.qty * COALESCE(m.unit_price, 0)), 0)) > 1
+  `);
+
+  res.json({
+    success: true,
+    data: {
+      totalDcs: counts.total_dcs,
+      pendingMatch: counts.pending_match,
+      matchedAwaitingGrn: counts.matched_awaiting_grn,
+      convertedToGrn: counts.converted_to_grn,
+      cancelled: counts.cancelled,
+      provisionalValuePending: Number(provisional.provisional_value),
+      matchedValue: Number(matchedValue.matched_value),
+      mismatchCount: mismatchRows.length,
+      mismatches: mismatchRows.map(r => ({
+        id: r.id,
+        dcNo: r.dc_no,
+        invoiceTotal: Number(r.invoice_total),
+        computedTotal: Number(r.computed_total)
+      })),
+      generatedAt: new Date().toISOString()
+    }
+  });
+}));
+
 
 // GET /:id — one DC with items
 router.get('/:id', auth, ar(async (req, res) => {
@@ -253,5 +327,6 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
     client.release();
   }
 }));
+
 
 module.exports = router;

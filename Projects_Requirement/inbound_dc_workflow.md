@@ -187,3 +187,26 @@ match card. Renamed the definition to match the call site (one-line fix,
 `frontend/src/pages/Store.jsx` line 926) so the E2E tests above can
 actually reach the card. Also noted, not fixed: the submit button's loading
 label reads `'Processing₦'` (stray currency symbol, likely meant `'Processing…'`).
+
+## Reporting / analytics surfacing (2026-08-29)
+
+Per user request to "include the DC in the reporting as well, with accurate
+sync option", Inbound DC data is now surfaced on the **Store Dashboard**
+(`frontend/src/pages/StoreDashboard.jsx`, sidebar "Store Analytics &
+Reports") — the global `Reports.jsx` page was intentionally left untouched.
+
+### `GET /api/inbound-dc/summary`
+Live aggregate endpoint (`backend/src/routes/inboundDc.js`) — every call
+runs fresh SQL against `inbound_dc`/`inbound_dc_items`/`stock_ledger`
+(no caching layer). Returns: `totalDcs`, `pendingMatch`,
+`matchedAwaitingGrn`, `convertedToGrn`, `cancelled`,
+`provisionalValuePending` (₹ stock value added but not yet invoice-
+reconciled), `matchedValue`, `mismatchCount`/`mismatches[]` (DCs whose
+keyed invoice total disagrees with items × catalog unit price by > ₹1).
+
+### Dashboard block
+A new "Inbound DC & Invoice Match" card on Store Dashboard shows the above
+as KPI tiles, fetched on page load. A dedicated **Refresh** button on the
+card re-fetches the endpoint on demand — since the backend never caches,
+this refresh always reflects the current DB state. This manual control is
+the "accurate sync option": no reliance on any client-side stale snapshot.
