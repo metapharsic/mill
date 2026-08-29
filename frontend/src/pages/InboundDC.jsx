@@ -10,6 +10,7 @@ const TABS = [
   { key: 'receive', label: 'Receive DC' },
   { key: 'pending', label: 'Pending Invoice Match' },
   { key: 'ready', label: 'Matched — Ready for GRN' },
+  { key: 'register', label: 'All Inbound DCs Register' },
 ]
 
 const btnStyle = {
@@ -33,7 +34,11 @@ export default function InboundDC() {
   const [materials, setMaterials] = useState([])
   const [pendingList, setPendingList] = useState([])
   const [readyList, setReadyList] = useState([])
+  const [registerList, setRegisterList] = useState([])
+  const [registerStatusFilter, setRegisterStatusFilter] = useState('')
   const [loading, setLoading] = useState(false)
+  const [editModal, setEditModal] = useState(null) // full DC + items being edited
+  const [historyModal, setHistoryModal] = useState(null) // { dcNo, rows }
 
   const [form, setForm] = useState({
     vendor_id: '', dc_no: '', dc_date: new Date().toISOString().slice(0, 10),
@@ -68,11 +73,20 @@ export default function InboundDC() {
       .finally(() => setLoading(false))
   }, [])
 
+  const loadRegister = useCallback(() => {
+    setLoading(true)
+    const qs = registerStatusFilter ? `?status=${registerStatusFilter}` : ''
+    fetch(`${API}/inbound-dc${qs}`, { headers: h() }).then(r => r.json())
+      .then(r => setRegisterList(r.success ? (r.data || []) : []))
+      .finally(() => setLoading(false))
+  }, [registerStatusFilter])
+
   useEffect(() => { loadLookups() }, [loadLookups])
   useEffect(() => {
     if (tab === 'pending') loadPending()
     if (tab === 'ready') loadReady()
-  }, [tab, loadPending, loadReady])
+    if (tab === 'register') loadRegister()
+  }, [tab, loadPending, loadReady, loadRegister])
 
   const addItemRow = () => setForm(f => ({ ...f, items: [...f.items, { material_id: '', qty: '', unit: '', batch_no: '' }] }))
   const removeItemRow = (idx) => setForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }))
@@ -116,6 +130,55 @@ export default function InboundDC() {
     if (!window.confirm('Create GRN from this matched Inbound DC?')) return
     const res = await fetch(`${API}/inbound-dc/${id}/grn`, { method: 'POST', headers: json() }).then(r => r.json())
     if (notify(res, res && res.message)) loadReady()
+  }
+
+  const openEdit = async (id) => {
+    const res = await fetch(`${API}/inbound-dc/${id}`, { headers: h() }).then(r => r.json())
+    if (!res.success) { addToast(res.message || 'Failed to load DC', 'error'); return }
+    const d = res.data
+    setEditModal({
+      id: d.id,
+      vendor_id: d.vendor_id || '',
+      dc_no: d.dc_no || '',
+      dc_date: d.dc_date ? String(d.dc_date).slice(0, 10) : '',
+      vehicle_number: d.vehicle_number || '',
+      remarks: d.remarks || '',
+      items: (d.items || []).map(it => ({ material_id: it.material_id, qty: it.qty, unit: it.unit || '', batch_no: it.batch_no || '' })),
+    })
+  }
+
+  const updateEditItemRow = (idx, key, val) => setEditModal(m => ({ ...m, items: m.items.map((it, i) => i === idx ? { ...it, [key]: val } : it) }))
+  const addEditItemRow = () => setEditModal(m => ({ ...m, items: [...m.items, { material_id: '', qty: '', unit: '', batch_no: '' }] }))
+  const removeEditItemRow = (idx) => setEditModal(m => ({ ...m, items: m.items.filter((_, i) => i !== idx) }))
+
+  const saveEdit = async () => {
+    if (!editModal) return
+    const items = editModal.items.filter(it => it.material_id && Number(it.qty) > 0)
+    if (!items.length) { addToast('Add at least one item with material and quantity', 'error'); return }
+    const res = await fetch(`${API}/inbound-dc/${editModal.id}`, {
+      method: 'PUT', headers: json(),
+      body: JSON.stringify({ ...editModal, items }),
+    }).then(r => r.json())
+    if (notify(res, res && res.message)) {
+      setEditModal(null)
+      loadRegister()
+      loadPending()
+    }
+  }
+
+  const cancelDc = async (d) => {
+    if (!window.confirm(`Are you sure you want to cancel Inbound DC ${d.dc_no}? This will reverse the provisional stock added at receipt. This cannot be undone.`)) return
+    const res = await fetch(`${API}/inbound-dc/${d.id}`, { method: 'DELETE', headers: json() }).then(r => r.json())
+    if (notify(res, res && res.message)) {
+      loadRegister()
+      loadPending()
+      loadReady()
+    }
+  }
+
+  const viewHistory = async (d) => {
+    const res = await fetch(`${API}/inbound-dc/${d.id}/history`, { headers: h() }).then(r => r.json())
+    setHistoryModal({ dcNo: d.dc_no, rows: res.success ? (res.data || []) : [] })
   }
 
   return (
@@ -269,6 +332,71 @@ export default function InboundDC() {
         </div>
       )}
 
+      {tab === 'register' && (
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14 }}>
+            <span style={{ fontSize: 12, color: '#71717a', fontWeight: 700 }}>Filter by status:</span>
+            <select style={{ ...inputStyle, width: 220 }} value={registerStatusFilter} onChange={e => setRegisterStatusFilter(e.target.value)}>
+              <option value="">All statuses</option>
+              <option value="received">Received (pending match)</option>
+              <option value="invoice_matched">Invoice Matched (ready for GRN)</option>
+              <option value="grn_done">Converted to GRN</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button type="button" onClick={loadRegister} style={{ ...btnStyle, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8' }}>↻ Refresh</button>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>DC No</th>
+                  <th style={thStyle}>Date</th>
+                  <th style={thStyle}>Vendor</th>
+                  <th style={thStyle}>Status</th>
+                  <th style={thStyle}>Invoice Match</th>
+                  <th style={thStyle}>Value</th>
+                  <th style={thStyle}>Items</th>
+                  <th style={thStyle}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {registerList.length === 0 && !loading && (
+                  <tr><td style={tdStyle} colSpan={8}>No Inbound DCs found.</td></tr>
+                )}
+                {registerList.map(d => (
+                  <tr key={d.id}>
+                    <td style={tdStyle}>{d.dc_no}</td>
+                    <td style={tdStyle}>{d.dc_date ? String(d.dc_date).slice(0, 10) : ''}</td>
+                    <td style={tdStyle}>{d.vendor_name || '—'}</td>
+                    <td style={tdStyle}>
+                      <span style={{
+                        padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 700,
+                        background: d.status === 'cancelled' ? '#f4f4f5' : d.status === 'grn_done' ? '#f0fdf4' : d.status === 'invoice_matched' ? '#eff6ff' : '#fffbeb',
+                        color: d.status === 'cancelled' ? '#71717a' : d.status === 'grn_done' ? '#16a34a' : d.status === 'invoice_matched' ? '#2563eb' : '#b45309',
+                      }}>{d.status}</span>
+                    </td>
+                    <td style={tdStyle}>{d.invoice_number || '—'}</td>
+                    <td style={tdStyle}>{d.invoice_total != null ? Number(d.invoice_total).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : '—'}</td>
+                    <td style={tdStyle}>{d.itemCount}</td>
+                    <td style={tdStyle}>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {d.status === 'received' && (
+                          <button style={{ ...btnStyle, padding: '5px 10px', fontSize: 12 }} onClick={() => openEdit(d.id)}>Edit</button>
+                        )}
+                        {(d.status === 'received' || d.status === 'invoice_matched') && (
+                          <button style={{ ...btnStyle, padding: '5px 10px', fontSize: 12, background: '#fef2f2', color: '#dc2626' }} onClick={() => cancelDc(d)}>Cancel</button>
+                        )}
+                        <button style={{ ...btnStyle, padding: '5px 10px', fontSize: 12, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8' }} onClick={() => viewHistory(d)}>History</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {matchModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: 400 }}>
@@ -288,6 +416,80 @@ export default function InboundDC() {
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button onClick={() => setMatchModal(null)} style={{ ...btnStyle, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8' }}>Cancel</button>
               <button onClick={submitMatch} style={btnStyle}>Confirm Match</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: 640, maxHeight: '85vh', overflowY: 'auto' }}>
+            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16 }}>Edit Inbound DC {editModal.dc_no}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717a', display: 'block', marginBottom: 4 }}>Vendor</label>
+                <SearchableSelect
+                  value={editModal.vendor_id}
+                  onChange={(v) => setEditModal(m => ({ ...m, vendor_id: v }))}
+                  options={vendors.map(v => ({ value: v.id, label: v.name }))}
+                  placeholder="-- Select Vendor --"
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717a', display: 'block', marginBottom: 4 }}>DC No</label>
+                <input style={inputStyle} value={editModal.dc_no} onChange={e => setEditModal(m => ({ ...m, dc_no: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717a', display: 'block', marginBottom: 4 }}>DC Date</label>
+                <input type="date" style={inputStyle} value={editModal.dc_date} onChange={e => setEditModal(m => ({ ...m, dc_date: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717a', display: 'block', marginBottom: 4 }}>Vehicle Number</label>
+                <input style={inputStyle} value={editModal.vehicle_number} onChange={e => setEditModal(m => ({ ...m, vehicle_number: e.target.value }))} />
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, color: '#71717a', display: 'block', marginBottom: 4 }}>Remarks</label>
+              <input style={inputStyle} value={editModal.remarks} onChange={e => setEditModal(m => ({ ...m, remarks: e.target.value }))} />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Items</div>
+            {editModal.items.map((it, idx) => (
+              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                <SearchableSelect
+                  value={it.material_id}
+                  onChange={(v) => updateEditItemRow(idx, 'material_id', v)}
+                  options={materials.map(m => ({ value: m.id, label: `${m.name}${m.code ? ' (' + m.code + ')' : ''}` }))}
+                  placeholder="-- Material --"
+                />
+                <input style={inputStyle} type="number" step="0.001" min="0" placeholder="Qty" value={it.qty} onChange={e => updateEditItemRow(idx, 'qty', e.target.value)} />
+                <input style={inputStyle} placeholder="Unit" value={it.unit} onChange={e => updateEditItemRow(idx, 'unit', e.target.value)} />
+                <input style={inputStyle} placeholder="Batch No" value={it.batch_no} onChange={e => updateEditItemRow(idx, 'batch_no', e.target.value)} />
+                <button type="button" onClick={() => removeEditItemRow(idx)} disabled={editModal.items.length === 1}
+                  style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #e4e4e7', background: '#fff', cursor: 'pointer', color: '#dc2626' }}>✕</button>
+              </div>
+            ))}
+            <button type="button" onClick={addEditItemRow} style={{ ...btnStyle, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8', marginBottom: 16 }}>+ Add Item</button>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button onClick={() => setEditModal(null)} style={{ ...btnStyle, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8' }}>Cancel</button>
+              <button onClick={saveEdit} style={btnStyle}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {historyModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: 560, maxHeight: '75vh', overflowY: 'auto' }}>
+            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16 }}>History — DC {historyModal.dcNo}</div>
+            {historyModal.rows.length === 0 && <div style={{ fontSize: 13, color: '#71717a' }}>No audit history recorded for this DC.</div>}
+            {historyModal.rows.map(r => (
+              <div key={r.id} style={{ borderBottom: '1px solid #f4f4f5', padding: '8px 0', fontSize: 13 }}>
+                <div style={{ fontWeight: 700 }}>{r.action}</div>
+                <div style={{ color: '#71717a', fontSize: 12 }}>{r.user_name || 'Unknown user'} — {r.created_at ? new Date(r.created_at).toLocaleString() : ''}</div>
+              </div>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+              <button onClick={() => setHistoryModal(null)} style={{ ...btnStyle, background: '#fff', color: '#18181b', border: '1px solid #d4d4d8' }}>Close</button>
             </div>
           </div>
         </div>

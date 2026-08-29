@@ -612,6 +612,19 @@ export default function StoreDashboard({ onNavigate }) {
             <div style={S.kpiSub}>Stock value added but not yet invoice-reconciled</div>
           </div>
 
+          <div style={S.kpiCard}>
+            <div style={S.kpiHead}>
+              <span style={S.kpiLabel}>Cancelled</span>
+              <div style={{ ...S.kpiIcon, background: '#f4f4f5', color: '#71717a' }}>
+                <X size={18} />
+              </div>
+            </div>
+            <div style={{ ...S.kpiVal, color: '#52525b' }}>
+              {dcSummary?.cancelled ?? 0} <span style={{ fontSize: 13, fontWeight: 600 }}>DCs</span>
+            </div>
+            <div style={S.kpiSub}>Cancelled before GRN conversion</div>
+          </div>
+
           <div style={{ ...S.kpiCard, borderLeft: (dcSummary?.mismatchCount || 0) > 0 ? '4px solid #dc2626' : undefined }}>
             <div style={S.kpiHead}>
               <span style={S.kpiLabel}>Invoice Mismatches</span>

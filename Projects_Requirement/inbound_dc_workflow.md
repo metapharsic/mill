@@ -210,3 +210,60 @@ as KPI tiles, fetched on page load. A dedicated **Refresh** button on the
 card re-fetches the endpoint on demand — since the backend never caches,
 this refresh always reflects the current DB state. This manual control is
 the "accurate sync option": no reliance on any client-side stale snapshot.
+
+## Register, Edit, Cancel + Audit Trail (2026-08-29)
+
+Per user request to give Inbound DC the same treatment as Indent —
+a full list/register view, edit capability, and a per-record audit trail
+of every DML operation — the following was added, mirroring the existing
+Indent pattern rather than inventing a new one.
+
+### Audit mechanism (reused, not new)
+Indent uses a bespoke `indent_audit_log` table. Inbound DC instead reuses
+the **generic `audit_log` table** already written to by finance.js,
+production.js, purchase.js and master.js via the shared
+`audit(clientOrNull, {...})` helper in `backend/src/middleware/helpers.js`
+(`module: 'InboundDC'`). This is the lighter, more standard pattern in
+this codebase and needs no new table/migration. Every CREATE, UPDATE,
+MATCH_INVOICE, GRN_CONVERTED and CANCEL action on an inbound DC now writes
+one `audit_log` row with old/new JSON snapshots.
+
+### New backend routes (`backend/src/routes/inboundDc.js`)
+- `PUT /api/inbound-dc/:id` — edit header + items. Only allowed while
+  `status='received'` (before invoice match/GRN) — rejects with a clear
+  400 otherwise ("Only DCs still awaiting invoice match can be edited").
+  Reverses the old provisional stock/ledger effect for the previous item
+  set and re-applies it for the edited set (same compensating-ledger
+  pattern indent's force-delete uses), so `current_stock` stays correct.
+- `DELETE /api/inbound-dc/:id` — cancel (status → `cancelled`), NOT a hard
+  delete. Allowed only while status is `received` or `invoice_matched`;
+  refused once `grn_done` ("Void the GRN instead") and if already
+  cancelled. Reverses the provisional stock effect.
+- `GET /api/inbound-dc/:id/history` — per-DC audit trail, reading
+  `audit_log WHERE module='InboundDC' AND record_id=:id`, same shape as
+  the existing admin footsteps queries.
+
+### Frontend (`frontend/src/pages/InboundDC.jsx`)
+- New "All Inbound DCs Register" tab: DC No, Date, Vendor, Status badge,
+  Invoice Match no., Value, Item count, with status filter dropdown and a
+  manual Refresh (no caching, consistent with the summary card).
+- Edit modal (SearchableSelect for vendor/material, same layout as the
+  Receive form) — only its Edit button appears for `status='received'`
+  rows, calling the new PUT route.
+- Cancel action gated behind `window.confirm(...)` (matching the confirm
+  convention already used in Indent.jsx/Store.jsx), shown for `received`
+  and `invoice_matched` rows, calling the new DELETE route.
+- History modal listing that DC's `audit_log` rows (action, user, time).
+
+### Reporting
+`StoreDashboard.jsx`'s "Inbound DC & Invoice Match" card gained a
+"Cancelled" KPI tile (the `summary` endpoint already returned `cancelled`
+from the prior round; only the UI tile was missing). No caching was
+introduced anywhere in this round — register/history reads are always
+live queries, matching the "accurate sync" requirement from the prior
+round.
+
+### Still pending before any of this goes live
+`backend/scripts/migrate_inbound_dc.js` has NOT been run yet, and the
+backend/frontend have not been restarted/rebuilt since these changes
+(same standing caveat as every prior round on this feature).

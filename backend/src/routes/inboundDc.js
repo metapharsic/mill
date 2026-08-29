@@ -2,6 +2,7 @@ const router = require('express').Router();
 const pool = require('../db/pool');
 const { auth, requireLevel, requireStore } = require('../middleware/auth');
 const { computeLineValue } = require('../utils/dcInvoiceMatch');
+const { audit } = require('../middleware/helpers');
 
 const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -73,6 +74,8 @@ router.post('/', auth, requireStore, ar(async (req, res) => {
          `Provisional inward against Inbound DC ${autoDcNo} (invoice not yet matched)`, req.user.id, vendor_id || null]
       );
     }
+
+    await audit(client, { userId: req.user.id, module: 'InboundDC', action: 'CREATE', entityId: dc.id, newVal: dc, ip: req.ip });
 
     await client.query('COMMIT');
     res.json({ success: true, data: dc, message: `Inbound DC ${autoDcNo} received; stock updated provisionally pending invoice match` });
@@ -224,6 +227,7 @@ router.post('/:id/match-invoice', auth, requireStore, ar(async (req, res) => {
      WHERE id = $4 RETURNING *`,
     [invoice_number, invoice_date || null, req.user.id, req.params.id, party_name || null, invoice_total != null && invoice_total !== '' ? Number(invoice_total) : null]
   );
+  await audit(null, { userId: req.user.id, module: 'InboundDC', action: 'MATCH_INVOICE', entityId: updated.id, oldVal: dc, newVal: updated, ip: req.ip });
   res.json({ success: true, data: updated, message: 'Invoice matched. DC is now ready for GRN creation.' });
 }));
 
@@ -318,6 +322,8 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
       [grnId, dc.id]
     );
 
+    await audit(client, { userId: req.user.id, module: 'InboundDC', action: 'GRN_CONVERTED', entityId: dc.id, oldVal: dc, newVal: { ...dc, status: 'grn_done', grn_id: grnId }, ip: req.ip });
+
     await client.query('COMMIT');
     res.json({ success: true, data: { grn: head, grnId, grnNumber: grnNum }, message: `GRN ${grnNum} created from Inbound DC ${dc.dc_no}` });
   } catch (e) {
@@ -328,5 +334,160 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
   }
 }));
 
+
+// PUT /:id — edit DC header + items. Only allowed while status='received'
+// (before invoice-matched/grn'd) to avoid corrupting a reconciled record.
+// Item edits reverse the old provisional stock/ledger effect and reapply the
+// new one, so current_stock and stock_ledger stay consistent with the edited
+// quantities (mirrors the compensating-ledger-entry pattern used by indent's
+// force-delete route).
+router.put('/:id', auth, requireStore, ar(async (req, res) => {
+  const { vendor_id, dc_no, dc_date, vehicle_number, remarks, items } = req.body;
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ success: false, message: 'At least one item is required' });
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [dc] } = await client.query(`SELECT * FROM inbound_dc WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!dc) { await client.query('ROLLBACK'); return res.status(404).json({ success: false, message: 'Inbound DC not found' }); }
+    if (dc.status !== 'received') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: `Cannot edit: DC status is '${dc.status}'. Only DCs still awaiting invoice match ('received') can be edited.` });
+    }
+
+    // Reverse the old provisional stock effect for every existing item before re-applying the edited set.
+    const { rows: oldItems } = await client.query(`SELECT * FROM inbound_dc_items WHERE inbound_dc_id = $1`, [dc.id]);
+    for (const it of oldItems) {
+      const qty = parseFloat(it.qty || 0);
+      if (qty <= 0) continue;
+      const { rows: [mat] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id=$1 FOR UPDATE`, [it.material_id]);
+      if (!mat) continue;
+      const newStock = parseFloat(mat.current_stock || 0) - qty;
+      await client.query(`UPDATE materials SET current_stock=$1 WHERE id=$2`, [newStock, it.material_id]);
+      await client.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by, vendor_id)
+         VALUES ($1, CURRENT_DATE, 'adjustment_minus', 'INBOUND_DC', $2, 0, $3, $4, $5, $6, $7, $8, $9)`,
+        [it.material_id, dc.id, qty, newStock, mat.unit_price || 0, qty * (mat.unit_price || 0),
+         `Reversed on edit of Inbound DC ${dc.dc_no}`, req.user.id, dc.vendor_id || null]
+      );
+    }
+    // Retag old provisional ledger rows so they no longer double-count against the edited item set.
+    await client.query(
+      `UPDATE stock_ledger SET transaction_type = 'provisional_grn_superseded'
+       WHERE reference_type = 'INBOUND_DC' AND reference_id = $1 AND transaction_type = 'provisional_grn'`,
+      [dc.id]
+    );
+    await client.query(`DELETE FROM inbound_dc_items WHERE inbound_dc_id = $1`, [dc.id]);
+
+    const { rows: [updated] } = await client.query(
+      `UPDATE inbound_dc SET vendor_id = $1, dc_no = $2, dc_date = $3, vehicle_number = $4, remarks = $5
+       WHERE id = $6 RETURNING *`,
+      [vendor_id || null, (dc_no && String(dc_no).trim()) || dc.dc_no, dc_date || dc.dc_date, vehicle_number || null, remarks || null, dc.id]
+    );
+
+    for (const it of items) {
+      const materialId = it.material_id;
+      const qty = Number(it.qty);
+      if (!materialId || !(qty > 0)) continue;
+      await client.query(
+        `INSERT INTO inbound_dc_items (inbound_dc_id, material_id, qty, unit, batch_no)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [dc.id, materialId, qty, it.unit || null, it.batch_no || null]
+      );
+      const { rows: [mat] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id=$1 FOR UPDATE`, [materialId]);
+      if (!mat) continue;
+      const newStock = parseFloat(mat.current_stock || 0) + qty;
+      await client.query(`UPDATE materials SET current_stock=$1 WHERE id=$2`, [newStock, materialId]);
+      await client.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by, vendor_id)
+         VALUES ($1, CURRENT_DATE, 'provisional_grn', 'INBOUND_DC', $2, $3, 0, $4, $5, $6, $7, $8, $9)`,
+        [materialId, dc.id, qty, newStock, mat.unit_price || 0, qty * (mat.unit_price || 0),
+         `Provisional inward against edited Inbound DC ${updated.dc_no}`, req.user.id, vendor_id || null]
+      );
+    }
+
+    await audit(client, { userId: req.user.id, module: 'InboundDC', action: 'UPDATE', entityId: dc.id, oldVal: dc, newVal: updated, ip: req.ip });
+
+    await client.query('COMMIT');
+    res.json({ success: true, data: updated, message: `Inbound DC ${updated.dc_no} updated` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// DELETE /:id — cancel (soft-delete) an inbound DC. Only allowed pre-GRN
+// (status IN 'received','invoice_matched'); a GRN-converted DC is a
+// reconciled financial record and must not be cancelled here (mirrors
+// how PO/indent avoid hard-deleting settled records). Reverses the
+// provisional stock effect, like the indent force-delete restore pattern.
+router.delete('/:id', auth, requireStore, ar(async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [dc] } = await client.query(`SELECT * FROM inbound_dc WHERE id = $1 FOR UPDATE`, [req.params.id]);
+    if (!dc) { await client.query('ROLLBACK'); return res.status(404).json({ success: false, message: 'Inbound DC not found' }); }
+    if (dc.status === 'grn_done') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'Cannot cancel: this DC has already been converted to a GRN. Void the GRN instead.' });
+    }
+    if (dc.status === 'cancelled') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ success: false, message: 'This DC is already cancelled.' });
+    }
+
+    const { rows: items } = await client.query(`SELECT * FROM inbound_dc_items WHERE inbound_dc_id = $1`, [dc.id]);
+    for (const it of items) {
+      const qty = parseFloat(it.qty || 0);
+      if (qty <= 0) continue;
+      const { rows: [mat] } = await client.query(`SELECT current_stock, unit_price FROM materials WHERE id=$1 FOR UPDATE`, [it.material_id]);
+      if (!mat) continue;
+      const newStock = parseFloat(mat.current_stock || 0) - qty;
+      await client.query(`UPDATE materials SET current_stock=$1 WHERE id=$2`, [newStock, it.material_id]);
+      await client.query(
+        `INSERT INTO stock_ledger (material_id, date, transaction_type, reference_type, reference_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by, vendor_id)
+         VALUES ($1, CURRENT_DATE, 'adjustment_minus', 'INBOUND_DC', $2, 0, $3, $4, $5, $6, $7, $8, $9)`,
+        [it.material_id, dc.id, qty, newStock, mat.unit_price || 0, qty * (mat.unit_price || 0),
+         `Stock reversed on Cancel of Inbound DC ${dc.dc_no}`, req.user.id, dc.vendor_id || null]
+      );
+    }
+    await client.query(
+      `UPDATE stock_ledger SET transaction_type = 'provisional_grn_reversed'
+       WHERE reference_type = 'INBOUND_DC' AND reference_id = $1 AND transaction_type = 'provisional_grn'`,
+      [dc.id]
+    );
+
+    const { rows: [updated] } = await client.query(
+      `UPDATE inbound_dc SET status = 'cancelled' WHERE id = $1 RETURNING *`,
+      [dc.id]
+    );
+
+    await audit(client, { userId: req.user.id, module: 'InboundDC', action: 'CANCEL', entityId: dc.id, oldVal: dc, newVal: updated, ip: req.ip });
+
+    await client.query('COMMIT');
+    res.json({ success: true, data: updated, message: `Inbound DC ${dc.dc_no} cancelled; stock reversed` });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}));
+
+// GET /:id/history — per-record audit trail (reuses the shared audit_log
+// table written by helpers.audit(), filtered to this DC's entries).
+router.get('/:id/history', auth, ar(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT al.id, al.action, al.old_data, al.new_data, al.created_at, u.name AS user_name
+     FROM audit_log al LEFT JOIN users u ON u.id = al.user_id
+     WHERE al.module = 'InboundDC' AND al.record_id = $1
+     ORDER BY al.created_at DESC`,
+    [req.params.id]
+  );
+  res.json({ success: true, data: rows });
+}));
 
 module.exports = router;
