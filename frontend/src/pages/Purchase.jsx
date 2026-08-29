@@ -411,6 +411,7 @@ export default function Purchase() {
       remarks: preselectedIndent
         ? `PO raised against PR ${preselectedIndent.indentNumber || preselectedIndent.indent_number} (${preselectedIndent.deptName || 'Dept'})`
         : '',
+      roundoff: 0,
       items
     })
     setFormErrors({})
@@ -2589,7 +2590,8 @@ export default function Purchase() {
         const totalSgst = form.items.reduce((a, it) => a + calcLine(it).sgst, 0)
         const totalIgst = form.items.reduce((a, it) => a + calcLine(it).igst, 0)
         const totalTax = form.items.reduce((a, it) => a + calcLine(it).tax, 0)
-        const grandTotal = subtotal + totalTax
+        const roundoffVal = parseFloat(form.roundoff) || 0
+        const grandTotal = subtotal + totalTax + roundoffVal
 
         const fmtAmt = v => v > 0 ? `₹${v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₹0.00'
         const PAYMENT_PRESETS = ['Net 15', 'Net 30', 'Net 45', 'Advance', 'COD', 'Custom']
@@ -2959,7 +2961,7 @@ export default function Purchase() {
                               {/* Qty */}
                               <div style={{ width: 80, flexShrink: 0 }}>
                                 <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', ...(itErr.qty ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
-                                  type="number" step="0.001" min="0.001"
+                                  type="number" step="any" min="0"
                                   value={it.qty} placeholder="0"
                                   onChange={e => { setItem(i, 'qty', e.target.value); if (formErrors.itemFields) setFormErrors(fe => ({ ...fe, itemFields: fe.itemFields.map((x,j)=>j===i?{...x,qty:undefined}:x) })) }} />
                                 {itErr.qty && <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginTop: 2 }}>{itErr.qty}</div>}
@@ -2975,7 +2977,7 @@ export default function Purchase() {
                               {/* Unit Rate */}
                               <div style={{ width: 90, flexShrink: 0 }}>
                                 <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', ...(itErr.unit_price ? { border: '1px solid #ef4444', background: '#ef444411' } : {}) }}
-                                  type="number" step="0.01" min="0"
+                                  type="number" step="any" min="0"
                                   value={it.unit_price} placeholder="0.00"
                                   onChange={e => { setItem(i, 'unit_price', e.target.value); if (formErrors.itemFields) setFormErrors(fe => ({ ...fe, itemFields: fe.itemFields.map((x,j)=>j===i?{...x,unit_price:undefined}:x) })) }} />
                                 {itErr.unit_price && <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginTop: 2 }}>{itErr.unit_price}</div>}
@@ -2984,7 +2986,7 @@ export default function Purchase() {
                               {/* Discount % */}
                               <div style={{ width: 75, flexShrink: 0 }}>
                                 <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', color: lt.discPct > 0 ? '#b45309' : undefined, fontWeight: lt.discPct > 0 ? 600 : undefined }}
-                                  type="number" step="0.01" min="0" max="100"
+                                  type="number" step="any" min="0" max="100"
                                   value={it.discount_pct !== undefined ? it.discount_pct : ''} placeholder="0%"
                                   onChange={e => setItem(i, 'discount_pct', e.target.value)}
                                   title="Item discount percentage (deducted from gross)" />
@@ -2993,7 +2995,7 @@ export default function Purchase() {
                               {/* Other Charges (Transport / P&F) */}
                               <div style={{ width: 90, flexShrink: 0 }}>
                                 <input style={{ ...S.input, fontSize: 12, padding: '6px 6px', textAlign: 'right', width: '100%', color: lt.otherCharges > 0 ? '#0369a1' : undefined, fontWeight: lt.otherCharges > 0 ? 600 : undefined }}
-                                  type="number" step="0.01" min="0"
+                                  type="number" step="any" min="0"
                                   value={it.other_charges !== undefined ? it.other_charges : ''} placeholder="0.00"
                                   onChange={e => setItem(i, 'other_charges', e.target.value)}
                                   title="Other charges: Transport, Packing & Forwarding (P&F)" />
@@ -3101,6 +3103,18 @@ export default function Purchase() {
                   <div style={{ textAlign: 'left' }}>
                     <div style={{ fontSize: 10, color: '#a0a0a6', fontWeight: 700, textTransform: 'uppercase' }}>Total Tax</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1b1b1d' }}>{fmtAmt(totalTax)}</div>
+                  </div>
+                  <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: 10, color: '#8a8a90', fontWeight: 700, textTransform: 'uppercase' }}>Round Off (₹)</div>
+                    <input
+                      type="number" step="any"
+                      style={{ ...S.input, width: 80, fontSize: 13, fontWeight: 600, padding: '3px 6px', textAlign: 'right' }}
+                      value={form.roundoff !== undefined ? form.roundoff : 0}
+                      placeholder="0.00"
+                      onChange={e => setForm(f => ({ ...f, roundoff: e.target.value }))}
+                      title="Manual round-off adjustment applied to the Grand Total"
+                    />
                   </div>
                   <div style={{ width: 1, height: 24, background: '#e7e6df' }} />
                   <div style={{ textAlign: 'left' }}>

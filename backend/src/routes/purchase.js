@@ -162,7 +162,7 @@ router.get('/po/:id', auth, ar(async (req, res) => {
 
 // CREATE PO
 router.post('/po', auth, requireLevel(2), ar(async (req, res) => {
-  const { vendor_id, indent_id, po_date, date, delivery_date, payment_terms, remarks, items=[], status='Draft', tax_type } = req.body;
+  const { vendor_id, indent_id, po_date, date, delivery_date, payment_terms, remarks, items=[], status='Draft', tax_type, roundoff=0 } = req.body;
   if (!vendor_id || !items.length) return res.json({ success:false, message:'Vendor + items required' });
 
   const isDraftSave = status === 'Draft';
@@ -274,15 +274,16 @@ router.post('/po', auth, requireLevel(2), ar(async (req, res) => {
     });
 
     const totalGst = totalCgst + totalSgst + totalIgst;
-    const grandTotal = totalTaxable + totalGst;
+    const rOff = Number(roundoff || 0) || 0;
+    const grandTotal = totalTaxable + totalGst + rOff;
     const poStatus = status || 'Draft';
 
     const { rows } = await client.query(
       `INSERT INTO purchase_orders (po_number,date,vendor_id,indent_id,delivery_date,payment_terms,
-         status,tax_type,total_value,discount_value,other_charges,cgst_value,sgst_value,igst_value,gst_value,grand_total,created_by,remarks)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING *`,
+         status,tax_type,total_value,discount_value,other_charges,cgst_value,sgst_value,igst_value,gst_value,roundoff,grand_total,created_by,remarks)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING *`,
       [num, effectiveDate, vendor_id, indent_id||null, delivery_date||null, payment_terms||null,
-       poStatus, globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, req.user.id, remarks||null]
+       poStatus, globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, rOff, grandTotal, req.user.id, remarks||null]
     );
     const poId = rows[0].id;
     for (const it of preparedItems) {
@@ -322,7 +323,7 @@ router.post('/po', auth, requireLevel(2), ar(async (req, res) => {
 
 // EDIT PO — Supports backdated date, modifying items, adding new items, discount/tax recalculation
 router.put('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
-  const { vendor_id, vendorId, po_date, date, delivery_date, payment_terms, remarks, items, tax_type, status } = req.body;
+  const { vendor_id, vendorId, po_date, date, delivery_date, payment_terms, remarks, items, tax_type, status, roundoff } = req.body;
   const { rows: [po] } = await pool.query(`SELECT * FROM purchase_orders WHERE id=$1`, [req.params.id]);
   if (!po) return res.json({ success: false, message: 'Purchase Order not found' });
   if (['Received', 'Closed'].includes(po.status)) {
@@ -493,7 +494,8 @@ router.put('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
     }
 
     const totalGst = totalCgst + totalSgst + totalIgst;
-    const grandTotal = totalTaxable + totalGst;
+    const rOff = roundoff !== undefined ? (Number(roundoff) || 0) : (Number(po.roundoff) || 0);
+    const grandTotal = totalTaxable + totalGst + rOff;
 
     const { rows } = await client.query(
       `UPDATE purchase_orders SET
@@ -510,11 +512,12 @@ router.put('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
          sgst_value = $11,
          igst_value = $12,
          gst_value = $13,
-         grand_total = $14,
-         status = COALESCE($15, status)
-       WHERE id = $16 RETURNING *`,
+         roundoff = $14,
+         grand_total = $15,
+         status = COALESCE($16, status)
+       WHERE id = $17 RETURNING *`,
       [effectiveDate || null, targetVendorId || null, delivery_date || null, payment_terms || null, remarks || null,
-       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, grandTotal, status || null, req.params.id]
+       globalTaxType, totalTaxable, totalDiscount, totalOtherCharges, totalCgst, totalSgst, totalIgst, totalGst, rOff, grandTotal, status || null, req.params.id]
     );
 
     await client.query('COMMIT');
