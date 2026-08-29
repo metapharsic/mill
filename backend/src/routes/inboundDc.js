@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
 const { auth, requireLevel, requireStore } = require('../middleware/auth');
+const { computeLineValue } = require('../utils/dcInvoiceMatch');
 
 const ar = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -213,13 +214,15 @@ router.post('/:id/grn', auth, requireLevel(2), ar(async (req, res) => {
         gstAmt = 0;
       }
       const qty = Number(it.qty);
-      const taxableVal = qty * uPrice * (1 - discPct / 100);
-      const totalVal = taxableVal + gstAmt;
+      // Shared with the unit-tested pure helper (backend/src/utils/dcInvoiceMatch.js)
+      // and Store.jsx's client-side live-preview total, so all three surfaces
+      // agree on one formula instead of three hand-copied ones drifting apart.
+      const { taxableValue: taxableVal, totalValue: totalVal, gstPct } = computeLineValue(qty, uPrice, discPct, gstAmt);
       await client.query(
         `INSERT INTO grn_items (grn_id, material_id, po_qty, received_qty, accepted_qty, rejected_qty, uom, unit_price, discount_pct, taxable_amount, total_amount, gst_pct, remarks)
          VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9, $10, $11, $12)`,
         [grnId, it.material_id, qty, qty, qty, it.unit || null, uPrice, discPct, taxableVal, totalVal,
-         taxableVal > 0 ? Number(((gstAmt / taxableVal) * 100).toFixed(2)) : 0,
+         gstPct,
          `Invoice-matched via Store.jsx DC tick-mark flow (DC ${dc.dc_no})`]
       );
 

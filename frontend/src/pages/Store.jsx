@@ -923,7 +923,7 @@ export default function Store({ onNavigate }) {
 
   // Batch Inward submit for multi-item PO
   // Load DCs received but not yet invoice-matched, for tick-mark selection
-  const loadOpenInbounDcs = async () => {
+  const loadOpenInboundDcs = async () => {
     try {
       const r = await fetch(`${API}/inbound-dc?status=received`, { headers: h() }).then(res => res.json())
       if (r.success) {

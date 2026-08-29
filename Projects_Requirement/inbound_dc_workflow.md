@@ -114,3 +114,76 @@ Invoice Match" and "Matched — Ready for GRN" tabs duplicate this. Its
 place that happens, so the page isn't fully dead — only two of its three tabs
 are superseded. Left in place; not removed, per instruction to let the user
 decide.
+
+## Testing (added 2026-08-29)
+
+Three independent test layers were added for this feature, none touching
+the shared/off-limits e2e config or existing spec/page files:
+
+### 1. Playwright E2E — `e2e/specs/inbound_dc_invoice_match.spec.js`
+New spec file + new page object `e2e/pages/InboundDcPage.js` (imports the
+existing `LoginPage`/`BasePage`/`StorePage` rather than editing them).
+`playwright.config.js`'s `testDir: './e2e/specs'` has no `testMatch`
+restriction, so this new spec is picked up automatically — no config edit
+was needed or made. Covers: the match card rendering when Ref Document =
+"DC #" is selected, the DC table / empty-state fallback, ticking a DC +
+editing Rate/Disc%/Tax Amount, the live green "Matches Invoice" / red
+"Mismatch vs Invoice" indicator in both states, and the submit flow's two
+network calls (`POST /inbound-dc/:id/match-invoice`, `POST
+/inbound-dc/:id/grn`). Tests that need a pre-existing `status='received'` DC
+row skip themselves with a clear message when none exists in the target
+environment, rather than failing.
+
+Run:
+```
+npx playwright test e2e/specs/inbound_dc_invoice_match.spec.js
+```
+Artifacts (trace/screenshot/video-on-failure + HTML report) are already
+enabled by the existing `playwright.config.js` (`trace: 'retain-on-failure'`,
+`screenshot: 'only-on-failure'`, `video: 'retain-on-failure'`, `html`
+reporter to `playwright-report/`) — nothing extra to configure. To force
+artifacts on every run (not just failures) for a debugging pass:
+```
+npx playwright test e2e/specs/inbound_dc_invoice_match.spec.js --trace on --screenshot on --video on
+```
+
+### 2. Backend unit tests — `backend/scripts/test_dc_invoice_match_unit.js`
+Exercises the pure line-total/match-comparison logic, extracted into
+`backend/src/utils/dcInvoiceMatch.js` (`computeLineValue`,
+`computeSelectedTotal`, `compareToInvoiceTotal`) and now also used by
+`inboundDc.js`'s `POST /:id/grn` route itself, so the route, the unit tests,
+and Store.jsx's client-side live preview all agree on one formula. No test
+framework exists anywhere in this repo (checked both package.json files),
+and every other `backend/scripts/test_*.js` already follows a plain
+`assert` + print-PASS/FAIL convention, so this matches that instead of
+adding a new dependency. Run:
+```
+node backend/scripts/test_dc_invoice_match_unit.js
+```
+
+### 3. Integration / "db sync" test — `backend/scripts/test_inbound_dc_integration.js`
+Connects to the real database (via the same `pool` every other backend
+script uses), checks `inbound_dc` / `inbound_dc_items` actually have every
+column the routes and Store.jsx card depend on (this is the "db sync"
+check — it fails loudly if `migrate_inbound_dc.js` hasn't been run yet),
+then exercises the receive -> match-invoice -> grn lifecycle's core SQL
+writes (provisional stock bump, ledger insert, status transitions, GRN
+creation, provisional->grn ledger re-tag, no double-counted ledger rows) —
+all inside one transaction that is unconditionally rolled back in a
+`finally` block, so it is safe to run against a shared/staging database and
+never leaves test rows behind. If no DB is reachable it prints why and exits
+0 without asserting anything (this build sandbox has no DB access, so it
+was only syntax-checked here, not executed against real data). Run on a
+machine with real DB access:
+```
+node backend/scripts/test_inbound_dc_integration.js
+```
+
+### Bug fixed while wiring this up
+`Store.jsx` defined `loadOpenInbounDcs` (missing a "d") but the `useEffect`
+that fires when Ref Document switches to "DC #" called
+`loadOpenInboundDcs` — a `ReferenceError` on every attempt to open the
+match card. Renamed the definition to match the call site (one-line fix,
+`frontend/src/pages/Store.jsx` line 926) so the E2E tests above can
+actually reach the card. Also noted, not fixed: the submit button's loading
+label reads `'Processing₦'` (stray currency symbol, likely meant `'Processing…'`).
