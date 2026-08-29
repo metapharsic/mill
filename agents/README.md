@@ -31,3 +31,4 @@ of re-auditing from scratch.
 | 2026-08-24 | Indent Plant Section, Machine & Digital Twin Roll Selection Synchronization | [2026-08-24-indent-section-machine-equipment-selection-synchronization.md](./2026-08-24-indent-section-machine-equipment-selection-synchronization.md) |
 | 2026-08-24 | Reporting Suite Multi-Section & Digital Twin Machinery Synchronization | [2026-08-24-reporting-multi-section-and-digital-twin-enhancement.md](./2026-08-24-reporting-multi-section-and-digital-twin-enhancement.md) |
 | 2026-08-25 | Clubbed GRN Intake Provisioning, Inward Data Upload, Full Invoice Calculations & Multi-Agent Verification | [2026-08-25-clubbed-grn-inward-sync-invoice-calculations.md](./2026-08-25-clubbed-grn-inward-sync-invoice-calculations.md) |
+| 2026-08-29 | Inbound Delivery Challan (DC) workflow: receive-before-invoice, match, then GRN | [2026-08-29-inbound-dc-workflow.md](./2026-08-29-inbound-dc-workflow.md) |

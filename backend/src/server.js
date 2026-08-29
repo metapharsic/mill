@@ -60,6 +60,7 @@ app.use('/api/master', require('./routes/master'));
 app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/indent', require('./routes/indent'));
 app.use('/api/purchase', require('./routes/purchase'));
+app.use('/api/inbound-dc', require('./routes/inboundDc'));
 app.use('/api/quality', require('./routes/quality'));
 app.use('/api/maintenance', require('./routes/maintenance'));
 app.use('/api/sales', require('./routes/sales'));

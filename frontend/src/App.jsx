@@ -30,6 +30,7 @@ import HR from './pages/HR'
 import Finance from './pages/Finance'
 import RawMaterial from './pages/RawMaterial'
 import Store from './pages/Store'
+import InboundDC from './pages/InboundDC'
 import Scrap from './pages/Scrap'
 import Packing from './pages/Packing'
 import FGWarehouse from './pages/FGWarehouse'
@@ -56,7 +57,7 @@ const SECTION_KEYS = ['sections-all','sections-pulp','sections-centri','sections
   'sections-compressors','sections-store']
 
 const NAV_KEYS = ['dashboard','production','daily-report','quality','maintenance','utility','grades','machines',
-  'rawmaterial','inventory','materials','chemicals','store','store-dashboard','store-reports','indent','scrap',
+  'rawmaterial','inventory','materials','chemicals','store','store-dashboard','store-reports','inbound-dc','indent','scrap',
   'purchase','customers','vendors','sales','dispatch','finance',
   'packing','fgwarehouse','hr','security','laboratory','ehs',
   'reports','phases','checkpoint','agents','masterdata','admin','users',
@@ -113,6 +114,7 @@ const PAGE_COMPONENTS = {
   finance: Finance,
   rawmaterial: RawMaterial,
   store: Store,
+  'inbound-dc': InboundDC,
   'store-dashboard': StoreDashboard,
   'store-reports': StoreDeptReports,
   scrap: Scrap,
@@ -133,6 +135,7 @@ const PAGE_TITLES = {
   inventory:'Inventory', materials:'Materials', chemicals:'Chemical Store', store:'Store Management',
   'store-dashboard':'Store Dashboard',
   'store-reports':'Store Analytics & Reports',
+  'inbound-dc':'Inbound Delivery Challan',
   indent:'Indent / PIIMAS', scrap:'Scrap Management', purchase:'Purchase', customers:'Customers',
   vendors:'Vendors', sales:'Sales', dispatch:'Dispatch', finance:'Finance', packing:'Packing',
   fgwarehouse:'FG Warehouse', hr:'HR & Payroll', security:'Security', laboratory:'Laboratory',
