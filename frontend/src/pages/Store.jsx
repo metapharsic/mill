@@ -118,6 +118,8 @@ export default function Store({ onNavigate }) {
   const [inwardBatchMode, setInwardBatchMode] = useState(false)
   const [batchInwardQtys, setBatchInwardQtys] = useState({})
   const [batchSaving, setBatchSaving] = useState(false)
+  const [batchVendorInvoiceNumber, setBatchVendorInvoiceNumber] = useState('')
+  const [batchRemarks, setBatchRemarks] = useState('')
   const [inwardMatSearch, setInwardMatSearch] = useState('')
   const [inwardMatDropOpen, setInwardMatDropOpen] = useState(false)
   const [searchLot, setSearchLot] = useState('')
@@ -947,7 +949,8 @@ export default function Store({ onNavigate }) {
         vendor_name: activePoDetails.vendorName,
         tax_type: inwardForm.tax_type || 'intra',
         quality_status: inwardForm.quality_status || 'Accepted',
-        remarks: inwardForm.remarks || `Batch PO Inward`,
+        invoice_number: batchVendorInvoiceNumber || undefined,
+        remarks: batchRemarks || inwardForm.remarks || `Batch PO Inward`,
         items: validLines
       }
       const r = await fetch(`${API}/store/inward`, {
@@ -967,6 +970,8 @@ export default function Store({ onNavigate }) {
         setActivePoDetails(null)
         setSelectedPoLineId('')
         setBatchInwardQtys({})
+        setBatchVendorInvoiceNumber('')
+        setBatchRemarks('')
         loadInward()
         loadBaseData()
       } else {
@@ -2926,6 +2931,31 @@ export default function Store({ onNavigate }) {
                     </button>
                   </div>
                 </div>
+
+                {/* Batch GRN-level Reference Fields: Vendor Invoice Number & Remarks */}
+                {inwardBatchMode && (
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+                    <div style={{ flex: '1 1 220px' }}>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#0f766e', marginBottom: 4 }}>Vendor Invoice Number</label>
+                      <input
+                        style={{ ...S.input, borderColor: '#99f6e4' }}
+                        placeholder="e.g. INV-8902 (vendor's bill number)"
+                        value={batchVendorInvoiceNumber}
+                        onChange={e => setBatchVendorInvoiceNumber(e.target.value)}
+                      />
+                    </div>
+                    <div style={{ flex: '2 1 320px' }}>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#0f766e', marginBottom: 4 }}>Remarks (for this GRN)</label>
+                      <textarea
+                        style={{ ...S.input, borderColor: '#99f6e4', minHeight: 36, resize: 'vertical' }}
+                        placeholder="e.g. Partial delivery, 2 boxes damaged in transit…"
+                        value={batchRemarks}
+                        onChange={e => setBatchRemarks(e.target.value)}
+                        rows={1}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Line Items Table */}
                 <div style={{ overflowX: 'auto', background: '#ffffff', borderRadius: 8, border: '1px solid #ccfbf1' }}>
