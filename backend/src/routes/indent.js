@@ -679,6 +679,35 @@ router.put('/:id', auth, ar(async (req, res) => {
     );
 
     if (Array.isArray(items) && items.length) {
+      // IMPORTANT: We DELETE + re-INSERT all indent_items rows here (rather than UPDATE-in-place)
+      // because the item set/order can change on edit (lines added, removed, reordered) and
+      // re-inserting is the simplest way to keep indent_items in sync with the submitted `items`.
+      // However, `issued_qty`, `ack_status` and `batch_no` on indent_items are NOT part of the
+      // edit form — they are maintained separately by the issue/acknowledge flows (see the
+      // indent_items UPDATEs elsewhere in this file, e.g. the issue and ack handlers). A naive
+      // DELETE+INSERT resets those columns to their defaults/NULL for every line, silently wiping
+      // already-issued/acknowledged quantities and batch numbers on lines that already existed on
+      // the indent (e.g. when a user simply edits qty on one line of a partially-issued indent).
+      // To prevent that, we snapshot each existing line's issued_qty/ack_status/batch_no keyed by
+      // material_id BEFORE the delete, and carry them forward into the matching new row on
+      // re-insert. Do not remove this without preserving those columns by some other means.
+      const { rows: existingItemsForIssuance } = await client.query(
+        `SELECT material_id, issued_qty, ack_status, batch_no FROM indent_items WHERE indent_id=$1`, [req.params.id]
+      );
+      const issuanceByMaterial = new Map();
+      for (const row of existingItemsForIssuance) {
+        const key = String(row.material_id);
+        const prev = issuanceByMaterial.get(key);
+        // Defensive: if a material_id somehow appears more than once among existing rows,
+        // sum their issued_qty rather than losing quantity from any of them, and keep the
+        // last non-null ack_status/batch_no seen.
+        issuanceByMaterial.set(key, {
+          issued_qty: (prev?.issued_qty || 0) + (parseFloat(row.issued_qty) || 0),
+          ack_status: row.ack_status ?? prev?.ack_status ?? null,
+          batch_no: row.batch_no ?? prev?.batch_no ?? null
+        });
+      }
+
       await client.query(`DELETE FROM indent_items WHERE indent_id=$1`, [req.params.id]);
       for (const it of items) {
         const { rows: mat } = await client.query(`SELECT current_stock, unit_price, uom FROM materials WHERE id=$1`, [it.material_id]);
@@ -690,10 +719,11 @@ router.put('/:id', auth, ar(async (req, res) => {
         totalVal += lVal;
 
         const itemUom = mat[0]?.uom || it.uom || 'NOS';
+        const carried = issuanceByMaterial.get(String(it.material_id)) || {};
         await client.query(
-          `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-          [req.params.id, it.material_id, qty, itemUom, it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null]
+          `INSERT INTO indent_items (indent_id,material_id,required_qty,uom,purpose,current_stock,component_position,reason_code,unit_price,line_value,maintenance_log_id,issued_qty,ack_status,batch_no)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+          [req.params.id, it.material_id, qty, itemUom, it.purpose||'', mat[0]?.current_stock||0, it.component_position||null, it.reason_code||'Routine Replacement', price, lVal, it.maintenance_log_id ? parseInt(it.maintenance_log_id) : null, carried.issued_qty || 0, carried.ack_status || null, carried.batch_no || null]
         );
       }
       await client.query(`UPDATE indents SET total_value = $1 WHERE id = $2`, [totalVal, req.params.id]);
