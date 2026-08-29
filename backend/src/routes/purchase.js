@@ -422,20 +422,43 @@ router.put('/po/:id', auth, requireLevel(2), ar(async (req, res) => {
         };
       });
 
-      // Atomically replace items
+      // IMPORTANT: We DELETE + re-INSERT all po_items rows here (rather than UPDATE-in-place)
+      // because the item set/order can change on edit (lines added, removed, reordered) and
+      // re-inserting is the simplest way to keep po_items in sync with the submitted `items`.
+      // However, `received_qty` on po_items is NOT part of the edit form — it is maintained
+      // separately by GRN receiving (see the received_qty UPDATEs elsewhere in this file).
+      // A naive DELETE+INSERT resets received_qty to 0/NULL for every line, silently wiping
+      // already-received quantities on lines that already existed on the PO (e.g. when a user
+      // simply appends one new line to a partially-received PO). To prevent that, we snapshot
+      // each existing line's received_qty keyed by material_id BEFORE the delete, and carry it
+      // forward into the matching new row on re-insert. Do not remove this without preserving
+      // received_qty by some other means.
+      const { rows: existingItemsForReceipt } = await client.query(
+        `SELECT material_id, received_qty FROM po_items WHERE po_id=$1`, [req.params.id]
+      );
+      const receivedQtyByMaterial = new Map();
+      for (const row of existingItemsForReceipt) {
+        const key = String(row.material_id);
+        // Defensive: if a material_id somehow appears more than once among existing rows,
+        // sum their received_qty rather than losing quantity from any of them.
+        const prev = receivedQtyByMaterial.get(key) || 0;
+        receivedQtyByMaterial.set(key, prev + (parseFloat(row.received_qty) || 0));
+      }
+
       await client.query(`DELETE FROM po_items WHERE po_id=$1`, [req.params.id]);
       for (const it of preparedItems) {
+        const carriedReceivedQty = receivedQtyByMaterial.get(String(it.material_id)) || 0;
         await client.query(
           `INSERT INTO po_items (
              po_id, material_id, qty, uom, unit_price,
              discount_pct, discount_amount, other_charges, taxable_amount,
              tax_type, gst_pct, cgst_pct, sgst_pct, igst_pct,
-             cgst_amount, sgst_amount, igst_amount, total, remarks
-           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
+             cgst_amount, sgst_amount, igst_amount, total, remarks, received_qty
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
           [req.params.id, it.material_id, it.qty, it.uom||'', it.unit_price||0,
            it.discount_pct, it.discount_amount, it.other_charges, it.taxable_amount,
            it.tax_type, it.gst_pct, it.cgst_pct, it.sgst_pct, it.igst_pct,
-           it.cgst_amount, it.sgst_amount, it.igst_amount, it.total, it.remarks||null]
+           it.cgst_amount, it.sgst_amount, it.igst_amount, it.total, it.remarks||null, carriedReceivedQty]
         );
       }
     } else {
