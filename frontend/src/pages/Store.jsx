@@ -3782,7 +3782,7 @@ export default function Store({ onNavigate }) {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ background: '#0f766e', color: '#ffffff', padding: '4px 14px', borderRadius: 4, fontWeight: 800, fontSize: 13, display: 'inline-block', textTransform: 'uppercase' }}>
-                      GOODS RECEIPT NOTE (GRN)
+                      GRN IN-WORD
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
                       GRN #: {grnDisplayNum}
@@ -3802,15 +3802,11 @@ export default function Store({ onNavigate }) {
                     <div style={{ fontWeight: 800, color: '#0f766e', marginBottom: 6, textTransform: 'uppercase', fontSize: 11 }}>
                       🏢 SUPPLIER / VENDOR PARTICULAR DETAILS
                     </div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
-                      {inwardVoucher.vendorName || (inwardVoucher.remarks?.includes('Party:') ? inwardVoucher.remarks.split('Party:')[1]?.split('|')[0]?.trim() : 'Registered Vendor')}
-                    </div>
-                    {inwardVoucher.vendorCode && <div style={{ fontSize: 11, color: '#64748b' }}>Vendor Code: <code>{inwardVoucher.vendorCode}</code></div>}
-                    <div style={{ fontSize: 11, color: '#334155', marginTop: 3 }}>
-                      GSTIN: <strong>{inwardVoucher.vendorGstin || 'Unregistered / Exempt'}</strong>
+                    <div style={{ fontSize: 11, color: '#334155' }}>
+                      Supplier Name: <strong>{inwardVoucher.vendorName || (inwardVoucher.remarks?.includes('Party:') ? inwardVoucher.remarks.split('Party:')[1]?.split('|')[0]?.trim() : 'Registered Vendor')}</strong>
                     </div>
                     <div style={{ fontSize: 11, color: '#334155' }}>
-                      State of Supply: <strong>{inwardVoucher.vendorState || (isInterState ? 'Inter-State' : 'Karnataka (Code 29)')}</strong>
+                      Party Name: <strong>{inwardVoucher.partyName || inwardVoucher.vendorName || '—'}</strong>
                     </div>
                     <div style={{ fontSize: 11, color: '#334155' }}>
                       Address: <strong>{inwardVoucher.vendorAddress || '—'}</strong>
@@ -3818,8 +3814,12 @@ export default function Store({ onNavigate }) {
                     <div style={{ fontSize: 11, color: '#334155' }}>
                       Cell No: <strong>{inwardVoucher.vendorMobile || inwardVoucher.vendorPhone || '—'}</strong>
                     </div>
+                    <div style={{ fontSize: 11, color: '#334155', marginTop: 3 }}>
+                      GST No: <strong>{inwardVoucher.vendorGstin || 'Unregistered / Exempt'}</strong>
+                    </div>
+                    {inwardVoucher.vendorCode && <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Vendor Code: <code>{inwardVoucher.vendorCode}</code></div>}
                     <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                      GST Mode: <span style={{ fontWeight: 700, color: isInterState ? '#d97706' : '#0f766e' }}>{isInterState ? 'Inter-State (IGST Applicable)' : 'Intra-State (CGST + SGST Applicable)'}</span>
+                      GST Mode: <span style={{ fontWeight: 700, color: isInterState ? '#d97706' : '#0f766e' }}>{isInterState ? 'Inter-State (IGST Applicable)' : 'Intra-State (CGST + SGST Applicable)'}</span> · State of Supply: <strong>{inwardVoucher.vendorState || (isInterState ? 'Inter-State' : 'Karnataka (Code 29)')}</strong>
                     </div>
                   </div>
 
@@ -3863,66 +3863,51 @@ export default function Store({ onNavigate }) {
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                     <thead>
                       <tr style={{ background: '#f1f5f9', borderBottom: '2px solid #0f766e', color: '#0f766e', fontWeight: 800, textAlign: 'left' }}>
-                        <th style={{ padding: '8px 6px', width: 26, textAlign: 'center' }}>#</th>
-                        <th style={{ padding: '8px 6px' }}>Material Description & Specifications</th>
-                        <th style={{ padding: '8px 6px', width: 65 }}>HSN/SAC</th>
-                        <th style={{ padding: '8px 6px', width: 45, textAlign: 'center' }}>UOM</th>
-                        <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>Recv Qty</th>
+                        <th style={{ padding: '8px 6px', width: 40, textAlign: 'center' }}>S.NO</th>
+                        <th style={{ padding: '8px 6px', width: 90 }}>Item Code</th>
+                        <th style={{ padding: '8px 6px' }}>Product Name</th>
+                        <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>Qty</th>
                         <th style={{ padding: '8px 6px', width: 75, textAlign: 'right' }}>Rate/Price</th>
-                        <th style={{ padding: '8px 6px', width: 55, textAlign: 'right' }}>Disc %</th>
-                        <th style={{ padding: '8px 6px', width: 85, textAlign: 'right' }}>Taxable Val</th>
-                        {!isInterState ? (
-                          <>
-                            <th style={{ padding: '8px 6px', width: 70, textAlign: 'right' }}>CGST ({cgstPct}%)</th>
-                            <th style={{ padding: '8px 6px', width: 70, textAlign: 'right' }}>SGST ({sgstPct}%)</th>
-                          </>
-                        ) : (
-                          <th style={{ padding: '8px 6px', width: 85, textAlign: 'right' }}>IGST ({igstPct}%)</th>
-                        )}
-                        <th style={{ padding: '8px 6px', width: 95, textAlign: 'right' }}>Total Val (₹)</th>
+                        <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>Discount %</th>
+                        <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>GST %</th>
+                        <th style={{ padding: '8px 6px', width: 95, textAlign: 'right' }}>Total Amount</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                         <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>1</td>
+                        <td style={{ padding: '8px 6px' }}><code>{inwardVoucher.materialCode}</code></td>
                         <td style={{ padding: '8px 6px' }}>
                           <div style={{ fontWeight: 700, color: '#0f172a' }}>{inwardVoucher.materialName}</div>
                           <div style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 6, marginTop: 1 }}>
-                            <span>Code: <code>{inwardVoucher.materialCode}</code></span>
-                            {inwardVoucher.categoryName && <span>· Cat: {inwardVoucher.categoryName}</span>}
+                            {inwardVoucher.categoryName && <span>Cat: {inwardVoucher.categoryName}</span>}
                           </div>
                         </td>
-                        <td style={{ padding: '8px 6px', fontFamily: 'monospace' }}>{inwardVoucher.hsnCode || '8439'}</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'center', fontWeight: 600 }}>{inwardVoucher.uom}</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{qty.toFixed(3)}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{qty.toFixed(3)} {inwardVoucher.uom}</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right' }}>{discPct > 0 ? discPct.toFixed(2) : '0.00'}</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                        {!isInterState ? (
-                          <>
-                            <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                            <td style={{ padding: '8px 6px', textAlign: 'right', color: '#475569' }}>₹{sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                          </>
-                        ) : (
-                          <td style={{ padding: '8px 6px', textAlign: 'right', color: '#d97706' }}>₹{igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                        )}
+                        <td style={{ padding: '8px 6px', textAlign: 'right' }}>{isInterState ? igstPct : (cgstPct + sgstPct)}%</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 800, color: '#0f766e' }}>₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                {/* Tax Matrix Summary Box & Amount in Words */}
+                {/* Bank Details & Tax Matrix Summary Box (Bank Details left of Totals, per reference GRN format) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 14, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
-                      AMOUNT CHARGEABLE IN WORDS:
+                      🏦 Bank Details
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
-                      {numberToWords(grandTotal)}
-                    </div>
-                    <div style={{ fontSize: 10, color: '#64748b', marginTop: 8 }}>
-                      Certified that all items listed in this Goods Receipt Note have been physically verified, counted, quality inspected, and recorded in live store inventory.
+                    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '2px 10px', fontSize: 12 }}>
+                      <span style={{ color: '#64748b' }}>Bank Name:</span>
+                      <strong>{inwardVoucher.bankName || 'HDFC Bank Ltd.'}</strong>
+                      <span style={{ color: '#64748b' }}>Account Number:</span>
+                      <strong>{inwardVoucher.bankAccountNumber || '50200067891234'}</strong>
+                      <span style={{ color: '#64748b' }}>IFSC Code:</span>
+                      <strong>{inwardVoucher.bankIfsc || 'HDFC0001234'}</strong>
+                      <span style={{ color: '#64748b' }}>Branch Name:</span>
+                      <strong>{inwardVoucher.bankBranch || 'Main Branch'}</strong>
                     </div>
                   </div>
 
@@ -3938,7 +3923,7 @@ export default function Store({ onNavigate }) {
                       </div>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b' }}>Sub Total (Taxable):</span>
+                      <span style={{ color: '#64748b' }}>Sub Total:</span>
                       <strong>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
                     </div>
                     {!isInterState ? (
@@ -3965,20 +3950,16 @@ export default function Store({ onNavigate }) {
                   </div>
                 </div>
 
-                {/* Bank Details (per reference GRN format) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 11 }}>
-                  <div style={{ fontWeight: 800, color: '#0f766e', marginBottom: 4, textTransform: 'uppercase', fontSize: 10.5 }}>
-                    🏦 Bank Details
+                {/* Amount Chargeable in Words (below Bank Details / Totals block, per reference GRN format) */}
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>
+                    AMOUNT CHARGEABLE IN WORDS:
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto 1fr)', gap: '2px 10px' }}>
-                    <span style={{ color: '#64748b' }}>Bank Name:</span>
-                    <strong>{inwardVoucher.bankName || 'HDFC Bank Ltd.'}</strong>
-                    <span style={{ color: '#64748b' }}>Account Number:</span>
-                    <strong>{inwardVoucher.bankAccountNumber || '50200067891234'}</strong>
-                    <span style={{ color: '#64748b' }}>IFSC Code:</span>
-                    <strong>{inwardVoucher.bankIfsc || 'HDFC0001234'}</strong>
-                    <span style={{ color: '#64748b' }}>Branch Name:</span>
-                    <strong>{inwardVoucher.bankBranch || 'Main Branch'}</strong>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
+                    {numberToWords(grandTotal)}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748b', marginTop: 8 }}>
+                    Certified that all items listed in this Goods Receipt Note have been physically verified, counted, quality inspected, and recorded in live store inventory.
                   </div>
                 </div>
 
