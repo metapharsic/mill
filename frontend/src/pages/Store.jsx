@@ -3709,7 +3709,10 @@ export default function Store({ onNavigate }) {
       {inwardVoucher && (() => {
         const qty = Number(inwardVoucher.in_qty || 0)
         const price = Number(inwardVoucher.unit_price || 0)
-        const taxable = qty * price
+        const discPct = Number(inwardVoucher.discount_pct || 0)
+        const grossValue = qty * price
+        const discAmt = Number(inwardVoucher.discount_amount || (grossValue * discPct) / 100)
+        const taxable = Math.max(0, grossValue - discAmt)
         const gstPct = Number(inwardVoucher.gst_pct ?? 18)
 
         // Determine Interstate vs Intrastate from Vendor State / GSTIN (Company State Code: 29)
@@ -3809,6 +3812,12 @@ export default function Store({ onNavigate }) {
                     <div style={{ fontSize: 11, color: '#334155' }}>
                       State of Supply: <strong>{inwardVoucher.vendorState || (isInterState ? 'Inter-State' : 'Karnataka (Code 29)')}</strong>
                     </div>
+                    <div style={{ fontSize: 11, color: '#334155' }}>
+                      Address: <strong>{inwardVoucher.vendorAddress || '—'}</strong>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#334155' }}>
+                      Cell No: <strong>{inwardVoucher.vendorMobile || inwardVoucher.vendorPhone || '—'}</strong>
+                    </div>
                     <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
                       GST Mode: <span style={{ fontWeight: 700, color: isInterState ? '#d97706' : '#0f766e' }}>{isInterState ? 'Inter-State (IGST Applicable)' : 'Intra-State (CGST + SGST Applicable)'}</span>
                     </div>
@@ -3819,9 +3828,24 @@ export default function Store({ onNavigate }) {
                       📋 LOGISTICS & INSPECTION REFERENCES
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 4 }}>
-                      <span style={{ color: '#64748b' }}>PO Reference:</span>
-                      <strong>{inwardVoucher.reference_id || 'PO-REGULAR'}</strong>
-                      
+                      <span style={{ color: '#64748b' }}>P.O. No:</span>
+                      <strong>{inwardVoucher.poNumber || inwardVoucher.po_number || inwardVoucher.reference_id || '—'}</strong>
+
+                      <span style={{ color: '#64748b' }}>P.O. Date:</span>
+                      <strong>{(inwardVoucher.poDate || inwardVoucher.po_date) ? new Date(inwardVoucher.poDate || inwardVoucher.po_date).toLocaleDateString('en-IN') : '—'}</strong>
+
+                      <span style={{ color: '#64748b' }}>P.R. No:</span>
+                      <strong>{inwardVoucher.prNumber || inwardVoucher.pr_number || '—'}</strong>
+
+                      <span style={{ color: '#64748b' }}>P.R. Date:</span>
+                      <strong>{(inwardVoucher.prDate || inwardVoucher.pr_date) ? new Date(inwardVoucher.prDate || inwardVoucher.pr_date).toLocaleDateString('en-IN') : '—'}</strong>
+
+                      <span style={{ color: '#64748b' }}>Department:</span>
+                      <strong>{inwardVoucher.department || inwardVoucher.departmentName || '—'}</strong>
+
+                      <span style={{ color: '#64748b' }}>Payment Period:</span>
+                      <strong>{inwardVoucher.paymentPeriod || inwardVoucher.payment_period || inwardVoucher.paymentTerms || '—'}</strong>
+
                       <span style={{ color: '#64748b' }}>Storage Bin/Rack:</span>
                       <strong>{inwardVoucher.bin_location || 'Main Store Floor (Rack M-1)'}</strong>
                       
@@ -3844,7 +3868,8 @@ export default function Store({ onNavigate }) {
                         <th style={{ padding: '8px 6px', width: 65 }}>HSN/SAC</th>
                         <th style={{ padding: '8px 6px', width: 45, textAlign: 'center' }}>UOM</th>
                         <th style={{ padding: '8px 6px', width: 65, textAlign: 'right' }}>Recv Qty</th>
-                        <th style={{ padding: '8px 6px', width: 75, textAlign: 'right' }}>Unit Rate</th>
+                        <th style={{ padding: '8px 6px', width: 75, textAlign: 'right' }}>Rate/Price</th>
+                        <th style={{ padding: '8px 6px', width: 55, textAlign: 'right' }}>Disc %</th>
                         <th style={{ padding: '8px 6px', width: 85, textAlign: 'right' }}>Taxable Val</th>
                         {!isInterState ? (
                           <>
@@ -3871,6 +3896,7 @@ export default function Store({ onNavigate }) {
                         <td style={{ padding: '8px 6px', textAlign: 'center', fontWeight: 600 }}>{inwardVoucher.uom}</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700, color: '#16a34a' }}>{qty.toFixed(3)}</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right' }}>{discPct > 0 ? discPct.toFixed(2) : '0.00'}</td>
                         <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                         {!isInterState ? (
                           <>
@@ -3902,18 +3928,28 @@ export default function Store({ onNavigate }) {
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b' }}>Taxable Subtotal:</span>
+                      <span style={{ color: '#64748b' }}>Sub Total:</span>
+                      <strong>₹{grossValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+                    </div>
+                    {discAmt > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#b45309' }}>Discount:</span>
+                        <span style={{ color: '#b45309' }}>– ₹{discAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#64748b' }}>Sub Total (Taxable):</span>
                       <strong>₹{taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
                     </div>
                     {!isInterState ? (
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#64748b' }}>CGST ({cgstPct}%):</span>
-                          <span>₹{cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span style={{ color: '#64748b' }}>SGST ({sgstPct}%):</span>
                           <span>₹{sgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: '#64748b' }}>CGST ({cgstPct}%):</span>
+                          <span>₹{cgstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                         </div>
                       </>
                     ) : (
@@ -3922,14 +3958,27 @@ export default function Store({ onNavigate }) {
                         <span style={{ color: '#d97706', fontWeight: 600 }}>₹{igstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       </div>
                     )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #cbd5e1', paddingTop: 4 }}>
-                      <span style={{ color: '#64748b' }}>Total GST Tax:</span>
-                      <strong>₹{totalGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
-                    </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #0f766e', paddingTop: 4, fontSize: 14 }}>
-                      <span style={{ fontWeight: 800, color: '#0f766e' }}>Grand Total Valuation:</span>
+                      <span style={{ fontWeight: 800, color: '#0f766e' }}>Total Purchase Amount:</span>
                       <span style={{ fontWeight: 900, color: '#0f766e' }}>₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Bank Details (per reference GRN format) */}
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 11 }}>
+                  <div style={{ fontWeight: 800, color: '#0f766e', marginBottom: 4, textTransform: 'uppercase', fontSize: 10.5 }}>
+                    🏦 Bank Details
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto 1fr)', gap: '2px 10px' }}>
+                    <span style={{ color: '#64748b' }}>Bank Name:</span>
+                    <strong>{inwardVoucher.bankName || 'HDFC Bank Ltd.'}</strong>
+                    <span style={{ color: '#64748b' }}>Account Number:</span>
+                    <strong>{inwardVoucher.bankAccountNumber || '50200067891234'}</strong>
+                    <span style={{ color: '#64748b' }}>IFSC Code:</span>
+                    <strong>{inwardVoucher.bankIfsc || 'HDFC0001234'}</strong>
+                    <span style={{ color: '#64748b' }}>Branch Name:</span>
+                    <strong>{inwardVoucher.bankBranch || 'Main Branch'}</strong>
                   </div>
                 </div>
 
