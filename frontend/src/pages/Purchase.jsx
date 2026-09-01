@@ -470,7 +470,12 @@ export default function Purchase() {
       setCashErr('Supplier / Vendor Name is required')
       return
     }
-    const validItems = cashForm.items.filter(it => it.material_id && parseFloat(it.qty) > 0)
+    const validItems = cashForm.items
+      .filter(it => it.material_id && parseFloat(it.qty) > 0)
+      .map(it => ({
+        ...it,
+        gst_pct: (it.gst_pct !== undefined && it.gst_pct !== null && it.gst_pct !== '') ? parseFloat(it.gst_pct) : 18
+      }))
     if (!validItems.length) {
       setCashErr('Please add at least one material with quantity > 0')
       return
@@ -667,6 +672,7 @@ export default function Purchase() {
     ]
 
     po.items.forEach((it, idx) => {
+      const gPct = it.gst_pct != null && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18
       const row = [
         idx + 1,
         `"${it.materialCode || it.material_id || ''}"`,
@@ -675,8 +681,8 @@ export default function Purchase() {
         parseFloat(it.qty || 0).toFixed(3),
         `"${it.uom || 'NOS'}"`,
         parseFloat(it.unit_price || 0).toFixed(2),
-        it.gst_pct || 18,
-        parseFloat(it.total || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + (parseFloat(it.gst_pct || 18)/100)))).toFixed(2)
+        gPct,
+        parseFloat(it.total || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + (gPct / 100)))).toFixed(2)
       ]
       csvRows.push(row.join(','))
     })
@@ -1384,8 +1390,8 @@ export default function Purchase() {
                 <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
                 <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
                 <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{it.gst_pct || 18}%</td>
-                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(it.line_total || it.lineTotal || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * 1.18)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{it.gst_pct != null && it.gst_pct !== '' ? it.gst_pct : 18}%</td>
+                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(it.line_total || it.lineTotal || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + ((it.gst_pct != null && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18) / 100)))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
@@ -4176,7 +4182,8 @@ export default function Purchase() {
       {cashModal && (() => {
         const isInter = cashForm.vendor_gstin && !cashForm.vendor_gstin.startsWith('29')
         const calcCpLine = it => {
-          const q = parseFloat(it.qty) || 0, p = parseFloat(it.unit_price) || 0, g = parseFloat(it.gst_pct) || 18
+          const q = parseFloat(it.qty) || 0, p = parseFloat(it.unit_price) || 0
+          const g = (it.gst_pct !== undefined && it.gst_pct !== null && it.gst_pct !== '') ? parseFloat(it.gst_pct) : 18
           const base = q * p
           const tax = (base * g) / 100
           const cgst = isInter ? 0 : tax / 2

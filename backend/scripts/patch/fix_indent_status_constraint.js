@@ -43,22 +43,31 @@ async function fix() {
     `);
     console.log(`Migrated ${m3} rows from Cancelled → Rejected`);
 
-    // Now add the new constraint
+    // Now add the widened constraint supporting all runtime fulfillment modes and approval states
     await client.query(`
       ALTER TABLE indents
       ADD CONSTRAINT indents_status_check
       CHECK (status IN (
         'Draft',
         'Submitted',
+        'L1 Approved',
+        'L2 Approved',
+        'L3 Approved',
+        'Approved',
+        'PO Created',
+        'DC Generated',
+        'Cash Purchased',
+        'Partially Issued',
         'Issued',
         'Closed',
-        'Rejected'
+        'Rejected',
+        'Cancelled'
       ));
     `);
-    console.log('Added new constraint');
+    console.log('Added widened constraint');
 
     await client.query('COMMIT');
-    console.log('\n✅ Done — indents_status_check now allows: Draft, Submitted, Issued, Closed, Rejected');
+    console.log('\n✅ Done — indents_status_check now allows all runtime statuses');
   } catch (e) {
     await client.query('ROLLBACK');
     console.error('FAILED:', e.message);
