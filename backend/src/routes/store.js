@@ -1789,10 +1789,16 @@ router.get('/vendors/:vendorId/grn-materials', requireAuth, ar(async (req, res) 
       m.name AS "materialName",
       m.code AS "materialCode",
       m.uom,
+      m.hsn_code AS "hsnCode",
       COALESCE(m.current_stock, 0) AS "currentStock",
       gi.unit_price AS "unitPrice",
       gi.received_qty AS "receivedQty",
       gi.batch_number AS "batchNumber",
+      COALESCE(gi.gst_pct, 18) AS "gstPct",
+      gi.tax_type AS "taxType",
+      gi.cgst_pct AS "cgstPct",
+      gi.sgst_pct AS "sgstPct",
+      gi.igst_pct AS "igstPct",
       g.id AS "grnId",
       g.grn_number AS "grnNumber",
       g.date AS "grnDate",
@@ -1826,17 +1832,20 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
       vals.push('transfer');
       where.push(`sl.transaction_type = $${vals.length}`);
     } else if (outward_type === 'issue') {
-      where.push(`sl.transaction_type IN ('issue', 'out')`);
+      vals.push('issue');
+      where.push(`sl.transaction_type = $${vals.length}`);
     }
   }
-  if (store_type) {
-    if (store_type === 'mechanical') {
-      where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
-    } else if (store_type === 'electrical') {
-      where.push(`(mc.type = 'Electrical' OR mc.name = 'Electrical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'ELEC' OR name = 'Electrical'))`);
-    } else if (store_type === 'chemical' || store_type === 'raw' || store_type === 'rawmaterial') {
-      where.push(`(mc.name ILIKE '%chemical%' OR mc.type = 'Raw Material' OR mc.name ILIKE '%raw%' OR mc.name ILIKE '%pulp%' OR mc.name ILIKE '%waste%')`);
-    } else if (store_type === 'consumable') {
+  if (department_id) {
+    vals.push(parseInt(department_id));
+    where.push(`m.section_id = $${vals.length}`);
+  }
+  if (store_type && store_type !== 'all') {
+    if (store_type === 'Engineering') {
+      where.push(`(mc.type = 'Spare' OR mc.name ILIKE '%Mechanical%' OR mc.name ILIKE '%Electrical%' OR mc.name ILIKE '%Civil%')`);
+    } else if (store_type === 'Raw Material') {
+      where.push(`(mc.type = 'Raw Material' OR mc.name IN ('Waste Paper', 'Imported Pulp', 'Chemicals', 'Dyes'))`);
+    } else if (store_type === 'General') {
       where.push(`(mc.type = 'Consumable' OR mc.name IN ('General', 'Stationary', 'Clothing', 'Packing'))`);
     }
   }
@@ -1896,10 +1905,10 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
   });
 }));
 
-// POST /api/store/outward — Fast Outward Issue: 1. Job Work | 2. Return to Party | 3. Inter Store Transfer | 4. Dept Issue (Multi-Item Batch Support)
+// POST /api/store/outward — Fast Outward Issue: 1. Job Work | 2. Return to Party | 3. Inter Store Transfer | 4. Dept Issue (Multi-Item Batch Support with Sub Amount & GST Tax Calculation)
 router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
   const {
-    material_id, out_qty, unit_price, department_id, machine_id, position_id, section_id,
+    material_id, out_qty, unit_price, gst_pct, department_id, machine_id, position_id, section_id,
     vendor_id, outward_type = 'issue', issued_to, purpose, serial_number, batch_number,
     reference_type, reference_id, remarks, date, grn_id, items
   } = req.body;
@@ -1912,6 +1921,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       material_id,
       out_qty,
       unit_price,
+      gst_pct: gst_pct !== undefined ? gst_pct : 18,
       machine_id: machine_id || null,
       position_id: position_id || null,
       section_id: section_id || null,
@@ -1947,13 +1957,24 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         ? parseFloat(item.unit_price)
         : parseFloat(mat.unit_price || 0);
 
+      const taxableAmount = qty * price;
+      const itemGstPct = (item.gst_pct !== undefined && item.gst_pct !== null && item.gst_pct !== '' && !isNaN(parseFloat(item.gst_pct)))
+        ? parseFloat(item.gst_pct)
+        : 18.0;
+      const taxAmount = (taxableAmount * itemGstPct) / 100.0;
+      const totalAmount = taxableAmount + taxAmount;
+
       validatedItems.push({
         ...item,
         mat,
         curStock,
         qty,
         price,
-        totalVal: qty * price
+        gstPct: itemGstPct,
+        taxableAmount,
+        taxAmount,
+        totalAmount,
+        totalVal: taxableAmount
       });
     }
 
@@ -1967,7 +1988,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     let vendorName = '';
     const vId = vendor_id ? parseInt(vendor_id) : null;
     if (vId) {
-      const { rows: [ven] } = await client.query('SELECT name, code FROM vendors WHERE id = $1', [vId]);
+      const { rows: [ven] } = await client.query('SELECT name, code, gstin, state FROM vendors WHERE id = $1', [vId]);
       if (ven) vendorName = ven.name;
     }
 
@@ -1997,7 +2018,11 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
     const matSummaryText = validatedItems.map(vi => `${vi.qty} ${vi.mat.uom} of ${vi.mat.name} (${vi.mat.code})`).join(', ');
 
-    // 4. Automatic Gate Pass provisioning for Job Work & RTV (Bundled for batch)
+    const totalSubAmount = validatedItems.reduce((sum, it) => sum + it.taxableAmount, 0);
+    const totalTaxAmount = validatedItems.reduce((sum, it) => sum + it.taxAmount, 0);
+    const totalDebitNoteAmount = totalSubAmount + totalTaxAmount;
+
+    // 4. Automatic Gate Pass provisioning for Job Work & RTV (Bundled for batch with Sub & Tax Breakdown)
     if (outward_type === 'job_work') {
       await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-jw-${stamp}`]);
       const { rows: [seq] } = await client.query(`SELECT COUNT(*)+1 AS n FROM gate_passes WHERE created_at::date = CURRENT_DATE`);
@@ -2016,7 +2041,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       `, [
         gpNum,
         purpose || 'Material Outward for Job Work / Outside Repair',
-        `Job Work (${validatedItems.length} items): ${matSummaryText}`,
+        `Job Work (${validatedItems.length} items · Val: ₹${totalSubAmount.toFixed(2)}): ${matSummaryText}`,
         vendorName || 'Outside Job Worker',
         req.user.id,
         remarks || `Job work outward dispatched by ${req.user.name || 'Store'}`,
@@ -2042,10 +2067,10 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       `, [
         gpNum,
         purpose || 'Return to Vendor (RTV)',
-        `RTV Return (${validatedItems.length} items): ${matSummaryText}`,
+        `RTV Return (${validatedItems.length} items | Sub: ₹${totalSubAmount.toFixed(2)} + Tax: ₹${totalTaxAmount.toFixed(2)} = Debit: ₹${totalDebitNoteAmount.toFixed(2)}): ${matSummaryText}`,
         vendorName || 'Supplier / Vendor',
         req.user.id,
-        remarks || `Return to party processed by ${req.user.name || 'Store'}`,
+        remarks || `Return to party processed with Debit Note by ${req.user.name || 'Store'}`,
         vId
       ]);
       createdGatePass = gp;
@@ -2062,7 +2087,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     const txnDate = date ? new Date(date) : new Date();
     const createdLedgerRows = [];
 
-    // 5. Deduct stock & create ledger records for each item
+    // 5. Deduct stock & create ledger records for each item (recording Sub Amount and Tax Amount)
     for (const vi of validatedItems) {
       const newStock = vi.curStock - vi.qty;
       await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, vi.material_id]);
@@ -2074,10 +2099,15 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         if (mach) itemMachineName = mach.name || mach.code;
       }
 
+      const fiscalDetail = outward_type === 'return_to_vendor'
+        ? `Sub: ₹${vi.taxableAmount.toFixed(2)} | GST (${vi.gstPct}%): ₹${vi.taxAmount.toFixed(2)} | Debit Total: ₹${vi.totalAmount.toFixed(2)}`
+        : null;
+
       const remarkFull = [
         prefixTag,
         vendorName ? `Party: ${vendorName}` : null,
         generatedRef && !refIdNum ? `Ref: ${generatedRef}` : null,
+        fiscalDetail,
         deptName ? `Dept: ${deptName}` : null,
         itemMachineName ? `M/S: ${itemMachineName}` : null,
         issued_to ? `To: ${issued_to}` : null,
@@ -2108,7 +2138,11 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         materialName: vi.mat.name,
         materialCode: vi.mat.code,
         uom: vi.mat.uom,
-        newStock
+        newStock,
+        taxableAmount: vi.taxableAmount,
+        gstPct: vi.gstPct,
+        taxAmount: vi.taxAmount,
+        totalAmount: vi.totalAmount
       });
 
       // Serialized asset tracking if applicable
@@ -2149,7 +2183,21 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         action: 'store.outward',
         module: 'store',
         recordId: ledger.id,
-        newData: { material_id: vi.material_id, qty: vi.qty, price: vi.price, newStock, outward_type, vendor_id: vId, department_id, machine_id: mId, issued_to, ref: generatedRef },
+        newData: {
+          material_id: vi.material_id,
+          qty: vi.qty,
+          price: vi.price,
+          taxableAmount: vi.taxableAmount,
+          taxAmount: vi.taxAmount,
+          totalAmount: vi.totalAmount,
+          newStock,
+          outward_type,
+          vendor_id: vId,
+          department_id,
+          machine_id: mId,
+          issued_to,
+          ref: generatedRef
+        },
         ip: req.ip
       });
     }
@@ -2162,9 +2210,11 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
 
     res.json({
       success: true,
-      message: `Outward issue of ${createdLedgerRows.length} item(s) (${totalBatchQty.toFixed(2)} total qty) recorded successfully (${prefixTag}).`,
-      data: {
-        records: createdLedgerRows,
+      message: outward_type === 'return_to_vendor'
+        ? `RTV Debit Note processed (Sub Total: ₹${totalSubAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} + Tax: ₹${totalTaxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} = Debit Total: ₹${totalDebitNoteAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`
+        : `Outward recorded successfully (${createdLedgerRows.length} item(s) processed)`,
+      data: createdLedgerRows,
+      summary: {
         itemCount: createdLedgerRows.length,
         totalQty: totalBatchQty,
         totalValue: totalBatchVal,

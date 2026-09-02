@@ -117,7 +117,7 @@ async function runTests() {
     assert(gpJW.gp_number.startsWith('GP-JW-'), `Bundled Returnable Gate Pass generated: ${gpJW.gp_number}`);
 
     // ------------------------------------------------------------------------
-    console.log('\n--- 2. Testing WORKFLOW 2: MULTI-ITEM RETURN TO PARTY (RTV) ---');
+    console.log('\n--- 2. Testing WORKFLOW 2: MULTI-ITEM RETURN TO PARTY (RTV) & DEBIT NOTE (SUB + TAX) ---');
     // ------------------------------------------------------------------------
     const { rows: [testGrn] } = await client.query(`
       INSERT INTO grn (grn_number, date, vendor_id, status, remarks)
@@ -126,15 +126,15 @@ async function runTests() {
     `, [vendor.id]);
 
     await client.query(`
-      INSERT INTO grn_items (grn_id, material_id, received_qty, unit_price, uom)
+      INSERT INTO grn_items (grn_id, material_id, received_qty, unit_price, gst_pct, uom)
       VALUES 
-        ($1, $2, 10, 1200, 'Nos'),
-        ($1, $3, 5, 8000, 'Nos')
+        ($1, $2, 10, 1200, 18, 'Nos'),
+        ($1, $3, 5, 8000, 18, 'Nos')
     `, [testGrn.id, testMaterials[0].id, testMaterials[2].id]);
 
     const rtvItems = [
-      { material_id: testMaterials[0].id, out_qty: 2, unit_price: 1200, remarks: 'QC hardness fail' },
-      { material_id: testMaterials[2].id, out_qty: 1, unit_price: 8000, remarks: 'Defective blade crack' }
+      { material_id: testMaterials[0].id, out_qty: 2, unit_price: 1200, gst_pct: 18, remarks: 'QC hardness fail' },
+      { material_id: testMaterials[2].id, out_qty: 1, unit_price: 8000, gst_pct: 18, remarks: 'Defective blade crack' }
     ];
 
     await client.query('BEGIN');
@@ -145,12 +145,34 @@ async function runTests() {
       const reqQty = parseFloat(it.out_qty);
       const newStock = curStock - reqQty;
       await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, it.material_id]);
-      lockedRTV.push({ ...it, mat: m, curStock, newStock, totalVal: reqQty * it.unit_price });
+
+      const subAmt = reqQty * it.unit_price;
+      const taxAmt = (subAmt * it.gst_pct) / 100;
+      const totalDebitAmt = subAmt + taxAmt;
+
+      lockedRTV.push({
+        ...it,
+        mat: m,
+        curStock,
+        newStock,
+        subAmt,
+        taxAmt,
+        totalDebitAmt,
+        totalVal: subAmt
+      });
     }
+
+    const totalRtvSub = lockedRTV.reduce((s, it) => s + it.subAmt, 0);
+    const totalRtvTax = lockedRTV.reduce((s, it) => s + it.taxAmt, 0);
+    const totalRtvDebit = totalRtvSub + totalRtvTax;
+
+    assert(totalRtvSub === (2 * 1200 + 1 * 8000), `Total Sub Amount (Taxable) calculated correctly: ₹${totalRtvSub} (2400 + 8000)`);
+    assert(totalRtvTax === (10400 * 0.18), `Total GST Tax Amount (18%) calculated correctly: ₹${totalRtvTax} (₹1872)`);
+    assert(totalRtvDebit === 12272, `Total Gross Debit Note calculated correctly: ₹${totalRtvDebit} (₹10400 Sub + ₹1872 Tax)`);
 
     const seqRTV = await client.query(`SELECT COUNT(*)+1 AS n FROM gate_passes WHERE created_at::date = CURRENT_DATE`);
     const gpNumRTV = `GP-RTV-${stamp}-${String(seqRTV.rows[0].n).padStart(4, '0')}`;
-    const matSummaryRTV = lockedRTV.map(l => `${l.out_qty} ${l.mat.uom} of ${l.mat.name}`).join(', ');
+    const matSummaryRTV = lockedRTV.map(l => `${l.out_qty} ${l.mat.uom} of ${l.mat.name} (Sub: ₹${l.subAmt} + Tax: ₹${l.taxAmt})`).join(', ');
 
     const { rows: [gpRTV] } = await client.query(`
       INSERT INTO gate_passes (
@@ -162,16 +184,16 @@ async function runTests() {
         $2, 'MK Paper Mill', $3, NOW(), $4, 'Multi-item QC reject batch',
         $5, 'Closed'
       ) RETURNING id, gp_number
-    `, [gpNumRTV, `RTV (2 items): ${matSummaryRTV}`, vendor.name, user.id, vendor.id]);
+    `, [gpNumRTV, `RTV (2 items | Sub: ₹${totalRtvSub} + Tax: ₹${totalRtvTax} = Debit: ₹${totalRtvDebit}): ${matSummaryRTV}`, vendor.name, user.id, vendor.id]);
 
     for (const l of lockedRTV) {
-      const remark = `[Return to Party] | Party: ${vendor.name} | Ref: ${testGrn.grn_number} | Note: ${l.remarks}`;
+      const remark = `[Return to Party] | Party: ${vendor.name} | Ref: ${testGrn.grn_number} | Sub: ₹${l.subAmt.toFixed(2)} | GST (${l.gst_pct}%): ₹${l.taxAmt.toFixed(2)} | Debit Total: ₹${l.totalDebitAmt.toFixed(2)} | Note: ${l.remarks}`;
       await client.query(`
         INSERT INTO stock_ledger (
           material_id, date, transaction_type, reference_type, reference_id,
           vendor_id, in_qty, out_qty, balance, unit_price, value, remarks, created_by
         ) VALUES ($1, CURRENT_DATE, 'return_to_vendor', 'RTV', NULL, $2, 0, $3, $4, $5, $6, $7, $8)
-      `, [l.material_id, vendor.id, l.out_qty, l.newStock, l.unit_price, l.totalVal, remark, user.id]);
+      `, [l.material_id, vendor.id, l.out_qty, l.newStock, l.unit_price, l.subAmt, remark, user.id]);
     }
     await client.query('COMMIT');
 
@@ -179,7 +201,7 @@ async function runTests() {
     const { rows: [mat3AfterRTV] } = await client.query('SELECT current_stock FROM materials WHERE id = $1', [testMaterials[2].id]);
     assert(parseFloat(mat1AfterRTV.current_stock) === 44, `Material 1 stock deducted from 46 to 44 Nos`);
     assert(parseFloat(mat3AfterRTV.current_stock) === 19, `Material 3 stock deducted from 20 to 19 Nos`);
-    assert(gpRTV.gp_number.startsWith('GP-RTV-'), `Bundled RTV Gate Pass generated: ${gpRTV.gp_number}`);
+    assert(gpRTV.gp_number.startsWith('GP-RTV-'), `Bundled RTV Gate Pass generated with Debit Note financials: ${gpRTV.gp_number}`);
 
     // ------------------------------------------------------------------------
     console.log('\n--- 3. Testing WORKFLOW 3: MULTI-ITEM INTER STORE TRANSFER (STO) ---');

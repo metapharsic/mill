@@ -245,6 +245,7 @@ export default function Store({ onNavigate }) {
     material_id: '',
     out_qty: '',
     unit_price: '',
+    gst_pct: '18',
     machine_id: '',
     position_id: '',
     section_id: '',
@@ -264,6 +265,7 @@ export default function Store({ onNavigate }) {
     material_id: '',
     out_qty: '',
     unit_price: '',
+    gst_pct: '18',
     department_id: '',
     machine_id: '',
     section_id: '',
@@ -1537,6 +1539,7 @@ export default function Store({ onNavigate }) {
         material_id: it.material_id,
         out_qty: Number(it.out_qty),
         unit_price: it.unit_price ? Number(it.unit_price) : undefined,
+        gst_pct: it.gst_pct !== undefined && it.gst_pct !== '' ? Number(it.gst_pct) : 18,
         machine_id: it.machine_id || outwardForm.machine_id || undefined,
         position_id: it.position_id || outwardForm.position_id || undefined,
         section_id: it.section_id || outwardForm.section_id || undefined,
@@ -4203,6 +4206,7 @@ export default function Store({ onNavigate }) {
                                       ...newItems[idx],
                                       material_id: v,
                                       unit_price: grnIt?.unitPrice || matObj?.unit_price || '',
+                                      gst_pct: String(grnIt?.gstPct || 18),
                                       grn_id: grnIt?.grnId || '',
                                       reference_id: grnIt?.grnNumber || '',
                                       batch_number: grnIt?.batchNumber || '',
@@ -4219,8 +4223,8 @@ export default function Store({ onNavigate }) {
                                     value: String(g.material_id),
                                     label: `${g.materialName} (${g.materialCode})`,
                                     code: g.grnNumber,
-                                    subtext: `GRN: ${g.grnNumber} (${new Date(g.grnDate).toLocaleDateString('en-IN')}) · Rec: ${g.receivedQty} ${g.uom} @ ₹${g.unitPrice} · Stock: ${g.currentStock}`,
-                                    badge: `GRN: ₹${g.unitPrice}`
+                                    subtext: `GRN: ${g.grnNumber} (${new Date(g.grnDate).toLocaleDateString('en-IN')}) · Rec: ${g.receivedQty} ${g.uom} @ ₹${g.unitPrice} · GST: ${g.gstPct || 18}% · Stock: ${g.currentStock}`,
+                                    badge: `GRN: ₹${g.unitPrice} + ${g.gstPct || 18}% Tax`
                                   })),
                                   ...mats.filter(m => !vendorGrnMaterials.some(g => String(g.material_id) === String(m.id))).map(m => ({
                                     value: String(m.id),
@@ -4249,44 +4253,86 @@ export default function Store({ onNavigate }) {
 
                           {item.selectedGrnItem && (
                             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '4px 8px', borderRadius: 4, fontSize: 11, color: '#991b1b', margin: '4px 0', display: 'flex', justifyContent: 'space-between' }}>
-                              <span>📄 GRN: <b>{item.selectedGrnItem.grnNumber}</b> ({new Date(item.selectedGrnItem.grnDate).toLocaleDateString('en-IN')})</span>
-                              <span>Inward: <b>{item.selectedGrnItem.receivedQty} {item.selectedGrnItem.uom}</b> · Store Stock: <b>{item.selectedGrnItem.currentStock} {item.selectedGrnItem.uom}</b></span>
+                              <span>📄 GRN: <b>{item.selectedGrnItem.grnNumber}</b> ({new Date(item.selectedGrnItem.grnDate).toLocaleDateString('en-IN')}) · Inward: <b>{item.selectedGrnItem.receivedQty} {item.selectedGrnItem.uom}</b></span>
+                              <span>Inward Rate: <b>₹{item.selectedGrnItem.unitPrice}</b> · GST: <b>{item.selectedGrnItem.gstPct || 18}%</b></span>
                             </div>
                           )}
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: 8, marginTop: 6 }}>
-                            <div>
-                              <label style={{ ...S.label, fontSize: 11 }}>Return Qty *</label>
-                              <input
-                                type="number"
-                                step="0.001"
-                                min="0.001"
-                                max={itemMat ? curStock : 999999}
-                                style={S.input}
-                                placeholder="0.000"
-                                value={item.out_qty}
-                                onChange={e => updateOutwardItem(idx, 'out_qty', e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label style={{ ...S.label, fontSize: 11 }}>Debit Rate (₹ / Unit)</label>
-                              <input
-                                type="number"
-                                step="0.01"
-                                style={S.input}
-                                placeholder="Debit Price"
-                                value={item.unit_price}
-                                onChange={e => updateOutwardItem(idx, 'unit_price', e.target.value)}
-                              />
-                            </div>
-                            <div>
-                              <label style={{ ...S.label, fontSize: 11 }}>Debit Valuation</label>
-                              <div style={{ padding: '7px 8px', background: '#fee2e2', borderRadius: 6, fontWeight: 700, color: '#991b1b', fontSize: 12, textAlign: 'right' }}>
-                                ₹{lineVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          {(() => {
+                            const itemQty = Number(item.out_qty || 0)
+                            const itemRate = Number(item.unit_price || 0)
+                            const itemGst = Number(item.gst_pct !== undefined && item.gst_pct !== '' ? item.gst_pct : 18)
+                            const subAmt = itemQty * itemRate
+                            const taxAmt = (subAmt * itemGst) / 100
+                            const totalDebit = subAmt + taxAmt
+
+                            return (
+                              <div style={{ marginTop: 6, background: '#fff', border: '1px solid #fed7aa', borderRadius: 6, padding: '8px 10px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>Return Qty *</label>
+                                    <input
+                                      type="number"
+                                      step="0.001"
+                                      min="0.001"
+                                      max={itemMat ? curStock : 999999}
+                                      style={S.input}
+                                      placeholder="0.000"
+                                      value={item.out_qty}
+                                      onChange={e => updateOutwardItem(idx, 'out_qty', e.target.value)}
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>Rate (₹ / Unit)</label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      style={S.input}
+                                      placeholder="Debit Price"
+                                      value={item.unit_price}
+                                      onChange={e => updateOutwardItem(idx, 'unit_price', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>Sub Amount (Taxable)</label>
+                                    <div style={{ padding: '7px 8px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, fontWeight: 700, color: '#334155', fontSize: 12, textAlign: 'right' }}>
+                                      ₹{subAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.2fr', gap: 8, marginTop: 6, paddingTop: 6, borderTop: '1px dashed #fed7aa', alignItems: 'center' }}>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>GST Tax Rate (%)</label>
+                                    <select
+                                      style={{ ...S.input, padding: '4px 6px', fontSize: 11 }}
+                                      value={String(item.gst_pct !== undefined && item.gst_pct !== '' ? item.gst_pct : '18')}
+                                      onChange={e => updateOutwardItem(idx, 'gst_pct', e.target.value)}
+                                    >
+                                      <option value="0">0% (Nil / Exempt)</option>
+                                      <option value="5">5% (CGST 2.5% + SGST 2.5%)</option>
+                                      <option value="12">12% (CGST 6% + SGST 6%)</option>
+                                      <option value="18">18% (CGST 9% + SGST 9%)</option>
+                                      <option value="28">28% (CGST 14% + SGST 14%)</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>Tax Amount (+ GST)</label>
+                                    <div style={{ padding: '6px 8px', background: '#fef3c7', borderRadius: 6, fontWeight: 700, color: '#92400e', fontSize: 11, textAlign: 'right' }}>
+                                      + ₹{taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label style={{ ...S.label, fontSize: 11 }}>Total Debit Amount</label>
+                                    <div style={{ padding: '6px 8px', background: '#fee2e2', borderRadius: 6, fontWeight: 800, color: '#991b1b', fontSize: 12, textAlign: 'right' }}>
+                                      = ₹{totalDebit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
+                            )
+                          })()}
                         </div>
                       )
                     })}
@@ -4686,26 +4732,53 @@ export default function Store({ onNavigate }) {
                 const itemsList = outwardForm.items || []
                 const validCount = itemsList.filter(it => it.material_id && Number(it.out_qty) > 0).length
                 const totalQty = itemsList.reduce((sum, it) => sum + (Number(it.out_qty) || 0), 0)
-                const totalVal = itemsList.reduce((sum, it) => sum + ((Number(it.out_qty) || 0) * (Number(it.unit_price) || 0)), 0)
+                const isRtv = outwardForm.outward_type === 'return_to_vendor'
+                const totalSub = itemsList.reduce((sum, it) => sum + ((Number(it.out_qty) || 0) * (Number(it.unit_price) || 0)), 0)
+                const totalTax = itemsList.reduce((sum, it) => {
+                  const sub = (Number(it.out_qty) || 0) * (Number(it.unit_price) || 0)
+                  const gst = Number(it.gst_pct !== undefined && it.gst_pct !== '' ? it.gst_pct : 18)
+                  return sum + ((sub * gst) / 100)
+                }, 0)
+                const totalDebitGross = totalSub + totalTax
 
                 return (
-                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', gap: 14 }}>
-                      <div>
-                        <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Total Items</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#1e293b' }}>{validCount} of {itemsList.length} Item(s)</div>
+                  <div style={{ background: isRtv ? '#fff7ed' : '#f8fafc', border: isRtv ? '1px solid #ffedd5' : '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', marginTop: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                      <div style={{ display: 'flex', gap: 14 }}>
+                        <div>
+                          <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Total Items</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: '#1e293b' }}>{validCount} of {itemsList.length} Item(s)</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Total Quantity</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: '#0f766e' }}>{totalQty.toFixed(3)} Units</div>
+                        </div>
                       </div>
-                      <div>
-                        <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Total Quantity</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#0f766e' }}>{totalQty.toFixed(3)} Units</div>
-                      </div>
+
+                      {isRtv ? (
+                        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Sub Amount (Taxable)</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: '#475569' }}>₹{totalSub.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: 10, color: '#b45309', textTransform: 'uppercase', fontWeight: 700 }}>Tax Amount (+ GST)</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: '#d97706' }}>+ ₹{totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          </div>
+                          <div style={{ textAlign: 'right', background: '#fee2e2', padding: '4px 10px', borderRadius: 6, border: '1px solid #fecaca' }}>
+                            <div style={{ fontSize: 10, color: '#991b1b', textTransform: 'uppercase', fontWeight: 800 }}>Total Debit Note</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#b91c1c' }}>= ₹{totalDebitGross.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                          </div>
+                        </div>
+                      ) : (
+                        totalSub > 0 && (
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Combined Valuation</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#7c3aed' }}>₹{totalSub.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                          </div>
+                        )
+                      )}
                     </div>
-                    {totalVal > 0 && (
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Combined Valuation</div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: '#7c3aed' }}>₹{totalVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-                      </div>
-                    )}
                   </div>
                 )
               })()}
@@ -4727,7 +4800,7 @@ export default function Store({ onNavigate }) {
                   }}
                 >
                   {outwardForm.outward_type === 'job_work' && `🏭 Confirm Stock Issue (Job Work · ${(outwardForm.items || []).filter(it => it.material_id && Number(it.out_qty) > 0).length || 1} Items)`}
-                  {outwardForm.outward_type === 'return_to_vendor' && `↩️ Confirm Store Issue to Out (RTV · ${(outwardForm.items || []).filter(it => it.material_id && Number(it.out_qty) > 0).length || 1} Items)`}
+                  {outwardForm.outward_type === 'return_to_vendor' && `↩️ Confirm Store Issue to Out (RTV Debit Note · ${(outwardForm.items || []).filter(it => it.material_id && Number(it.out_qty) > 0).length || 1} Items)`}
                   {(outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer') && `🔄 Confirm Store Received Stock (STO · ${(outwardForm.items || []).filter(it => it.material_id && Number(it.out_qty) > 0).length || 1} Items)`}
                   {outwardForm.outward_type === 'issue' && `📤 Confirm Stock Issue (${(outwardForm.items || []).filter(it => it.material_id && Number(it.out_qty) > 0).length || 1} Items)`}
                 </button>
