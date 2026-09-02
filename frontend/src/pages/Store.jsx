@@ -4042,7 +4042,7 @@ export default function Store({ onNavigate }) {
                                 type="number"
                                 step="0.001"
                                 min="0.001"
-                                max={itemMat ? curStock : 999999}
+                                max={curStock > 0 ? curStock : undefined}
                                 style={S.input}
                                 placeholder="0.000"
                                 value={item.out_qty}
@@ -4299,7 +4299,7 @@ export default function Store({ onNavigate }) {
                                       type="number"
                                       step="0.001"
                                       min="0.001"
-                                      max={itemMat ? curStock : 999999}
+                                      max={Math.max(curStock, Number(item.selectedGrnItem?.receivedQty || 0)) > 0 ? Math.max(curStock, Number(item.selectedGrnItem?.receivedQty || 0)) : undefined}
                                       style={S.input}
                                       placeholder="0.000"
                                       value={item.out_qty}
@@ -4519,7 +4519,7 @@ export default function Store({ onNavigate }) {
                                 type="number"
                                 step="0.001"
                                 min="0.001"
-                                max={itemMat ? curStock : 999999}
+                                max={curStock > 0 ? curStock : undefined}
                                 style={S.input}
                                 placeholder="0.000"
                                 value={item.out_qty}
@@ -4715,7 +4715,7 @@ export default function Store({ onNavigate }) {
                                 type="number"
                                 step="0.001"
                                 min="0.001"
-                                max={itemMat ? curStock : 999999}
+                                max={curStock > 0 ? curStock : undefined}
                                 style={S.input}
                                 placeholder="0.000"
                                 value={item.out_qty}
