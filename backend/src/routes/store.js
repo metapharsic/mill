@@ -1896,50 +1896,72 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
   });
 }));
 
-// POST /api/store/outward — Fast Outward Issue: 1. Job Work | 2. Return to Party | 3. Inter Store Transfer | General Issue
+// POST /api/store/outward — Fast Outward Issue: 1. Job Work | 2. Return to Party | 3. Inter Store Transfer | 4. Dept Issue (Multi-Item Batch Support)
 router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
   const {
     material_id, out_qty, unit_price, department_id, machine_id, position_id, section_id,
     vendor_id, outward_type = 'issue', issued_to, purpose, serial_number, batch_number,
-    reference_type, reference_id, remarks, date, grn_id
+    reference_type, reference_id, remarks, date, grn_id, items
   } = req.body;
 
-  if (!material_id || !out_qty || Number(out_qty) <= 0) {
-    return res.status(400).json({ success: false, message: 'Valid material and quantity (> 0) required' });
+  let lineItems = [];
+  if (Array.isArray(items) && items.length > 0) {
+    lineItems = items.filter(it => it && it.material_id && Number(it.out_qty) > 0);
+  } else if (material_id && Number(out_qty) > 0) {
+    lineItems = [{
+      material_id,
+      out_qty,
+      unit_price,
+      machine_id: machine_id || null,
+      position_id: position_id || null,
+      section_id: section_id || null,
+      serial_number: serial_number || null,
+      batch_number: batch_number || null,
+      remarks: remarks || '',
+      grn_id: grn_id || null
+    }];
+  }
+
+  if (lineItems.length === 0) {
+    return res.status(400).json({ success: false, message: 'At least one valid material line item with quantity (> 0) is required' });
   }
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [material_id]);
-    if (!mat) throw new Error('Material not found');
+    // 1. Lock and validate stock for all items
+    const validatedItems = [];
+    for (const item of lineItems) {
+      const { rows: [mat] } = await client.query('SELECT * FROM materials WHERE id = $1 FOR UPDATE', [item.material_id]);
+      if (!mat) throw new Error(`Material with ID ${item.material_id} not found`);
 
-    const qty = parseFloat(out_qty);
-    const curStock = parseFloat(mat.current_stock || 0);
+      const qty = parseFloat(item.out_qty);
+      const curStock = parseFloat(mat.current_stock || 0);
 
-    if (curStock < qty) {
-      throw new Error(`Insufficient stock. Available: ${curStock} ${mat.uom}, Requested: ${qty} ${mat.uom}`);
+      if (curStock < qty) {
+        throw new Error(`Insufficient stock for "${mat.name}". Available: ${curStock} ${mat.uom}, Requested: ${qty} ${mat.uom}`);
+      }
+
+      const price = (item.unit_price !== undefined && item.unit_price !== null && item.unit_price !== '' && !isNaN(parseFloat(item.unit_price)))
+        ? parseFloat(item.unit_price)
+        : parseFloat(mat.unit_price || 0);
+
+      validatedItems.push({
+        ...item,
+        mat,
+        curStock,
+        qty,
+        price,
+        totalVal: qty * price
+      });
     }
 
-    const newStock = curStock - qty;
-    const price = (unit_price !== undefined && unit_price !== null && unit_price !== '' && !isNaN(parseFloat(unit_price)))
-      ? parseFloat(unit_price)
-      : parseFloat(mat.unit_price || 0);
-    const totalVal = qty * price;
-
-    await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, material_id]);
-
+    // 2. Fetch context metadata (Department, Vendor)
     let deptName = '';
     if (department_id) {
       const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
       if (dept) deptName = dept.name;
-    }
-
-    let machineName = '';
-    if (machine_id) {
-      const { rows: [mach] } = await client.query('SELECT name, code FROM machines WHERE id = $1', [machine_id]);
-      if (mach) machineName = mach.name || mach.code;
     }
 
     let vendorName = '';
@@ -1949,7 +1971,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       if (ven) vendorName = ven.name;
     }
 
-    // Determine transaction type and reference type
+    // 3. Determine transaction type & reference defaults
     let txnType = 'issue';
     let defaultRefType = 'ISSUE';
     let prefixTag = '[Store Issue]';
@@ -1971,10 +1993,11 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     let generatedRef = reference_id || '';
     let createdGatePass = null;
 
-    // Automatic Gate Pass provisioning for Job Work & RTV
     const d = new Date();
     const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    const matSummaryText = validatedItems.map(vi => `${vi.qty} ${vi.mat.uom} of ${vi.mat.name} (${vi.mat.code})`).join(', ');
 
+    // 4. Automatic Gate Pass provisioning for Job Work & RTV (Bundled for batch)
     if (outward_type === 'job_work') {
       await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-jw-${stamp}`]);
       const { rows: [seq] } = await client.query(`SELECT COUNT(*)+1 AS n FROM gate_passes WHERE created_at::date = CURRENT_DATE`);
@@ -1993,7 +2016,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       `, [
         gpNum,
         purpose || 'Material Outward for Job Work / Outside Repair',
-        `Job Work: ${qty} ${mat.uom} of ${mat.name} (${mat.code})`,
+        `Job Work (${validatedItems.length} items): ${matSummaryText}`,
         vendorName || 'Outside Job Worker',
         req.user.id,
         remarks || `Job work outward dispatched by ${req.user.name || 'Store'}`,
@@ -2019,7 +2042,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       `, [
         gpNum,
         purpose || 'Return to Vendor (RTV)',
-        `RTV Return: ${qty} ${mat.uom} of ${mat.name} (${mat.code})`,
+        `RTV Return (${validatedItems.length} items): ${matSummaryText}`,
         vendorName || 'Supplier / Vendor',
         req.user.id,
         remarks || `Return to party processed by ${req.user.name || 'Store'}`,
@@ -2036,111 +2059,115 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     }
 
     const refIdNum = /^\d+$/.test(String(generatedRef)) ? parseInt(generatedRef) : null;
-    const remarkFull = [
-      prefixTag,
-      vendorName ? `Party: ${vendorName}` : null,
-      generatedRef && !refIdNum ? `Ref: ${generatedRef}` : null,
-      deptName ? `Dept: ${deptName}` : null,
-      machineName ? `M/S: ${machineName}` : null,
-      issued_to ? `To: ${issued_to}` : null,
-      purpose ? `Purpose: ${purpose}` : null,
-      remarks
-    ].filter(Boolean).join(' | ');
-
     const txnDate = date ? new Date(date) : new Date();
+    const createdLedgerRows = [];
 
-    const { rows: [ledger] } = await client.query(`
-      INSERT INTO stock_ledger (
-        material_id, date, transaction_type, reference_type, reference_id,
-        vendor_id, in_qty, out_qty, balance, unit_price, value,
-        batch_number, remarks, created_by
-      ) VALUES (
-        $1, $2, $3, $4, $5,
-        $6, 0, $7, $8, $9, $10,
-        $11, $12, $13
-      ) RETURNING *
-    `, [
-      material_id, txnDate, txnType,
-      reference_type || defaultRefType, refIdNum,
-      vId, qty, newStock, price, totalVal,
-      batch_number || serial_number || null, remarkFull, req.user.id
-    ]);
+    // 5. Deduct stock & create ledger records for each item
+    for (const vi of validatedItems) {
+      const newStock = vi.curStock - vi.qty;
+      await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, vi.material_id]);
 
-    if (mat.is_serialized || machine_id || serial_number) {
-      const selectedSn = serial_number || batch_number || null;
-      if (position_id) {
-        await client.query(
-          `UPDATE installed_assets 
-           SET status = 'retired', retired_at = NOW(), failure_reason = 'Replaced by clothing/asset ' || COALESCE($1, 'new issue')
-           WHERE position_id = $2 AND status = 'active'`,
-          [selectedSn, position_id]
-        );
+      let itemMachineName = '';
+      const mId = vi.machine_id || machine_id || null;
+      if (mId) {
+        const { rows: [mach] } = await client.query('SELECT name, code FROM machines WHERE id = $1', [mId]);
+        if (mach) itemMachineName = mach.name || mach.code;
       }
 
-      let existingInStock = null;
-      if (selectedSn) {
-        const { rows: inStockRows } = await client.query(
-          `SELECT id, asset_number FROM installed_assets 
-           WHERE material_id = $1 AND LOWER(TRIM(serial_number)) = LOWER(TRIM($2)) AND status = 'In Stock' 
-           ORDER BY id ASC LIMIT 1`,
-          [material_id, selectedSn]
-        );
-        if (inStockRows.length) existingInStock = inStockRows[0];
-      }
+      const remarkFull = [
+        prefixTag,
+        vendorName ? `Party: ${vendorName}` : null,
+        generatedRef && !refIdNum ? `Ref: ${generatedRef}` : null,
+        deptName ? `Dept: ${deptName}` : null,
+        itemMachineName ? `M/S: ${itemMachineName}` : null,
+        issued_to ? `To: ${issued_to}` : null,
+        purpose ? `Purpose: ${purpose}` : null,
+        vi.remarks || remarks
+      ].filter(Boolean).join(' | ');
 
-      if (existingInStock) {
-        await client.query(
-          `UPDATE installed_assets
-           SET status = 'active', machine_id = $1, position_id = $2, issued_by = $3, installed_at = NOW(), purchase_price = $4
-           WHERE id = $5`,
-          [machine_id || null, position_id || null, req.user.id, price, existingInStock.id]
-        );
-      } else {
-        const today = new Date();
-        const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-        const finalSn = selectedSn || `SN-${Date.now()}`;
+      const { rows: [ledger] } = await client.query(`
+        INSERT INTO stock_ledger (
+          material_id, date, transaction_type, reference_type, reference_id,
+          vendor_id, in_qty, out_qty, balance, unit_price, value,
+          batch_number, remarks, created_by
+        ) VALUES (
+          $1, $2, $3, $4, $5,
+          $6, 0, $7, $8, $9, $10,
+          $11, $12, $13
+        ) RETURNING *
+      `, [
+        vi.material_id, txnDate, txnType,
+        reference_type || defaultRefType, refIdNum,
+        vId, vi.qty, newStock, vi.price, vi.totalVal,
+        vi.batch_number || vi.serial_number || batch_number || serial_number || null,
+        remarkFull, req.user.id
+      ]);
 
-        const { rows: dupCheck } = await client.query(
-          `SELECT id, asset_number FROM installed_assets 
-           WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
-          [finalSn]
-        );
-        if (dupCheck.length > 0) {
-          throw new Error(`Serial number "${finalSn}" is already active in mill registry (Asset #${dupCheck[0].asset_number}). Cannot issue duplicate.`);
+      createdLedgerRows.push({
+        ...ledger,
+        materialName: vi.mat.name,
+        materialCode: vi.mat.code,
+        uom: vi.mat.uom,
+        newStock
+      });
+
+      // Serialized asset tracking if applicable
+      if (vi.mat.is_serialized || mId || vi.serial_number) {
+        const selectedSn = vi.serial_number || vi.batch_number || null;
+        if (vi.position_id || position_id) {
+          await client.query(
+            `UPDATE installed_assets 
+             SET status = 'retired', retired_at = NOW(), failure_reason = 'Replaced by clothing/asset ' || COALESCE($1, 'new issue')
+             WHERE position_id = $2 AND status = 'active'`,
+            [selectedSn, vi.position_id || position_id]
+          );
         }
 
-        const { rows: assetSeq } = await client.query(`SELECT LPAD((COUNT(*) + 1)::text, 4, '0') AS seq FROM installed_assets WHERE asset_number LIKE $1`, [`AST-${dateStr}-%`]);
-        const assetNumber = `AST-${dateStr}-${assetSeq[0].seq}`;
-        await client.query(`
-          INSERT INTO installed_assets (
-            asset_number, material_id, serial_number, batch_number, machine_id, position_id,
-            requested_by, approved_by, issued_by, purchase_price, installed_at, status, expected_lifespan_days
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),'active',$11)
-        `, [
-          assetNumber, material_id, finalSn,
-          batch_number || null, machine_id || null, position_id || null, req.user.id,
-          req.user.id, req.user.id, price, mat.expected_lifespan_days || 90
-        ]);
+        let existingInStock = null;
+        if (selectedSn) {
+          const { rows: inStockRows } = await client.query(
+            `SELECT id, asset_number FROM installed_assets 
+             WHERE material_id = $1 AND LOWER(TRIM(serial_number)) = LOWER(TRIM($2)) AND status = 'In Stock' 
+             ORDER BY id ASC LIMIT 1`,
+            [vi.material_id, selectedSn]
+          );
+          if (inStockRows.length) existingInStock = inStockRows[0];
+        }
+
+        if (existingInStock) {
+          await client.query(
+            `UPDATE installed_assets
+             SET status = 'active', machine_id = $1, position_id = $2, issued_by = $3, installed_at = NOW(), purchase_price = $4
+             WHERE id = $5`,
+            [mId, vi.position_id || position_id || null, req.user.id, vi.price, existingInStock.id]
+          );
+        }
       }
+
+      await auditLog(client, {
+        userId: req.user.id,
+        action: 'store.outward',
+        module: 'store',
+        recordId: ledger.id,
+        newData: { material_id: vi.material_id, qty: vi.qty, price: vi.price, newStock, outward_type, vendor_id: vId, department_id, machine_id: mId, issued_to, ref: generatedRef },
+        ip: req.ip
+      });
     }
 
-    await auditLog(client, {
-      userId: req.user.id,
-      action: 'store.outward',
-      module: 'store',
-      recordId: ledger.id,
-      newData: { material_id, qty, price, newStock, outward_type, vendor_id: vId, department_id, machine_id, issued_to, ref: generatedRef },
-      ip: req.ip
-    });
-
     await client.query('COMMIT');
-    publish(TOPICS.EVENTS_ALL, `outward-${ledger.id}`, { event: 'store.outward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
+    publish(TOPICS.EVENTS_ALL, `outward-batch`, { event: 'store.outward.batch_created', count: createdLedgerRows.length, outward_type, userId: req.user.id });
+
+    const totalBatchQty = validatedItems.reduce((sum, it) => sum + it.qty, 0);
+    const totalBatchVal = validatedItems.reduce((sum, it) => sum + it.totalVal, 0);
 
     res.json({
       success: true,
-      message: `Outward issue recorded successfully (${prefixTag}). New balance: ${newStock} ${mat.uom}`,
+      message: `Outward issue of ${createdLedgerRows.length} item(s) (${totalBatchQty.toFixed(2)} total qty) recorded successfully (${prefixTag}).`,
       data: {
-        ...ledger,
+        records: createdLedgerRows,
+        itemCount: createdLedgerRows.length,
+        totalQty: totalBatchQty,
+        totalValue: totalBatchVal,
         gatePass: createdGatePass,
         referenceId: generatedRef
       }

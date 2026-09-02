@@ -100,6 +100,17 @@ class StorePage extends BasePage {
   }
 
   /**
+   * Click [+ Add Item] button inside Fast Outward modal
+   */
+  async clickAddOutwardItem() {
+    const addBtn = this.page.locator('button:has-text("+ ➕ Add"), button:has-text("+ Add")').first();
+    if (await addBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await this.safeClick(addBtn);
+      await this.page.waitForTimeout(200);
+    }
+  }
+
+  /**
    * Verify A3 Master Store Issue Slip / Invoice Modal
    */
   async verifyA3ModalDates() {

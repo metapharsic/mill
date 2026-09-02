@@ -67,7 +67,7 @@ test.describe('📦 Central Store Management & Inventory Workflow Suite', () => 
     }
   });
 
-  test('TC-STORE-06: Fast Outward Issue 3-Tier Workflows (Job Work, Return to Party, Inter Store Transfer)', async ({ page }) => {
+  test('TC-STORE-06: Fast Outward Issue 3-Tier & Multi-Item Workflows (Job Work, Return to Party, Inter Store Transfer, Dept Issue)', async ({ page }) => {
     const storePage = new StorePage(page);
     await storePage.goto();
 
@@ -86,20 +86,29 @@ test.describe('📦 Central Store Management & Inventory Workflow Suite', () => 
       const modal = page.locator('div:has-text("Fast Outward Issue Desk")').first();
       await expect(modal).toBeVisible();
 
-      // Test Mode 1: Job Work
+      // Test Mode 1: Job Work & Multi-Item Add
       await storePage.selectOutwardWorkflow('job_work');
-      const submitBtnJW = page.locator('button:has-text("Confirm Stock Issue (Job Work)")').first();
+      await storePage.clickAddOutwardItem();
+      const submitBtnJW = page.locator('button:has-text("Confirm Stock Issue (Job Work")').first();
       await expect(submitBtnJW).toBeVisible();
 
-      // Test Mode 2: Return to Party
+      // Test Mode 2: Return to Party & Multi-Item Add
       await storePage.selectOutwardWorkflow('return_to_vendor');
+      await storePage.clickAddOutwardItem();
       const submitBtnRTV = page.locator('button:has-text("Confirm Store Issue to Out")').first();
       await expect(submitBtnRTV).toBeVisible();
 
-      // Test Mode 3: Inter Store Transfer
+      // Test Mode 3: Inter Store Transfer & Multi-Item Add
       await storePage.selectOutwardWorkflow('inter_store_transfer');
+      await storePage.clickAddOutwardItem();
       const submitBtnSTO = page.locator('button:has-text("Confirm Store Received Stock")').first();
       await expect(submitBtnSTO).toBeVisible();
+
+      // Test Mode 4: Dept Issue
+      await storePage.selectOutwardWorkflow('issue');
+      await storePage.clickAddOutwardItem();
+      const submitBtnIssue = page.locator('button:has-text("Confirm Stock Issue")').first();
+      await expect(submitBtnIssue).toBeVisible();
 
       // Close modal
       const closeBtn = page.locator('button:has-text("Cancel")').first();
