@@ -1427,7 +1427,15 @@ export default function Store({ onNavigate }) {
     loadBaseData()
     loadOpenGatePasses()
     loadWarehouses()
-  }, [])
+
+    const handleGlobalRefresh = () => {
+      loadBaseData()
+      if (tab === 'inward') loadInward()
+      if (tab === 'outward') loadOutward()
+    }
+    window.addEventListener('mk-inventory-refresh', handleGlobalRefresh)
+    return () => window.removeEventListener('mk-inventory-refresh', handleGlobalRefresh)
+  }, [tab, loadInward, loadOutward])
 
   useEffect(() => {
     if (tab === 'inward') { loadInward(); loadOpenGatePasses() }
@@ -1459,6 +1467,7 @@ export default function Store({ onNavigate }) {
       setVendorPickMode('list')
       loadInward()
       loadBaseData()
+      window.dispatchEvent(new CustomEvent('mk-inventory-refresh'))
     } else {
       addToast(r.message || 'Failed to record inward', 'error')
     }
@@ -1534,7 +1543,16 @@ export default function Store({ onNavigate }) {
     }
 
     const payload = {
-      ...outwardForm,
+      outward_type: outwardForm.outward_type || 'issue',
+      vendor_id: outwardForm.vendor_id ? outwardForm.vendor_id : undefined,
+      department_id: outwardForm.department_id ? outwardForm.department_id : undefined,
+      machine_id: outwardForm.machine_id ? outwardForm.machine_id : undefined,
+      section_id: outwardForm.section_id ? outwardForm.section_id : undefined,
+      position_id: outwardForm.position_id ? outwardForm.position_id : undefined,
+      issued_to: outwardForm.issued_to || undefined,
+      purpose: outwardForm.purpose || undefined,
+      date: outwardForm.date || new Date().toISOString().slice(0, 10),
+      remarks: outwardForm.remarks || undefined,
       items: validItems.map(it => ({
         material_id: it.material_id,
         out_qty: Number(it.out_qty),
@@ -1548,44 +1566,50 @@ export default function Store({ onNavigate }) {
         remarks: it.remarks || undefined,
         grn_id: it.grn_id || undefined
       })),
+      reference_type: outwardForm.reference_type || (outwardForm.outward_type === 'job_work' ? 'JOB_WORK' : outwardForm.outward_type === 'return_to_vendor' ? 'RTV' : outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer' ? 'STO' : 'ISSUE'),
       reference_id: outwardForm.store_issue_no || outwardForm.reference_id || undefined
     }
 
-    const r = await fetch(`${API}/store/outward`, {
-      method: 'POST',
-      headers: json(),
-      body: JSON.stringify(payload)
-    }).then(r => r.json())
-    if (r.success) {
-      addToast(r.message || 'Outward issue recorded successfully', 'success')
-      setOutwardModal(false)
-      setSelectedGrnItem(null)
-      setOutwardForm({
-        outward_type: outwardForm.outward_type || 'job_work',
-        vendor_id: '',
-        material_id: '',
-        out_qty: '',
-        unit_price: '',
-        department_id: '',
-        machine_id: '',
-        section_id: '',
-        position_id: '',
-        issued_to: '',
-        purpose: '',
-        serial_number: '',
-        batch_number: '',
-        reference_type: outwardForm.outward_type === 'job_work' ? 'JOB_WORK' : outwardForm.outward_type === 'return_to_vendor' ? 'RTV' : 'STO',
-        reference_id: '',
-        store_issue_no: '',
-        date: new Date().toISOString().slice(0, 10),
-        remarks: '',
-        grn_id: '',
-        items: [createBlankOutwardItem()]
-      })
-      loadOutward()
-      loadBaseData()
-    } else {
-      addToast(r.message || 'Failed to record outward issue', 'error')
+    try {
+      const r = await fetch(`${API}/store/outward`, {
+        method: 'POST',
+        headers: json(),
+        body: JSON.stringify(payload)
+      }).then(r => r.json())
+      if (r.success) {
+        addToast(r.message || 'Outward issue recorded successfully', 'success')
+        setOutwardModal(false)
+        setSelectedGrnItem(null)
+        setOutwardForm({
+          outward_type: outwardForm.outward_type || 'job_work',
+          vendor_id: '',
+          material_id: '',
+          out_qty: '',
+          unit_price: '',
+          department_id: '',
+          machine_id: '',
+          section_id: '',
+          position_id: '',
+          issued_to: '',
+          purpose: '',
+          serial_number: '',
+          batch_number: '',
+          reference_type: outwardForm.outward_type === 'job_work' ? 'JOB_WORK' : outwardForm.outward_type === 'return_to_vendor' ? 'RTV' : 'STO',
+          reference_id: '',
+          store_issue_no: '',
+          date: new Date().toISOString().slice(0, 10),
+          remarks: '',
+          grn_id: '',
+          items: [createBlankOutwardItem()]
+        })
+        loadOutward()
+        loadBaseData()
+        window.dispatchEvent(new CustomEvent('mk-inventory-refresh'))
+      } else {
+        addToast(r.message || 'Failed to record outward issue', 'error')
+      }
+    } catch (err) {
+      addToast('Network/Server error while recording outward issue: ' + err.message, 'error')
     }
   }
 

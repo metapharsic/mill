@@ -118,6 +118,11 @@ export default function RawMaterial({ onNavigate }) {
 
   useEffect(() => {
     loadBaseData()
+    const handleRefresh = () => {
+      loadBaseData()
+    }
+    window.addEventListener('mk-inventory-refresh', handleRefresh)
+    return () => window.removeEventListener('mk-inventory-refresh', handleRefresh)
   }, [loadBaseData])
 
   // Handle Fast Inward Entry

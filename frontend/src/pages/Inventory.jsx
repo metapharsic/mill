@@ -213,6 +213,16 @@ export default function Inventory() {
   useEffect(() => { loadLedger() }, [loadLedger])
   useEffect(() => { if (roleLevel >= 3) loadShiftSummary() }, [activeStoreTab, shiftFilter, roleLevel])
 
+  useEffect(() => {
+    const handleRefresh = () => {
+      loadSummary()
+      loadMaterials()
+      loadLedger()
+    }
+    window.addEventListener('mk-inventory-refresh', handleRefresh)
+    return () => window.removeEventListener('mk-inventory-refresh', handleRefresh)
+  }, [loadSummary, loadMaterials, loadLedger])
+
   const availableTabs = useMemo(() => {
     if (isAdmin) return [...STORE_TABS, ...ADMIN_EXTRA_TABS]
     return STORE_TABS

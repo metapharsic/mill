@@ -1980,13 +1980,14 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
 
     // 2. Fetch context metadata (Department, Vendor)
     let deptName = '';
-    if (department_id) {
-      const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [department_id]);
+    const dId = department_id && !isNaN(parseInt(department_id)) ? parseInt(department_id) : null;
+    if (dId) {
+      const { rows: [dept] } = await client.query('SELECT name FROM departments WHERE id = $1', [dId]);
       if (dept) deptName = dept.name;
     }
 
     let vendorName = '';
-    const vId = vendor_id ? parseInt(vendor_id) : null;
+    const vId = vendor_id && !isNaN(parseInt(vendor_id)) ? parseInt(vendor_id) : null;
     if (vId) {
       const { rows: [ven] } = await client.query('SELECT name, code, gstin, state FROM vendors WHERE id = $1', [vId]);
       if (ven) vendorName = ven.name;
@@ -2011,7 +2012,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       prefixTag = '[Inter Store Transfer]';
     }
 
-    let generatedRef = reference_id || '';
+    let generatedRef = reference_id ? String(reference_id).trim() : '';
     let createdGatePass = null;
 
     const d = new Date();
@@ -2093,7 +2094,9 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, vi.material_id]);
 
       let itemMachineName = '';
-      const mId = vi.machine_id || machine_id || null;
+      const mId = (vi.machine_id && !isNaN(parseInt(vi.machine_id))) ? parseInt(vi.machine_id) : (machine_id && !isNaN(parseInt(machine_id)) ? parseInt(machine_id) : null);
+      const posId = (vi.position_id && !isNaN(parseInt(vi.position_id))) ? parseInt(vi.position_id) : (position_id && !isNaN(parseInt(position_id)) ? parseInt(position_id) : null);
+
       if (mId) {
         const { rows: [mach] } = await client.query('SELECT name, code FROM machines WHERE id = $1', [mId]);
         if (mach) itemMachineName = mach.name || mach.code;
@@ -2148,12 +2151,12 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       // Serialized asset tracking if applicable
       if (vi.mat.is_serialized || mId || vi.serial_number) {
         const selectedSn = vi.serial_number || vi.batch_number || null;
-        if (vi.position_id || position_id) {
+        if (posId) {
           await client.query(
             `UPDATE installed_assets 
              SET status = 'retired', retired_at = NOW(), failure_reason = 'Replaced by clothing/asset ' || COALESCE($1, 'new issue')
              WHERE position_id = $2 AND status = 'active'`,
-            [selectedSn, vi.position_id || position_id]
+            [selectedSn, posId]
           );
         }
 
@@ -2173,7 +2176,7 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
             `UPDATE installed_assets
              SET status = 'active', machine_id = $1, position_id = $2, issued_by = $3, installed_at = NOW(), purchase_price = $4
              WHERE id = $5`,
-            [mId, vi.position_id || position_id || null, req.user.id, vi.price, existingInStock.id]
+            [mId, posId, req.user.id, vi.price, existingInStock.id]
           );
         }
       }
