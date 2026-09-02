@@ -66,4 +66,45 @@ test.describe('📦 Central Store Management & Inventory Workflow Suite', () => 
       }
     }
   });
+
+  test('TC-STORE-06: Fast Outward Issue 3-Tier Workflows (Job Work, Return to Party, Inter Store Transfer)', async ({ page }) => {
+    const storePage = new StorePage(page);
+    await storePage.goto();
+
+    // Navigate to Outward desk
+    await storePage.safeClick(storePage.outwardTab);
+
+    // Verify Outward Workflow filter chips
+    await storePage.filterOutwardType('job_work');
+    await storePage.filterOutwardType('return_to_vendor');
+    await storePage.filterOutwardType('transfer');
+    await storePage.filterOutwardType('all');
+
+    // Trigger Fast Outward Modal
+    if (await storePage.fastOutwardBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await storePage.openFastOutward();
+      const modal = page.locator('div:has-text("Fast Outward Issue Desk")').first();
+      await expect(modal).toBeVisible();
+
+      // Test Mode 1: Job Work
+      await storePage.selectOutwardWorkflow('job_work');
+      const submitBtnJW = page.locator('button:has-text("Confirm Stock Issue (Job Work)")').first();
+      await expect(submitBtnJW).toBeVisible();
+
+      // Test Mode 2: Return to Party
+      await storePage.selectOutwardWorkflow('return_to_vendor');
+      const submitBtnRTV = page.locator('button:has-text("Confirm Store Issue to Out")').first();
+      await expect(submitBtnRTV).toBeVisible();
+
+      // Test Mode 3: Inter Store Transfer
+      await storePage.selectOutwardWorkflow('inter_store_transfer');
+      const submitBtnSTO = page.locator('button:has-text("Confirm Store Received Stock")').first();
+      await expect(submitBtnSTO).toBeVisible();
+
+      // Close modal
+      const closeBtn = page.locator('button:has-text("Cancel")').first();
+      await storePage.safeClick(closeBtn);
+    }
+  });
 });
+

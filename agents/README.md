@@ -34,3 +34,4 @@ of re-auditing from scratch.
 | 2026-08-29 | Inbound Delivery Challan (DC) workflow: receive-before-invoice, match, then GRN | [2026-08-29-inbound-dc-workflow.md](./2026-08-29-inbound-dc-workflow.md) |
 | 2026-08-29 | Inbound DC + Invoice Match: Playwright E2E, backend unit tests, DB-sync integration test, typo bug fix (loadOpenInbounDcs) | [2026-08-29-inbound-dc-testing.md](./2026-08-29-inbound-dc-testing.md) |
 | 2026-08-29 | Inbound DC surfaced in Store Dashboard reporting/analytics (live summary endpoint + manual-refresh sync) | [2026-08-29-inbound-dc-reporting.md](./2026-08-29-inbound-dc-reporting.md) |
+| 2026-09-02 | Fast Outward Issue workflows (Job Work, Return to Party, Inter Store Transfer) | [2026-09-02-fast-outward-issue-workflows.md](./2026-09-02-fast-outward-issue-workflows.md) |

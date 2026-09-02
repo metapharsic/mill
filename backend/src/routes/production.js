@@ -1598,5 +1598,202 @@ router.post('/jumbo-reels/:id/override', auth, requireLevel(4), asyncRoute(async
   res.json({ success: true, data: rows[0] });
 }));
 
-module.exports = router;
+// ─── 12. GET /api/production/ppc/deckle-optimizer ─────────────────────────────
+// Greedy Best-Fit Decreasing (BFD): given usable_deckle_mm + optional grade/gsm,
+// returns an ordered list of suggested cut positions drawn from pending SOs,
+// minimising trim waste.
+router.get('/ppc/deckle-optimizer', auth, asyncRoute(async (req, res) => {
+  const { usable_deckle_mm, grade_id, gsm } = req.query;
+  if (!usable_deckle_mm) {
+    return res.status(400).json({ success: false, message: 'usable_deckle_mm is required' });
+  }
+  const deckle = parseFloat(usable_deckle_mm);
 
+  const conds = [
+    `so.status IN ('Confirmed','In Production','Pending')`,
+    `(so.qty_mt - COALESCE(so.fulfilled_mt,0)) > 0`,
+    `so.width_mm IS NOT NULL AND so.width_mm > 0`
+  ];
+  const params = []; let p = 1;
+  if (grade_id) { conds.push(`so.grade_id=$${p++}`); params.push(grade_id); }
+  if (gsm)      { conds.push(`ABS(so.gsm - $${p++}) < 5`); params.push(parseFloat(gsm)); }
+
+  const { rows: orders } = await pool.query(
+    `SELECT so.id, so.so_number AS "soNumber", so.width_mm AS "widthMm",
+            so.gsm, (so.qty_mt - COALESCE(so.fulfilled_mt,0)) AS "balanceMt",
+            c.name AS "customerName", g.name AS "gradeName"
+     FROM sales_orders so
+     LEFT JOIN customers c ON c.id = so.customer_id
+     LEFT JOIN grades    g ON g.id = so.grade_id
+     WHERE ${conds.join(' AND ')}
+     ORDER BY so.width_mm DESC, so.delivery_date ASC NULLS LAST`,
+    params
+  );
+
+  // BFD: sort descending by width (already sorted), pack greedily into one pattern
+  const cuts = [];
+  let remaining = deckle;
+  for (const order of orders) {
+    const w = parseFloat(order.widthMm);
+    if (w > 0 && w <= remaining) {
+      cuts.push({
+        cutPosition: cuts.length + 1,
+        widthMm: w,
+        salesOrderId: order.id,
+        soNumber: order.soNumber,
+        customerName: order.customerName,
+        gradeName: order.gradeName,
+        balanceMt: parseFloat(order.balanceMt || 0),
+        remarks: `SO: ${order.soNumber}`,
+      });
+      remaining -= w;
+      if (remaining < 50) break; // insufficient space for another useful cut
+    }
+  }
+
+  const trimMm = remaining;
+  const trimPct = deckle > 0 ? (trimMm / deckle) * 100 : 0;
+
+  res.json({
+    success: true,
+    data: {
+      usableDeckleMm: deckle,
+      suggestedCuts: cuts,
+      trimMm: parseFloat(trimMm.toFixed(2)),
+      trimPct: parseFloat(trimPct.toFixed(2)),
+      totalCutWidthMm: parseFloat((deckle - trimMm).toFixed(2)),
+      ordersConsidered: orders.length,
+    }
+  });
+}));
+
+// ─── 13. GET /api/production/reports/production-order ─────────────────────────
+// Printable Production Order Report: PPC plans → patterns → cuts → SOs
+router.get('/reports/production-order', auth, asyncRoute(async (req, res) => {
+  const { date_from, date_to, machine_id, status } = req.query;
+  const conds = ['1=1']; const params = []; let p = 1;
+  if (date_from)  { conds.push(`p.target_date >= $${p++}`); params.push(date_from); }
+  if (date_to)    { conds.push(`p.target_date <= $${p++}`); params.push(date_to); }
+  if (machine_id) { conds.push(`p.machine_id = $${p++}`);   params.push(machine_id); }
+  if (status)     { conds.push(`p.status = $${p++}`);       params.push(status); }
+
+  const { rows } = await pool.query(
+    `SELECT
+       p.id AS "planId",
+       p.plan_number AS "planNumber",
+       p.target_date AS "targetDate",
+       m.name AS "machineName",
+       g.name AS "gradeName", g.code AS "gradeCode",
+       p.target_gsm AS "targetGsm", p.target_bf AS "targetBf",
+       p.usable_deckle_mm AS "usableDeckleMm",
+       p.planned_tonnage_mt AS "plannedTonnageMt",
+       p.status,
+       u.name AS "createdBy", p.created_at AS "createdAt",
+       COALESCE(json_agg(
+         json_build_object(
+           'patternId', sp.id,
+           'patternNumber', sp.pattern_number,
+           'totalCutWidthMm', sp.total_cut_width_mm,
+           'plannedTrimMm', sp.planned_trim_mm,
+           'trimPercentage', sp.trim_percentage,
+           'setsPlanned', sp.sets_planned,
+           'setsCompleted', sp.sets_completed,
+           'patternStatus', sp.status,
+           'cuts', (
+             SELECT COALESCE(json_agg(
+               json_build_object(
+                 'cutPosition', pc.cut_position,
+                 'widthMm', pc.width_mm,
+                 'soNumber', so2.so_number,
+                 'customerName', c2.name,
+                 'balanceMt', (so2.qty_mt - COALESCE(so2.fulfilled_mt,0)),
+                 'remarks', pc.remarks
+               ) ORDER BY pc.cut_position
+             ), '[]'::json)
+             FROM ppc_pattern_cuts pc
+             LEFT JOIN sales_orders so2 ON so2.id = pc.sales_order_id
+             LEFT JOIN customers    c2  ON c2.id  = so2.customer_id
+             WHERE pc.pattern_id = sp.id
+           )
+         ) ORDER BY sp.pattern_number
+       ) FILTER (WHERE sp.id IS NOT NULL), '[]'::json) AS patterns
+     FROM ppc_production_plans p
+     LEFT JOIN machines m ON m.id = p.machine_id
+     LEFT JOIN grades   g ON g.id = p.grade_id
+     LEFT JOIN users    u ON u.id = p.created_by
+     LEFT JOIN ppc_slitting_patterns sp ON sp.plan_id = p.id
+     WHERE ${conds.join(' AND ')}
+     GROUP BY p.id, m.name, g.name, g.code, u.name
+     ORDER BY p.target_date DESC, p.id DESC`,
+    params
+  );
+  res.json({ success: true, data: rows });
+}));
+
+// ─── 14. GET /api/production/reports/rewinder-cutting-order/:jumbo_id ─────────
+// Per-jumbo Rewinder Operator Cutting Instruction Sheet
+router.get('/reports/rewinder-cutting-order/:jumbo_id', auth, asyncRoute(async (req, res) => {
+  const jumboId = parseInt(req.params.jumbo_id);
+
+  const { rows: jRows } = await pool.query(
+    `SELECT j.id, j.jumbo_number AS "jumboNumber",
+            j.gsm_actual AS "gsmActual", j.bf_actual AS "bfActual",
+            j.deckle_width_mm AS "deckleWidthMm",
+            j.gross_weight_kg AS "grossWeightKg", j.net_weight_kg AS "netWeightKg",
+            j.status, j.created_at AS "createdAt",
+            m.name AS "machineName",
+            g.name AS "gradeName", g.code AS "gradeCode",
+            s.date AS "shiftDate", s.shift_type AS "shiftType"
+     FROM jumbo_reels j
+     LEFT JOIN machines m ON m.id = j.machine_id
+     LEFT JOIN grades   g ON g.id = j.grade_id
+     LEFT JOIN shifts   s ON s.id = j.shift_id
+     WHERE j.id = $1`,
+    [jumboId]
+  );
+  if (!jRows.length) {
+    return res.status(404).json({ success: false, message: 'Jumbo reel not found' });
+  }
+  const jumbo = jRows[0];
+  const deckle = parseFloat(jumbo.deckleWidthMm) || 1;
+  const netKg  = parseFloat(jumbo.netWeightKg)   || 0;
+
+  // Find pattern cuts from the plan for this jumbo's machine + date
+  const { rows: cuts } = await pool.query(
+    `SELECT
+       pc.cut_position AS "cutPosition",
+       pc.width_mm AS "widthMm",
+       so.so_number AS "soNumber",
+       c.name AS "customerName",
+       (so.qty_mt - COALESCE(so.fulfilled_mt,0)) AS "balanceMt",
+       pc.remarks,
+       ROUND((pc.width_mm / $2) * $3, 2) AS "plannedWeightKg"
+     FROM ppc_pattern_cuts pc
+     LEFT JOIN ppc_slitting_patterns sp ON sp.id = pc.pattern_id
+     LEFT JOIN ppc_production_plans  pp ON pp.id = sp.plan_id
+     LEFT JOIN sales_orders so ON so.id = pc.sales_order_id
+     LEFT JOIN customers c ON c.id = so.customer_id
+     WHERE pp.machine_id = (SELECT machine_id FROM jumbo_reels WHERE id=$1)
+       AND pp.target_date = (SELECT DATE(created_at) FROM jumbo_reels WHERE id=$1)
+       AND sp.status IN ('ACTIVE','QUEUED')
+     ORDER BY pc.cut_position`,
+    [jumboId, deckle, netKg]
+  );
+
+  const totalCutMm = cuts.reduce((s, c) => s + parseFloat(c.widthMm || 0), 0);
+  const trimMm = Math.max(0, deckle - totalCutMm);
+
+  res.json({
+    success: true,
+    data: {
+      jumbo,
+      cuts,
+      trimMm: parseFloat(trimMm.toFixed(2)),
+      trimPct: parseFloat(((trimMm / deckle) * 100).toFixed(2)),
+      totalCutMm: parseFloat(totalCutMm.toFixed(2)),
+      printedAt: new Date().toISOString(),
+    }
+  });
+}));
+
+module.exports = router;

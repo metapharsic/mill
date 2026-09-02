@@ -222,6 +222,7 @@ export default function Store({ onNavigate }) {
   const [outwardLoading, setOutwardLoading] = useState(false)
   const [outwardStoreType, setOutwardStoreType] = useState('')
   const [outwardDeptFilter, setOutwardDeptFilter] = useState('')
+  const [outwardTypeFilter, setOutwardTypeFilter] = useState('')
   const [outwardSearch, setOutwardSearch] = useState('')
   const [outwardPage, setOutwardPage] = useState(1)
   const [outwardTotal, setOutwardTotal] = useState(0)
@@ -239,23 +240,53 @@ export default function Store({ onNavigate }) {
   const [outwardModal, setOutwardModal] = useState(false)
   const [outwardModalMinimized, setOutwardModalMinimized] = useState(false)
   const { minimize: mmMinimize, close: mmClose } = useMinimizedModals()
+  const [vendorGrnMaterials, setVendorGrnMaterials] = useState([])
+  const [loadingVendorGrn, setLoadingVendorGrn] = useState(false)
+  const [selectedGrnItem, setSelectedGrnItem] = useState(null)
   const [outwardForm, setOutwardForm] = useState({
+    outward_type: 'job_work',
+    vendor_id: '',
     material_id: '',
     out_qty: '',
+    unit_price: '',
     department_id: '',
     machine_id: '',
+    section_id: '',
     position_id: '',
-    outward_type: 'issue',
     issued_to: '',
     purpose: '',
     serial_number: '',
     batch_number: '',
-    reference_type: 'WORK_ORDER',
+    reference_type: 'JOB_WORK',
     reference_id: '',
-    remarks: ''
+    store_issue_no: '',
+    date: new Date().toISOString().slice(0, 10),
+    remarks: '',
+    grn_id: ''
   })
   const [outwardVoucher, setOutwardVoucher] = useState(null)
   const [syncing, setSyncing] = useState(false)
+
+  const fetchVendorGrnMaterials = async (vendorId) => {
+    if (!vendorId) {
+      setVendorGrnMaterials([])
+      return
+    }
+    setLoadingVendorGrn(true)
+    try {
+      const res = await fetch(`${API}/store/vendors/${vendorId}/grn-materials`, { headers: h() }).then(r => r.json())
+      if (res.success) {
+        setVendorGrnMaterials(res.data || [])
+      } else {
+        setVendorGrnMaterials([])
+      }
+    } catch (err) {
+      console.error('Error fetching vendor GRN materials:', err)
+      setVendorGrnMaterials([])
+    } finally {
+      setLoadingVendorGrn(false)
+    }
+  }
 
   // Master GRN Viewer & A3 Print & Receiver Sign states
   const [masterGrnModal, setMasterGrnModal] = useState(null)
@@ -1128,6 +1159,7 @@ export default function Store({ onNavigate }) {
       const params = new URLSearchParams()
       if (outwardStoreType) params.append('store_type', outwardStoreType)
       if (outwardDeptFilter) params.append('department_id', outwardDeptFilter)
+      if (outwardTypeFilter) params.append('outward_type', outwardTypeFilter)
       if (outwardSearch) params.append('search', outwardSearch)
       params.append('limit', String(OUTWARD_LIMIT))
       params.append('page', String(outwardPage))
@@ -1142,7 +1174,7 @@ export default function Store({ onNavigate }) {
     } finally {
       setOutwardLoading(false)
     }
-  }, [outwardStoreType, outwardDeptFilter, outwardSearch, outwardPage])
+  }, [outwardStoreType, outwardDeptFilter, outwardTypeFilter, outwardSearch, outwardPage])
 
   const loadDeptSummary = async () => {
     try {
@@ -1383,22 +1415,79 @@ export default function Store({ onNavigate }) {
   const handleCreateOutward = async (e) => {
     e.preventDefault()
     if (!outwardForm.material_id || !outwardForm.out_qty || Number(outwardForm.out_qty) <= 0) {
-      addToast('Please select material and enter valid quantity', 'warning')
+      addToast('Please select material and enter valid quantity (> 0)', 'warning')
       return
     }
+
+    if (outwardForm.outward_type === 'job_work') {
+      if (!outwardForm.vendor_id) {
+        addToast('Please select Job Worker / Party Name', 'warning')
+        return
+      }
+      if (!outwardForm.department_id) {
+        addToast('Please select requesting Plant Department for Job Work', 'warning')
+        return
+      }
+      if (!outwardForm.purpose) {
+        addToast('Please enter Job Work Purpose (e.g. Turning, Rewinding, Grinding)', 'warning')
+        return
+      }
+    } else if (outwardForm.outward_type === 'return_to_vendor') {
+      if (!outwardForm.vendor_id) {
+        addToast('Please select Vendor / Party Name for Return', 'warning')
+        return
+      }
+      if (!outwardForm.purpose) {
+        addToast('Please enter Return Reason / Purpose', 'warning')
+        return
+      }
+    } else if (outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer') {
+      if (!outwardForm.department_id) {
+        addToast('Please select Target Receiving Department / Sub-Store', 'warning')
+        return
+      }
+      if (!outwardForm.purpose) {
+        addToast('Please enter Transfer Purpose', 'warning')
+        return
+      }
+    }
+
+    const payload = {
+      ...outwardForm,
+      out_qty: Number(outwardForm.out_qty),
+      unit_price: outwardForm.unit_price ? Number(outwardForm.unit_price) : undefined,
+      reference_id: outwardForm.store_issue_no || outwardForm.reference_id || undefined
+    }
+
     const r = await fetch(`${API}/store/outward`, {
       method: 'POST',
       headers: json(),
-      body: JSON.stringify(outwardForm)
+      body: JSON.stringify(payload)
     }).then(r => r.json())
     if (r.success) {
       addToast(r.message || 'Outward issue recorded successfully', 'success')
       setOutwardModal(false)
+      setSelectedGrnItem(null)
       setOutwardForm({
-        material_id: '', out_qty: '', department_id: '', machine_id: '',
-        position_id: '', outward_type: 'issue', issued_to: '', purpose: '',
-        serial_number: '', batch_number: '', reference_type: 'WORK_ORDER',
-        reference_id: '', remarks: ''
+        outward_type: outwardForm.outward_type || 'job_work',
+        vendor_id: '',
+        material_id: '',
+        out_qty: '',
+        unit_price: '',
+        department_id: '',
+        machine_id: '',
+        section_id: '',
+        position_id: '',
+        issued_to: '',
+        purpose: '',
+        serial_number: '',
+        batch_number: '',
+        reference_type: outwardForm.outward_type === 'job_work' ? 'JOB_WORK' : outwardForm.outward_type === 'return_to_vendor' ? 'RTV' : 'STO',
+        reference_id: '',
+        store_issue_no: '',
+        date: new Date().toISOString().slice(0, 10),
+        remarks: '',
+        grn_id: ''
       })
       loadOutward()
       loadBaseData()
@@ -2122,10 +2211,29 @@ export default function Store({ onNavigate }) {
             </div>
           </div>
 
-          {/* Department / Store Scoping Chips */}
-          <div style={S.scopeBar}>
+          {/* Department / Store Scoping & Workflow Chips */}
+          <div style={{ ...S.scopeBar, marginBottom: 8 }}>
             {[
               { id: '', label: '⚡ All Outward' },
+              { id: 'job_work', label: '🏭 1. Job Work', color: '#7c3aed' },
+              { id: 'return_to_vendor', label: '↩️ 2. Return to Party (RTV)', color: '#dc2626' },
+              { id: 'transfer', label: '🔄 3. Inter Store Transfer', color: '#0284c7' },
+              { id: 'issue', label: '📤 Dept Issue', color: '#d97706' },
+            ].map(tc => (
+              <button
+                key={tc.id}
+                style={{
+                  ...S.chip,
+                  ...(outwardTypeFilter === tc.id ? { ...S.chipActive, background: tc.color || '#1b1b1d', borderColor: tc.color || '#1b1b1d', color: '#fff' } : {})
+                }}
+                onClick={() => { setOutwardTypeFilter(tc.id); setOutwardPage(1) }}
+              >{tc.label}</button>
+            ))}
+          </div>
+
+          <div style={{ ...S.scopeBar, marginBottom: 12 }}>
+            {[
+              { id: '', label: '🏢 All Mill Stores' },
               { id: 'mechanical', label: '⚙️ Mechanical Store' },
               { id: 'electrical', label: '💡 Electrical Store' },
               { id: 'chemical', label: '🧪 Chemical Store' },
@@ -2143,7 +2251,7 @@ export default function Store({ onNavigate }) {
           <div style={S.filterBar}>
             <input
               style={{ ...S.input, maxWidth: 280, background: '#fff' }}
-              placeholder="🔍 Search material, code, to, purpose..."
+              placeholder="🔍 Search material, code, party, purpose..."
               value={outwardSearch}
               onChange={e => { setOutwardSearch(e.target.value); setOutwardPage(1) }}
             />
@@ -2156,20 +2264,20 @@ export default function Store({ onNavigate }) {
           </div>
 
           {/* Outward Register Table */}
-          <TableScrollWrapper title="Outward (SIV) Register">
+          <TableScrollWrapper title="Outward (SIV / DC / Gate Pass) Register">
             <table style={S.table}>
               <thead>
                 <tr style={S.thead}>
                   <SortableTh label="Date" columnKey="date" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} width={95} />
-                  <SortableTh label="Type" columnKey="transaction_type" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} width={90} />
-                  <SortableTh label="Issue / WO Ref" columnKey="reference_id" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
-                  <SortableTh label="Material" columnKey="materialName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
-                  <SortableTh label="Category" columnKey="categoryName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Type / Mode" columnKey="transaction_type" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} width={115} />
+                  <SortableTh label="Issue / GP / Ref #" columnKey="reference_id" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Material & Code" columnKey="materialName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Category / Party" columnKey="categoryName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
                   <SortableTh label="Issued Qty" columnKey="out_qty" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
                   <SortableTh label="Balance After" columnKey="balance" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
                   <SortableTh label="Unit Price" columnKey="unit_price" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
                   <SortableTh label="Total Value" columnKey="value" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} align="right" />
-                  <SortableTh label="Purpose / Dept / To" columnKey="purpose" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
+                  <SortableTh label="Purpose / Details" columnKey="purpose" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
                   <SortableTh label="Issued By" columnKey="createdByName" currentSortKey={outwardSortBy} currentSortOrder={outwardSortOrder} onSort={(k, o) => { setOutwardSortBy(k); setOutwardSortOrder(o) }} />
                   <th style={{ ...S.th, width: 85, textAlign: 'center' }}>Voucher</th>
                 </tr>
@@ -2183,8 +2291,13 @@ export default function Store({ onNavigate }) {
                   <tr key={outw.id} style={S.tr}>
                     <td style={S.td}><span style={S.code}>{new Date(outw.date).toLocaleDateString('en-IN')}</span></td>
                     <td style={S.td}>
-                      <span style={{ ...S.badge, background: outw.transaction_type === 'return_to_vendor' ? '#fee2e2' : '#fef3c7', color: outw.transaction_type === 'return_to_vendor' ? '#dc2626' : '#b45309' }}>
-                        {outw.transaction_type === 'return_to_vendor' ? 'RTV Outward' : 'Store Issue'}
+                      <span style={{
+                        ...S.badge,
+                        background: outw.transaction_type === 'job_work' ? '#ede9fe' : outw.transaction_type === 'return_to_vendor' ? '#fee2e2' : outw.transaction_type === 'transfer' ? '#e0f2fe' : '#fef3c7',
+                        color: outw.transaction_type === 'job_work' ? '#7c3aed' : outw.transaction_type === 'return_to_vendor' ? '#dc2626' : outw.transaction_type === 'transfer' ? '#0284c7' : '#b45309',
+                        fontWeight: 700
+                      }}>
+                        {outw.transaction_type === 'job_work' ? '🏭 Job Work' : outw.transaction_type === 'return_to_vendor' ? '↩️ Return (RTV)' : outw.transaction_type === 'transfer' ? '🔄 STO Transfer' : '📤 Dept Issue'}
                       </span>
                     </td>
                     <td style={S.td}>
@@ -2197,7 +2310,6 @@ export default function Store({ onNavigate }) {
                         }}
                         onClick={() => {
                           if (outw.reference_type === 'indent' || outw.reference_id?.startsWith('IND-')) {
-                            // If reference is indent, open receiver sign or detail
                             setReceiverModal({ id: outw.reference_id || outw.id, isIndent: true, name: outw.materialName, qty: outw.out_qty, uom: outw.uom })
                           } else {
                             setOutwardVoucher(outw)
@@ -2219,7 +2331,10 @@ export default function Store({ onNavigate }) {
                       </div>
                       <div style={S.muted}>{outw.materialCode}</div>
                     </td>
-                    <td style={S.td}><span style={S.muted}>{outw.categoryName || '—'}</span></td>
+                    <td style={S.td}>
+                      <div>{outw.categoryName || '—'}</div>
+                      {outw.vendorName && <div style={{ fontSize: 11, color: '#7c3aed', fontWeight: 600 }}>🏢 {outw.vendorName}</div>}
+                    </td>
                     <td style={S.td}><span style={{ color: '#dc2626', fontWeight: 700 }}>-{Number(outw.out_qty).toFixed(3)} {outw.uom}</span></td>
                     <td style={S.td}><span style={{ color: '#1b1b1d', fontWeight: 600 }}>{Number(outw.balance).toFixed(3)} {outw.uom}</span></td>
                     <td style={S.td}>₹{Number(outw.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
@@ -3579,11 +3694,23 @@ export default function Store({ onNavigate }) {
       {/* ── MODAL: FAST OUTWARD (ISSUE) ── */}
       {outwardModal && (
         <div style={{ ...S.overlay, display: outwardModalMinimized ? 'none' : 'flex' }}>
-          <div style={{ ...S.modal, maxWidth: 680 }}>
+          <div style={{ ...S.modal, maxWidth: 740, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={S.modalHdr}>
               <div>
-                <b>📤 Fast Outward Issue (Plant Requisition / RTV)</b>
-                <div style={S.muted}>Direct stock deduction with audit logging</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <b style={{ fontSize: 16 }}>📤 Fast Outward Issue Desk</b>
+                  <span style={{
+                    fontSize: 11,
+                    padding: '2px 8px',
+                    borderRadius: 12,
+                    fontWeight: 700,
+                    background: outwardForm.outward_type === 'job_work' ? '#ede9fe' : outwardForm.outward_type === 'return_to_vendor' ? '#fee2e2' : outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer' ? '#e0f2fe' : '#fef3c7',
+                    color: outwardForm.outward_type === 'job_work' ? '#7c3aed' : outwardForm.outward_type === 'return_to_vendor' ? '#dc2626' : outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer' ? '#0284c7' : '#b45309'
+                  }}>
+                    {outwardForm.outward_type === 'job_work' ? '1. JOB WORK' : outwardForm.outward_type === 'return_to_vendor' ? '2. RETURN TO PARTY' : outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer' ? '3. INTER STORE TRANSFER' : 'DEPT CONSUMPTION'}
+                  </span>
+                </div>
+                <div style={S.muted}>Direct stock deduction with permanent traceability &amp; audit logging</div>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button
@@ -3597,108 +3724,786 @@ export default function Store({ onNavigate }) {
                 <button style={S.x} onClick={() => { mmClose('store-outward'); setOutwardModalMinimized(false); setOutwardModal(false) }}>✕</button>
               </div>
             </div>
+
+            {/* 3-Mode Workflow Segmented Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, margin: '12px 0 16px 0' }}>
+              {[
+                {
+                  id: 'job_work',
+                  title: '1. 🏭 Job Work',
+                  subtitle: 'Outside repair / machining',
+                  color: '#7c3aed',
+                  bg: '#ede9fe',
+                  border: '#c4b5fd'
+                },
+                {
+                  id: 'return_to_vendor',
+                  title: '2. ↩️ Return to Party',
+                  subtitle: 'RTV against GRN / QC reject',
+                  color: '#dc2626',
+                  bg: '#fee2e2',
+                  border: '#fca5a5'
+                },
+                {
+                  id: 'inter_store_transfer',
+                  title: '3. 🔄 Store Transfer',
+                  subtitle: 'STO inter-store / sub-store',
+                  color: '#0284c7',
+                  bg: '#e0f2fe',
+                  border: '#7dd3fc'
+                },
+                {
+                  id: 'issue',
+                  title: '4. 📤 Dept Issue',
+                  subtitle: 'Internal plant consumption',
+                  color: '#b45309',
+                  bg: '#fef3c7',
+                  border: '#fcd34d'
+                }
+              ].map(m => {
+                const isActive = (outwardForm.outward_type === m.id) || (m.id === 'inter_store_transfer' && outwardForm.outward_type === 'transfer')
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      setOutwardForm(prev => ({
+                        ...prev,
+                        outward_type: m.id,
+                        reference_type: m.id === 'job_work' ? 'JOB_WORK' : m.id === 'return_to_vendor' ? 'RTV' : m.id === 'inter_store_transfer' ? 'STO' : 'WORK_ORDER',
+                        reference_id: '',
+                        unit_price: selectedOutwardMat ? (selectedOutwardMat.unit_price || '') : prev.unit_price
+                      }))
+                    }}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: 8,
+                      border: isActive ? `2px solid ${m.color}` : '1px solid #e2e8f0',
+                      background: isActive ? m.bg : '#ffffff',
+                      color: isActive ? m.color : '#475569',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isActive ? '0 2px 6px rgba(0,0,0,0.06)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontWeight: 800, fontSize: 13 }}>{m.title}</div>
+                    <div style={{ fontSize: 10, opacity: 0.85, marginTop: 2 }}>{m.subtitle}</div>
+                  </button>
+                )
+              })}
+            </div>
+
             <form onSubmit={handleCreateOutward} style={S.form}>
-              <div style={S.grid2}>
-                <div>
-                  <label style={S.label}>Outward Type *</label>
-                  <SearchableSelect
-                    value={outwardForm.outward_type || 'issue'}
-                    onChange={v => setOutwardForm({ ...outwardForm, outward_type: v })}
-                    placeholder="Select outward type..."
-                    searchPlaceholder="Type or press D/R/T..."
-                    options={[
-                      { value: 'issue', label: 'Department Issue (Production / Maintenance)', subtext: 'Internal plant consumption' },
-                      { value: 'return_to_vendor', label: 'Return to Vendor (RTV)', subtext: 'Defective / excess material return' },
-                      { value: 'transfer', label: 'Inter-Store Transfer', subtext: 'Move stock to another store' }
-                    ]}
-                  />
-                </div>
-                <div>
-                  <label style={S.label}>Work Order / Ref #</label>
-                  <input style={S.input} placeholder="WO # / Indent Ref" value={outwardForm.reference_id} onChange={e => setOutwardForm({ ...outwardForm, reference_id: e.target.value })} />
-                </div>
-              </div>
 
-              <div>
-                <label style={S.label}>Select Material *</label>
-                <SearchableSelect
-                  value={String(outwardForm.material_id || '')}
-                  onChange={v => setOutwardForm({ ...outwardForm, material_id: v })}
-                  placeholder="-- Choose Material --"
-                  searchPlaceholder="Type material name, code, category, bin..."
-                  required
-                  options={mats.map(m => ({
-                    value: String(m.id),
-                    label: m.name,
-                    code: m.code,
-                    subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Bin: ${m.bin_location || m.binLocation || 'Store'}`,
-                    badge: Number(m.current_stock || m.currentStock || 0) <= 0 ? '❌ Out' : undefined,
-                    group: m.categoryName
-                  }))}
-                />
-              </div>
+              {/* ── WORKFLOW 1: JOB WORK ── */}
+              {outwardForm.outward_type === 'job_work' && (
+                <>
+                  {/* 1. Select Party Name */}
+                  <div>
+                    <label style={S.label}>1. Select Party Name (Job Worker / Vendor) *</label>
+                    <SearchableSelect
+                      value={String(outwardForm.vendor_id || '')}
+                      onChange={v => {
+                        setOutwardForm({ ...outwardForm, vendor_id: v })
+                      }}
+                      placeholder="-- Choose Job Worker / Lathe / Motor Repair Vendor --"
+                      searchPlaceholder="Search vendor by name, code, city..."
+                      required
+                      options={vendors.map(v => ({
+                        value: String(v.id),
+                        label: v.name,
+                        code: v.code,
+                        subtext: `${v.city ? v.city + ' · ' : ''}${v.gstin ? 'GST: ' + v.gstin : 'Vendor'}`
+                      }))}
+                    />
+                  </div>
 
-              {selectedOutwardMat && (
-                <div style={{ background: Number(selectedOutwardMat.current_stock||0) > 0 ? '#f0fdf4' : '#fef2f2', padding: '8px 12px', borderRadius: 6, fontSize: 13, color: Number(selectedOutwardMat.current_stock||0) > 0 ? '#166534' : '#991b1b', fontWeight: 600 }}>
-                  📦 Available in Store: {selectedOutwardMat.current_stock || 0} {selectedOutwardMat.uom} | Location: {selectedOutwardMat.binLocation || selectedOutwardMat.bin_location || 'Main Store'}
-                </div>
+                  {/* 2. Select Job Work Material */}
+                  <div>
+                    <label style={S.label}>2. Select Job Work Material *</label>
+                    <SearchableSelect
+                      value={String(outwardForm.material_id || '')}
+                      onChange={v => {
+                        const m = mats.find(mm => String(mm.id) === String(v))
+                        setOutwardForm({
+                          ...outwardForm,
+                          material_id: v,
+                          unit_price: m?.unit_price || m?.unitPrice || ''
+                        })
+                      }}
+                      placeholder="-- Choose Spare / Material to send for Job Work --"
+                      searchPlaceholder="Type material name, code, category, bin..."
+                      required
+                      options={mats.map(m => ({
+                        value: String(m.id),
+                        label: m.name,
+                        code: m.code,
+                        subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Price: ₹${m.unit_price || 0} · Bin: ${m.bin_location || m.binLocation || 'Main Store'}`,
+                        badge: Number(m.current_stock || m.currentStock || 0) <= 0 ? '❌ Out of Stock' : undefined,
+                        group: m.categoryName
+                      }))}
+                    />
+                  </div>
+
+                  {selectedOutwardMat && (
+                    <div style={{ background: Number(selectedOutwardMat.current_stock || 0) > 0 ? '#f5f3ff' : '#fef2f2', border: '1px solid #ddd6fe', padding: '8px 12px', borderRadius: 6, fontSize: 12, color: '#5b21b6', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>📦 Store Stock: <b>{selectedOutwardMat.current_stock || 0} {selectedOutwardMat.uom}</b> · Bin: {selectedOutwardMat.binLocation || selectedOutwardMat.bin_location || 'Store'}</span>
+                      <span>Default Rate: <b>₹{Number(selectedOutwardMat.unit_price || 0).toFixed(2)}</b></span>
+                    </div>
+                  )}
+
+                  {/* 3. Select Qty & Rate */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>3. Select Job Work Qty *</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        min="0.001"
+                        max={selectedOutwardMat?.current_stock ?? 999999}
+                        style={S.input}
+                        placeholder="0.000"
+                        value={outwardForm.out_qty}
+                        onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Rate (₹ / Unit)</label>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input
+                          type="number"
+                          step="0.01"
+                          style={S.input}
+                          placeholder="Rate per unit"
+                          value={outwardForm.unit_price}
+                          onChange={e => setOutwardForm({ ...outwardForm, unit_price: e.target.value })}
+                        />
+                        {outwardForm.out_qty && outwardForm.unit_price && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', whiteSpace: 'nowrap' }}>
+                            = ₹{(Number(outwardForm.out_qty) * Number(outwardForm.unit_price)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Select Dept & Machine / Section */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>4. Select Department *</label>
+                      <SearchableSelect
+                        value={String(outwardForm.department_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
+                        placeholder="-- Requesting Department --"
+                        searchPlaceholder="Type department name..."
+                        required
+                        options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Select M/S (Machine / Section)</label>
+                      <SearchableSelect
+                        value={String(outwardForm.machine_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
+                        placeholder="-- Select Machine (PM1 / Boiler / ETP) --"
+                        searchPlaceholder="Type machine name or code..."
+                        allowClear={true}
+                        options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 5. Purpose & Remarks */}
+                  <div>
+                    <label style={S.label}>5. Job Work Purpose *</label>
+                    <input
+                      style={S.input}
+                      placeholder="e.g. Bearing journal turning & re-sleeving / Motor 75kW rewinding / Rubber roll re-grinding..."
+                      value={outwardForm.purpose}
+                      onChange={e => setOutwardForm({ ...outwardForm, purpose: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Delivery / DC / Gate Pass Ref #</label>
+                      <input
+                        style={S.input}
+                        placeholder="Auto-generated Returnable GP (or custom ref)"
+                        value={outwardForm.reference_id}
+                        onChange={e => setOutwardForm({ ...outwardForm, reference_id: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Issued To / Transporter</label>
+                      <input
+                        style={S.input}
+                        placeholder="e.g. Driver / Courier / Authorized Bearer"
+                        value={outwardForm.issued_to}
+                        onChange={e => setOutwardForm({ ...outwardForm, issued_to: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={S.label}>Remarks / Authorization Details</label>
+                    <textarea
+                      style={S.input}
+                      rows={2}
+                      placeholder="Shift details, expected return date, special instructions..."
+                      value={outwardForm.remarks}
+                      onChange={e => setOutwardForm({ ...outwardForm, remarks: e.target.value })}
+                    />
+                  </div>
+                </>
               )}
 
-              <div style={S.grid2}>
-                <div>
-                  <label style={S.label}>Issue Quantity *</label>
-                  <input type="number" step="0.001" max={selectedOutwardMat?.current_stock ?? 999999} style={S.input} placeholder="0.000" value={outwardForm.out_qty} onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })} required />
-                </div>
-                <div>
-                  <label style={S.label}>Plant Department *</label>
-                  <SearchableSelect
-                    value={String(outwardForm.department_id || '')}
-                    onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
-                    placeholder="-- Select Receiving Dept --"
-                    searchPlaceholder="Type department name..."
-                    required
-                    options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
-                  />
-                </div>
-              </div>
+              {/* ── WORKFLOW 2: RETURN TO PARTY (RTV) ── */}
+              {outwardForm.outward_type === 'return_to_vendor' && (
+                <>
+                  {/* 1. Select Party Name */}
+                  <div>
+                    <label style={S.label}>1. Select Party Name (Vendor / Supplier) *</label>
+                    <SearchableSelect
+                      value={String(outwardForm.vendor_id || '')}
+                      onChange={v => {
+                        setOutwardForm({ ...outwardForm, vendor_id: v, material_id: '', unit_price: '', grn_id: '', reference_id: '' })
+                        setSelectedGrnItem(null)
+                        fetchVendorGrnMaterials(v)
+                      }}
+                      placeholder="-- Select Vendor / Supplier to Return Material --"
+                      searchPlaceholder="Search supplier by name, code..."
+                      required
+                      options={vendors.map(v => ({
+                        value: String(v.id),
+                        label: v.name,
+                        code: v.code,
+                        subtext: `${v.city ? v.city + ' · ' : ''}${v.gstin ? 'GST: ' + v.gstin : 'Vendor'}`
+                      }))}
+                    />
+                  </div>
 
-              <div style={S.grid2}>
-                <div>
-                  <label style={S.label}>Machine / Section Context</label>
-                  <SearchableSelect
-                    value={String(outwardForm.machine_id || '')}
-                    onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
-                    placeholder="-- Select Machine (Optional) --"
-                    searchPlaceholder="Type machine name or code..."
-                    allowClear={true}
-                    options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
-                  />
-                </div>
-                <div>
-                  <label style={S.label}>Issued To (Person Name) *</label>
-                  <input style={S.input} placeholder="e.g. Ramesh Kumar (Operator)" value={outwardForm.issued_to} onChange={e => setOutwardForm({ ...outwardForm, issued_to: e.target.value })} required />
-                </div>
-              </div>
+                  {/* 2. Select GRN Material */}
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <label style={S.label}>2. Select GRN Material *</label>
+                      {loadingVendorGrn && <span style={{ fontSize: 11, color: '#0284c7' }}>⏳ Fetching vendor GRN records...</span>}
+                      {outwardForm.vendor_id && !loadingVendorGrn && (
+                        <span style={{ fontSize: 11, color: '#64748b' }}>
+                          {vendorGrnMaterials.length} past GRN item(s) found for this vendor
+                        </span>
+                      )}
+                    </div>
 
-              <div style={S.grid2}>
-                <div>
-                  <label style={S.label}>Serial # / Asset Tag (For Traceability)</label>
-                  <input style={S.input} placeholder="Scan motor / bearing serial..." value={outwardForm.serial_number} onChange={e => setOutwardForm({ ...outwardForm, serial_number: e.target.value })} />
-                </div>
-                <div>
-                  <label style={S.label}>Purpose *</label>
-                  <input style={S.input} placeholder="e.g. PM1 Felt Roll Replacement" value={outwardForm.purpose} onChange={e => setOutwardForm({ ...outwardForm, purpose: e.target.value })} required />
-                </div>
-              </div>
+                    {vendorGrnMaterials.length > 0 ? (
+                      <SearchableSelect
+                        value={String(outwardForm.material_id || '')}
+                        onChange={v => {
+                          const grnIt = vendorGrnMaterials.find(g => String(g.material_id) === String(v))
+                          const matObj = mats.find(mm => String(mm.id) === String(v))
+                          if (grnIt) {
+                            setSelectedGrnItem(grnIt)
+                            setOutwardForm({
+                              ...outwardForm,
+                              material_id: v,
+                              unit_price: grnIt.unitPrice || matObj?.unit_price || '',
+                              grn_id: grnIt.grnId || '',
+                              reference_id: grnIt.grnNumber || '',
+                              batch_number: grnIt.batchNumber || ''
+                            })
+                          } else {
+                            setSelectedGrnItem(null)
+                            setOutwardForm({
+                              ...outwardForm,
+                              material_id: v,
+                              unit_price: matObj?.unit_price || ''
+                            })
+                          }
+                        }}
+                        placeholder="-- Choose GRN Material received from this vendor --"
+                        searchPlaceholder="Type material name, code, GRN #..."
+                        required
+                        options={[
+                          ...vendorGrnMaterials.map(g => ({
+                            value: String(g.material_id),
+                            label: `${g.materialName} (${g.materialCode})`,
+                            code: g.grnNumber,
+                            subtext: `GRN: ${g.grnNumber} (${new Date(g.grnDate).toLocaleDateString('en-IN')}) · Rec: ${g.receivedQty} ${g.uom} @ ₹${g.unitPrice} · Store Stock: ${g.currentStock}`,
+                            badge: `GRN: ₹${g.unitPrice}`
+                          })),
+                          ...mats.filter(m => !vendorGrnMaterials.some(g => String(g.material_id) === String(m.id))).map(m => ({
+                            value: String(m.id),
+                            label: m.name,
+                            code: m.code,
+                            subtext: `Stock: ${m.current_stock || 0} ${m.uom} (Other Store Material)`
+                          }))
+                        ]}
+                      />
+                    ) : (
+                      <SearchableSelect
+                        value={String(outwardForm.material_id || '')}
+                        onChange={v => {
+                          const m = mats.find(mm => String(mm.id) === String(v))
+                          setOutwardForm({
+                            ...outwardForm,
+                            material_id: v,
+                            unit_price: m?.unit_price || ''
+                          })
+                        }}
+                        placeholder="-- Choose Material from Store Inventory --"
+                        searchPlaceholder="Type material name, code, category..."
+                        required
+                        options={mats.map(m => ({
+                          value: String(m.id),
+                          label: m.name,
+                          code: m.code,
+                          subtext: `Stock: ${m.current_stock || 0} ${m.uom} · Price: ₹${m.unit_price || 0}`
+                        }))}
+                      />
+                    )}
+                  </div>
 
-              <div>
-                <label style={S.label}>Remarks / Shift Details</label>
-                <textarea style={S.input} rows={2} placeholder="Shift A/B/C, authorization notes..." value={outwardForm.remarks} onChange={e => setOutwardForm({ ...outwardForm, remarks: e.target.value })} />
-              </div>
+                  {selectedGrnItem && (
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '8px 12px', borderRadius: 6, fontSize: 12, color: '#991b1b', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>📄 GRN Ref: <b>{selectedGrnItem.grnNumber}</b> ({new Date(selectedGrnItem.grnDate).toLocaleDateString('en-IN')}) · Inward Qty: <b>{selectedGrnItem.receivedQty} {selectedGrnItem.uom}</b></span>
+                      <span>Current Store Balance: <b>{selectedGrnItem.currentStock} {selectedGrnItem.uom}</b></span>
+                    </div>
+                  )}
 
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 10 }}>
+                  {/* 3. Select GRN Qty & Rate */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>3. Select GRN Qty to Return *</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        min="0.001"
+                        max={selectedOutwardMat?.current_stock ?? selectedGrnItem?.currentStock ?? 999999}
+                        style={S.input}
+                        placeholder="0.000"
+                        value={outwardForm.out_qty}
+                        onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Rate / Debit Price (₹ / Unit)</label>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input
+                          type="number"
+                          step="0.01"
+                          style={S.input}
+                          placeholder="Rate per unit"
+                          value={outwardForm.unit_price}
+                          onChange={e => setOutwardForm({ ...outwardForm, unit_price: e.target.value })}
+                        />
+                        {outwardForm.out_qty && outwardForm.unit_price && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', whiteSpace: 'nowrap' }}>
+                            = ₹{(Number(outwardForm.out_qty) * Number(outwardForm.unit_price)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} (Debit)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Select Dept & Machine / Section */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>4. Select Department *</label>
+                      <SearchableSelect
+                        value={String(outwardForm.department_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
+                        placeholder="-- Quality / Store / Originating Dept --"
+                        searchPlaceholder="Type department name..."
+                        options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Select M/S (Machine / Section Context)</label>
+                      <SearchableSelect
+                        value={String(outwardForm.machine_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
+                        placeholder="-- Select Machine (Optional) --"
+                        searchPlaceholder="Type machine name or code..."
+                        allowClear={true}
+                        options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 5. Purpose & Remarks */}
+                  <div>
+                    <label style={S.label}>5. Purpose / Rejection Reason *</label>
+                    <input
+                      style={S.input}
+                      placeholder="e.g. QC Spec Failure / Dimension Mismatch / Core Cracking / Excess Quantity Returned to Supplier..."
+                      value={outwardForm.purpose}
+                      onChange={e => setOutwardForm({ ...outwardForm, purpose: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Debit Note / Rejection Memo Ref</label>
+                      <input
+                        style={S.input}
+                        placeholder="DN # / RTV Ref"
+                        value={outwardForm.reference_id}
+                        onChange={e => setOutwardForm({ ...outwardForm, reference_id: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Transporter / Courier LR #</label>
+                      <input
+                        style={S.input}
+                        placeholder="Vehicle / Courier tracking details"
+                        value={outwardForm.issued_to}
+                        onChange={e => setOutwardForm({ ...outwardForm, issued_to: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={S.label}>Remarks / Settlement Notes</label>
+                    <textarea
+                      style={S.input}
+                      rows={2}
+                      placeholder="Debit note adjustments, authorization notes, replacement agreement..."
+                      value={outwardForm.remarks}
+                      onChange={e => setOutwardForm({ ...outwardForm, remarks: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* ── WORKFLOW 3: INTER STORE TRANSFER ── */}
+              {(outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer') && (
+                <>
+                  {/* 1. Store Issue No & Date */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>1. Store Issue No (STO / SIV Ref)</label>
+                      <input
+                        style={S.input}
+                        placeholder="Auto-generated STO # (or enter SIV Ref)"
+                        value={outwardForm.store_issue_no || outwardForm.reference_id}
+                        onChange={e => setOutwardForm({ ...outwardForm, store_issue_no: e.target.value, reference_id: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Issue Date *</label>
+                      <input
+                        type="date"
+                        style={S.input}
+                        value={outwardForm.date}
+                        onChange={e => setOutwardForm({ ...outwardForm, date: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* 2. Select Issue Material */}
+                  <div>
+                    <label style={S.label}>2. Select Issue Material *</label>
+                    <SearchableSelect
+                      value={String(outwardForm.material_id || '')}
+                      onChange={v => {
+                        const m = mats.find(mm => String(mm.id) === String(v))
+                        setOutwardForm({
+                          ...outwardForm,
+                          material_id: v,
+                          unit_price: m?.unit_price || m?.unitPrice || ''
+                        })
+                      }}
+                      placeholder="-- Choose Material to Transfer --"
+                      searchPlaceholder="Type material name, code, category, bin..."
+                      required
+                      options={mats.map(m => ({
+                        value: String(m.id),
+                        label: m.name,
+                        code: m.code,
+                        subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Bin: ${m.bin_location || m.binLocation || 'Main Store'}`,
+                        badge: Number(m.current_stock || m.currentStock || 0) <= 0 ? '❌ Out of Stock' : undefined,
+                        group: m.categoryName
+                      }))}
+                    />
+                  </div>
+
+                  {selectedOutwardMat && (
+                    <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', padding: '8px 12px', borderRadius: 6, fontSize: 12, color: '#0369a1', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>📦 Available in Source Store: <b>{selectedOutwardMat.current_stock || 0} {selectedOutwardMat.uom}</b></span>
+                      <span>Location: <b>{selectedOutwardMat.binLocation || selectedOutwardMat.bin_location || 'Main Store'}</b></span>
+                    </div>
+                  )}
+
+                  {/* 3. Select Issue Qty */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>3. Select Issue Qty *</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        min="0.001"
+                        max={selectedOutwardMat?.current_stock ?? 999999}
+                        style={S.input}
+                        placeholder="0.000"
+                        value={outwardForm.out_qty}
+                        onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Transfer Valuation Rate (₹ / Unit)</label>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input
+                          type="number"
+                          step="0.01"
+                          style={S.input}
+                          placeholder="Rate per unit"
+                          value={outwardForm.unit_price}
+                          onChange={e => setOutwardForm({ ...outwardForm, unit_price: e.target.value })}
+                        />
+                        {outwardForm.out_qty && outwardForm.unit_price && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#0284c7', whiteSpace: 'nowrap' }}>
+                            = ₹{(Number(outwardForm.out_qty) * Number(outwardForm.unit_price)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Select Dept & Machine / Section */}
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>4. Select Receiving Department / Sub-Store *</label>
+                      <SearchableSelect
+                        value={String(outwardForm.department_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
+                        placeholder="-- Target / Receiving Dept --"
+                        searchPlaceholder="Type department name..."
+                        required
+                        options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Select M/S (Machine / Section Context)</label>
+                      <SearchableSelect
+                        value={String(outwardForm.machine_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
+                        placeholder="-- Target Equipment / Machine --"
+                        searchPlaceholder="Type machine name or code..."
+                        allowClear={true}
+                        options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 5. Purpose & Remarks */}
+                  <div>
+                    <label style={S.label}>5. Purpose *</label>
+                    <input
+                      style={S.input}
+                      placeholder="e.g. Shift replenishment to Electrical sub-store / Urgent chemical dosing shift transfer..."
+                      value={outwardForm.purpose}
+                      onChange={e => setOutwardForm({ ...outwardForm, purpose: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Receiver Person Name</label>
+                      <input
+                        style={S.input}
+                        placeholder="e.g. Sub-store keeper / Section in-charge"
+                        value={outwardForm.issued_to}
+                        onChange={e => setOutwardForm({ ...outwardForm, issued_to: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Batch / Serial Tag</label>
+                      <input
+                        style={S.input}
+                        placeholder="Batch / barcode if applicable"
+                        value={outwardForm.batch_number || outwardForm.serial_number}
+                        onChange={e => setOutwardForm({ ...outwardForm, batch_number: e.target.value, serial_number: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={S.label}>Remarks / Handover Notes</label>
+                    <textarea
+                      style={S.input}
+                      rows={2}
+                      placeholder="Transfer slip details, carrier shift, physical inspection note..."
+                      value={outwardForm.remarks}
+                      onChange={e => setOutwardForm({ ...outwardForm, remarks: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* ── WORKFLOW 4: GENERAL DEPT ISSUE ── */}
+              {outwardForm.outward_type === 'issue' && (
+                <>
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Work Order / Indent Ref #</label>
+                      <input
+                        style={S.input}
+                        placeholder="WO # / Indent Ref"
+                        value={outwardForm.reference_id}
+                        onChange={e => setOutwardForm({ ...outwardForm, reference_id: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Issue Date *</label>
+                      <input
+                        type="date"
+                        style={S.input}
+                        value={outwardForm.date}
+                        onChange={e => setOutwardForm({ ...outwardForm, date: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={S.label}>Select Material *</label>
+                    <SearchableSelect
+                      value={String(outwardForm.material_id || '')}
+                      onChange={v => setOutwardForm({ ...outwardForm, material_id: v })}
+                      placeholder="-- Choose Material --"
+                      searchPlaceholder="Type material name, code, category, bin..."
+                      required
+                      options={mats.map(m => ({
+                        value: String(m.id),
+                        label: m.name,
+                        code: m.code,
+                        subtext: `Stock: ${m.current_stock || m.currentStock || 0} ${m.uom} · Bin: ${m.bin_location || m.binLocation || 'Store'}`,
+                        badge: Number(m.current_stock || m.currentStock || 0) <= 0 ? '❌ Out' : undefined,
+                        group: m.categoryName
+                      }))}
+                    />
+                  </div>
+
+                  {selectedOutwardMat && (
+                    <div style={{ background: Number(selectedOutwardMat.current_stock || 0) > 0 ? '#f0fdf4' : '#fef2f2', padding: '8px 12px', borderRadius: 6, fontSize: 13, color: Number(selectedOutwardMat.current_stock || 0) > 0 ? '#166534' : '#991b1b', fontWeight: 600 }}>
+                      📦 Available in Store: {selectedOutwardMat.current_stock || 0} {selectedOutwardMat.uom} | Location: {selectedOutwardMat.binLocation || selectedOutwardMat.bin_location || 'Main Store'}
+                    </div>
+                  )}
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Issue Quantity *</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        max={selectedOutwardMat?.current_stock ?? 999999}
+                        style={S.input}
+                        placeholder="0.000"
+                        value={outwardForm.out_qty}
+                        onChange={e => setOutwardForm({ ...outwardForm, out_qty: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Plant Department *</label>
+                      <SearchableSelect
+                        value={String(outwardForm.department_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, department_id: v })}
+                        placeholder="-- Select Receiving Dept --"
+                        searchPlaceholder="Type department name..."
+                        required
+                        options={depts.map(d => ({ value: String(d.id), label: d.name, code: d.code }))}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Machine / Section Context</label>
+                      <SearchableSelect
+                        value={String(outwardForm.machine_id || '')}
+                        onChange={v => setOutwardForm({ ...outwardForm, machine_id: v })}
+                        placeholder="-- Select Machine (Optional) --"
+                        searchPlaceholder="Type machine name or code..."
+                        allowClear={true}
+                        options={machines.map(m => ({ value: String(m.id), label: m.name, code: m.code || m.machine_code, subtext: m.type }))}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Issued To (Person Name) *</label>
+                      <input
+                        style={S.input}
+                        placeholder="e.g. Ramesh Kumar (Operator)"
+                        value={outwardForm.issued_to}
+                        onChange={e => setOutwardForm({ ...outwardForm, issued_to: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div style={S.grid2}>
+                    <div>
+                      <label style={S.label}>Serial # / Asset Tag</label>
+                      <input
+                        style={S.input}
+                        placeholder="Scan motor / bearing serial..."
+                        value={outwardForm.serial_number}
+                        onChange={e => setOutwardForm({ ...outwardForm, serial_number: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={S.label}>Purpose *</label>
+                      <input
+                        style={S.input}
+                        placeholder="e.g. PM1 Felt Roll Replacement"
+                        value={outwardForm.purpose}
+                        onChange={e => setOutwardForm({ ...outwardForm, purpose: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={S.label}>Remarks / Shift Details</label>
+                    <textarea
+                      style={S.input}
+                      rows={2}
+                      placeholder="Shift A/B/C, authorization notes..."
+                      value={outwardForm.remarks}
+                      onChange={e => setOutwardForm({ ...outwardForm, remarks: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Dynamic Action Buttons per Mode */}
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 14, paddingTop: 10, borderTop: '1px solid #e2e8f0' }}>
                 <button type="button" style={S.btnGhost} onClick={() => setOutwardModal(false)}>Cancel</button>
-                <button type="submit" style={{ ...S.btn, background: '#d97706' }}>Confirm Stock Issue</button>
+                <button
+                  type="submit"
+                  style={{
+                    ...S.btn,
+                    background: outwardForm.outward_type === 'job_work' ? '#7c3aed' : outwardForm.outward_type === 'return_to_vendor' ? '#dc2626' : outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer' ? '#0284c7' : '#d97706',
+                    color: '#fff',
+                    fontWeight: 700,
+                    padding: '8px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  {outwardForm.outward_type === 'job_work' && '🏭 Confirm Stock Issue (Job Work)'}
+                  {outwardForm.outward_type === 'return_to_vendor' && '↩️ Confirm Store Issue to Out'}
+                  {(outwardForm.outward_type === 'inter_store_transfer' || outwardForm.outward_type === 'transfer') && '🔄 Confirm Store Received Stock'}
+                  {outwardForm.outward_type === 'issue' && '📤 Confirm Stock Issue'}
+                </button>
               </div>
             </form>
           </div>

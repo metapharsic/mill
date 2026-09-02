@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import {
   ShieldCheck, CheckCircle2, AlertTriangle, XCircle, RefreshCw,
-  Database, Code2, ShoppingCart, Store, Layers, Wrench,
+  Database, Code2, ShoppingCart, Store, Layers, Wrench, Factory,
   Activity, ArrowUpRight, Cpu, Clock, Terminal, ChevronDown,
-  ChevronRight, Sparkles, Filter, Search, FileText, Check
+  ChevronRight, Sparkles, Filter, Search, FileText, Check, GitBranch
 } from 'lucide-react'
 
 const AGENT_META = {
@@ -48,6 +48,13 @@ const AGENT_META = {
     bg: 'rgba(6, 182, 212, 0.08)',
     border: 'rgba(6, 182, 212, 0.25)',
     label: 'Maintenance & Finance AP',
+  },
+  A_PROD_ORDER: {
+    icon: Factory,
+    color: '#f97316',
+    bg: 'rgba(249, 115, 22, 0.08)',
+    border: 'rgba(249, 115, 22, 0.25)',
+    label: 'Production Order Pipeline',
   },
 }
 
@@ -134,7 +141,7 @@ export default function MultiAgentCheckpoint() {
               <h1 style={S.headerTitle}>Multi-Agent System & Checkpoint Engine</h1>
               <span style={S.liveBadge}>
                 <span style={S.livePillDot} />
-                6/6 AGENTS ACTIVE
+                7/7 AGENTS ACTIVE
               </span>
             </div>
             <div style={S.headerSubtitle}>
@@ -174,7 +181,7 @@ export default function MultiAgentCheckpoint() {
           <div style={{ ...S.kpiValue, color: '#15803d' }}>
             {telemetry?.systemSummary?.systemStatus || '100% VERIFIED'}
           </div>
-          <div style={S.kpiSub}>6 Specialized Agents Online</div>
+          <div style={S.kpiSub}>7 Specialized Agents Online</div>
         </div>
 
         <div style={S.kpiCard}>
@@ -250,6 +257,13 @@ export default function MultiAgentCheckpoint() {
           >
             <AlertTriangle size={15} />
             Architectural Items ({openItems.length})
+          </button>
+          <button
+            style={{ ...S.tabBtn, ...(activeTab === 'pipeline' ? S.tabBtnActive : {}) }}
+            onClick={() => setActiveTab('pipeline')}
+          >
+            <GitBranch size={15} />
+            Production Pipeline Wiring
           </button>
         </div>
       </div>
@@ -593,6 +607,112 @@ export default function MultiAgentCheckpoint() {
           </div>
         </div>
       )}
+
+      {/* ═══ PIPELINE WIRING DIAGRAM TAB ═══════════════════════════════════ */}
+      {activeTab === 'pipeline' && (() => {
+        const po = telemetry?.agents?.A_PROD_ORDER
+        const pipeline = po?.pipeline || []
+        const STAGE_COLORS = {
+          PASS: { bg: 'rgba(16,185,129,0.1)', border: '#10b981', txt: '#065f46', dot: '#10b981' },
+          WARN: { bg: 'rgba(245,158,11,0.1)', border: '#f59e0b', txt: '#92400e', dot: '#f59e0b' },
+          FAIL: { bg: 'rgba(239,68,68,0.1)', border: '#ef4444', txt: '#7f1d1d', dot: '#ef4444' },
+        }
+        return (
+          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+            {/* Live Metrics Panel */}
+            {po && (
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+                {[
+                  ['Open SOs', po.metrics?.openSalesOrders, '#6366f1'],
+                  ['Active PPC Plans', po.metrics?.activePpcPlans, '#f97316'],
+                  ['Slit Reels Produced', po.metrics?.slitReelsProduced, '#10b981'],
+                  ['Orders With Balance', po.metrics?.ordersWithBalance, '#eab308'],
+                  ['Overdue Orders', po.metrics?.overdueOrders, '#ef4444'],
+                ].map(([l, v, c]) => (
+                  <div key={l} style={{ background: '#fff', border: `1px solid ${c}33`, borderLeft: `4px solid ${c}`, borderRadius: 10, padding: '10px 16px', minWidth: 140, flex: 1 }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>{l}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: c }}>{v ?? '—'}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Pipeline Heading */}
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#18181b', marginBottom: 6 }}>
+              🏭 Production Order Pipeline — A2A Wiring Diagram
+            </div>
+            <div style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>
+              Agent <strong>A_PROD_ORDER</strong> monitors all 7 stages. Arrows represent data handoff between system actors.
+            </div>
+
+            {/* 7-Stage Flow */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {[
+                { stage: 1, id: 'order_book',       label: 'Party Order → Order Book',          desc: 'Customer raises order. Unique SO-YYYYMMDD-NNNN generated. Entry recorded in sales_orders.',       actor: 'Sales Team', endpoint: 'POST /api/sales/orders  ·  GET /api/sales/order-book' },
+                { stage: 2, id: 'deckle_perm',       label: 'Deckle Matching / BFD Optimizer',   desc: 'Pending SOs fed into Best-Fit Decreasing algorithm. Cut positions suggested to minimise trim.',     actor: 'PPC Manager', endpoint: 'GET /api/production/ppc/deckle-optimizer' },
+                { stage: 3, id: 'prod_order_report', label: 'Production Order Report',           desc: 'Approved PPC plan locked. Printable Production Order Report generated for paper machine operators.', actor: 'Production Mgr', endpoint: 'GET /api/production/reports/production-order' },
+                { stage: 4, id: 'rewinder_cutting',  label: 'Rewinder Cutting Order Sheet',      desc: 'Per-jumbo operator instruction sheet: cut positions, widths, planned weight, SO traceability.',      actor: 'Rewinder Operator', endpoint: 'GET /api/production/reports/rewinder-cutting-order/:id' },
+                { stage: 5, id: 'reel_entry_qty',    label: 'Reel Entry + SO Qty Reduction',     desc: 'Slit reels entered after rewinding. fulfilled_mt on sales_orders atomically decremented.',          actor: 'Store / QC', endpoint: 'POST /api/production/slitting/slit-reels' },
+                { stage: 6, id: 'balance_list',      label: 'Balance List',                      desc: 'Live view of all open SOs with remaining balance MT, pending value, and overdue flag.',              actor: 'Sales / Management', endpoint: 'GET /api/sales/balance-list' },
+                { stage: 7, id: 'a2a_wiring',        label: 'A2A Agent — A_PROD_ORDER',          desc: 'All 6 upstream stages monitored by A_PROD_ORDER. Registers in MultiAgentCheckpoint. Telemetry live.', actor: 'A_PROD_ORDER', endpoint: 'GET /api/dev/agents  ·  POST /api/dev/agents/validate' },
+              ].map((s, idx) => {
+                const pipelineItem = pipeline.find(p => p.id === s.id)
+                const status = pipelineItem?.status || 'PASS'
+                const col = STAGE_COLORS[status] || STAGE_COLORS.PASS
+                const isLast = idx === 6
+                return (
+                  <div key={s.id}>
+                    <div style={{ display: 'flex', gap: 0, alignItems: 'stretch' }}>
+                      {/* Left connector column */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 40, flexShrink: 0 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: col.bg, border: `2px solid ${col.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, color: col.border, flexShrink: 0 }}>
+                          {s.stage}
+                        </div>
+                        {!isLast && <div style={{ width: 2, flex: 1, minHeight: 20, background: col.border, opacity: 0.4 }} />}
+                      </div>
+                      {/* Card */}
+                      <div style={{ flex: 1, marginLeft: 14, marginBottom: isLast ? 0 : 0, paddingBottom: isLast ? 0 : 16 }}>
+                        <div style={{ background: col.bg, border: `1px solid ${col.border}`, borderRadius: 12, padding: '14px 18px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 14, color: '#18181b' }}>{s.label}</div>
+                              <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>{s.desc}</div>
+                              <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 11, background: '#f1f5f9', borderRadius: 6, padding: '2px 8px', color: '#334155', fontWeight: 600 }}>👤 {s.actor}</span>
+                                <span style={{ fontSize: 11, fontFamily: 'monospace', background: '#18181b', borderRadius: 6, padding: '2px 8px', color: '#f4c84b' }}>{s.endpoint}</span>
+                              </div>
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 8, background: col.border, color: '#fff', flexShrink: 0 }}>
+                              ✓ {status}
+                            </span>
+                          </div>
+                          {pipelineItem?.note && (
+                            <div style={{ marginTop: 10, fontSize: 11.5, color: '#64748b', borderTop: `1px dashed ${col.border}`, paddingTop: 8 }}>
+                              ℹ️ {pipelineItem.note}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Legend */}
+            <div style={{ marginTop: 24, padding: '12px 16px', background: '#fff', borderRadius: 10, border: '1px solid #e2e8f0', display: 'flex', gap: 20, fontSize: 12, flexWrap: 'wrap' }}>
+              <strong style={{ color: '#334155' }}>Legend:</strong>
+              {[['PASS', '#10b981'], ['WARN', '#f59e0b'], ['FAIL', '#ef4444']].map(([l, c]) => (
+                <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: c, display: 'inline-block' }} />
+                  <span style={{ color: '#475569' }}>{l}</span>
+                </span>
+              ))}
+              <span style={{ color: '#94a3b8', marginLeft: 'auto' }}>Refreshed: {new Date().toLocaleTimeString('en-IN')}</span>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

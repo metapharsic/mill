@@ -11,36 +11,36 @@
       "approvals": "Live synchronized queue for Submitted, L1 Approved, and Approved indents with 1-click approval, serial/batch issue picking, rejection, and full DML deletion options.",
       "departmentConsumptionShare": "Multi-view visualizer (Bars, SVG Donut, Detailed Data Table, Ranked Leaderboard) with real-time searchbar filter, sorting by valuation/qty/indents, and instant drill-down hyperlinks connecting directly to store vouchers.",
       "systemBackupAndMigration": "Full project backup bundle (mkmill_complete_backup.zip, 26.68 MB) + PostgreSQL data dump (db/backups/mkmill_complete_dump.sql) with 1-click restore engine (scripts/restore_db.js, setup_new_system.bat) and MIGRATION_GUIDE.md verified with 100% data fidelity.",
-      "departmentReports": "Confidential \u2014 Store Manager (role_level<4) sees own department only; admin/Plant Head (role_level>=4) sees org-wide. 6 tabs: Department Summary, Item-Wise, Category/Subcategory, Bin/Rack Location, Vendor-Wise, Fast/Slow/Dead Stock \u2014 all with drill-down, print-ready. Live verified with test JWTs.",
+      "departmentReports": "Confidential — Store Manager (role_level<4) sees own department only; admin/Plant Head (role_level>=4) sees org-wide. 6 tabs: Department Summary, Item-Wise, Category/Subcategory, Bin/Rack Location, Vendor-Wise, Fast/Slow/Dead Stock — all with drill-down, print-ready. Live verified with test JWTs.",
       "excelSync": "Automated sync for all 7 store categories + inward GRN transactions strictly by material code without naming assumptions",
-      "stockLedgerReconciliation": "Corrected 2026-08-20: indent-issue was writing a stale pre-deduction balance into stock_ledger (now fixed), warehouse transfer dispatch/receive wrote ledger rows without updating materials.current_stock (now fixed, both routes). Earlier 'reconciled, 0 drift' claim did not account for these paths \u2014 going-forward writes are now consistent.",
-      "warehouseTransfers": "PUT /transfers/:id/dispatch and /receive now correctly update materials.current_stock in the same transaction as the stock_ledger insert (previously silently no-op on current_stock \u2014 fixed 2026-08-20).",
-      "rejectionsAndRtv": "2026-08-20 audit: genuinely wired \u2014 Dispatch RTV calls the live store.js route (not the dead security.js one), status correctly flips to 'Dispatched Out', no missing-vendor crash risk. No bug found.",
+      "stockLedgerReconciliation": "Corrected 2026-08-20: indent-issue was writing a stale pre-deduction balance into stock_ledger (now fixed), warehouse transfer dispatch/receive wrote ledger rows without updating materials.current_stock (now fixed, both routes). Earlier 'reconciled, 0 drift' claim did not account for these paths — going-forward writes are now consistent.",
+      "warehouseTransfers": "PUT /transfers/:id/dispatch and /receive now correctly update materials.current_stock in the same transaction as the stock_ledger insert (previously silently no-op on current_stock — fixed 2026-08-20).",
+      "rejectionsAndRtv": "2026-08-20 audit: genuinely wired — Dispatch RTV calls the live store.js route (not the dead security.js one), status correctly flips to 'Dispatched Out', no missing-vendor crash risk. No bug found.",
       "storeReturnsSrv": "2026-08-20: creating + inspecting a return correctly credits current_stock, writes a real stock_ledger 'return' row, and produces a real listed SRV voucher. 'Original Indent/Issue Ref' is intentionally optional. FIXED: POST /returns now caps cumulative returned qty per indent+material at indent_items.required_qty, rejecting over-return with a clear error.",
-      "installedAssetsDigitalTwin": "2026-08-20 audit: genuinely real, DB-backed (installed_assets table), sortable, with a working Retire/Failure action that writes back and logs an asset_events audit row \u2014 confirmed not a placeholder tab."
+      "installedAssetsDigitalTwin": "2026-08-20 audit: genuinely real, DB-backed (installed_assets table), sortable, with a working Retire/Failure action that writes back and logs an asset_events audit row — confirmed not a placeholder tab."
     },
     "gatePass": {
-      "lifecycle": "Create (inward/outward/RTV), list open passes, mark-out, edit \u2014 all wired end to end as of 2026-08-20 (edit route existed server-side but had no UI button until this session; also had a missing permission guard, and allowed creation against a Cancelled PO \u2014 all 3 fixed). Note: linkage to GRN is optional today, not enforced \u2014 flagged as an open process question.",
-      "knownDeadCode": "security.js's POST /rtv-pass is unreachable \u2014 Security.jsx never calls it, the live RTV-dispatch path is store.js's own route. Left as-is, flagged for future cleanup/consolidation."
+      "lifecycle": "Create (inward/outward/RTV), list open passes, mark-out, edit — all wired end to end as of 2026-08-20 (edit route existed server-side but had no UI button until this session; also had a missing permission guard, and allowed creation against a Cancelled PO — all 3 fixed). Note: linkage to GRN is optional today, not enforced — flagged as an open process question.",
+      "knownDeadCode": "security.js's POST /rtv-pass is unreachable — Security.jsx never calls it, the live RTV-dispatch path is store.js's own route. Left as-is, flagged for future cleanup/consolidation."
     },
     "qualityControl": {
-      "scope": "Dual-purpose: incoming-GRN inspection (accept/reject reconciliation against grn_items) AND a standalone lab-testing module (Process/Final/Customer tests on Reels) \u2014 not purely one or the other.",
-      "grnInspectFix": "2026-08-20: quality.js's grn-inspect route was re-applying the FULL received qty to stock/rejections on top of what GRN intake already applied (double-count on every QC decision) \u2014 fixed to diff against the existing decision and apply only the delta. Quality.jsx was also not sending the GRN line-item id, so the backend update silently no-op'd \u2014 fixed. A fake-fallback that could submit a QC decision against fabricated data when the real GRN failed to load was removed.",
-      "designNote": "QC is currently a correction layer, not a mandatory gate \u2014 accept/reject is already decided and applied at GRN-intake time, before QC ever reviews it. If 'nothing counts as stock until QC signs off' is the intended business rule, that needs a flow/schema change, not a patch \u2014 flagged, not implemented."
+      "scope": "Dual-purpose: incoming-GRN inspection (accept/reject reconciliation against grn_items) AND a standalone lab-testing module (Process/Final/Customer tests on Reels) — not purely one or the other.",
+      "grnInspectFix": "2026-08-20: quality.js's grn-inspect route was re-applying the FULL received qty to stock/rejections on top of what GRN intake already applied (double-count on every QC decision) — fixed to diff against the existing decision and apply only the delta. Quality.jsx was also not sending the GRN line-item id, so the backend update silently no-op'd — fixed. A fake-fallback that could submit a QC decision against fabricated data when the real GRN failed to load was removed.",
+      "designNote": "QC is currently a correction layer, not a mandatory gate — accept/reject is already decided and applied at GRN-intake time, before QC ever reviews it. If 'nothing counts as stock until QC signs off' is the intended business rule, that needs a flow/schema change, not a patch — flagged, not implemented."
     },
     "apSettlement": {
-      "billing": "Vendor bills can now only be booked against a GRN's ACCEPTED (post-QC) value, not the PO's ordered value \u2014 guard added in both finance.js POST /bills (2026-08-20) and, more critically, in purchase.js POST /po/:id/bill (the actual live route the Purchase module uses \u2014 previously silently defaulted the taxable amount to the full PO value when omitted, now requires it explicitly and validates against GRN accepted value).",
+      "billing": "Vendor bills can now only be booked against a GRN's ACCEPTED (post-QC) value, not the PO's ordered value — guard added in both finance.js POST /bills (2026-08-20) and, more critically, in purchase.js POST /po/:id/bill (the actual live route the Purchase module uses — previously silently defaulted the taxable amount to the full PO value when omitted, now requires it explicitly and validates against GRN accepted value).",
       "payments": "Double-payment guard verified solid (row-locked balance check, no race condition). Fixed: AP Ledger (GET /ap) had a join-fan-out inflating totals for vendors with multiple bills+POs; vendor-payments total was summed over a paginated page instead of the full result set.",
-      "segregationOfDuties": "Bill-approval and payment-disbursement both only require role_level 3 with no check against the same person doing both \u2014 no maker-checker, unlike the pattern already used for customer-payment confirmation elsewhere in this codebase. Flagged, needs a policy decision."
+      "segregationOfDuties": "Bill-approval and payment-disbursement both only require role_level 3 with no check against the same person doing both — no maker-checker, unlike the pattern already used for customer-payment confirmation elsewhere in this codebase. Flagged, needs a policy decision."
     },
     "indentIssuance": {
-      "lifecycle": "Draft -> Submitted -> L1 Approved -> Approved -> Partially Issued -> Issued -> Closed (Rejected/Cancelled). Tier-1 (<10k) auto-advances L1->Approved. Partial issues accurately tracked and auto-provisions Digital Twin assets. Edit permitted Draft through Partially Issued; Issued/Closed/Rejected/Cancelled are hard-blocked in BOTH the UI and the backend (Rejected/Cancelled were previously editable via direct API call \u2014 fixed 2026-08-20).",
-      "routeOrdering": "Cleaned up route precedence \u2014 calendar and my-acks routes verified working with HTTP 200.",
+      "lifecycle": "Draft -> Submitted -> L1 Approved -> Approved -> Partially Issued -> Issued -> Closed (Rejected/Cancelled). Tier-1 (<10k) auto-advances L1->Approved. Partial issues accurately tracked and auto-provisions Digital Twin assets. Edit permitted Draft through Partially Issued; Issued/Closed/Rejected/Cancelled are hard-blocked in BOTH the UI and the backend (Rejected/Cancelled were previously editable via direct API call — fixed 2026-08-20).",
+      "routeOrdering": "Cleaned up route precedence — calendar and my-acks routes verified working with HTTP 200.",
       "prToPoConversion": "Two routes (POST /po with indent_id, and POST /indent/:id/convert-to-po) both now guard against double-converting the same indent and against converting a non-Approved indent (FOR UPDATE locked). Cancelling a linked PO now reverts the indent back to Approved (previously left it stuck at 'PO Created' forever). Line-item totals now consistently GST-exclusive across both conversion paths (convert-to-po was previously inflating totals 18% vs the other path). indentRequiredQty now exposed on GET /po/:id so the UI can show requested-vs-ordered qty (not yet consumed by any page).",
-      "raiseModesAudit": "2026-08-20: all 5 mode cards (Plant Requisition, Direct PO, Cash Purchase, Store Issue/SIV, Delivery Challan/DC) validated against their own UI copy. Fixed: Cash Purchase mode was missing its promised paid vendor_bills record in the create-from-scratch flow (only existed in a separate convert-existing-indent endpoint); Store Issue (SIV) had a stale-stock-snapshot race condition allowing concurrent submits to drive stock negative (added FOR UPDATE locking); DC's 'Returnable' toggle never captured an expected_return_date (added, threaded to both DC-creation paths); Required-By-Date and Plant-Section/Area were labelled required (*) but under-enforced client/server-side (both now enforced both sides, all modes). Flagged, not fixed: the '3-tier L1 Store -> L2 Dept Head -> L3 Plant Head' approval copy overstates the real mechanism \u2014 only 2 physical approval clicks exist, 'L2 Approved' is a dead status string never written."
+      "raiseModesAudit": "2026-08-20: all 5 mode cards (Plant Requisition, Direct PO, Cash Purchase, Store Issue/SIV, Delivery Challan/DC) validated against their own UI copy. Fixed: Cash Purchase mode was missing its promised paid vendor_bills record in the create-from-scratch flow (only existed in a separate convert-existing-indent endpoint); Store Issue (SIV) had a stale-stock-snapshot race condition allowing concurrent submits to drive stock negative (added FOR UPDATE locking); DC's 'Returnable' toggle never captured an expected_return_date (added, threaded to both DC-creation paths); Required-By-Date and Plant-Section/Area were labelled required (*) but under-enforced client/server-side (both now enforced both sides, all modes). Flagged, not fixed: the '3-tier L1 Store -> L2 Dept Head -> L3 Plant Head' approval copy overstates the real mechanism — only 2 physical approval clicks exist, 'L2 Approved' is a dead status string never written."
     },
     "reporting": {
-      "crossDeptDeepDive": "HR / Maintenance / Purchase / Finance / EHS deep-dive tabs in Reports.jsx \u2014 dept-scoped for L3, org-wide for L4+, drill-down to transaction level, CSV export, print"
+      "crossDeptDeepDive": "HR / Maintenance / Purchase / Finance / EHS deep-dive tabs in Reports.jsx — dept-scoped for L3, org-wide for L4+, drill-down to transaction level, CSV export, print"
     },
     "purchase": {
       "createPO": "Server-side + client-side validation (vendor active, material active, qty>0, price>=0, GST 0-100, no duplicate materials, delivery-date sanity). Responsive 2-line cards layout.",
@@ -48,28 +48,28 @@
       "editWindow": "Edit/Modify PO button shown for any non-terminal status (all but Received/Closed/Cancelled), not just Draft."
     },
     "vendors": {
-      "access": "Store Manager (role_level 3) has full create/update/delete access on vendors, backend (master.js requireLevel(3)) and frontend (no extra role gate on Vendors.jsx buttons) \u2014 verified 2026-08-20, was already correct.",
-      "excelImport": "backend/scripts/import_vendors.js \u2014 dry-run-safe, insert-only, dedupes by GSTIN-else-normalized-name, plus POST /api/master/vendors/sync-excel + a Sync-from-Excel button in Vendors.jsx. Source file Projects_Requirement/8202026/VENDER NAME.xlsx has 42 unique vendor names only (no GSTIN/address/bank columns). Logic-verified, not yet run live (no DB access from build sandbox)."
+      "access": "Store Manager (role_level 3) has full create/update/delete access on vendors, backend (master.js requireLevel(3)) and frontend (no extra role gate on Vendors.jsx buttons) — verified 2026-08-20, was already correct.",
+      "excelImport": "backend/scripts/import_vendors.js — dry-run-safe, insert-only, dedupes by GSTIN-else-normalized-name, plus POST /api/master/vendors/sync-excel + a Sync-from-Excel button in Vendors.jsx. Source file Projects_Requirement/8202026/VENDER NAME.xlsx has 42 unique vendor names only (no GSTIN/address/bank columns). Logic-verified, not yet run live (no DB access from build sandbox)."
     },
     "uiComponents": {
-      "searchableSelect": "frontend/src/components/SearchableSelect.jsx \u2014 universal typeahead combobox (search-as-you-type, arrow-key nav, Enter/Escape, first-letter jump, code/subtext/badge display, clear button, checkmark on selection). Rolled out across every dropdown in Purchase.jsx, Indent.jsx, Store.jsx, Materials.jsx, Users.jsx, and (as of 2026-08-20) Inventory.jsx \u2014 every dropdown in the app now has typeahead search + keyboard nav."
+      "searchableSelect": "frontend/src/components/SearchableSelect.jsx — universal typeahead combobox (search-as-you-type, arrow-key nav, Enter/Escape, first-letter jump, code/subtext/badge display, clear button, checkmark on selection). Rolled out across every dropdown in Purchase.jsx, Indent.jsx, Store.jsx, Materials.jsx, Users.jsx, and (as of 2026-08-20) Inventory.jsx — every dropdown in the app now has typeahead search + keyboard nav."
     },
     "inventoryPage": {
-      "syncWithMaterials": "2026-08-20: confirmed Inventory.jsx/inventory.js has no independent stock recalculation \u2014 reads and maintains the same canonical materials.current_stock column transactionally (FOR UPDATE + matching stock_ledger write in the same transaction on every route) as everywhere else in the app. Cannot disagree with Materials.jsx for the same material. No drift risk, no fix needed."
+      "syncWithMaterials": "2026-08-20: confirmed Inventory.jsx/inventory.js has no independent stock recalculation — reads and maintains the same canonical materials.current_stock column transactionally (FOR UPDATE + matching stock_ledger write in the same transaction on every route) as everywhere else in the app. Cannot disagree with Materials.jsx for the same material. No drift risk, no fix needed."
     },
     "exports": {
-      "vendorNameCoverage": "2026-08-20: audited every excel/CSV export in the app. Added Vendor Name + GSTIN columns to the Enterprise Inventory Excel export (inventoryExcelExporter.js) and Vendor Name + PO Number(s) to the Indents CSV export (reports.js) and to Indent.jsx's own client-side CSV export. PO list/detail, Purchase Deep-Dive, and P2P Pipeline exports already had vendor name. Pure consumption/KPI rollup exports (StoreDeptReports.jsx etc.) correctly left without a vendor column \u2014 no vendor relationship in that data."
+      "vendorNameCoverage": "2026-08-20: audited every excel/CSV export in the app. Added Vendor Name + GSTIN columns to the Enterprise Inventory Excel export (inventoryExcelExporter.js) and Vendor Name + PO Number(s) to the Indents CSV export (reports.js) and to Indent.jsx's own client-side CSV export. PO list/detail, Purchase Deep-Dive, and P2P Pipeline exports already had vendor name. Pure consumption/KPI rollup exports (StoreDeptReports.jsx etc.) correctly left without a vendor column — no vendor relationship in that data."
     },
     "dailyStockRollover": {
       "invariant": "Opening = current_stock - today_received + today_issued; Closing = current_stock; tomorrow's Opening = today's Closing. Enforced in master.js across GET /materials, GET /materials/:id, GET /materials/:id/stock-summary.",
       "correctness": "2026-08-20 re-audit: GET /materials/:id was using a narrow transaction_type whitelist instead of != 'opening' like the other two endpoints, silently excluding 9+ real transaction types from ProductDetailModal.jsx's daily figures. Fixed to match. No date/timezone bug found (all stock_ledger writes use Postgres CURRENT_DATE server-side)."
     },
     "branding": {
-      "logo": "Pending \u2014 user wants the company logo (Sri M K Paper Mills) updated across app header, invoices, excel exports, and print/PDF watermarks (incl. a watermark behind every page). Blocked as of 2026-08-20: user pasted the logo inline in chat but it didn't reach the build sandbox as a real file; asked user to attach it as a proper file upload instead. Not yet started."
+      "logo": "Pending — user wants the company logo (Sri M K Paper Mills) updated across app header, invoices, excel exports, and print/PDF watermarks (incl. a watermark behind every page). Blocked as of 2026-08-20: user pasted the logo inline in chat but it didn't reach the build sandbox as a real file; asked user to attach it as a proper file upload instead. Not yet started."
     },
     "gitCheckpoint": {
-      "status": "Blocked 2026-08-20. A full git add -A + commit of all outstanding work (this session's fixes plus previously-uncommitted work) was prepared and safety-reviewed (no secrets/.env, no oversized binaries, .gitignore's exclusion of checkpoint.json correctly respected) but cannot complete: .git/index.lock exists and cannot be removed from the build sandbox (rm/mv both fail 'Operation not permitted', no live git process found running) \u2014 almost certainly a Windows-side lock on the user's own machine (an open git GUI/editor, or an antivirus scan). User needs to close whatever has the repo open, or delete the lock file, before the prepared commit can run.",
-      "pushNote": "Even once committed locally, git push to origin (github.com/metapharsic/mill.git) cannot happen from this sandbox or the device bridge \u2014 neither has network access to GitHub or the user's credentials. Push needs to run from the user's own machine."
+      "status": "Blocked 2026-08-20. A full git add -A + commit of all outstanding work (this session's fixes plus previously-uncommitted work) was prepared and safety-reviewed (no secrets/.env, no oversized binaries, .gitignore's exclusion of checkpoint.json correctly respected) but cannot complete: .git/index.lock exists and cannot be removed from the build sandbox (rm/mv both fail 'Operation not permitted', no live git process found running) — almost certainly a Windows-side lock on the user's own machine (an open git GUI/editor, or an antivirus scan). User needs to close whatever has the repo open, or delete the lock file, before the prepared commit can run.",
+      "pushNote": "Even once committed locally, git push to origin (github.com/metapharsic/mill.git) cannot happen from this sandbox or the device bridge — neither has network access to GitHub or the user's credentials. Push needs to run from the user's own machine."
     },
     "launchers": {
       "silentLauncher": "Start MK Paper Mill.vbs",
@@ -113,7 +113,7 @@
     },
     {
       "file": "indents table ALTER (cancelled_by/cancellation_reason/cancelled_at columns)",
-      "status": "done, applied live, no separate .sql file \u2014 folded into this session's fixes"
+      "status": "done, applied live, no separate .sql file — folded into this session's fixes"
     },
     {
       "file": "db/migration_material_section_machine.sql",
@@ -127,7 +127,7 @@
   "openItems": [
     {
       "item": ".git/index.lock stuck on the user's machine",
-      "cause": "an external process (likely a git GUI, editor, or antivirus scan) holds a lock this sandbox cannot clear \u2014 rm/mv both fail 'Operation not permitted' with no live git process visible",
+      "cause": "an external process (likely a git GUI, editor, or antivirus scan) holds a lock this sandbox cannot clear — rm/mv both fail 'Operation not permitted' with no live git process visible",
       "impact": "the prepared git add + commit of today's (and prior sessions') work cannot complete until it clears",
       "status": "RESOLVED 2026-08-23: unlink is blocked on this mount for ANY process (confirmed it's the sandbox's own restriction, not an external lock-holder) -- but renaming the lock file to a new, not-yet-existing name succeeds. Pattern: rename any existing index.lock (or objects/*.lock, HEAD.lock) to a throwaway name immediately before each git add/commit, then retry. Commit adcb051 landed successfully this way."
     },
@@ -140,14 +140,14 @@
     {
       "item": "'3-tier approval' copy on the Plant Requisition card overstates the real mechanism",
       "cause": "only 2 physical approval actions exist in indent.js; 'L2 Approved' status is referenced defensively but never actually written",
-      "impact": "the UI promises an L1 Store -> L2 Dept Head -> L3 Plant Head chain that doesn't structurally exist \u2014 a single Plant-Head-level user can finalize Tier-3 requisitions alone",
+      "impact": "the UI promises an L1 Store -> L2 Dept Head -> L3 Plant Head chain that doesn't structurally exist — a single Plant-Head-level user can finalize Tier-3 requisitions alone",
       "status": "flagged 2026-08-20, needs a wording fix or a real 3rd persisted approval state, a product decision either way"
     },
     {
       "item": "22 test-generated Purchase Orders still live in purchase_orders/po_items",
       "cause": "generated during PO feature testing, never cleaned up",
       "impact": "clutters PO lists/reports with non-real data",
-      "status": "truncate_test_pos.js confirmed correct and ready, but this build sandbox has no route to the live Postgres DB (ECONNREFUSED) \u2014 user needs to run `cd backend && node scripts/truncate_test_pos.js` locally; note the script has no test-vs-real filter, it clears the whole table"
+      "status": "truncate_test_pos.js confirmed correct and ready, but this build sandbox has no route to the live Postgres DB (ECONNREFUSED) — user needs to run `cd backend && node scripts/truncate_test_pos.js` locally; note the script has no test-vs-real filter, it clears the whole table"
     },
     {
       "item": "backend/scripts/import_vendors.js (vendor excel importer) written and logic-verified but never executed against the live DB",
@@ -165,7 +165,7 @@
       "item": "PO qty/price edits don't sync back to the source indent (intentional one-way copy)",
       "cause": "no design ever specified two-way sync",
       "impact": "an indent's original requested qty and its linked PO's (possibly edited) ordered qty can silently diverge with no UI visibility",
-      "status": "flagged 2026-08-20; added indentRequiredQty to GET /po/:id as a minimal additive fix so the UI *can* show requested-vs-ordered, but no page consumes it yet \u2014 needs a product decision on whether/how to surface it"
+      "status": "flagged 2026-08-20; added indentRequiredQty to GET /po/:id as a minimal additive fix so the UI *can* show requested-vs-ordered, but no page consumes it yet — needs a product decision on whether/how to surface it"
     },
     {
       "item": "indent_items.approved_qty column is unused/dead",
@@ -189,7 +189,7 @@
       "item": "QC is a correction layer, not a mandatory hold-back gate on materials.current_stock",
       "cause": "GRN intake already applies the accepted/rejected split to stock before QC ever reviews it; QC's role today is to correct that decision after the fact (now correctly delta-based, no longer double-counting)",
       "impact": "goods are counted as usable stock before any formal QC sign-off",
-      "status": "flagged 2026-08-20, needs a decision on whether stock should be held out of current_stock until QC approves \u2014 that would require a schema/flow change, not a patch"
+      "status": "flagged 2026-08-20, needs a decision on whether stock should be held out of current_stock until QC approves — that would require a schema/flow change, not a patch"
     },
     {
       "item": "No maker-checker segregation between AP bill-approval and payment-disbursement",
@@ -207,7 +207,7 @@
       "item": "Company logo update across app header, invoices, excel exports, and print/PDF watermarks (incl. a page-background watermark)",
       "cause": "user requested a rebrand to the Sri M K Paper Mills logo",
       "impact": "branding not yet applied anywhere",
-      "status": "blocked 2026-08-20 \u2014 user's pasted image did not reach the build sandbox as a real file; user has been asked to attach it as a proper file upload, work will proceed once received"
+      "status": "blocked 2026-08-20 — user's pasted image did not reach the build sandbox as a real file; user has been asked to attach it as a proper file upload, work will proceed once received"
     },
     {
       "item": "1025 of 1077 active materials (95.2%) have unit_price = 0 or NULL in legacy sheets",
@@ -253,6 +253,48 @@
     {
       "date": "2026-08-27",
       "note": "REAL vendor-cutoff root cause found: GET /master/vendors defaults to limit=50 server-side pagination; Indent.jsx and ProductDetailModal.jsx called it with no limit param, silently losing every vendor past #50. Not a CSS issue at all -- fixed by adding ?limit=2500 (same pattern Materials already uses). Also read the two reference PDFs at Projects_Requirement/Purchase_recipt.pdf (actually a 'Purchase Request' PR format, not a PO/GRN receipt despite filename) and issue_invoice.pdf (Issue Slip format), and added matching print buttons on the Indent Voucher detail modal: 'PR Format' and 'Issue Slip', both self-contained window.print() popups replicating the exact company paper layout (logo+address header, S.NO/Item Code/Product Name/Qty/Dept-or-Depot/Remarks-or-Value table, 3-column signature footer). Commit 29954b1 on top of 6012d84. Still open: no separate 'Purchase Order/GRN receipt' reference format was actually supplied (the file named Purchase_recipt.pdf turned out to be the PR format) -- if the user still wants the PO/GRN print redesigned to a specific paper layout, need that reference file distinctly, the existing Purchase.jsx GRN/PO print (tax-matrix table) was left untouched this round."
+    },
+    {
+      "date": "2026-08-29",
+      "note": "Built new Inbound Delivery Challan (DC) workflow to close the gap that GRN previously only existed 1:1 against an Approved PO, created atomically with invoice info -- no 'received now, invoice matched later' state existed. New tables inbound_dc / inbound_dc_items (backend/scripts/migrate_inbound_dc.js, idempotent, NOT YET RUN -- no DB access from sandbox). New route backend/src/routes/inboundDc.js mounted at /api/inbound-dc in server.js: POST / (create + provisional stock bump via stock_ledger transaction_type='provisional_grn'), GET /, GET /:id, POST /:id/match-invoice (records invoice + explicit party-name-confirmed checkbox), POST /:id/grn (converts matched DC into a real grn/grn_items row set with po_id=NULL -- confirmed nullable live -- and re-tags the provisional ledger row to 'grn' without double-adding stock). New frontend page frontend/src/pages/InboundDC.jsx (kept separate from the already-huge, concurrently-edited Store.jsx) with 3 tabs: Receive DC / Pending Invoice Match / Matched-Ready for GRN. Wired into App.jsx, Sidebar.jsx, data/permissions.js. Docs at Projects_Requirement/inbound_dc_workflow.md and agents/2026-08-29-inbound-dc-workflow.md. STILL OPEN: user must run `node backend/scripts/migrate_inbound_dc.js` against the real DB and restart the backend before any of this works; frontend needs its normal rebuild/redeploy. Also checked Indent.jsx for a free-text inbound-vendor-DC field to upgrade to a dropdown per the original plan -- none exists (its 'DC' is an unrelated outward MATERIAL_OUT dispatch feature), so that plan step was skipped rather than inventing a field."
+    },
+    {
+      "date": "2026-08-29",
+      "note": "Refined the Inbound DC invoice-match flow per the user's handwritten paper-process note: built a tick-mark 'Match Vendor Invoice Against Received DC(s)' card directly into Store.jsx's existing Inward modal (Ref Document = DC #) instead of routing users to the separate InboundDC.jsx page -- Qty view-only, Rate/Disc%/Tax Amount editable, Party Name + Invoice Total fields, live computed-total vs invoice-total match/mismatch pill. Backend inboundDc.js /match-invoice and /grn routes extended to accept & store party_name/invoice_total and per-item rate/disc/tax overrides (falls back to catalog price only when no override sent). migrate_inbound_dc.js amended (still NOT run) to add inbound_dc.party_name / invoice_total columns. party_name has no grn table column (verified against live INSERT column lists) so it's folded into grn.remarks instead of inventing a schema change. STILL OPEN: run the (still-updated, still-unrun) migration, restart backend, rebuild frontend; and InboundDC.jsx's 'Pending Invoice Match'/'Matched-Ready for GRN' tabs are now likely redundant given this Store.jsx fix -- left in place, flagged for the user to decide on removal."
+    },
+    {
+      "item": "Inbound DC + Invoice Match feature has no test coverage yet",
+      "cause": "feature (inboundDc.js, migrate_inbound_dc.js, Store.jsx match card) was built across 3 local commits without accompanying tests",
+      "impact": "resolved 2026-08-29: added e2e/specs/inbound_dc_invoice_match.spec.js + e2e/pages/InboundDcPage.js (new files, existing specs/pages/config untouched), backend/src/utils/dcInvoiceMatch.js + backend/scripts/test_dc_invoice_match_unit.js (13 passing pure-function unit tests), and backend/scripts/test_inbound_dc_integration.js (DB-sync + lifecycle check, transaction always rolled back). Also fixed a real bug found in the process: Store.jsx called loadOpenInboundDcs() but defined loadOpenInbounDcs() (typo) -- ReferenceError blocked the match card from ever loading data.",
+      "status": "tests written and unit-tested here; user should run the integration script + full Playwright spec on a machine with real DB access, and still needs to run migrate_inbound_dc.js against production before invoice_total/party_name columns exist there"
+    },
+    {
+      "item": "Inbound DC summary endpoint depends on migrate_inbound_dc.js having been run",
+      "cause": "GET /api/inbound-dc/summary (new, for Store Dashboard reporting) queries inbound_dc/inbound_dc_items which do not exist until backend/scripts/migrate_inbound_dc.js is run against the real DB",
+      "impact": "the new Inbound DC card on Store Dashboard will show a fetch error until that migration is run",
+      "status": "not yet run; pending someone with real DB access"
+    },
+    {
+      "item": "Inbound DC register/edit/cancel/audit (2026-08-29)",
+      "cause": "user asked for the same register+edit+audit treatment Indent has, applied to inbound_dc",
+      "impact": "new PUT/DELETE /api/inbound-dc/:id + GET /:id/history routes and InboundDC.jsx Register/Edit/Cancel/History UI added, reusing the generic audit_log table via helpers.audit() (module='InboundDC') -- not yet live: migrate_inbound_dc.js still not run, backend/frontend not restarted/rebuilt",
+      "status": "code complete, pending migration + restart + rebuild"
+    },
+    {
+      "item": "GRN print reference gaps: P.R. No, P.R. Date, Department, Payment Period, per-company Bank Details not stored on the inward/GRN record",
+      "cause": "Projects_Requirement/GRN PRINT FORMATE.xlsx expects these fields; current inward voucher / grn_items schema has no columns for them",
+      "impact": "Store.jsx inward GRN print (2026-08-29 grn-print-format session) renders them as em-dash placeholders / hard-coded bank fallback until upstream fields exist",
+      "status": "OPEN"
+    },
+    {
+      "item": "GRN print invoice-values audit (2026-08-31)",
+      "status": "No fix needed -- verified grn_items (populated from the invoice-matched overrides in inbound-dc /:id/grn) is already the sole source for the GRN print grid, grand total, and amount-in-words line across both GRN-creation paths (inbound_dc match and old PO->GRN). See agents/2026-08-29-grn-print-invoice-values.md."
+    },
+    {
+      "item": "GRN print format aligned to definitive reference (2026-08-29)",
+      "cause": "user supplied exact row-by-row reference content for GRN print voucher",
+      "impact": "Store.jsx GRN print now matches title (GRN IN-WORD), field order, item table columns, and Bank Details/Totals layout from reference; 'Total Purchade Amount' typo in source intentionally NOT reproduced -- kept as 'Total Purchase Amount'",
+      "status": "done locally, needs frontend rebuild+redeploy to go live"
     }
   ]
 }

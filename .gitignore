@@ -6,6 +6,8 @@ yarn-error.log*
 
 # ─── Build Outputs ─────────────────────────────────────────────
 frontend/dist/
+playwright-report/
+test-results/
 
 # ─── Environment & Secrets ─────────────────────────────────────
 backend/.env

@@ -320,4 +320,108 @@ router.get('/reels/warehouse', auth, ar(async (req, res) => {
   res.json({ success:true, data:rows });
 }));
 
+// ── ORDER BOOK: Full register view of all open/confirmed orders
+router.get('/order-book', auth, ar(async (req, res) => {
+  const { status, customer_id, grade_id, date_from, date_to, page = 1, limit = 50 } = req.query;
+  const conds = ["so.status NOT IN ('Cancelled')"]; const params = []; let p = 1;
+  if (status)      { conds.push(`so.status=$${p++}`);        params.push(status); }
+  if (customer_id) { conds.push(`so.customer_id=$${p++}`);   params.push(customer_id); }
+  if (grade_id)    { conds.push(`so.grade_id=$${p++}`);      params.push(grade_id); }
+  if (date_from)   { conds.push(`so.date>=$${p++}`);         params.push(date_from); }
+  if (date_to)     { conds.push(`so.date<=$${p++}`);         params.push(date_to); }
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const { rows } = await pool.query(
+    `SELECT
+       so.id,
+       so.so_number                                          AS "soNumber",
+       so.date,
+       so.delivery_date                                      AS "deliveryDate",
+       c.name                                                AS "customerName",
+       c.mobile                                              AS "customerMobile",
+       c.city                                                AS "customerCity",
+       g.name                                                AS "gradeName",
+       g.code                                                AS "gradeCode",
+       so.gsm,
+       so.width_mm                                           AS "widthMm",
+       so.qty_mt                                             AS "qtyMt",
+       COALESCE(so.fulfilled_mt, 0)                          AS "fulfilledMt",
+       (so.qty_mt - COALESCE(so.fulfilled_mt, 0))            AS "balanceMt",
+       so.rate_per_kg                                        AS "ratePerKg",
+       so.total_value                                        AS "totalValue",
+       so.status,
+       so.remarks
+     FROM sales_orders so
+     LEFT JOIN customers c ON c.id = so.customer_id
+     LEFT JOIN grades    g ON g.id = so.grade_id
+     WHERE ${conds.join(' AND ')}
+     ORDER BY so.date DESC, so.id DESC
+     LIMIT $${p} OFFSET $${p + 1}`,
+    [...params, parseInt(limit), offset]
+  );
+  const { rows: cnt } = await pool.query(
+    `SELECT COUNT(*)::int AS total FROM sales_orders so WHERE ${conds.join(' AND ')}`,
+    params
+  );
+  res.json({ success: true, data: rows, total: cnt[0]?.total || 0 });
+}));
+
+// ── BALANCE LIST: Master shortage / fulfilment report with overdue detection
+router.get('/balance-list', auth, ar(async (req, res) => {
+  const { customer_id, grade_id, overdue_only } = req.query;
+  const conds = ["so.status NOT IN ('Dispatched','Cancelled')",
+                 "(so.qty_mt - COALESCE(so.fulfilled_mt,0)) > 0"];
+  const params = []; let p = 1;
+  if (customer_id)              { conds.push(`so.customer_id=$${p++}`); params.push(customer_id); }
+  if (grade_id)                 { conds.push(`so.grade_id=$${p++}`);    params.push(grade_id); }
+  if (overdue_only === 'true')  { conds.push(`so.delivery_date < CURRENT_DATE`); }
+  const { rows } = await pool.query(
+    `SELECT
+       so.id,
+       so.so_number                                              AS "soNumber",
+       so.date                                                   AS "orderDate",
+       so.delivery_date                                          AS "deliveryDate",
+       c.name                                                    AS "customerName",
+       c.mobile                                                  AS "customerMobile",
+       g.name                                                    AS "gradeName",
+       g.code                                                    AS "gradeCode",
+       so.gsm,
+       so.width_mm                                               AS "widthMm",
+       so.qty_mt                                                 AS "qtyMt",
+       COALESCE(so.fulfilled_mt, 0)                              AS "producedMt",
+       (so.qty_mt - COALESCE(so.fulfilled_mt, 0))                AS "balanceMt",
+       ROUND(
+         CASE WHEN so.qty_mt > 0
+              THEN (COALESCE(so.fulfilled_mt,0) / so.qty_mt) * 100
+              ELSE 0 END, 1
+       )                                                         AS "completionPct",
+       so.status,
+       so.rate_per_kg                                            AS "ratePerKg",
+       ROUND((so.qty_mt - COALESCE(so.fulfilled_mt,0)) * 1000 * so.rate_per_kg, 2)
+                                                                 AS "pendingValue",
+       CASE
+         WHEN so.delivery_date IS NOT NULL AND so.delivery_date < CURRENT_DATE
+              AND (so.qty_mt - COALESCE(so.fulfilled_mt,0)) > 0 THEN true
+         ELSE false
+       END                                                       AS overdue,
+       CASE
+         WHEN so.delivery_date IS NOT NULL
+              THEN (so.delivery_date - CURRENT_DATE)
+         ELSE NULL
+       END                                                       AS "daysToDelivery"
+     FROM sales_orders so
+     LEFT JOIN customers c ON c.id = so.customer_id
+     LEFT JOIN grades    g ON g.id = so.grade_id
+     WHERE ${conds.join(' AND ')}
+     ORDER BY overdue DESC, so.delivery_date ASC NULLS LAST, so.id ASC`,
+    params
+  );
+  const summary = {
+    totalOrders: rows.length,
+    totalBalanceMt: rows.reduce((s, r) => s + parseFloat(r.balanceMt || 0), 0).toFixed(3),
+    totalPendingValue: rows.reduce((s, r) => s + parseFloat(r.pendingValue || 0), 0).toFixed(2),
+    overdueCount: rows.filter(r => r.overdue).length,
+  };
+  res.json({ success: true, data: rows, summary });
+}));
+
 module.exports = router;

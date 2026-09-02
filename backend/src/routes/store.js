@@ -1776,14 +1776,59 @@ router.post('/inward', requireAuth, requireStore, ar(async (req, res) => {
 }));
 
 // ── OUTWARD DESK ────────────────────────────────────────────────────────────
+// GET /api/store/vendors/:vendorId/grn-materials — Fetch distinct materials received from a vendor
+router.get('/vendors/:vendorId/grn-materials', requireAuth, ar(async (req, res) => {
+  const vendorId = parseInt(req.params.vendorId);
+  if (!vendorId) {
+    return res.status(400).json({ success: false, message: 'Valid vendorId required' });
+  }
+
+  const { rows } = await pool.query(`
+    SELECT DISTINCT ON (gi.material_id, g.id)
+      gi.material_id AS "material_id",
+      m.name AS "materialName",
+      m.code AS "materialCode",
+      m.uom,
+      COALESCE(m.current_stock, 0) AS "currentStock",
+      gi.unit_price AS "unitPrice",
+      gi.received_qty AS "receivedQty",
+      gi.batch_number AS "batchNumber",
+      g.id AS "grnId",
+      g.grn_number AS "grnNumber",
+      g.date AS "grnDate",
+      g.invoice_number AS "invoiceNumber"
+    FROM grn_items gi
+    JOIN grn g ON gi.grn_id = g.id
+    JOIN materials m ON gi.material_id = m.id
+    WHERE g.vendor_id = $1
+    ORDER BY gi.material_id, g.id, g.date DESC
+  `, [vendorId]);
+
+  res.json({ success: true, data: rows });
+}));
+
 // GET /api/store/outward
 router.get('/outward', requireAuth, ar(async (req, res) => {
-  const { from, to, store_type, department_id, search, limit = 100, page = 1 } = req.query;
-  const where = ["sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer')"];
+  const { from, to, store_type, department_id, search, outward_type, limit = 100, page = 1 } = req.query;
+  const where = ["sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer', 'job_work')"];
   const vals = [];
 
   if (from) { vals.push(from); where.push(`sl.date >= $${vals.length}`); }
   if (to)   { vals.push(to);   where.push(`sl.date <= $${vals.length}`); }
+  if (outward_type) {
+    if (outward_type === 'job_work') {
+      vals.push('job_work');
+      where.push(`sl.transaction_type = $${vals.length}`);
+    } else if (outward_type === 'return_to_vendor') {
+      vals.push('return_to_vendor');
+      where.push(`sl.transaction_type = $${vals.length}`);
+    } else if (outward_type === 'transfer' || outward_type === 'inter_store_transfer') {
+      vals.push('transfer');
+      where.push(`sl.transaction_type = $${vals.length}`);
+    } else if (outward_type === 'issue') {
+      where.push(`sl.transaction_type IN ('issue', 'out')`);
+    }
+  }
   if (store_type) {
     if (store_type === 'mechanical') {
       where.push(`(mc.type = 'Mechanical' OR mc.name = 'Mechanical' OR mc.parent_id IN (SELECT id FROM material_categories WHERE code = 'MECH' OR name = 'Mechanical'))`);
@@ -1797,7 +1842,7 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
   }
   if (search) {
     vals.push(`%${search}%`);
-    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length})`);
+    where.push(`(m.name ILIKE $${vals.length} OR m.code ILIKE $${vals.length} OR sl.remarks ILIKE $${vals.length} OR sl.batch_number ILIKE $${vals.length} OR v.name ILIKE $${vals.length})`);
   }
 
   const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -1805,15 +1850,17 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
 
   const { rows } = await pool.query(`
     SELECT sl.id, sl.date, sl.material_id, sl.transaction_type, sl.reference_type, sl.reference_id,
-           sl.out_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
+           sl.vendor_id, sl.out_qty, sl.balance, sl.unit_price, sl.value, sl.batch_number, sl.bin_location,
            sl.remarks, sl.created_at,
            m.name AS "materialName", m.code AS "materialCode", m.uom,
            mc.name AS "categoryName",
-           u.name AS "createdByName"
+           u.name AS "createdByName",
+           v.name AS "vendorName", v.code AS "vendorCode"
     FROM stock_ledger sl
     JOIN materials m ON sl.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
     LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
     WHERE ${whereClause}
     ORDER BY sl.id DESC
     LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
@@ -1824,13 +1871,14 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
     FROM stock_ledger sl
     JOIN materials m ON sl.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
     WHERE ${whereClause}
   `, vals);
 
   const todayRes = await pool.query(`
     SELECT COUNT(*) as today_count, COALESCE(SUM(sl.out_qty), 0) as today_qty, COALESCE(SUM(sl.value), 0) as today_value
     FROM stock_ledger sl
-    WHERE sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer') AND sl.date = CURRENT_DATE
+    WHERE sl.transaction_type IN ('issue', 'out', 'return_to_vendor', 'transfer', 'job_work') AND sl.date = CURRENT_DATE
   `);
 
   res.json({
@@ -1848,10 +1896,13 @@ router.get('/outward', requireAuth, ar(async (req, res) => {
   });
 }));
 
-// POST /api/store/outward — Fast Outward Issue / Dispatch / RTV
+// POST /api/store/outward — Fast Outward Issue: 1. Job Work | 2. Return to Party | 3. Inter Store Transfer | General Issue
 router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
-  const { material_id, out_qty, department_id, machine_id, position_id, outward_type = 'issue',
-          issued_to, purpose, serial_number, batch_number, reference_type, reference_id, remarks } = req.body;
+  const {
+    material_id, out_qty, unit_price, department_id, machine_id, position_id, section_id,
+    vendor_id, outward_type = 'issue', issued_to, purpose, serial_number, batch_number,
+    reference_type, reference_id, remarks, date, grn_id
+  } = req.body;
 
   if (!material_id || !out_qty || Number(out_qty) <= 0) {
     return res.status(400).json({ success: false, message: 'Valid material and quantity (> 0) required' });
@@ -1872,7 +1923,9 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
     }
 
     const newStock = curStock - qty;
-    const price = parseFloat(mat.unit_price || 0);
+    const price = (unit_price !== undefined && unit_price !== null && unit_price !== '' && !isNaN(parseFloat(unit_price)))
+      ? parseFloat(unit_price)
+      : parseFloat(mat.unit_price || 0);
     const totalVal = qty * price;
 
     await client.query('UPDATE materials SET current_stock = $1 WHERE id = $2', [newStock, material_id]);
@@ -1883,37 +1936,138 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       if (dept) deptName = dept.name;
     }
 
-    const refIdNum = /^\d+$/.test(String(reference_id)) ? parseInt(reference_id) : null;
+    let machineName = '';
+    if (machine_id) {
+      const { rows: [mach] } = await client.query('SELECT name, code FROM machines WHERE id = $1', [machine_id]);
+      if (mach) machineName = mach.name || mach.code;
+    }
+
+    let vendorName = '';
+    const vId = vendor_id ? parseInt(vendor_id) : null;
+    if (vId) {
+      const { rows: [ven] } = await client.query('SELECT name, code FROM vendors WHERE id = $1', [vId]);
+      if (ven) vendorName = ven.name;
+    }
+
+    // Determine transaction type and reference type
+    let txnType = 'issue';
+    let defaultRefType = 'ISSUE';
+    let prefixTag = '[Store Issue]';
+
+    if (outward_type === 'job_work') {
+      txnType = 'job_work';
+      defaultRefType = 'JOB_WORK';
+      prefixTag = '[Job Work]';
+    } else if (outward_type === 'return_to_vendor') {
+      txnType = 'return_to_vendor';
+      defaultRefType = 'RTV';
+      prefixTag = '[Return to Party]';
+    } else if (outward_type === 'inter_store_transfer' || outward_type === 'transfer') {
+      txnType = 'transfer';
+      defaultRefType = 'STO';
+      prefixTag = '[Inter Store Transfer]';
+    }
+
+    let generatedRef = reference_id || '';
+    let createdGatePass = null;
+
+    // Automatic Gate Pass provisioning for Job Work & RTV
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+
+    if (outward_type === 'job_work') {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-jw-${stamp}`]);
+      const { rows: [seq] } = await client.query(`SELECT COUNT(*)+1 AS n FROM gate_passes WHERE created_at::date = CURRENT_DATE`);
+      const gpNum = `GP-JW-${stamp}-${String(seq.n).padStart(4, '0')}`;
+
+      const { rows: [gp] } = await client.query(`
+        INSERT INTO gate_passes (
+          gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
+          material_description, from_party, to_party, out_time, security_guard_id, remarks,
+          vendor_id, status
+        ) VALUES (
+          $1, 'RETURNABLE', 'Commercial Vehicle', 'To be logged at gate', 'Authorized Driver', $2,
+          $3, 'MK Paper Mill Main Store', $4, NOW(), $5, $6,
+          $7, 'Open'
+        ) RETURNING id, gp_number
+      `, [
+        gpNum,
+        purpose || 'Material Outward for Job Work / Outside Repair',
+        `Job Work: ${qty} ${mat.uom} of ${mat.name} (${mat.code})`,
+        vendorName || 'Outside Job Worker',
+        req.user.id,
+        remarks || `Job work outward dispatched by ${req.user.name || 'Store'}`,
+        vId
+      ]);
+      createdGatePass = gp;
+      if (!generatedRef) generatedRef = gp.gp_number;
+    } else if (outward_type === 'return_to_vendor') {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`gp-rtv-${stamp}`]);
+      const { rows: [seq] } = await client.query(`SELECT COUNT(*)+1 AS n FROM gate_passes WHERE created_at::date = CURRENT_DATE`);
+      const gpNum = `GP-RTV-${stamp}-${String(seq.n).padStart(4, '0')}`;
+
+      const { rows: [gp] } = await client.query(`
+        INSERT INTO gate_passes (
+          gp_number, pass_type, vehicle_type, vehicle_number, driver_name, purpose,
+          material_description, from_party, to_party, out_time, security_guard_id, remarks,
+          vendor_id, status
+        ) VALUES (
+          $1, 'RTV', 'Commercial Vehicle', 'To be logged at gate', 'Authorized Driver', $2,
+          $3, 'MK Paper Mill', $4, NOW(), $5, $6,
+          $7, 'Closed'
+        ) RETURNING id, gp_number
+      `, [
+        gpNum,
+        purpose || 'Return to Vendor (RTV)',
+        `RTV Return: ${qty} ${mat.uom} of ${mat.name} (${mat.code})`,
+        vendorName || 'Supplier / Vendor',
+        req.user.id,
+        remarks || `Return to party processed by ${req.user.name || 'Store'}`,
+        vId
+      ]);
+      createdGatePass = gp;
+      if (!generatedRef) generatedRef = gp.gp_number;
+    } else if (outward_type === 'inter_store_transfer' || outward_type === 'transfer') {
+      if (!generatedRef) {
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`sto-${stamp}`]);
+        const { rows: [seq] } = await client.query(`SELECT COUNT(*)+1 AS n FROM store_transfers WHERE created_at::date = CURRENT_DATE`);
+        generatedRef = `STO-${stamp}-${String(seq.n).padStart(4, '0')}`;
+      }
+    }
+
+    const refIdNum = /^\d+$/.test(String(generatedRef)) ? parseInt(generatedRef) : null;
     const remarkFull = [
-      outward_type === 'return_to_vendor' ? '[RTV Outward]' : '[Store Issue]',
-      reference_id && !refIdNum ? `Ref: ${reference_id}` : null,
+      prefixTag,
+      vendorName ? `Party: ${vendorName}` : null,
+      generatedRef && !refIdNum ? `Ref: ${generatedRef}` : null,
       deptName ? `Dept: ${deptName}` : null,
+      machineName ? `M/S: ${machineName}` : null,
       issued_to ? `To: ${issued_to}` : null,
       purpose ? `Purpose: ${purpose}` : null,
       remarks
     ].filter(Boolean).join(' | ');
 
+    const txnDate = date ? new Date(date) : new Date();
+
     const { rows: [ledger] } = await client.query(`
       INSERT INTO stock_ledger (
         material_id, date, transaction_type, reference_type, reference_id,
-        in_qty, out_qty, balance, unit_price, value,
+        vendor_id, in_qty, out_qty, balance, unit_price, value,
         batch_number, remarks, created_by
       ) VALUES (
-        $1, CURRENT_DATE, $2, $3, $4,
-        0, $5, $6, $7, $8,
-        $9, $10, $11
+        $1, $2, $3, $4, $5,
+        $6, 0, $7, $8, $9, $10,
+        $11, $12, $13
       ) RETURNING *
     `, [
-      material_id, outward_type === 'return_to_vendor' ? 'return_to_vendor' : 'issue',
-      reference_type || 'ISSUE', refIdNum,
-      qty, newStock, price, totalVal,
+      material_id, txnDate, txnType,
+      reference_type || defaultRefType, refIdNum,
+      vId, qty, newStock, price, totalVal,
       batch_number || serial_number || null, remarkFull, req.user.id
     ]);
 
     if (mat.is_serialized || machine_id || serial_number) {
       const selectedSn = serial_number || batch_number || null;
-      
-      // 1. If position_id provided, retire any existing active clothing/asset at that position
       if (position_id) {
         await client.query(
           `UPDATE installed_assets 
@@ -1923,7 +2077,6 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         );
       }
 
-      // 2. Check if this serialized asset is already registered in 'In Stock' status
       let existingInStock = null;
       if (selectedSn) {
         const { rows: inStockRows } = await client.query(
@@ -1944,10 +2097,9 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
         );
       } else {
         const today = new Date();
-        const dateStr = today.toISOString().slice(0,10).replace(/-/g, '');
+        const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
         const finalSn = selectedSn || `SN-${Date.now()}`;
-        
-        // Ensure uniqueness
+
         const { rows: dupCheck } = await client.query(
           `SELECT id, asset_number FROM installed_assets 
            WHERE LOWER(TRIM(serial_number)) = LOWER(TRIM($1)) AND status NOT IN ('retired', 'scrapped')`,
@@ -1977,14 +2129,22 @@ router.post('/outward', requireAuth, requireStore, ar(async (req, res) => {
       action: 'store.outward',
       module: 'store',
       recordId: ledger.id,
-      newData: { material_id, qty, price, newStock, outward_type, department_id, issued_to },
+      newData: { material_id, qty, price, newStock, outward_type, vendor_id: vId, department_id, machine_id, issued_to, ref: generatedRef },
       ip: req.ip
     });
 
     await client.query('COMMIT');
     publish(TOPICS.EVENTS_ALL, `outward-${ledger.id}`, { event: 'store.outward.created', id: ledger.id, materialId: material_id, qty, newStock, userId: req.user.id });
 
-    res.json({ success: true, message: `Outward issue recorded. New balance: ${newStock} ${mat.uom}`, data: ledger });
+    res.json({
+      success: true,
+      message: `Outward issue recorded successfully (${prefixTag}). New balance: ${newStock} ${mat.uom}`,
+      data: {
+        ...ledger,
+        gatePass: createdGatePass,
+        referenceId: generatedRef
+      }
+    });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ success: false, message: e.message });
@@ -2599,7 +2759,7 @@ router.put('/outward/:id', requireAuth, requireStore, ar(async (req, res) => {
 
     const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
     if (!ledger) throw new Error('Outward record not found');
-    if (!['issue', 'out', 'return_to_vendor', 'transfer'].includes(ledger.transaction_type)) {
+    if (!['issue', 'out', 'return_to_vendor', 'transfer', 'job_work'].includes(ledger.transaction_type)) {
       throw new Error('Record is not an outward transaction');
     }
 
@@ -2627,8 +2787,16 @@ router.put('/outward/:id', requireAuth, requireStore, ar(async (req, res) => {
       if (dept) deptName = dept.name;
     }
 
+    const tagPrefix = ledger.remarks?.includes('[Job Work]')
+      ? '[Job Work]'
+      : ledger.remarks?.includes('[Return to Party]') || ledger.remarks?.includes('[RTV Outward]')
+      ? '[Return to Party]'
+      : ledger.remarks?.includes('[Inter Store Transfer]')
+      ? '[Inter Store Transfer]'
+      : '[Store Issue]';
+
     const remarkParts = [
-      ledger.remarks?.includes('[RTV Outward]') ? '[RTV Outward]' : '[Store Issue]',
+      tagPrefix,
       deptName ? `Dept: ${deptName}` : null,
       issued_to ? `To: ${issued_to}` : null,
       purpose ? `Purpose: ${purpose}` : null,
@@ -2678,7 +2846,7 @@ router.delete('/outward/:id', requireAuth, requireStore, ar(async (req, res) => 
 
     const { rows: [ledger] } = await client.query('SELECT * FROM stock_ledger WHERE id = $1 FOR UPDATE', [id]);
     if (!ledger) throw new Error('Outward record not found');
-    if (!['issue', 'out', 'return_to_vendor', 'transfer'].includes(ledger.transaction_type)) {
+    if (!['issue', 'out', 'return_to_vendor', 'transfer', 'job_work'].includes(ledger.transaction_type)) {
       throw new Error('Record is not an outward transaction');
     }
 

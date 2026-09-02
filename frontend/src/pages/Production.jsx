@@ -646,6 +646,165 @@ export default function Production() {
     toast(`Added SO ${so.soNumber} (${so.customerName}) as Knife Cut ✓`)
   }
 
+  const handleAutoSuggestCuts = async () => {
+    if (!ppcForm.usable_deckle_mm) {
+      toast('Please enter Usable Deckle first', false)
+      return
+    }
+    setBusy(true)
+    try {
+      const q = new URLSearchParams({
+        usable_deckle_mm: ppcForm.usable_deckle_mm,
+      })
+      if (ppcForm.grade_id) q.set('grade_id', ppcForm.grade_id)
+      if (ppcForm.target_gsm) q.set('gsm', ppcForm.target_gsm)
+      const res = await API(`/api/production/ppc/deckle-optimizer?${q}`)
+      if (res.success && res.data.suggestedCuts?.length > 0) {
+        setPpcForm(f => {
+          const p = f.patterns[0]
+          return {
+            ...f,
+            patterns: [{
+              ...p,
+              cuts: res.data.suggestedCuts.map((c, i) => ({
+                cut_position: i + 1,
+                width_mm: c.widthMm,
+                sales_order_id: c.salesOrderId,
+                remarks: c.remarks || `SO: ${c.soNumber}`
+              }))
+            }]
+          }
+        })
+        toast(`✨ Deckle Optimized: ${res.data.suggestedCuts.length} cuts matched (${res.data.trimMm}mm / ${res.data.trimPct}% trim) ✓`)
+      } else {
+        toast('No matching pending sales orders found for this deckle/grade/GSM', false)
+      }
+    } catch (err) {
+      toast(err.message, false)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const printProductionOrderReport = async (planId) => {
+    try {
+      const res = await API(`/api/production/reports/production-order`)
+      const plan = res.data?.find(p => p.planId === planId) || res.data?.[0]
+      if (!plan) { toast('Plan not found', false); return }
+      const w = window.open('', '_blank', 'width=900,height=700')
+      const patternsHtml = (plan.patterns || []).map(p => `
+        <div style="margin-bottom:16px;border:1px solid #ccc;padding:12px;border-radius:6px">
+          <h4>Pattern #${p.patternNumber} — Planned Sets: ${p.setsPlanned} | Trim: ${p.plannedTrimMm}mm (${p.trimPercentage}%)</h4>
+          <table style="width:100%;border-collapse:collapse;margin-top:8px">
+            <thead><tr style="background:#eee">
+              <th style="border:1px solid #ccc;padding:6px">Cut #</th>
+              <th style="border:1px solid #ccc;padding:6px">Width (mm)</th>
+              <th style="border:1px solid #ccc;padding:6px">SO Number</th>
+              <th style="border:1px solid #ccc;padding:6px">Customer</th>
+              <th style="border:1px solid #ccc;padding:6px">SO Balance MT</th>
+              <th style="border:1px solid #ccc;padding:6px">Remarks</th>
+            </tr></thead>
+            <tbody>
+              ${(p.cuts || []).map(c => `
+                <tr>
+                  <td style="border:1px solid #ccc;padding:6px;text-align:center">K#${c.cutPosition}</td>
+                  <td style="border:1px solid #ccc;padding:6px;text-align:center"><b>${c.widthMm} mm</b></td>
+                  <td style="border:1px solid #ccc;padding:6px">${c.soNumber || 'Stock'}</td>
+                  <td style="border:1px solid #ccc;padding:6px">${c.customerName || '—'}</td>
+                  <td style="border:1px solid #ccc;padding:6px;text-align:right">${c.balanceMt != null ? parseFloat(c.balanceMt).toFixed(3) + ' MT' : '—'}</td>
+                  <td style="border:1px solid #ccc;padding:6px">${c.remarks || '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `).join('')
+
+      w.document.write(`<!DOCTYPE html><html><head><title>Production Order Report — ${plan.planNumber}</title>
+      <style>body{font-family:Arial,sans-serif;padding:24px;color:#1a1a1a;font-size:13px}h2{margin:0 0 4px}h4{margin:0 0 6px}
+      .head-box{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;padding:12px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px}
+      @media print{button{display:none}}</style></head>
+      <body>
+        <button onclick="window.print()" style="padding:6px 16px;margin-bottom:16px;cursor:pointer">🖨️ Print Production Order</button>
+        <h2>MK PAPER MILL — PRODUCTION ORDER REPORT</h2>
+        <div style="font-size:14px;color:#555;font-family:monospace"><b>${plan.planNumber}</b> · Target Date: ${plan.targetDate ? new Date(plan.targetDate).toLocaleDateString() : '—'}</div>
+        <div class="head-box">
+          <div><b>Machine:</b> ${plan.machineName || '—'}</div>
+          <div><b>Grade:</b> ${plan.gradeName || '—'} (${plan.gradeCode || '—'})</div>
+          <div><b>Target GSM:</b> ${plan.targetGsm} GSM</div>
+          <div><b>Target BF:</b> ${plan.targetBf || '—'}</div>
+          <div><b>Usable Deckle:</b> ${plan.usableDeckleMm} mm</div>
+          <div><b>Planned Tonnage:</b> ${plan.plannedTonnageMt} MT</div>
+          <div><b>Status:</b> ${plan.status}</div>
+          <div><b>Created By:</b> ${plan.createdBy || 'System'}</div>
+          <div><b>Generated At:</b> ${new Date().toLocaleString('en-IN')}</div>
+        </div>
+        <h3>Slitting Patterns & Knife Configurations</h3>
+        ${patternsHtml}
+      </body></html>`)
+      w.document.close()
+    } catch (e) {
+      toast(e.message, false)
+    }
+  }
+
+  const printRewinderCuttingOrder = async (jumboId) => {
+    try {
+      const res = await API(`/api/production/reports/rewinder-cutting-order/${jumboId}`)
+      if (!res.success) { toast('Could not fetch rewinder cutting order', false); return }
+      const { jumbo, cuts, trimMm, trimPct, totalCutMm } = res.data
+      const w = window.open('', '_blank', 'width=900,height=650')
+      const cutsRows = (cuts || []).map(c => `
+        <tr>
+          <td style="border:1px solid #ccc;padding:8px;text-align:center;font-weight:bold">K#${c.cutPosition}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:center;font-size:15px"><b>${c.widthMm} mm</b></td>
+          <td style="border:1px solid #ccc;padding:8px">${c.soNumber || 'Direct / Stock'}</td>
+          <td style="border:1px solid #ccc;padding:8px">${c.customerName || '—'}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:right"><b>${c.plannedWeightKg ? c.plannedWeightKg + ' KG' : '—'}</b></td>
+          <td style="border:1px solid #ccc;padding:8px">${c.balanceMt != null ? parseFloat(c.balanceMt).toFixed(3) + ' MT' : '—'}</td>
+          <td style="border:1px solid #ccc;padding:8px;border-left:2px solid #333;width:100px"></td>
+        </tr>
+      `).join('')
+
+      w.document.write(`<!DOCTYPE html><html><head><title>Rewinder Cutting Order — ${jumbo.jumboNumber}</title>
+      <style>body{font-family:Arial,sans-serif;padding:24px;color:#1a1a1a;font-size:13px}h2{margin:0 0 4px}
+      .jumbo-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;padding:12px;background:#f0f7ff;border:2px solid #0284c7;border-radius:6px}
+      table{width:100%;border-collapse:collapse;margin-top:16px}th{background:#f0f0f0;font-weight:700;border:1px solid #ccc;padding:8px}
+      .notes{margin-top:20px;padding:12px;border:1px dashed #999;border-radius:4px;font-size:12px;color:#555}
+      @media print{button{display:none}}</style></head>
+      <body>
+        <button onclick="window.print()" style="padding:6px 16px;margin-bottom:12px;cursor:pointer">🖨️ Print Rewinder Instruction Sheet</button>
+        <h2>MK PAPER MILL — REWINDER CUTTING ORDER</h2>
+        <div style="font-size:13px;color:#666">Instruction Sheet for Rewinder Operator</div>
+        <div class="jumbo-box">
+          <div><b>Mother Jumbo Roll:</b> <span style="font-family:monospace;font-size:15px;font-weight:bold">${jumbo.jumboNumber}</span></div>
+          <div><b>Machine:</b> ${jumbo.machineName || '—'}</div>
+          <div><b>Grade:</b> ${jumbo.gradeName || '—'} (${jumbo.gradeCode || '—'})</div>
+          <div><b>Actual GSM:</b> ${jumbo.gsmActual} GSM</div>
+          <div><b>Actual BF:</b> ${jumbo.bfActual || '—'}</div>
+          <div><b>Deckle Width:</b> ${jumbo.deckleWidthMm} mm</div>
+          <div><b>Net Weight:</b> ${jumbo.netWeightKg} KG</div>
+          <div><b>Shift Date:</b> ${jumbo.shiftDate || '—'} (${jumbo.shiftType || '—'})</div>
+          <div><b>Printed At:</b> ${new Date().toLocaleString('en-IN')}</div>
+        </div>
+        <div style="margin:8px 0;font-size:13px"><b>Total Cut Width:</b> ${totalCutMm} mm | <b>Edge Trim:</b> ${trimMm} mm (${trimPct}%)</div>
+        <table>
+          <thead><tr>
+            <th>Knife #</th><th>Cut Width (mm)</th><th>Sales Order #</th><th>Customer / Party</th>
+            <th>Planned Wt</th><th>SO Balance</th><th style="background:#e0e7ff">Actual Wt Scale (Operator)</th>
+          </tr></thead>
+          <tbody>${cutsRows || '<tr><td colspan="7" style="padding:16px;text-align:center">No active slitting pattern cuts configured</td></tr>'}</tbody>
+        </table>
+        <div class="notes">
+          <b>Operator Instructions:</b> 1. Set slitter knives to specified widths. 2. Verify edge trim &ge; 40mm on each side. 3. Log scale weight for each child reel in the MES terminal. 4. Collect edge trim and broke into broke pulper.
+        </div>
+      </body></html>`)
+      w.document.close()
+    } catch (e) {
+      toast(e.message, false)
+    }
+  }
+
   const handlePpcPlanSubmit = async (e) => {
     e.preventDefault()
     if (totalPatternCutWidth > usableDeckleNum) {
@@ -1029,9 +1188,19 @@ export default function Production() {
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
                       ✂️ Slitting Knives Configuration ({currentPattern.cuts.length} Cuts)
                     </div>
-                    <button type="button" style={{ ...S.btnSecondary, padding: '4px 10px', fontSize: 11 }} onClick={handleAddCut}>
-                      + Add Knife Cut
-                    </button>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        type="button"
+                        style={{ ...S.btnSecondary, background: '#f59e0b', color: '#fff', border: 'none', padding: '4px 10px', fontSize: 11, fontWeight: 700 }}
+                        onClick={handleAutoSuggestCuts}
+                        title="Run Best-Fit Decreasing algorithm against pending sales orders"
+                      >
+                        ✨ Auto-Optimize Knives (BFD)
+                      </button>
+                      <button type="button" style={{ ...S.btnSecondary, padding: '4px 10px', fontSize: 11 }} onClick={handleAddCut}>
+                        + Add Knife Cut
+                      </button>
+                    </div>
                   </div>
 
                   <div style={S.tableWrap}>
@@ -1226,16 +1395,26 @@ export default function Production() {
                         </span>
                       </Td>
                       <Td>
-                        <select
-                          style={{ ...S.statusSelect, fontSize: 11 }}
-                          value={plan.status}
-                          onChange={e => handlePlanStatusChange(plan.id, e.target.value)}
-                        >
-                          <option value="SCHEDULED">SCHEDULED</option>
-                          <option value="IN_PROGRESS">IN_PROGRESS</option>
-                          <option value="COMPLETED">COMPLETED</option>
-                          <option value="CANCELLED">CANCELLED</option>
-                        </select>
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <select
+                            style={{ ...S.statusSelect, fontSize: 11 }}
+                            value={plan.status}
+                            onChange={e => handlePlanStatusChange(plan.id, e.target.value)}
+                          >
+                            <option value="SCHEDULED">SCHEDULED</option>
+                            <option value="IN_PROGRESS">IN_PROGRESS</option>
+                            <option value="COMPLETED">COMPLETED</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                          </select>
+                          <button
+                            type="button"
+                            style={{ ...S.btnSm, background: '#0284c7', fontSize: 10, padding: '3px 7px' }}
+                            onClick={() => printProductionOrderReport(plan.id)}
+                            title="Print Production Order Report"
+                          >
+                            🖨️ Report
+                          </button>
+                        </div>
                       </Td>
                     </tr>
                   ))}
@@ -1359,9 +1538,19 @@ export default function Production() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
                   {/* Jumbo Specs Card */}
                   <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, fontSize: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
                       <span>Mother Roll: {currentJumbo.jumboNumber}</span>
-                      <span>Net Weight: {currentJumbo.netWeightKg} KG</span>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <span>Net Weight: {currentJumbo.netWeightKg} KG</span>
+                        <button
+                          type="button"
+                          style={{ ...S.btnSm, background: '#0284c7', fontSize: 11, padding: '4px 9px' }}
+                          onClick={() => printRewinderCuttingOrder(currentJumbo.id)}
+                          title="Print Rewinder Cutting Order Sheet for Operator"
+                        >
+                          🖨️ Rewinder Sheet
+                        </button>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', gap: 14, color: '#475569', flexWrap: 'wrap' }}>
                       <span>Grade: <b>{currentJumbo.gradeName || currentJumbo.gradeCode}</b></span>
