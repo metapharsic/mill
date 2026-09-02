@@ -58,5 +58,17 @@
     "inspected_by": null,
     "remarks": "Excess chemical from shift run",
     "created_at": "2026-08-19T05:00:57.243Z"
+  },
+  {
+    "id": 6,
+    "return_number": "SRV-TEST-985951",
+    "department_id": 1,
+    "indent_id": null,
+    "return_date": "2026-08-25T18:30:00.000Z",
+    "status": "Restocked",
+    "returned_by": 21,
+    "inspected_by": null,
+    "remarks": "Excess chemical from shift run",
+    "created_at": "2026-08-26T12:56:25.952Z"
   }
 ]

@@ -243,5 +243,33 @@
     "code": "CHEM",
     "type": "Raw Material",
     "parent_id": null
+  },
+  {
+    "id": 63,
+    "name": "General Spares",
+    "code": "GENSP",
+    "type": "Mechanical",
+    "parent_id": null
+  },
+  {
+    "id": 64,
+    "name": "Laboratory",
+    "code": "LAB",
+    "type": "Quality",
+    "parent_id": null
+  },
+  {
+    "id": 65,
+    "name": "ADMINISTRATION",
+    "code": "ADMIN",
+    "type": "Asset",
+    "parent_id": null
+  },
+  {
+    "id": 98,
+    "name": "Quality Control",
+    "code": "QC",
+    "type": "Consumable",
+    "parent_id": null
   }
 ]

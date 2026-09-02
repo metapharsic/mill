@@ -311,7 +311,7 @@ export default function Purchase() {
 
   const loadPendingIndents = useCallback(async () => {
     setPrLoading(true)
-    const r = await API(`/api/purchase/pending-indents?search=${encodeURIComponent(prSearch)}`)
+    const r = await API(`/api/purchase/pending-indents?search=${encodeURIComponent(prSearch)}&status=all`)
     if (r.success) {
       setPrList(r.data)
     }

@@ -11,160 +11,6 @@
     "department_id": null
   },
   {
-    "id": 2,
-    "section_code": "PULP",
-    "name": "Pulp Mill",
-    "icon": "🪵",
-    "description": "Converts raw fiber into clean refined pulp",
-    "sort_order": 1,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 3,
-    "section_code": "CENTRI",
-    "name": "Centricleaner",
-    "icon": "🌀",
-    "description": "Centrifugal removal of fine/heavy contaminants",
-    "sort_order": 2,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 4,
-    "section_code": "WIRE",
-    "name": "Wire Section",
-    "icon": "🕸️",
-    "description": "Sheet forming — dilute stock drained through forming fabric",
-    "sort_order": 3,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 5,
-    "section_code": "VACUUM",
-    "name": "Vacuum",
-    "icon": "💨",
-    "description": "Controlled vacuum for wire/press/felt dewatering",
-    "sort_order": 4,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 6,
-    "section_code": "PRESS",
-    "name": "Press Section",
-    "icon": "🗜️",
-    "description": "Mechanical water removal — 20% to 42–50% dryness",
-    "sort_order": 5,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 7,
-    "section_code": "UNIRUN",
-    "name": "Unirun",
-    "icon": "🏃",
-    "description": "Single-felt closed draw transfer press→dryer",
-    "sort_order": 6,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 8,
-    "section_code": "PREDRYER",
-    "name": "Pre Dryer",
-    "icon": "🔥",
-    "description": "Steam-heated cylinders — 50% to 92–95% dryness",
-    "sort_order": 7,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 9,
-    "section_code": "SIZEPRESS",
-    "name": "Size Press",
-    "icon": "📏",
-    "description": "Surface starch/sizing application",
-    "sort_order": 8,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 10,
-    "section_code": "SIZEKITCHEN",
-    "name": "Size Kitchen",
-    "icon": "🍳",
-    "description": "Starch cooking and supply for size press",
-    "sort_order": 9,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 11,
-    "section_code": "POSTDRYER",
-    "name": "Post Dryer",
-    "icon": "☀️",
-    "description": "Final drying after size press to 94–96%",
-    "sort_order": 10,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 12,
-    "section_code": "CALENDER",
-    "name": "Calender",
-    "icon": "🛢️",
-    "description": "Smoothness/gloss/caliper improvement via nip",
-    "sort_order": 11,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 13,
-    "section_code": "POPE",
-    "name": "Pope Reel",
-    "icon": "⭕",
-    "description": "Winds finished paper into parent jumbo reel",
-    "sort_order": 12,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 14,
-    "section_code": "REWINDER",
-    "name": "Rewinder",
-    "icon": "🔄",
-    "description": "Slits parent reel into customer roll specs",
-    "sort_order": 13,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
-    "id": 15,
-    "section_code": "STARCHKITCHEN",
-    "name": "Starch Kitchen",
-    "icon": "🧪",
-    "description": "Wet-end starch preparation for retention/strength",
-    "sort_order": 14,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 1
-  },
-  {
     "id": 20,
     "section_code": "CRANES",
     "name": "Cranes",
@@ -182,28 +28,6 @@
     "icon": "💧",
     "description": "Steam distribution and condensate recovery circuit",
     "sort_order": 15,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 9
-  },
-  {
-    "id": 17,
-    "section_code": "ETP",
-    "name": "ETP",
-    "icon": "🍀",
-    "description": "Effluent treatment — primary/secondary/tertiary",
-    "sort_order": 16,
-    "is_active": true,
-    "created_at": "2026-06-29T08:47:00.121Z",
-    "department_id": 9
-  },
-  {
-    "id": 18,
-    "section_code": "BOILER",
-    "name": "Boiler",
-    "icon": "🌋",
-    "description": "Steam generation and co-generation",
-    "sort_order": 17,
     "is_active": true,
     "created_at": "2026-06-29T08:47:00.121Z",
     "department_id": 9
@@ -242,17 +66,6 @@
     "department_id": 4
   },
   {
-    "id": 86,
-    "section_code": "CLOTHING",
-    "name": "Clothing Section",
-    "icon": "🧵",
-    "description": "Clothing Section from MK Paper Mill Machinery Registry",
-    "sort_order": 50,
-    "is_active": true,
-    "created_at": "2026-08-18T10:50:50.838Z",
-    "department_id": null
-  },
-  {
     "id": 87,
     "section_code": "MISC",
     "name": "Miscellaneous Section",
@@ -262,5 +75,225 @@
     "is_active": true,
     "created_at": "2026-08-18T10:50:50.838Z",
     "department_id": null
+  },
+  {
+    "id": 4,
+    "section_code": "WIRE",
+    "name": "WIRE SECTION",
+    "icon": "🔗",
+    "description": "Sheet forming — dilute stock drained through forming fabric",
+    "sort_order": 1,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 6,
+    "section_code": "PRESS",
+    "name": "PRESS SECTION",
+    "icon": "🔩",
+    "description": "Mechanical water removal — 20% to 42–50% dryness",
+    "sort_order": 2,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 7,
+    "section_code": "UNIRUN",
+    "name": "UNIRUN SECTION",
+    "icon": "⚙️",
+    "description": "Single-felt closed draw transfer press→dryer",
+    "sort_order": 3,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 8,
+    "section_code": "PREDRYER",
+    "name": "PRE DRYER SECTION",
+    "icon": "🔥",
+    "description": "Steam-heated cylinders — 50% to 92–95% dryness",
+    "sort_order": 4,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 9,
+    "section_code": "SIZEPRESS",
+    "name": "SIZE PRESS SECTION",
+    "icon": "📐",
+    "description": "Surface starch/sizing application",
+    "sort_order": 5,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 11,
+    "section_code": "POSTDRYER",
+    "name": "POST DRYER SECTION",
+    "icon": "♨️",
+    "description": "Final drying after size press to 94–96%",
+    "sort_order": 6,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 12,
+    "section_code": "CALENDER",
+    "name": "CALENDER SECTION",
+    "icon": "🗓️",
+    "description": "Smoothness/gloss/caliper improvement via nip",
+    "sort_order": 7,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 95,
+    "section_code": "POPEREEL",
+    "name": "POPE REEL SECTION",
+    "icon": "🎞️",
+    "description": null,
+    "sort_order": 8,
+    "is_active": true,
+    "created_at": "2026-08-23T11:00:53.357Z",
+    "department_id": null
+  },
+  {
+    "id": 14,
+    "section_code": "REWINDER",
+    "name": "REWINDER SECTION",
+    "icon": "🔄",
+    "description": "Slits parent reel into customer roll specs",
+    "sort_order": 9,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 5,
+    "section_code": "VACUUM",
+    "name": "VACUUM SECTION",
+    "icon": "💨",
+    "description": "Controlled vacuum for wire/press/felt dewatering",
+    "sort_order": 10,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 10,
+    "section_code": "SIZEKITCHEN",
+    "name": "SIZE KITCHEN SECTION",
+    "icon": "🍳",
+    "description": "Starch cooking and supply for size press",
+    "sort_order": 11,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 3,
+    "section_code": "CENTRI",
+    "name": "CENTRI CLEANER SECTION",
+    "icon": "🌀",
+    "description": "Centrifugal removal of fine/heavy contaminants",
+    "sort_order": 12,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 100,
+    "section_code": "PULPMILL",
+    "name": "PULP MILL SECTION",
+    "icon": "🏭",
+    "description": null,
+    "sort_order": 13,
+    "is_active": true,
+    "created_at": "2026-08-23T11:00:53.357Z",
+    "department_id": null
+  },
+  {
+    "id": 17,
+    "section_code": "ETP",
+    "name": "ETP SECTION",
+    "icon": "🌿",
+    "description": "Effluent treatment — primary/secondary/tertiary",
+    "sort_order": 14,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 9
+  },
+  {
+    "id": 18,
+    "section_code": "BOILER",
+    "name": "BOILER SECTION",
+    "icon": "🔥",
+    "description": "Steam generation and co-generation",
+    "sort_order": 15,
+    "is_active": true,
+    "created_at": "2026-06-29T08:47:00.121Z",
+    "department_id": 9
+  },
+  {
+    "id": 86,
+    "section_code": "CLOTHING",
+    "name": "CLOTHING",
+    "icon": "🧵",
+    "description": "Clothing Section from MK Paper Mill Machinery Registry",
+    "sort_order": 16,
+    "is_active": true,
+    "created_at": "2026-08-18T10:50:50.838Z",
+    "department_id": null
+  },
+  {
+    "id": 104,
+    "section_code": "POPE",
+    "name": "Pope Reel",
+    "icon": "🎞️",
+    "description": "Pope Reel from MK Paper Mill Machinery Registry",
+    "sort_order": 50,
+    "is_active": true,
+    "created_at": "2026-08-24T05:25:04.026Z",
+    "department_id": null
+  },
+  {
+    "id": 105,
+    "section_code": "PULP",
+    "name": "Pulp Mill",
+    "icon": "🪵",
+    "description": "Pulp Mill from MK Paper Mill Machinery Registry",
+    "sort_order": 50,
+    "is_active": true,
+    "created_at": "2026-08-24T05:25:04.026Z",
+    "department_id": null
+  },
+  {
+    "id": 15,
+    "section_code": "STARCHKITCHEN",
+    "name": "Starch Kitchen",
+    "icon": "🧪",
+    "description": "Wet-end starch preparation for retention/strength",
+    "sort_order": 14,
+    "is_active": true,
+    "created_at": "2026-06-29T03:17:00.121Z",
+    "department_id": 1
+  },
+  {
+    "id": 106,
+    "section_code": "MECH",
+    "name": "MECHANICAL",
+    "icon": null,
+    "description": "MECHANICAL Section",
+    "sort_order": 0,
+    "is_active": true,
+    "created_at": "2026-08-31T10:55:40.366Z",
+    "department_id": 2
   }
 ]

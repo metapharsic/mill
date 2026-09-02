@@ -43,5 +43,23 @@
     "uom": "Kg",
     "batch_number": null,
     "remarks": null
+  },
+  {
+    "id": 6,
+    "transfer_id": 6,
+    "material_id": 3169,
+    "qty": "50.000",
+    "uom": "Kg",
+    "batch_number": null,
+    "remarks": null
+  },
+  {
+    "id": 7,
+    "transfer_id": 7,
+    "material_id": 2164,
+    "qty": "6.000",
+    "uom": "NOS",
+    "batch_number": null,
+    "remarks": null
   }
 ]

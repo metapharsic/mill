@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "inbound_dc_id": 1,
+    "material_id": 2299,
+    "qty": "2.000",
+    "unit": "NOS",
+    "batch_no": "LOT-01"
+  },
+  {
+    "id": 2,
+    "inbound_dc_id": 2,
+    "material_id": 3166,
+    "qty": "10.000",
+    "unit": "NOS",
+    "batch_no": "LOT-E2E-01"
+  },
+  {
+    "id": 3,
+    "inbound_dc_id": 2,
+    "material_id": 3167,
+    "qty": "5.000",
+    "unit": "NOS",
+    "batch_no": "LOT-E2E-02"
+  },
+  {
+    "id": 4,
+    "inbound_dc_id": 3,
+    "material_id": 3167,
+    "qty": "10.000",
+    "unit": "NOS",
+    "batch_no": "LOT-E2E-01"
+  },
+  {
+    "id": 5,
+    "inbound_dc_id": 3,
+    "material_id": 3168,
+    "qty": "5.000",
+    "unit": "NOS",
+    "batch_no": "LOT-E2E-02"
+  }
+]

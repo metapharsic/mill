@@ -48,5 +48,15 @@
     "condition_grade": "Good",
     "action_taken": "Restocked to Store",
     "remarks": "Unopened bag"
+  },
+  {
+    "id": 6,
+    "return_id": 6,
+    "material_id": 3169,
+    "qty": "20.000",
+    "uom": "Kg",
+    "condition_grade": "Good",
+    "action_taken": "Restocked to Store",
+    "remarks": "Unopened bag"
   }
 ]

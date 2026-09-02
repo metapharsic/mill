@@ -35,3 +35,7 @@ of re-auditing from scratch.
 | 2026-08-29 | Inbound DC + Invoice Match: Playwright E2E, backend unit tests, DB-sync integration test, typo bug fix (loadOpenInbounDcs) | [2026-08-29-inbound-dc-testing.md](./2026-08-29-inbound-dc-testing.md) |
 | 2026-08-29 | Inbound DC surfaced in Store Dashboard reporting/analytics (live summary endpoint + manual-refresh sync) | [2026-08-29-inbound-dc-reporting.md](./2026-08-29-inbound-dc-reporting.md) |
 | 2026-09-02 | Fast Outward Issue workflows (Job Work, Return to Party, Inter Store Transfer) | [2026-09-02-fast-outward-issue-workflows.md](./2026-09-02-fast-outward-issue-workflows.md) |
+| 2026-09-02 | Complete Data Retrieval, Synchronization & Portable JSON Snapshots (All 110 Tables) | [2026-09-02-data-retrieval-and-synchronization.md](./2026-09-02-data-retrieval-and-synchronization.md) |
+| 2026-09-02 | Agent-to-Agent (A2A) Complete Data Wiring & P2P Restoration | [2026-09-02-a2a-data-wiring-restoration.md](./2026-09-02-a2a-data-wiring-restoration.md) |
+| 2026-09-02 | Data Synchronization & Visibility Audit: PR, PO, DC, GRN & Invoices | [2026-09-02-data-sync-and-visibility-audit.md](./2026-09-02-data-sync-and-visibility-audit.md) |
+

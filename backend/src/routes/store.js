@@ -1241,7 +1241,7 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
       LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND (CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END))
       LEFT JOIN vendors g_v ON g.vendor_id = g_v.id
       WHERE ${whereClause}
-      ORDER BY sl.id DESC
+      ORDER BY COALESCE(sl.date, sl.created_at::date) DESC, sl.id DESC
       LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
     `, [...vals, parseInt(limit), offset]);
 
@@ -1354,7 +1354,7 @@ router.get('/inward', requireAuth, ar(async (req, res) => {
     LEFT JOIN vendors v ON g.vendor_id = v.id
     LEFT JOIN users u ON g.received_by = u.id
     WHERE ${whereClause}
-    ORDER BY g.id DESC
+    ORDER BY COALESCE(g.date, g.created_at::date) DESC, g.id DESC
     LIMIT $${vals.length + 1} OFFSET $${vals.length + 2}
   `, [...vals, parseInt(limit), offset]);
 

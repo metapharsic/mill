@@ -471,5 +471,137 @@
     "ref_id": 27,
     "is_read": false,
     "created_at": "2026-08-23T05:54:26.357Z"
+  },
+  {
+    "id": 47,
+    "user_id": 10,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260827-0013",
+    "message": "5 item(s) from indent IND-20260827-0013 (Maintenance) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 150,
+    "is_read": false,
+    "created_at": "2026-08-28T13:26:43.811Z"
+  },
+  {
+    "id": 48,
+    "user_id": 1,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260827-0013",
+    "message": "5 item(s) from indent IND-20260827-0013 (Maintenance) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 150,
+    "is_read": false,
+    "created_at": "2026-08-28T13:26:43.815Z"
+  },
+  {
+    "id": 49,
+    "user_id": 2,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260827-0013",
+    "message": "5 item(s) from indent IND-20260827-0013 (Maintenance) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 150,
+    "is_read": false,
+    "created_at": "2026-08-28T13:26:43.816Z"
+  },
+  {
+    "id": 50,
+    "user_id": 1,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-29T13:15:14.693Z"
+  },
+  {
+    "id": 51,
+    "user_id": 12,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-29T13:15:14.696Z"
+  },
+  {
+    "id": 52,
+    "user_id": 2,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-29T13:15:14.697Z"
+  },
+  {
+    "id": 53,
+    "user_id": 1,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-31T03:53:51.076Z"
+  },
+  {
+    "id": 54,
+    "user_id": 12,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-31T03:53:51.078Z"
+  },
+  {
+    "id": 55,
+    "user_id": 2,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-08-31T03:53:51.079Z"
+  },
+  {
+    "id": 56,
+    "user_id": 1,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-09-02T08:07:11.846Z"
+  },
+  {
+    "id": 57,
+    "user_id": 12,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-09-02T08:07:11.853Z"
+  },
+  {
+    "id": 58,
+    "user_id": 2,
+    "type": "warning",
+    "title": "Pending Ack: IND-20260813-0014",
+    "message": "1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.",
+    "ref_table": "indents",
+    "ref_id": 27,
+    "is_read": false,
+    "created_at": "2026-09-02T08:07:11.854Z"
   }
 ]

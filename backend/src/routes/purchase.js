@@ -38,10 +38,20 @@ router.get('/vendors', auth, ar(async (req, res) => {
 
 // GET ALL PENDING INDENTS / PURCHASE REQUISITIONS (PR)
 router.get('/pending-indents', auth, ar(async (req, res) => {
-  const { search } = req.query;
-  const conds = [`i.status NOT IN ('Closed', 'Cancelled', 'Rejected')`];
+  const { search, status } = req.query;
+  const conds = [];
   const params = [];
   let p = 1;
+  if (status && status !== 'all' && status !== 'pending') {
+    conds.push(`i.status = $${p++}`);
+    params.push(status);
+  } else if (status === 'all') {
+    // Return all non-cancelled indents
+    conds.push(`i.status != 'Cancelled'`);
+  } else {
+    // Default: pending / approved indents not yet closed
+    conds.push(`i.status NOT IN ('Closed', 'Cancelled', 'Rejected')`);
+  }
   if (search) {
     conds.push(`(i.indent_number ILIKE $${p} OR d.name ILIKE $${p} OR u.name ILIKE $${p} OR i.remarks ILIKE $${p})`);
     params.push(`%${search}%`);
@@ -730,7 +740,7 @@ router.get('/grn', auth, ar(async (req, res) => {
      LEFT JOIN vendors v ON v.id = g.vendor_id
      LEFT JOIN users u ON u.id = g.received_by
      ${where}
-     ORDER BY g.created_at DESC
+     ORDER BY COALESCE(g.date, g.created_at::date) DESC, g.id DESC
      LIMIT $${p} OFFSET $${p+1}`,
     [...params, parseInt(limit), offset]
   );
