@@ -53,5 +53,49 @@
     "gst_pct": "0.00",
     "line_taxable": "3150.00",
     "line_total": "3150.00"
+  },
+  {
+    "id": 8,
+    "cash_purchase_id": 8,
+    "material_id": 4634,
+    "qty": "7000.000",
+    "uom": "NOS",
+    "unit_price": "5.00",
+    "gst_pct": "0.00",
+    "line_taxable": "35000.00",
+    "line_total": "35000.00"
+  },
+  {
+    "id": 9,
+    "cash_purchase_id": 8,
+    "material_id": 4718,
+    "qty": "7200.000",
+    "uom": "NOS",
+    "unit_price": "6.00",
+    "gst_pct": "0.00",
+    "line_taxable": "43200.00",
+    "line_total": "43200.00"
+  },
+  {
+    "id": 10,
+    "cash_purchase_id": 9,
+    "material_id": 4495,
+    "qty": "20.000",
+    "uom": "NOS",
+    "unit_price": "60.00",
+    "gst_pct": "0.00",
+    "line_taxable": "1200.00",
+    "line_total": "1200.00"
+  },
+  {
+    "id": 11,
+    "cash_purchase_id": 10,
+    "material_id": 4730,
+    "qty": "1.000",
+    "uom": "NOS",
+    "unit_price": "1000.00",
+    "gst_pct": "0.00",
+    "line_taxable": "1000.00",
+    "line_total": "1000.00"
   }
 ]

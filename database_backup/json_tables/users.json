@@ -374,23 +374,6 @@
     "section_id": null
   },
   {
-    "id": 6,
-    "employee_code": "DH-STORE",
-    "name": "Head - Store Management",
-    "email": "head.store@mkpapermill.com",
-    "mobile": "9000000004",
-    "password_hash": "$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa",
-    "role_id": 3,
-    "department_id": 4,
-    "shift": null,
-    "is_active": true,
-    "last_login": "2026-09-02T11:07:59.563Z",
-    "created_at": "2026-06-29T04:18:42.952Z",
-    "updated_at": "2026-06-29T04:18:42.952Z",
-    "must_change_password": false,
-    "section_id": null
-  },
-  {
     "id": 1,
     "employee_code": "EMP001",
     "name": "Admin",
@@ -401,9 +384,26 @@
     "department_id": 16,
     "shift": null,
     "is_active": true,
-    "last_login": "2026-09-02T05:26:50.283Z",
+    "last_login": "2026-09-04T14:18:04.628Z",
     "created_at": "2026-06-26T12:43:01.372Z",
     "updated_at": "2026-06-26T12:43:01.372Z",
+    "must_change_password": false,
+    "section_id": null
+  },
+  {
+    "id": 6,
+    "employee_code": "DH-STORE",
+    "name": "Head - Store Management",
+    "email": "head.store@mkpapermill.com",
+    "mobile": "9000000004",
+    "password_hash": "$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa",
+    "role_id": 3,
+    "department_id": 4,
+    "shift": null,
+    "is_active": true,
+    "last_login": "2026-09-06T04:51:16.685Z",
+    "created_at": "2026-06-29T04:18:42.952Z",
+    "updated_at": "2026-06-29T04:18:42.952Z",
     "must_change_password": false,
     "section_id": null
   }

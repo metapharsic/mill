@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 9DZpofYaup9lPD8gB8an4l5b8OKc5J11kZbb8i0mTjlTFfdHdworoXkxtyCzo0N
+\restrict 5UdgHgQIKReRHXcDtR7RPh4UmIMaQYFcK985VZQmMXfoBQr9NvUFYrOMLAHgM9y
 
 -- Dumped from database version 18.4
 -- Dumped by pg_dump version 18.4
@@ -7764,6 +7764,77 @@ INSERT INTO public.audit_log VALUES (470, 6, 'store.grn.delete', 'store', 26, '{
 INSERT INTO public.audit_log VALUES (471, 6, 'store.grn.delete', 'store', 21, '{"itemCount": 1, "grn_number": "GRN-20260818-0001"}', '{"deleted": true}', '::1', '2026-09-02 16:09:55.642501');
 INSERT INTO public.audit_log VALUES (479, 6, 'store.outward.delete', 'store', 1799, '{"out_qty": 10, "curStock": 69.084, "material_id": 3111}', '{"newStock": 79.084}', '::1', '2026-09-02 16:16:06.057204');
 INSERT INTO public.audit_log VALUES (480, 6, 'store.outward.delete', 'store', 1800, '{"out_qty": 5, "curStock": 13849, "material_id": 3112}', '{"newStock": 13854}', '::1', '2026-09-02 16:16:20.459493');
+INSERT INTO public.audit_log VALUES (481, 6, 'store.grn.delete', 'store', 133, '{"itemCount": 0, "grn_number": "GRN-20260902-0001"}', '{"deleted": true}', '::1', '2026-09-02 17:21:23.004422');
+INSERT INTO public.audit_log VALUES (482, 6, 'store.grn.delete', 'store', 134, '{"itemCount": 1, "grn_number": "GRN-20260902-0002"}', '{"deleted": true}', '::1', '2026-09-02 17:39:24.298147');
+INSERT INTO public.audit_log VALUES (483, 6, 'DELETE /materials/4662', 'master', 4662, NULL, '{}', '::1', '2026-09-02 18:45:37.642563');
+INSERT INTO public.audit_log VALUES (484, 6, 'DELETE /materials/4635', 'master', 4635, NULL, '{}', '::1', '2026-09-02 18:45:49.564046');
+INSERT INTO public.audit_log VALUES (485, 6, 'PUT /materials/4634', 'master', 4634, NULL, '{"uom": "NOS", "code": "GSS001", "name": "SELF DRILLING SCREW 1\"", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 85, "unit_price": 4.14285, "category_id": 55, "section_ids": ["85"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SHED ROOFING", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-02 18:50:36.29819');
+INSERT INTO public.audit_log VALUES (486, 6, 'PUT /materials/4634', 'master', 4634, NULL, '{"uom": "NOS", "code": "GSS001", "name": "SELF DRILLING SCREW 1\"", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 85, "unit_price": 4.14, "category_id": 55, "section_ids": ["85"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SHED ROOFING", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-02 18:50:37.429406');
+INSERT INTO public.audit_log VALUES (487, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "GSS003", "name": "SELF DRILLING SCREW 2\"", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 85, "unit_price": 6.52777, "category_id": 65, "section_ids": ["85"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-02 18:59:07.58888');
+INSERT INTO public.audit_log VALUES (488, 6, 'PUT /materials/4718', 'master', 4718, NULL, '{"uom": "NOS", "code": "GSS003", "name": "SELF DRILLING SCREW 2\"", "issued": 0, "balance": 0, "gst_pct": 18, "opening": 0, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 85, "unit_price": 6.537777, "category_id": 55, "section_ids": ["85"], "bin_location": "", "oem_supplier": "", "current_stock": 0, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "Store Section › Store Inventory Racking", "last_audit_cycle": "", "criticality_class": "C", "calibration_protocol": "", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"], "expected_lifespan_days": 365}', '::1', '2026-09-02 19:03:58.858777');
+INSERT INTO public.audit_log VALUES (489, 6, 'store.inward', 'store', 3576, NULL, '{"qty": 540, "price": 18, "newStock": 1177.4, "grn_number": "GRN-20260902-0001", "inward_type": "grn", "material_id": 3126, "reference_id": "PO-20260902-0001"}', '::1', '2026-09-02 19:12:32.239734');
+INSERT INTO public.audit_log VALUES (490, 6, 'POST /vendors', 'master', NULL, NULL, '{"pan": "", "city": "HYDERBAD", "name": "SUZALKEM TECHNOLOGIES PVT LTD", "email": "", "gstin": "", "state": "TELANGANA", "mobile": "", "rating": 3, "address": "401, RAJESWARE AAPARTMENTS, NAGARJUNA NAGAR, AMEERPET, HYDERBAD", "pincode": "500 073", "bank_name": "", "ifsc_code": "", "is_active": true, "branch_name": "", "credit_days": 30, "account_type": "Current", "payment_terms": "30 days", "account_number": "", "contact_person": "", "account_holder_name": ""}', '::1', '2026-09-02 19:15:54.714542');
+INSERT INTO public.audit_log VALUES (491, 6, 'PUT /vendors/113', 'master', 113, NULL, '{"pan": "AARCS1260Q", "city": "HYDERBAD", "name": "SUZALKEM TECHNOLOGIES PVT LTD", "email": "", "gstin": "36AARCS1260Q1ZN", "state": "TELANGANA", "mobile": "", "rating": "3.0", "address": "401, RAJESWARE AAPARTMENTS, NAGARJUNA NAGAR, AMEERPET, HYDERBAD", "pincode": "500 073", "bank_name": "ICICI Bank", "ifsc_code": "ICIC0002363", "is_active": true, "branch_name": "AMEERPET", "credit_days": 30, "account_type": "Current", "payment_terms": "30 days", "account_number": "0070505014941", "contact_person": "", "account_holder_name": "SUZALKEM TECHNOLOGIES PVT LTD"}', '::1', '2026-09-02 19:18:58.265028');
+INSERT INTO public.audit_log VALUES (492, 6, 'store.inward', 'store', 3577, NULL, '{"qty": 150, "price": 290, "newStock": 163, "grn_number": "GRN-20260902-0002", "inward_type": "grn", "material_id": 3119, "reference_id": "PO-20260902-0002"}', '::1', '2026-09-02 19:21:40.184407');
+INSERT INTO public.audit_log VALUES (493, 6, 'PUT /materials/2844', 'master', 2844, NULL, '{"uom": "PKT", "code": "MSR0003", "name": "MANGALAM M.S (4.00X450 MM) PKT", "issued": 0, "balance": 3, "gst_pct": 18, "opening": 3, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 0, "category_id": 44, "section_ids": [], "bin_location": "", "oem_supplier": "", "current_stock": 3, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "last_audit_cycle": "", "criticality_class": "", "calibration_protocol": "", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": [], "expected_lifespan_days": 365}', '::1', '2026-09-03 12:29:26.246857');
+INSERT INTO public.audit_log VALUES (494, 6, 'PUT /materials/4490', 'master', 4490, NULL, '{"uom": "NOS", "code": "GER0048", "name": "COCONUT BROOMS", "issued": 0, "balance": 18, "gst_pct": 18, "opening": 18, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 0, "category_id": 35, "section_ids": [], "bin_location": "", "oem_supplier": "", "current_stock": 18, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "last_audit_cycle": "", "criticality_class": "C", "calibration_protocol": "", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": [], "expected_lifespan_days": 365}', '::1', '2026-09-03 12:51:05.983118');
+INSERT INTO public.audit_log VALUES (495, 6, 'POST /vendors', 'master', NULL, NULL, '{"pan": "ABXPR3776L", "city": "VAPI", "name": "MICRO FAB INDUSTRIES", "email": "", "gstin": "24ABXPR3776L1ZN", "state": "GUJARAT", "mobile": "", "rating": 3, "address": "PLOT NO.5006, 4TH PHASE, GIDC VAPI", "pincode": "503 195", "bank_name": "", "ifsc_code": "", "is_active": true, "branch_name": "", "credit_days": 30, "account_type": "Current", "payment_terms": "30 days", "account_number": "", "contact_person": "", "account_holder_name": "MICRO FAB INDUSTRIES"}', '::1', '2026-09-03 18:54:53.438331');
+INSERT INTO public.audit_log VALUES (512, 6, 'store.inward', 'store', 3609, NULL, '{"qty": 350, "price": 7899, "newStock": 350, "grn_number": "GRN-20260903-0003", "inward_type": "grn", "material_id": 4728, "reference_id": "PO-20260903-0003"}', '::1', '2026-09-03 13:21:27.507589');
+INSERT INTO public.audit_log VALUES (496, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "MCH0001\t", "name": "CI HOUSING", "hsn_code": "8441 9000", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 6, "unit_price": 66562, "category_id": 31, "section_ids": ["6"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SECOUND PRESS ROLL", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 356, "section_equipment_ids": ["356"]}', '::1', '2026-09-03 09:27:00.2564');
+INSERT INTO public.audit_log VALUES (497, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "MCH0002\t", "name": "M.S COUPLING", "hsn_code": "8441 9000", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 6, "unit_price": 66561, "category_id": 31, "section_ids": ["6"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SECOUND PRESS ROLL", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 357, "section_equipment_ids": ["357"]}', '::1', '2026-09-03 09:28:37.913087');
+INSERT INTO public.audit_log VALUES (498, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "MCH0003\t", "name": "GEAR BOX WITH MOTOR", "hsn_code": "8441 9000", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 6, "unit_price": 66559, "category_id": 31, "section_ids": ["6"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SECOUND PRESS ROLL", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 357, "section_equipment_ids": ["357"]}', '::1', '2026-09-03 09:31:57.311951');
+INSERT INTO public.audit_log VALUES (499, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "MCH0004\t", "name": "GARE BOX MOUNTING PLATE", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 6, "unit_price": 66561, "category_id": 31, "section_ids": ["6"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "SECOUND PRESS ROLL", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 357, "section_equipment_ids": ["357"]}', '::1', '2026-09-04 09:32:58.367514');
+INSERT INTO public.audit_log VALUES (500, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "GER0094\t", "name": "CIRCLIP", "hsn_code": "8441 9000", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 66561, "category_id": 35, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-03 09:59:38.312522');
+INSERT INTO public.audit_log VALUES (501, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "MCH0005\t", "name": "GARE BOX BEARING HOUSING WITH SHAFT", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 55000, "category_id": 65, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-03 10:01:23.079683');
+INSERT INTO public.audit_log VALUES (502, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "GER0096\t", "name": "MS PIPE (APOLLO) 60X60X2.5MM (L-4.900 MTR)", "hsn_code": "7306 6100", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 7899, "category_id": 35, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-03 10:03:58.810256');
+INSERT INTO public.audit_log VALUES (503, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "BE0181\t", "name": "6014 2RS", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 0, "category_id": 39, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-03 10:11:04.484485');
+INSERT INTO public.audit_log VALUES (504, 6, 'store.inward', 'store', 3603, NULL, '{"qty": 2, "price": 33281.5, "newStock": 2, "grn_number": "GRN-20260903-0001", "inward_type": "grn", "material_id": 4719, "reference_id": "PO-20260903-0001"}', '::1', '2026-09-03 13:09:07.351781');
+INSERT INTO public.audit_log VALUES (505, 6, 'store.inward', 'store', 3604, NULL, '{"qty": 4, "price": 16640.25, "newStock": 4, "grn_number": "GRN-20260903-0001", "inward_type": "grn", "material_id": 4720, "reference_id": "PO-20260903-0001"}', '::1', '2026-09-03 13:09:07.351781');
+INSERT INTO public.audit_log VALUES (506, 6, 'store.inward', 'store', 3605, NULL, '{"qty": 8, "price": 8320.13, "newStock": 8, "grn_number": "GRN-20260903-0001", "inward_type": "grn", "material_id": 4721, "reference_id": "PO-20260903-0001"}', '::1', '2026-09-03 13:09:07.351781');
+INSERT INTO public.audit_log VALUES (507, 6, 'store.inward', 'store', 3606, NULL, '{"qty": 4, "price": 16641.2, "newStock": 4, "grn_number": "GRN-20260903-0001", "inward_type": "grn", "material_id": 4729, "reference_id": "PO-20260903-0001"}', '::1', '2026-09-03 13:09:07.351781');
+INSERT INTO public.audit_log VALUES (508, 6, 'store.inward', 'store', 3607, NULL, '{"qty": 12, "price": 5546.35, "newStock": 12, "grn_number": "GRN-20260903-0001", "inward_type": "grn", "material_id": 4726, "reference_id": "PO-20260903-0001"}', '::1', '2026-09-03 13:09:07.351781');
+INSERT INTO public.audit_log VALUES (509, 6, 'PUT /materials/4727', 'master', 4727, NULL, '{"uom": "NOS", "code": "MCH0005", "name": "GARE BOX BEARING HOUSING WITH SHAFT", "issued": 0, "balance": 0, "gst_pct": 18, "opening": 0, "hsn_code": "", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 55000, "category_id": 31, "section_ids": [], "bin_location": "", "oem_supplier": "", "current_stock": 0, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "last_audit_cycle": "", "criticality_class": "C", "calibration_protocol": "", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": [], "expected_lifespan_days": 365}', '::1', '2026-09-03 13:13:26.546933');
+INSERT INTO public.audit_log VALUES (510, 6, 'store.inward', 'store', 3608, NULL, '{"qty": 1, "price": 55000, "newStock": 1, "grn_number": "GRN-20260903-0002", "inward_type": "grn", "material_id": 4727, "reference_id": "PO-20260903-0002"}', '::1', '2026-09-03 13:15:05.676318');
+INSERT INTO public.audit_log VALUES (511, 6, 'POST /vendors', 'master', NULL, NULL, '{"pan": "AAOFS6315A", "city": "SECUNDRABAD", "name": "SHIVSHAKTI STEEL TUBES", "email": "", "gstin": "36AAOFS6315A1ZB", "state": "TELANGANA", "mobile": "", "rating": 3, "address": "REG OFF :5-2-199 TO 200/4, DISTILLERY ROAD, RANIGUNJ, SECUNDRABAD", "pincode": "500 055", "bank_name": "HDFC Bank", "ifsc_code": "HDFC0000042", "is_active": true, "branch_name": "SECUNDRABAD PARADISE CIRCLE", "credit_days": 30, "account_type": "Current", "payment_terms": "30 days", "account_number": "00422790001334", "contact_person": "", "account_holder_name": "SHIVSHAKTI STEEL TUBES"}', '::1', '2026-09-03 13:19:51.374015');
+INSERT INTO public.audit_log VALUES (513, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "GER0097\t", "name": "TRACH LIGHT", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": null, "unit_price": 1000, "category_id": 35, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-04 14:06:18.385881');
+INSERT INTO public.audit_log VALUES (514, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB009", "name": "BUFFER TABLET (PH )- 4", "hsn_code": "2917 3990", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 775, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:30:59.946924');
+INSERT INTO public.audit_log VALUES (515, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB010", "name": "BUFFER TABLET (PH )- 7\t", "hsn_code": "3822 9090", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 775, "category_id": 65, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:33:02.771088');
+INSERT INTO public.audit_log VALUES (516, 6, 'PUT /materials/4732', 'master', 4732, NULL, '{"uom": "NOS", "code": "LAB010", "name": "BUFFER TABLET (PH )- 7", "issued": 0, "balance": 0, "gst_pct": 18, "opening": 0, "hsn_code": "3822 9090", "received": 0, "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 775, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "current_stock": 0, "is_serialized": false, "reorder_level": 0, "reorder_buffer": 0, "section_context": "Lab › Store Inventory Racking", "last_audit_cycle": "", "criticality_class": "C", "calibration_protocol": "", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"], "expected_lifespan_days": 365}', '::1', '2026-09-04 15:35:51.911366');
+INSERT INTO public.audit_log VALUES (517, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB011\t", "name": "BUFFER TABLET (PH )- 9.20\t", "hsn_code": "3822 9090", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 19, "unit_price": 775, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:38:08.307863');
+INSERT INTO public.audit_log VALUES (518, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB012", "name": "GLYCERINE SOLUTION   (500ML OR 1LTR)\t", "hsn_code": "2905 4500", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 400, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:39:53.135719');
+INSERT INTO public.audit_log VALUES (519, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB013", "name": "BUFFER SOLUTION  -PH 4 (500ML OR 1LTR)\t", "hsn_code": "9027 5090", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 600, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:42:44.48405');
+INSERT INTO public.audit_log VALUES (520, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB014", "name": "BUFFER SOLUTION  -PH 7 (500ML OR 1LTR)\t", "hsn_code": "9027 5090", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 600, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:44:55.662331');
+INSERT INTO public.audit_log VALUES (521, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "LAB015", "name": "BUFFER SOLUTION  -PH 9 (500ML OR 1LTR)\t", "hsn_code": "9027 5090", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 24, "section_id": 19, "unit_price": 600, "category_id": 64, "section_ids": ["19"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 15:46:35.376867');
+INSERT INTO public.audit_log VALUES (522, 6, 'store.inward', 'store', 3612, NULL, '{"qty": 1, "price": 775, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4731, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (523, 6, 'store.inward', 'store', 3613, NULL, '{"qty": 1, "price": 775, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4732, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (524, 6, 'store.inward', 'store', 3614, NULL, '{"qty": 1, "price": 775, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4733, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (525, 6, 'store.inward', 'store', 3615, NULL, '{"qty": 1, "price": 400, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4734, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (526, 6, 'store.inward', 'store', 3616, NULL, '{"qty": 1, "price": 600, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4735, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (527, 6, 'store.inward', 'store', 3617, NULL, '{"qty": 1, "price": 600, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4736, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (528, 6, 'store.inward', 'store', 3618, NULL, '{"qty": 1, "price": 600, "newStock": 1, "grn_number": "GRN-20260904-0001", "inward_type": "grn", "material_id": 4737, "reference_id": "PO-20260904-0001"}', '::1', '2026-09-04 16:39:28.993169');
+INSERT INTO public.audit_log VALUES (529, 6, 'POST /sections', 'master', NULL, NULL, '{"code": "ELE", "icon": "⚡", "name": "Electrical Section", "description": "", "department_id": "3"}', '::1', '2026-09-04 17:24:36.849363');
+INSERT INTO public.audit_log VALUES (530, 6, 'POST /sections', 'master', NULL, NULL, '{"code": "ELE DEPT", "icon": "⚡", "name": "Electrical ", "description": "", "department_id": "3"}', '::1', '2026-09-04 17:25:10.504147');
+INSERT INTO public.audit_log VALUES (531, 6, 'PUT /materials/4546', 'master', 4546, NULL, '{"uom": "NOS", "code": "ELEG0110", "name": "COLLING FAN Fr.ND112 CG", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 22, "section_id": 139, "unit_price": 135, "category_id": 59, "section_ids": ["139"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:26:47.07768');
+INSERT INTO public.audit_log VALUES (532, 6, 'PUT /materials/4546', 'master', 4546, NULL, '{"uom": "NOS", "code": "ELEG0110", "name": "COLLING FAN Fr.ND112 CG", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": 22, "section_id": 139, "unit_price": 135, "category_id": 59, "section_ids": ["139"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:26:49.163105');
+INSERT INTO public.audit_log VALUES (533, 6, 'DELETE /sections/139/materials/4546', 'master', 139, NULL, '{}', '::1', '2026-09-04 17:28:04.450137');
+INSERT INTO public.audit_log VALUES (534, 6, 'DELETE /sections/139', 'master', 139, NULL, '{}', '::1', '2026-09-04 17:29:44.434088');
+INSERT INTO public.audit_log VALUES (535, 6, 'PUT /materials/4546', 'master', 4546, NULL, '{"uom": "NOS", "code": "ELEG0110", "name": "COLLING FAN Fr.ND112 CG", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 140, "unit_price": 135, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:30:53.335664');
+INSERT INTO public.audit_log VALUES (536, 6, 'PUT /materials/4546', 'master', 4546, NULL, '{"uom": "NOS", "code": "ELEG0110", "name": "COLLING FAN Fr.ND112 CG", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 140, "unit_price": 135, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:30:54.827553');
+INSERT INTO public.audit_log VALUES (537, 6, 'PUT /materials/4546', 'master', 4546, NULL, '{"uom": "NOS", "code": "ELEG0110", "name": "COLLING FAN Fr.ND112 CG", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 140, "unit_price": 135, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:30:55.989799');
+INSERT INTO public.audit_log VALUES (538, 6, 'PUT /materials/4552', 'master', 4552, NULL, '{"uom": "NOS", "code": "ELEG0116", "name": "FAN COVER Fr. ND 180 CG (25 To 30) Hp", "hsn_code": "8503-0029", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 140, "unit_price": 1885, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:33:25.26477');
+INSERT INTO public.audit_log VALUES (539, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "ELEG0128", "name": "COOLING FAN FR.ND 180 CG", "hsn_code": "8503", "is_active": true, "max_stock": 2, "min_stock": 1, "machine_id": null, "section_id": 140, "unit_price": 288, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "25 /30 HP MOTOR ", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:49:47.354239');
+INSERT INTO public.audit_log VALUES (540, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "ELEG0129", "name": "FAN COVER  FR.ND 160 CG", "hsn_code": "8503", "is_active": true, "max_stock": 2, "min_stock": 1, "machine_id": null, "section_id": 140, "unit_price": 1276, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "20 HP MOTOR ", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:52:12.433171');
+INSERT INTO public.audit_log VALUES (541, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "ELEG0130", "name": "TERMINAL BLOCK FR.ND 112 CG  (5HP)", "hsn_code": "8503", "is_active": true, "max_stock": 2, "min_stock": 1, "machine_id": null, "section_id": 140, "unit_price": 286, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "5 HP  MOTOR ", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:54:12.909093');
+INSERT INTO public.audit_log VALUES (542, 6, 'POST /materials', 'master', NULL, NULL, '{"uom": "NOS", "code": "ELEG0131", "name": "TERMINAL BLOCK FR.ND 132 CG  (7.5 HP)", "hsn_code": "8503", "is_active": true, "max_stock": 0, "min_stock": 0, "machine_id": null, "section_id": 140, "unit_price": 286, "category_id": 59, "section_ids": ["140"], "bin_location": "", "oem_supplier": "", "reorder_level": 0, "reorder_buffer": 0, "section_context": "7.5 HP MOTOR ", "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": 36, "section_equipment_ids": ["36"]}', '::1', '2026-09-04 17:55:28.765104');
+INSERT INTO public.audit_log VALUES (543, 6, 'store.inward', 'store', 3619, NULL, '{"qty": 13, "price": 665, "newStock": 16, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 3300, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (544, 6, 'store.inward', 'store', 3620, NULL, '{"qty": 4, "price": 1009, "newStock": 6, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 3299, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (545, 6, 'store.inward', 'store', 3621, NULL, '{"qty": 4, "price": 288, "newStock": 4, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 4740, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (546, 6, 'store.inward', 'store', 3622, NULL, '{"qty": 6, "price": 1276, "newStock": 6, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 4741, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (547, 6, 'store.inward', 'store', 3623, NULL, '{"qty": 6, "price": 286, "newStock": 6, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 4742, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (548, 6, 'store.inward', 'store', 3624, NULL, '{"qty": 6, "price": 286, "newStock": 6, "grn_number": "GRN-20260904-0002", "inward_type": "grn", "material_id": 4743, "reference_id": "PO-20260904-0002"}', '::1', '2026-09-04 18:11:44.635188');
+INSERT INTO public.audit_log VALUES (549, 6, 'store.inward', 'store', 3625, NULL, '{"qty": 25000, "price": 35.75, "newStock": 25079.084, "grn_number": "GRN-20260904-0003", "inward_type": "grn", "material_id": 3111, "reference_id": "PO-20260904-0003"}', '::1', '2026-09-04 18:17:08.228055');
+INSERT INTO public.audit_log VALUES (550, 6, 'PUT /materials/2168', 'master', 2168, NULL, '{"uom": "NOS", "code": "BE0041", "name": "6312-2z -L140", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 2, "machine_id": null, "section_id": null, "unit_price": 0, "category_id": 39, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 2, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-05 09:21:09.974952');
+INSERT INTO public.audit_log VALUES (551, 6, 'PUT /materials/2168', 'master', 2168, NULL, '{"uom": "NOS", "code": "BE0041", "name": "6312-2z -L140", "hsn_code": "", "is_active": true, "max_stock": 0, "min_stock": 2, "machine_id": null, "section_id": null, "unit_price": 0, "category_id": 39, "section_ids": [], "bin_location": "", "oem_supplier": "", "reorder_level": 2, "reorder_buffer": 0, "section_context": null, "criticality_class": "C", "procurement_strategy": "", "section_equipment_id": null, "section_equipment_ids": []}', '::1', '2026-09-05 09:21:11.445892');
 
 
 --
@@ -7782,6 +7853,10 @@ INSERT INTO public.cash_purchase_items VALUES (4, 4, 4609, 50.000, 'NOS', 28.40,
 INSERT INTO public.cash_purchase_items VALUES (5, 5, 4610, 1.000, 'NOS', 140.00, 18.00, 140.00, 165.20);
 INSERT INTO public.cash_purchase_items VALUES (6, 6, 4622, 10.000, 'NOS', 143.22, 18.00, 1432.20, 1690.00);
 INSERT INTO public.cash_purchase_items VALUES (7, 7, 4623, 1.000, 'NOS', 3150.00, 0.00, 3150.00, 3150.00);
+INSERT INTO public.cash_purchase_items VALUES (8, 8, 4634, 7000.000, 'NOS', 5.00, 0.00, 35000.00, 35000.00);
+INSERT INTO public.cash_purchase_items VALUES (9, 8, 4718, 7200.000, 'NOS', 6.00, 0.00, 43200.00, 43200.00);
+INSERT INTO public.cash_purchase_items VALUES (10, 9, 4495, 20.000, 'NOS', 60.00, 0.00, 1200.00, 1200.00);
+INSERT INTO public.cash_purchase_items VALUES (11, 10, 4730, 1.000, 'NOS', 1000.00, 0.00, 1000.00, 1000.00);
 
 
 --
@@ -7793,6 +7868,9 @@ INSERT INTO public.cash_purchases VALUES (4, 'CP-20260828-0001', '2026-08-28', N
 INSERT INTO public.cash_purchases VALUES (5, 'CP-20260828-0002', '2026-08-28', NULL, 'LOCAL PURCHAE', NULL, 'NILL', '2026-08-28', 'Cash', NULL, 140.00, 12.60, 12.60, 0.00, 25.20, 165.20, 'CHEMICAL STORAGE', 6, '2026-08-28 18:34:52.106223');
 INSERT INTO public.cash_purchases VALUES (6, 'CP-20260829-0001', '2026-08-29', NULL, 'AR TAPES AND PLASTICS (AMAZON)', '09ACFFA9600B1ZR', '171-8481020-2720352', '2026-08-18', 'Cash', NULL, 1432.20, 0.00, 0.00, 257.80, 257.80, 1690.00, NULL, 6, '2026-08-29 17:37:31.127218');
 INSERT INTO public.cash_purchases VALUES (7, 'CP-20260902-0001', '2026-09-02', NULL, 'SHARPEX ENGEINEERING WORKES (AMAZON)', '24AAKFS1881K1ZU', '171-1986117-9637935', '2026-08-18', 'Cash', NULL, 3150.00, 0.00, 0.00, 0.00, 0.00, 3150.00, NULL, 6, '2026-09-02 11:09:18.307314');
+INSERT INTO public.cash_purchases VALUES (8, 'CP-20260902-0002', '2026-09-02', NULL, 'MK INDUSTRIES', NULL, '14549', '2026-08-31', 'Cash', NULL, 78200.00, 0.00, 0.00, 0.00, 0.00, 78200.00, 'RETURN STOCK RECIVED OM 31/08/2026', 6, '2026-09-02 19:09:48.839902');
+INSERT INTO public.cash_purchases VALUES (9, 'CP-20260904-0001', '2026-09-04', NULL, 'ZAVERI BROTHERS', NULL, 'ZAVERI BROTHERS', '2026-09-03', 'Cash', NULL, 1200.00, 0.00, 0.00, 0.00, 0.00, 1200.00, 'CASH PURCHASE THROUGH  AMAN SIR', 6, '2026-09-04 13:52:14.532604');
+INSERT INTO public.cash_purchases VALUES (10, 'CP-20260904-0002', '2026-09-04', NULL, 'CASH PURCHASE', NULL, 'NILL', '2026-09-03', 'Cash', NULL, 1000.00, 0.00, 0.00, 0.00, 0.00, 1000.00, 'CASH PURCHASE THROUGH AMAN SIR', 6, '2026-09-04 14:07:22.265274');
 
 
 --
@@ -8695,6 +8773,8 @@ INSERT INTO public.grades VALUES (5, 'Tissue', 'TIS', 15.00, 35.00, NULL, true, 
 -- Data for Name: grn; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.grn VALUES (165, 'GRN-20260902-0002', '2026-09-02', 113, 88, NULL, NULL, 'INV202600575 / 21/0/2026', 6, 'Received', 'RECIVED ON 02/09/2026', '2026-09-02 19:21:40.184407', NULL, 'intra', 43500.00, 0.00, 0.00, 3915.00, 3915.00, 0.00, 7830.00, 51330.00, '2026-09-02 19:21:40.184407', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (169, 'GRN-20260904-0001', '2026-09-04', 79, 92, NULL, NULL, 'SAL/25341-31/08/2026', 6, 'Received', 'RECEIVED ON 04-SEP-2026', '2026-09-04 16:39:28.993169', NULL, 'intra', 5025.00, 0.00, 500.00, 351.51, 351.51, 0.00, 703.02, 5728.00, '2026-09-04 16:39:28.993169', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (32, 'GRN-20260819-0004', '2026-08-19', 17, NULL, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260813-0008', '2026-08-19 23:20:12.934665', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-08-22 10:38:12.318187', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (35, 'GRN-20260822-0001', '2026-08-22', 44, 4, 'MH12AB1234', 'CH-TEST-123', 'INV-TEST-123', 1, 'Received', NULL, '2026-08-22 12:09:05.507561', NULL, 'intra', 1015032.00, 0.00, 0.00, 91352.88, 91352.88, 0.00, 182705.76, 1197737.76, '2026-08-22 12:09:05.507561', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (36, 'GRN-20260823-0001', '2026-08-23', 25, 5, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260823-0001 — PROMASK 192', '2026-08-23 10:54:22.941959', NULL, 'intra', 724000.00, 0.00, 0.00, 0.00, 0.00, 130320.00, 130320.00, 854320.00, '2026-08-23 10:54:22.941959', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
@@ -8702,6 +8782,8 @@ INSERT INTO public.grn VALUES (37, 'GRN-E2E-1787464375012', '2026-08-23', NULL, 
 INSERT INTO public.grn VALUES (38, 'GRN-E2E-1787474059980', '2026-08-23', NULL, NULL, 'KA-25-EA-8842', 'CH-7741', 'INV-5512', 21, 'Received', 'E2E Master GRN Multi-Item Inward Test', '2026-08-23 14:04:19.980904', NULL, 'intra', 0.00, 50.00, 0.00, 76.50, 76.50, 0.00, 0.00, 1003.00, '2026-08-23 14:04:19.980904', 4, NULL, 'VRL Logistics', NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 850.00, 153.00);
 INSERT INTO public.grn VALUES (43, 'GRN-20260825-0001', '2026-08-25', 30, 10, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260825-0001', '2026-08-25 16:20:29.278995', NULL, 'intra', 237900.00, 0.00, 0.00, 21411.00, 21411.00, 0.00, 42822.00, 280722.00, '2026-08-25 16:20:29.278995', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (44, 'GRN-20260825-0002', '2026-08-25', 55, 11, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260825-0002 — PET STRAP BDL 12MM', '2026-08-25 16:59:39.913819', NULL, 'intra', 12900.00, 0.00, 0.00, 1161.00, 1161.00, 0.00, 2322.00, 15222.00, '2026-08-25 16:59:39.913819', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (166, 'GRN-20260903-0001', '2026-09-03', 114, 89, NULL, NULL, 'MFI/0105/26-27', 6, 'Received', 'RECIVED ON  03/09/2026', '2026-09-03 13:09:07.351781', NULL, 'intra', 332806.04, 0.00, 0.00, 29952.54, 29952.54, 0.00, 59905.08, 392711.13, '2026-09-03 13:09:07.351781', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (170, 'GRN-20260904-0002', '2026-09-04', 66, 93, NULL, NULL, '26-27/B-155/31-08-2026', 6, 'Received', ' RECEIVED ON 04-SEP-2026 ', '2026-09-04 18:11:44.635188', NULL, 'intra', 25421.00, 0.00, 500.00, 2287.89, 2287.89, 0.00, 4575.78, 29996.78, '2026-09-04 18:11:44.635188', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (78, 'GRN-20260828-0001', '2026-08-28', 75, 20, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260828-0001', '2026-08-28 12:59:30.926411', NULL, 'intra', 69726.00, 0.00, 400.00, 6275.34, 6275.34, 0.00, 12550.68, 82276.68, '2026-08-28 12:59:30.926411', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (79, 'GRN-20260828-0002', '2026-08-28', 23, 21, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260828-0002 — GREEN & BLACK SPC-PT 4750', '2026-08-28 13:14:19.278896', NULL, 'intra', 52359.60, 27830.40, 750.00, 4712.36, 4712.36, 0.00, 9424.72, 61784.33, '2026-08-28 13:14:19.278896', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (80, 'GRN-20260828-0003', '2026-08-28', 76, 22, NULL, NULL, NULL, 6, 'Received', 'Auto-populated from PO PO-20260828-0003 — 250KW INPUT CHOKE (ARIHANT)', '2026-08-28 14:03:11.585371', NULL, 'intra', 40050.00, 0.00, 0.00, 3604.50, 3604.50, 0.00, 7209.00, 47259.00, '2026-08-28 14:03:11.585371', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
@@ -8732,11 +8814,11 @@ INSERT INTO public.grn VALUES (5, 'GRN-20260813-3', '2026-08-13', 14, NULL, NULL
 INSERT INTO public.grn VALUES (6, 'GRN-20260813-4', '2026-08-13', 15, NULL, NULL, NULL, NULL, 6, 'Received', NULL, '2026-08-13 20:23:40.866', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-08-31 15:34:34.299881', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (7, 'GRN-20260813-5', '2026-08-13', 16, NULL, NULL, NULL, NULL, 6, 'Received', NULL, '2026-08-13 20:24:00.067', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-08-31 15:34:34.301418', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (8, 'GRN-20260813-6', '2026-08-13', 17, NULL, NULL, NULL, NULL, 6, 'Received', NULL, '2026-08-13 20:40:35.847', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-08-31 15:34:34.304807', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (167, 'GRN-20260903-0002', '2026-09-03', 37, 90, NULL, NULL, 'UPM/014/26-27', 6, 'Received', 'RECIVED FROM 03/09/2026', '2026-09-03 13:15:05.676318', NULL, 'intra', 55000.00, 0.00, 0.00, 4950.00, 4950.00, 0.00, 9900.00, 64900.00, '2026-09-03 13:15:05.676318', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (171, 'GRN-20260904-0003', '2026-09-04', 35, 94, NULL, NULL, 'ING2459/26-27-03-09-2026', 6, 'Received', 'RECEIVED ON 04-09-2026', '2026-09-04 18:17:08.228055', NULL, 'intra', 893750.00, 0.00, 0.00, 22343.75, 22343.75, 0.00, 44687.50, 938437.50, '2026-09-04 18:17:08.228055', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (103, 'GRN-20260831-0001', '2026-08-31', 79, 53, NULL, NULL, 'SAL/25315, DATE: 25/08/2026', 6, 'Received', 'INCLODING FRIGHT CHARGES', '2026-08-31 13:32:14.159651', NULL, 'intra', 6800.00, 0.00, 500.00, 612.00, 612.00, 0.00, 1224.00, 8024.00, '2026-08-31 13:32:14.159651', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (131, 'GRN-20260901-0001', '2026-09-01', 60, 82, NULL, NULL, '723/26-27, DATE: 31/08/2026', 6, 'Received', 'RECIVED DATE: 31/08/2026', '2026-09-01 16:42:05.173519', NULL, 'intra', 7500.00, 0.00, 0.00, 675.00, 675.00, 0.00, 1350.00, 8850.00, '2026-09-01 16:42:05.173519', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (132, 'GRN-20260901-0002', '2026-09-01', 46, 83, NULL, NULL, '1992/26-27 DATE:28/08/2026', 6, 'Received', 'RECIVED FORM 01/09/2026', '2026-09-01 19:47:58.700621', NULL, 'intra', 15966.75, 12008.25, 0.00, 1437.01, 1437.01, 0.00, 2874.02, 18840.77, '2026-09-01 19:47:58.700621', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
-INSERT INTO public.grn VALUES (133, 'GRN-20260902-0001', '2026-09-02', 33, 30, NULL, NULL, NULL, 23, 'Received', NULL, '2026-09-02 15:06:00.434164', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-09-02 15:06:00.434164', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
-INSERT INTO public.grn VALUES (134, 'GRN-20260902-0002', '2026-09-02', NULL, NULL, NULL, NULL, NULL, 23, 'Received', NULL, '2026-09-02 15:22:55.262299', NULL, 'intra', 2040.00, 0.00, 0.00, 183.60, 183.60, 0.00, 367.20, 2407.20, '2026-09-02 15:22:55.262299', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 INSERT INTO public.grn VALUES (135, '202608-24', '2026-08-12', 22, NULL, NULL, NULL, '256', 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 24) | Party: ENAR MILL STORES', '2026-09-02 16:05:18.127671', NULL, 'intra', 3520.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 3520.00, '2026-09-02 16:05:18.127671', 0, NULL, NULL, NULL, NULL, NULL, '2026-08-12', NULL, NULL, 'CREDIT', 3520.00, 0.00);
 INSERT INTO public.grn VALUES (137, '202608-26', '2026-08-16', 112, NULL, NULL, NULL, 'SIV-31151', 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 26) | Party: SUNRISE BEARING CORPORATION', '2026-09-02 16:05:18.127671', NULL, 'intra', 118950.00, 0.00, 0.00, 10705.50, 10705.50, 0.00, 21411.00, 140361.00, '2026-09-02 16:05:18.127671', 0, NULL, NULL, NULL, NULL, NULL, '2026-08-13', NULL, NULL, 'CREDIT', 118950.00, 21411.00);
 INSERT INTO public.grn VALUES (138, '202608-27', '2026-08-16', 63, NULL, NULL, NULL, '514/26-27', 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 27) | Party: SRI SAI VIVEK TECHNOLOGIES', '2026-09-02 16:05:18.127671', NULL, 'intra', 12900.00, 0.00, 0.00, 1161.00, 1161.00, 0.00, 2322.00, 15222.00, '2026-09-02 16:05:18.127671', 0, NULL, NULL, NULL, NULL, NULL, '2026-08-14', NULL, NULL, 'CREDIT', 12900.00, 2322.00);
@@ -8761,12 +8843,16 @@ INSERT INTO public.grn VALUES (157, '202608-41', '2026-08-24', 61, NULL, NULL, N
 INSERT INTO public.grn VALUES (158, '202608-42', '2026-08-24', 29, NULL, NULL, NULL, 'D.C. NO.5298', 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 47) | Party: DATTU ELECTRICALS', '2026-09-02 16:05:18.127671', NULL, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2026-09-02 16:05:18.127671', 0, NULL, 'BY HAND', NULL, NULL, NULL, '2026-08-24', NULL, NULL, 'CREDIT', 0.00, 0.00);
 INSERT INTO public.grn VALUES (159, '202608-43', '2026-08-24', 68, NULL, NULL, NULL, 'AG/26-27/112', 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 43) | Party: ANNPURANA GLOBALS', '2026-09-02 16:05:18.127671', NULL, 'intra', 33600.00, 0.00, 0.00, 0.00, 0.00, 1680.00, 1680.00, 35280.00, '2026-09-02 16:05:18.127671', 0, NULL, NULL, NULL, NULL, NULL, '2026-08-17', NULL, NULL, 'CREDIT', 33600.00, 1680.00);
 INSERT INTO public.grn VALUES (160, '202608-C01-2', '2026-08-24', 74, NULL, NULL, NULL, NULL, 1, 'Received', 'Imported from 8252026 Inward Sheet (S.No 44) | Party: LOCAL PURCHASE', '2026-09-02 16:05:18.127671', NULL, 'intra', 1800.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1800.00, '2026-09-02 16:05:18.127671', 0, NULL, NULL, NULL, NULL, NULL, '2026-08-24', NULL, NULL, 'CREDIT', 1800.00, 0.00);
+INSERT INTO public.grn VALUES (164, 'GRN-20260902-0001', '2026-09-02', 34, 87, NULL, NULL, '443, DATE: 31/08/2026', 6, 'Received', 'RECIVED FROM 02/09/2026', '2026-09-02 19:12:32.239734', NULL, 'intra', 9720.00, 0.00, 0.00, 874.80, 874.80, 0.00, 1749.60, 11469.60, '2026-09-02 19:12:32.239734', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
+INSERT INTO public.grn VALUES (168, 'GRN-20260903-0003', '2026-09-03', 115, 91, NULL, NULL, 'JDM/6194', 6, 'Received', 'RECIVED ON 03/09/2026', '2026-09-03 13:21:27.507589', NULL, 'intra', 2764650.00, 0.00, 0.00, 248818.50, 248818.50, 0.00, 497637.00, 3262287.00, '2026-09-03 13:21:27.507589', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Credit', 0.00, 0.00);
 
 
 --
 -- Data for Name: grn_items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.grn_items VALUES (326, 164, 3126, 540.000, 540.000, 540.000, 0.000, 'KG', 18.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260902-0001', NULL, 0.00, 0.00, 0.00, 9720.00, 18.00, 'intra', 9.00, 9.00, 0.00, 874.80, 874.80, 0.00, 11469.60, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (334, 168, 4728, 350.000, 350.000, 350.000, 0.000, 'NOS', 7899.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0003', NULL, 0.00, 0.00, 0.00, 2764650.00, 18.00, 'intra', 9.00, 9.00, 0.00, 248818.50, 248818.50, 0.00, 3262287.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (18, 32, 4455, 10.000, 10.000, 10.000, 0.000, 'MT', 54000.00, NULL, NULL, NULL, 'YARD-PULP-1', 'Auto-populated from PO PO-20260813-0008', NULL, 0.00, 0.00, 0.00, 0.00, 18.00, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (21, 35, 2299, 2.000, 2.000, 2.000, 0.000, 'NOS', 507516.00, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 1015032.00, 18.00, 'intra', 9.00, 9.00, 0.00, 91352.88, 91352.88, 0.00, 1197737.76, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (22, 36, 3124, 2500.000, 2500.000, 2500.000, 0.000, 'KGS', 230.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260823-0001 — PROMASK 192', NULL, 0.00, 0.00, 0.00, 575000.00, 18.00, 'inter', 0.00, 0.00, 18.00, 0.00, 0.00, 103500.00, 678500.00, 0.00, 0.00, 0.00, NULL, 0.000);
@@ -8789,6 +8875,25 @@ INSERT INTO public.grn_items VALUES (38, 43, 4496, 2.000, 2.000, 2.000, 0.000, '
 INSERT INTO public.grn_items VALUES (39, 43, 4497, 4.000, 4.000, 4.000, 0.000, 'NOS', 50.00, NULL, NULL, NULL, '1', 'Auto-populated from PO PO-20260825-0001', NULL, 0.00, 0.00, 0.00, 200.00, 18.00, 'intra', 9.00, 9.00, 0.00, 18.00, 18.00, 0.00, 236.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (40, 43, 4498, 4.000, 4.000, 4.000, 0.000, 'NOS', 80.00, NULL, NULL, NULL, '3', 'Auto-populated from PO PO-20260825-0001', NULL, 0.00, 0.00, 0.00, 320.00, 18.00, 'intra', 9.00, 9.00, 0.00, 28.80, 28.80, 0.00, 377.60, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (41, 44, 3515, 6.000, 6.000, 6.000, 0.000, 'NOS', 2150.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260825-0002 — PET STRAP BDL 12MM', NULL, 0.00, 0.00, 0.00, 12900.00, 18.00, 'intra', 9.00, 9.00, 0.00, 1161.00, 1161.00, 0.00, 15222.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (327, 165, 3119, 150.000, 150.000, 150.000, 0.000, 'KG', 290.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260902-0002', NULL, 0.00, 0.00, 0.00, 43500.00, 18.00, 'intra', 9.00, 9.00, 0.00, 3915.00, 3915.00, 0.00, 51330.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (335, 169, 4731, 1.000, 1.000, 1.000, 0.000, 'NOS', 775.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 100.00, 875.00, 18.00, 'intra', 9.00, 9.00, 0.00, 78.75, 78.75, 0.00, 1032.50, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (336, 169, 4732, 1.000, 1.000, 1.000, 0.000, 'NOS', 775.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 0.00, 775.00, 5.00, 'intra', 2.50, 2.50, 0.00, 19.38, 19.38, 0.00, 813.75, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (337, 169, 4733, 1.000, 1.000, 1.000, 0.000, 'NOS', 775.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 0.00, 775.00, 5.00, 'intra', 2.50, 2.50, 0.00, 19.38, 19.38, 0.00, 813.75, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (338, 169, 4734, 1.000, 1.000, 1.000, 0.000, 'NOS', 400.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 100.00, 500.00, 18.00, 'intra', 9.00, 9.00, 0.00, 45.00, 45.00, 0.00, 590.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (339, 169, 4735, 1.000, 1.000, 1.000, 0.000, 'NOS', 600.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 100.00, 700.00, 18.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, 826.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (340, 169, 4736, 1.000, 1.000, 1.000, 0.000, 'NOS', 600.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 100.00, 700.00, 18.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, 826.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (341, 169, 4737, 1.000, 1.000, 1.000, 0.000, 'NOS', 600.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0001', NULL, 0.00, 0.00, 100.00, 700.00, 18.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, 826.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (328, 166, 4719, 2.000, 2.000, 2.000, 0.000, 'NOS', 33281.50, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0001', NULL, 0.00, 0.00, 0.00, 66563.00, 18.00, 'intra', 9.00, 9.00, 0.00, 5990.67, 5990.67, 0.00, 78544.34, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (329, 166, 4720, 4.000, 4.000, 4.000, 0.000, 'NOS', 16640.25, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0001', NULL, 0.00, 0.00, 0.00, 66561.00, 18.00, 'intra', 9.00, 9.00, 0.00, 5990.49, 5990.49, 0.00, 78541.98, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (330, 166, 4721, 8.000, 8.000, 8.000, 0.000, 'NOS', 8320.13, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0001', NULL, 0.00, 0.00, 0.00, 66561.04, 18.00, 'intra', 9.00, 9.00, 0.00, 5990.49, 5990.49, 0.00, 78542.03, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (331, 166, 4729, 4.000, 4.000, 4.000, 0.000, 'NOS', 16641.20, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0001', NULL, 0.00, 0.00, 0.00, 66564.80, 18.00, 'intra', 9.00, 9.00, 0.00, 5990.83, 5990.83, 0.00, 78546.46, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (332, 166, 4726, 12.000, 12.000, 12.000, 0.000, 'NOS', 5546.35, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0001', NULL, 0.00, 0.00, 0.00, 66556.20, 18.00, 'intra', 9.00, 9.00, 0.00, 5990.06, 5990.06, 0.00, 78536.32, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (342, 170, 3300, 13.000, 13.000, 13.000, 0.000, 'NOS', 665.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 100.00, 8745.00, 18.00, 'intra', 9.00, 9.00, 0.00, 787.05, 787.05, 0.00, 10319.10, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (343, 170, 3299, 4.000, 4.000, 4.000, 0.000, 'NOS', 1009.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 100.00, 4136.00, 18.00, 'intra', 9.00, 9.00, 0.00, 372.24, 372.24, 0.00, 4880.48, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (344, 170, 4740, 4.000, 4.000, 4.000, 0.000, 'NOS', 288.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 100.00, 1252.00, 18.00, 'intra', 9.00, 9.00, 0.00, 112.68, 112.68, 0.00, 1477.36, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (345, 170, 4741, 6.000, 6.000, 6.000, 0.000, 'NOS', 1276.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 100.00, 7756.00, 18.00, 'intra', 9.00, 9.00, 0.00, 698.04, 698.04, 0.00, 9152.08, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (346, 170, 4742, 6.000, 6.000, 6.000, 0.000, 'NOS', 286.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 100.00, 1816.00, 18.00, 'intra', 9.00, 9.00, 0.00, 163.44, 163.44, 0.00, 2142.88, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (347, 170, 4743, 6.000, 6.000, 6.000, 0.000, 'NOS', 286.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0002', NULL, 0.00, 0.00, 0.00, 1716.00, 18.00, 'intra', 9.00, 9.00, 0.00, 154.44, 154.44, 0.00, 2024.88, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (125, 78, 4596, 1.000, 1.000, 1.000, 0.000, 'NOS', 13850.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0001', NULL, 0.00, 0.00, 100.00, 13950.00, 18.00, 'intra', 9.00, 9.00, 0.00, 1255.50, 1255.50, 0.00, 16461.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (126, 78, 4597, 4.000, 4.000, 4.000, 0.000, 'NOS', 12825.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0001', NULL, 0.00, 0.00, 100.00, 51400.00, 18.00, 'intra', 9.00, 9.00, 0.00, 4626.00, 4626.00, 0.00, 60652.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (127, 78, 3044, 12.000, 12.000, 12.000, 0.000, 'NOS', 150.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0001', NULL, 0.00, 0.00, 100.00, 1900.00, 18.00, 'intra', 9.00, 9.00, 0.00, 171.00, 171.00, 0.00, 2242.00, 0.00, 0.00, 0.00, NULL, 0.000);
@@ -8813,6 +8918,8 @@ INSERT INTO public.grn_items VALUES (145, 83, 4608, 1.000, 1.000, 1.000, 0.000, 
 INSERT INTO public.grn_items VALUES (146, 84, 2947, 7.500, 7.500, 7.500, 0.000, 'KGS', 300.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0007 INO.711/26-27, DATE:27/08/2026', NULL, 0.00, 0.00, 0.00, 2250.00, 18.00, 'intra', 9.00, 9.00, 0.00, 202.50, 202.50, 0.00, 2655.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (147, 84, 2949, 5.000, 5.000, 5.000, 0.000, 'KGS', 2100.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0007 INO.711/26-27, DATE:27/08/2026', NULL, 0.00, 0.00, 0.00, 10500.00, 18.00, 'intra', 9.00, 9.00, 0.00, 945.00, 945.00, 0.00, 12390.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (148, 85, 2705, 2.000, 2.000, 2.000, 0.000, 'NOS', 3985.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260828-0008 I.NO.1449/2026-27, DATE:27/08/2026', NULL, 0.00, 0.00, 0.00, 7970.00, 18.00, 'intra', 9.00, 9.00, 0.00, 717.30, 717.30, 0.00, 9404.60, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (333, 167, 4727, 1.000, 1.000, 1.000, 0.000, 'NOS', 55000.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260903-0002', NULL, 0.00, 0.00, 0.00, 55000.00, 18.00, 'intra', 9.00, 9.00, 0.00, 4950.00, 4950.00, 0.00, 64900.00, 0.00, 0.00, 0.00, NULL, 0.000);
+INSERT INTO public.grn_items VALUES (348, 171, 3111, 25000.000, 25000.000, 25000.000, 0.000, 'KG', 35.75, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260904-0003', NULL, 0.00, 0.00, 0.00, 893750.00, 5.00, 'intra', 2.50, 2.50, 0.00, 22343.75, 22343.75, 0.00, 938437.50, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (158, 88, 2862, 210.000, 210.000, 210.000, 0.000, 'LTR', 155.00, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 32550.00, 18.00, 'intra', 9.00, 9.00, 0.00, 2929.50, 2929.50, 0.00, 38409.00, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (159, 88, 2859, 210.000, 210.000, 210.000, 0.000, 'LTR', 222.00, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 46620.00, 18.00, 'intra', 9.00, 9.00, 0.00, 4195.80, 4195.80, 0.00, 55011.60, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (160, 88, 2860, 182.000, 182.000, 182.000, 0.000, 'KGS', 300.00, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 54600.00, 18.00, 'intra', 9.00, 9.00, 0.00, 4914.00, 4914.00, 0.00, 64428.00, 0.00, 0.00, 0.00, NULL, 0.000);
@@ -8873,7 +8980,6 @@ INSERT INTO public.grn_items VALUES (238, 131, 4660, 2.000, 2.000, 2.000, 0.000,
 INSERT INTO public.grn_items VALUES (239, 132, 4661, 1.000, 1.000, 1.000, 0.000, 'NOS', 10155.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260901-0002', NULL, 45.00, 4569.75, 0.00, 5585.25, 18.00, 'intra', 9.00, 9.00, 0.00, 502.67, 502.67, 0.00, 6590.60, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (240, 132, 4673, 1.000, 1.000, 1.000, 0.000, 'NOS', 16530.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260901-0002', NULL, 45.00, 7438.50, 0.00, 9091.50, 18.00, 'intra', 9.00, 9.00, 0.00, 818.24, 818.24, 0.00, 10727.97, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (241, 132, 2311, 6.000, 6.000, 6.000, 0.000, 'NOS', 215.00, NULL, NULL, NULL, NULL, 'Auto-populated from PO PO-20260901-0002', NULL, 0.00, 0.00, 0.00, 1290.00, 18.00, 'intra', 9.00, 9.00, 0.00, 116.10, 116.10, 0.00, 1522.20, 0.00, 0.00, 0.00, NULL, 0.000);
-INSERT INTO public.grn_items VALUES (242, 134, 2164, 4.000, 4.000, 4.000, 0.000, 'NOS', 510.00, NULL, NULL, NULL, 'RM-YARD', NULL, NULL, 0.00, 0.00, 0.00, 2040.00, 18.00, 'intra', 9.00, 9.00, 0.00, 183.60, 183.60, 0.00, 2407.20, 0.00, 0.00, 0.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (243, 135, 3461, 28.000, 28.000, 28.000, 0.000, 'MTR', 100.00, NULL, NULL, NULL, NULL, 'Item: LIFT SLING WIRE ROPE 3 TON X 10MM (MTR)', NULL, 0.00, 0.00, 0.00, 2800.00, 0.00, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2800.00, 0.00, 100.00, 100.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (244, 135, 4467, 2.000, 2.000, 2.000, 0.000, 'NOS', 360.00, NULL, NULL, NULL, NULL, 'Item: MEHANICAL SEAL 25MM', NULL, 0.00, 0.00, 0.00, 720.00, 0.00, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 720.00, 0.00, 360.00, 360.00, NULL, 0.000);
 INSERT INTO public.grn_items VALUES (245, 136, 4468, 1.000, 1.000, 1.000, 0.000, 'NOS', 430.00, NULL, NULL, NULL, NULL, 'Item: MEHANICAL SEAL 28MM', NULL, 0.00, 0.00, 0.00, 430.00, 0.00, 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 430.00, 0.00, 430.00, 430.00, NULL, 0.000);
@@ -9068,6 +9174,22 @@ INSERT INTO public.indent_audit_log VALUES (89, 187, 'close', 'Closed', 'Closed'
 INSERT INTO public.indent_audit_log VALUES (90, 189, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-01 10:04:05.634102+05:30');
 INSERT INTO public.indent_audit_log VALUES (91, 189, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-01 10:04:49.382793+05:30');
 INSERT INTO public.indent_audit_log VALUES (13, 27, 'issue', 'L1 Approved', 'Issued', 6, 'Issued to Pulp Mill Floor', '2026-08-14 01:54:00.145+05:30');
+INSERT INTO public.indent_audit_log VALUES (92, 197, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-02 19:31:58.982201+05:30');
+INSERT INTO public.indent_audit_log VALUES (93, 197, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-02 19:32:22.383834+05:30');
+INSERT INTO public.indent_audit_log VALUES (94, 198, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-02 19:41:23.34772+05:30');
+INSERT INTO public.indent_audit_log VALUES (95, 198, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-02 19:41:47.084539+05:30');
+INSERT INTO public.indent_audit_log VALUES (96, 199, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-03 18:45:43.812395+05:30');
+INSERT INTO public.indent_audit_log VALUES (97, 199, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-03 18:46:03.343318+05:30');
+INSERT INTO public.indent_audit_log VALUES (98, 200, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-04 18:32:39.570808+05:30');
+INSERT INTO public.indent_audit_log VALUES (99, 200, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-04 18:33:06.642011+05:30');
+INSERT INTO public.indent_audit_log VALUES (100, 201, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-04 18:56:47.737653+05:30');
+INSERT INTO public.indent_audit_log VALUES (101, 201, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-04 18:57:11.090618+05:30');
+INSERT INTO public.indent_audit_log VALUES (102, 202, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-05 19:00:54.175918+05:30');
+INSERT INTO public.indent_audit_log VALUES (103, 203, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-05 19:12:38.336859+05:30');
+INSERT INTO public.indent_audit_log VALUES (104, 203, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-05 19:13:55.772815+05:30');
+INSERT INTO public.indent_audit_log VALUES (105, 202, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-05 19:14:07.386301+05:30');
+INSERT INTO public.indent_audit_log VALUES (106, 204, 'issue', 'Submitted', 'Issued', 6, 'Immediate store issuance executed on indent creation', '2026-09-05 19:25:03.609258+05:30');
+INSERT INTO public.indent_audit_log VALUES (107, 204, 'close', 'Closed', 'Closed', 6, NULL, '2026-09-05 19:25:43.175718+05:30');
 
 
 --
@@ -9123,6 +9245,7 @@ INSERT INTO public.indent_items VALUES (131, 140, 4521, 1.000, NULL, 'NOS', 'STO
 INSERT INTO public.indent_items VALUES (132, 140, 3032, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 70, 21/08/2026', 7.000, 'MCN DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (133, 140, 2910, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 70, 21/08/2026', 166.000, NULL, NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (134, 141, 2160, 2.000, NULL, 'NOS', 'STORE ISSUE NO: 01-22/08/2026', 7.000, 'SIZE KITCHAN PUMP', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (360, 197, 3339, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 21/02/08/2026', 142.000, 'SIZE KITCHAN DEPT', NULL, NULL, 3.80, 3.80, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (135, 141, 2060, 2.000, NULL, 'NOS', 'STORE ISSUE NO: 01-22/08/2026', 3.000, 'SIZE KITCHAN PUMP', NULL, NULL, 60.00, 120.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (136, 141, 3025, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 01-22/08/2026', 13.000, 'SIZE KITCHAN PUM', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (137, 141, 2311, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 01-22/08/2026', 2.000, 'STRACH POWDER PLANT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
@@ -9183,15 +9306,20 @@ INSERT INTO public.indent_items VALUES (336, 187, 2852, 50.000, NULL, 'NOS', 'ST
 INSERT INTO public.indent_items VALUES (337, 187, 2319, 1.000, NULL, 'NOS', 'STORE ISSUE NO ; 19- 01/09/2026', 1.000, 'TDR PULP MILL NO1', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (28, 27, 4454, 4.000, NULL, 'MT', 'Pulper feeding', 15.000, NULL, NULL, NULL, 54000.00, 216000.00, 4.000, 'LOT-PULP-639817', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (39, 41, 2068, 15.000, NULL, NULL, 'Store Section Safety Buffer Stock', NULL, NULL, NULL, NULL, 0.00, 0.00, 0.000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (363, 197, 2840, 1.000, NULL, 'PKT', 'STORE ISSUE NO: 21/02/08/2026', 8.000, 'WORKSHOP ETP PLANT SS TANK', NULL, NULL, 680.00, 680.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (195, 153, 2980, 1.000, NULL, 'NOS', 'REWINDING DEPARTMENT', 87.000, 'REWINDING DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (196, 153, 2658, 4.000, NULL, 'NOS', 'PULP MILL PUMP NO1', 14.000, 'PULP MILL PUMP 1 NO', NULL, NULL, 1927.00, 7708.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (197, 153, 3032, 1.000, NULL, 'NOS', 'REWIDING DEPT', 6.000, 'REWINDING DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (198, 153, 2151, 1.000, NULL, 'NOS', '30 HP SAPRE MOTER', 14.000, '30 HP SPARE MOTER', NULL, NULL, 540.00, 540.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (199, 153, 2165, 1.000, NULL, 'NOS', '30 HP SPARE MOTER', 9.000, '30 HP SPARE MOTER', NULL, NULL, 1025.00, 1025.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (361, 197, 3330, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 21/02/08/2026', 5.000, 'LAB DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (33, 33, 4455, 4.000, NULL, 'MT', 'Pulper feeding', 15.000, NULL, NULL, NULL, 54000.00, 216000.00, 4.000, 'LOT-PULP-635458', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (7, 8, 2074, 1.000, NULL, 'NOS', '', 10.000, 'front', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (15, 14, 3343, 1.000, NULL, 'NOS', '', 0.000, NULL, NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (36, 36, 3059, 1.000, NULL, 'NOS', 'CHANGING LINE', 0.000, 'Vaccume Line ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Upgrade/MOC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (362, 197, 3029, 2.000, NULL, 'NOS', 'STORE ISSUE NO: 21/02/08/2026', 78.000, 'MCN DEPT', NULL, NULL, 4.76, 9.52, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (364, 197, 4499, 3.000, NULL, 'NOS', 'STORE ISSUE NO: 21/02/08/2026', 14.000, 'WORKSHOP ETP PLANT SS TANK', NULL, NULL, 0.00, 0.00, 3.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (365, 197, 2854, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 21/02/08/2026', 23.000, 'WORKSHOP ETP PLANT SS TANK', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (231, 159, 4585, 1.000, NULL, 'NOS', 'STORE ISSUE NO :10, 26/08/2026', 10.000, 'LAB DEPT ', NULL, NULL, 90.00, 90.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (232, 159, 3343, 1.000, NULL, 'NOS', 'STORE ISSUE NO :10, 26/08/2026', 1.000, 'LAB DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (233, 159, 2297, 2.000, NULL, 'NOS', 'STORE ISSUE NO :10, 26/08/2026', 10.000, 'SPARE DRAYER ROLL FRONT AND BACK SIDE ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
@@ -9260,8 +9388,10 @@ INSERT INTO public.indent_items VALUES (284, 165, 2840, 1.000, NULL, 'PKT', 'STO
 INSERT INTO public.indent_items VALUES (285, 165, 3507, 1.000, NULL, 'NOS', 'STORE ISSUE NO : 16, 30/08/2026', 4.000, 'WORKSHOP PRASANTH', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (286, 165, 2850, 10.000, NULL, 'NOS', 'STORE ISSUE NO : 16, 30/08/2026', 88.000, 'WORKSHOP BUFFING', NULL, NULL, 30.00, 300.00, 10.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (287, 165, 3029, 1.000, NULL, 'NOS', 'STORE ISSUE NO : 16, 30/08/2026', 79.000, 'REWINDING DEPT', NULL, NULL, 4.76, 4.76, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
-INSERT INTO public.indent_items VALUES (352, 194, 3111, 5.000, NULL, 'NOS', NULL, NULL, NULL, NULL, NULL, 100.00, 500.00, 0.000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
-INSERT INTO public.indent_items VALUES (353, 195, 3111, 2.000, NULL, 'NOS', 'Overhaul pump gland seal', NULL, NULL, NULL, NULL, 500.00, 1000.00, 2.000, NULL, 'Emergency Breakdown', NULL, NULL, '2026-09-02', 'Bearings verified, fitment completed on PM1 Vacuum Pump', NULL, NULL, NULL, 'done', NULL, 'Anil Deshmukh (Mech Senior Eng)', 'EMP-MECH-302', '2026-09-02 17:13:28.863811');
+INSERT INTO public.indent_items VALUES (366, 198, 2852, 11.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 296.000, 'SHED ROOFING ', NULL, NULL, 12.00, 132.00, 11.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (367, 198, 3013, 4.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 7.000, 'ELE DEPT 180 HP MOTOR', NULL, NULL, 0.00, 0.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (368, 198, 3263, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 3.000, 'ELE DEPT', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (369, 198, 2130, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 5.000, 'CENTRY CLEANER PUMP', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (288, 165, 4618, 52.000, NULL, 'NOS', 'STORE ISSUE NO : 16, 30/08/2026
 ', 100.000, 'DOCTOR BLADE HOLDER PURPOSE', NULL, NULL, 8.20, 426.40, 52.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (289, 165, 2291, 2.000, NULL, 'NOS', 'STORE ISSUE NO : 16, 30/08/2026', 6.000, 'PAPER ROLL', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
@@ -9300,13 +9430,74 @@ INSERT INTO public.indent_items VALUES (346, 189, 3325, 1.000, NULL, 'NOS', 'STO
 INSERT INTO public.indent_items VALUES (347, 189, 4661, 1.000, NULL, 'NOS', 'STORES ISSUE NO:20, DATE: 01/09/2026', 1.000, '[PULP-MCN-044] AFT Press Screen-1', NULL, NULL, 10155.00, 10155.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (348, 189, 4673, 1.000, NULL, 'NOS', 'STORES ISSUE NO:20, DATE: 01/09/2026', 1.000, '[PULP-MCN-045] AFT Press Screen-2', NULL, NULL, 16530.00, 16530.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 INSERT INTO public.indent_items VALUES (349, 189, 4609, 8.000, NULL, 'NOS', 'STORES ISSUE NO:20, DATE: 01/09/2026', 36.000, 'REWIDER CORE PIPE STAND', NULL, NULL, 28.40, 227.20, 8.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (370, 198, 2164, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 2.000, 'CENTRY CLEANER PUMP', NULL, NULL, 510.00, 510.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (371, 198, 2075, 2.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 6.000, 'CENTRY CLEANER PUMP', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (372, 198, 2859, 10.000, NULL, 'LTR', 'STORE ISSUE NO: 22/02/08/2026', 300.000, 'CENTRY CLEANER PUMP', NULL, NULL, 222.00, 2220.00, 10.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (373, 198, 4572, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 2.000, 'SIZE KITCHAN', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (374, 198, 3264, 1.000, NULL, 'NOS', 'STORE ISSUE NO: 22/02/08/2026', 13.000, 'MONTY LABER PATA DEPT ROOM', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (375, 199, 2910, 1.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 163.000, 'MCN AIR LIN', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (376, 199, 2993, 16.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 39.000, 'SIZE KITCHAN MESH', NULL, NULL, 0.00, 0.00, 16.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (377, 199, 4718, 600.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 7200.000, 'SHED ROOFING', NULL, NULL, 6.00, 3600.00, 600.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (378, 199, 4595, 2.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 20.000, 'PATTA TRACTOR TYRE', NULL, NULL, 90.00, 180.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (379, 199, 2840, 1.000, NULL, 'PKT', 'STORE ISSUE NO : 23-03/09/2026', 7.000, 'ETP SS TANK WELDING', NULL, NULL, 680.00, 680.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (380, 199, 2844, 1.000, NULL, 'PKT', 'STORE ISSUE NO : 23-03/09/2026', 3.000, 'WORKSHOP WELDING ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (381, 199, 2794, 1.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 1.000, '[SIZEKITCHEN-180] Size kitchen Cooker Pump', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (382, 199, 2104, 2.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 9.000, '[PULPMILL-226] AFT Press Screen-3', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (383, 199, 2852, 10.000, NULL, 'NOS', 'STORE ISSUE NO : 23-03/09/2026', 285.000, 'ETP SS PLATE CUTTING', NULL, NULL, 12.00, 120.00, 10.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (384, 200, 2843, 2.000, NULL, 'PKT', 'STORE ISSUE NO:201,DATE:04-09-2026', 12.000, 'WORKSHOP  -MS WELDING ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (385, 200, 4495, 5.000, NULL, 'NOS', 'STORE ISSUE NO:201,DATE:04-09-2026', 35.000, 'WORKSHOP -CLEANING ', NULL, NULL, 60.00, 300.00, 5.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (386, 201, 2958, 4.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026 
+', 305.000, 'PULP MILL SECTION ', NULL, NULL, 0.00, 0.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (387, 201, 4660, 2.000, NULL, 'MTR', '
+STORE ISSUE NO:24,DATE:04-09-2026 
+', 2.000, '[REWINDER-MCN-163] Rewinder break drum', NULL, NULL, 3750.00, 7500.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (388, 201, 3392, 3.000, NULL, 'NOS', '
+STORE ISSUE NO:24,DATE:04-09-2026, 5HP & 7.5 HP MOTOR
+', 4.000, '[STORE-SHELF-01] Store Inventory Racking', NULL, NULL, 0.00, 0.00, 3.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (389, 201, 4555, 3.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, 5HP & 7.5 HP MOTOR
+', 6.000, 'ELETRICAL DEPT ', NULL, NULL, 55.00, 165.00, 3.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (390, 201, 3327, 10.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, 5HP & 7.5 HP MOTOR
+', 205.000, 'ELECTRICAL  DEPT ', NULL, NULL, 0.00, 0.00, 10.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (391, 201, 4551, 1.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, 5HP & 7.5 HP MOTOR
+', 4.000, '7.5 HP MOTOR  -ELECTGRICAL DEPT', NULL, NULL, 836.00, 836.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (392, 201, 2852, 25.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, 
+', 275.000, 'CUTTING -WORKSHOP', NULL, NULL, 15.00, 375.00, 25.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (393, 201, 2999, 4.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, ', 42.000, 'BOILER TANK -FITTING ', NULL, NULL, 0.00, 0.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (394, 201, 3339, 2.000, NULL, 'NOS', 'STORE ISSUE NO:24,DATE:04-09-2026, ', 141.000, 'SECURITY & SANTOSH  ', NULL, NULL, 3.80, 7.60, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (395, 202, 4731, 1.000, NULL, 'NOS', 'TESTING -25', 1.000, '[STORE-SHELF-01] Store Inventory Racking', NULL, NULL, 775.00, 775.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (396, 202, 4732, 1.000, NULL, 'NOS', 'TESTING -25', 1.000, '[STORE-SHELF-01] Store Inventory Racking', NULL, NULL, 775.00, 775.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (397, 202, 4733, 1.000, NULL, 'NOS', 'TESTING -25', 1.000, '[STORE-SHELF-01] Store Inventory Racking', NULL, NULL, 775.00, 775.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (398, 202, 2664, 4.000, NULL, 'NOS', 'PRESSURE SCREEN BOTTOM -25', 17.000, 'MECHANICAL ', NULL, NULL, 4954.00, 19816.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (399, 202, 2852, 10.000, NULL, 'NOS', 'TIN WORK -25', 250.000, 'ROOF SHED ', NULL, NULL, 12.00, 120.00, 10.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (400, 202, 4718, 600.000, NULL, 'NOS', 'TIN WORK -25 ', 6600.000, 'ROOF SHED ', NULL, NULL, 6.00, 3600.00, 600.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (401, 202, 3339, 1.000, NULL, 'NOS', 'REWINDER -25', 139.000, 'KAILASH ', NULL, NULL, 3.80, 3.80, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (402, 203, 2840, 1.000, NULL, 'PKT', ' STORE 05-09-2026 , SLIP NO: 202. ', 6.000, 'MECHANICAL -S.S WELDING ', NULL, NULL, 680.00, 680.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (403, 203, 3040, 2.000, NULL, 'NOS', 'STORE 05-09-2026 , SLIP NO: 202. ', 17.000, 'REWINDER BRAKE DRUM LINE ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (404, 203, 2999, 1.000, NULL, 'NOS', 'STORE 05-09-2026 , SLIP NO: 202.', 38.000, 'DOCTOR BLADE HOLDER ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (405, 203, 4562, 1.000, NULL, 'NOS', 'STORE 05-09-2026 , SLIP NO: 202.', 18.000, 'RADHESHYAM -SAFETY', NULL, NULL, 35.00, 35.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (406, 203, 3033, 1.000, NULL, 'NOS', 'STORE 05-09-2026 , SLIP NO: 202.', 7.000, 'MECHANICAL -RUST FREE', NULL, NULL, 380.00, 380.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (407, 203, 2852, 25.000, NULL, 'NOS', 'STORE 05-09-2026 , SLIP NO: 203.', 240.000, 'cutting ', NULL, NULL, 12.00, 300.00, 25.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (408, 203, 2935, 1.000, NULL, 'NOS', 'SPARE PUMP  STORE 05-09-2026 , SLIP NO: 203.', 6.000, 'REWINDER ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (409, 203, 2871, 1.000, NULL, 'NOS', 'SPARE PUMP  STORE 05-09-2026 , SLIP NO: 203.', 7.000, 'REWINDER ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (410, 204, 2936, 2.000, NULL, 'NOS', 'SPARTE CYLINDER -STORE 05-09-2026 , SLIP NO: 204.', 3.000, 'REWINDER ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (411, 204, 2901, 2.000, NULL, 'NOS', 'AIR LINE - STORE 05-09-2026 , SLIP NO: 204.', 29.000, 'REWINDER ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (412, 204, 2734, 1.000, NULL, 'NOS', 'SIZE KITCHEN STOCK TANK -  STORE 05-09-2026 , SLIP NO: 204.', 1.000, 'SIZE KITCHEN ', NULL, NULL, 0.00, 0.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (413, 204, 3079, 2.000, NULL, 'NOS', 'SIZE KITCHEN STOCK TANK -  STORE 05-09-2026 , SLIP NO: 204.', 9.000, 'SIZE KITCHEN ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (414, 204, 3041, 4.000, NULL, 'NOS', 'SIZE KITCHEN STOCK TANK -  STORE 05-09-2026 , SLIP NO: 204.', 7.000, 'SIZE KITCHEN ', NULL, NULL, 0.00, 0.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (415, 204, 3067, 2.000, NULL, 'NOS', 'SIZE KITCHEN STOCK TANK -  STORE 05-09-2026 , SLIP NO: 204.', 25.000, 'SIZ KITCHEN ', NULL, NULL, 0.00, 0.00, 2.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (416, 204, 4735, 1.000, NULL, 'NOS', 'TESTING -STORE 05-09-2026 , SLIP NO: 204.', 1.000, 'LAB ', NULL, NULL, 600.00, 600.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (417, 204, 4736, 1.000, NULL, 'NOS', 'TESTING -STORE 05-09-2026 , SLIP NO: 204.', 1.000, 'LAB', NULL, NULL, 600.00, 600.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (418, 204, 4737, 1.000, NULL, 'NOS', 'TESTING -STORE 05-09-2026 , SLIP NO: 204.', 1.000, 'LAB', NULL, NULL, 600.00, 600.00, 1.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
+INSERT INTO public.indent_items VALUES (419, 204, 3078, 4.000, NULL, 'NOS', 'REWINDER BRAKE DRUM LINE - -STORE 05-09-2026 , SLIP NO: 204.', 27.000, 'REWINDER ', NULL, NULL, 0.00, 0.00, 4.000, NULL, 'Routine Replacement', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending', NULL, NULL, NULL, NULL);
 
 
 --
 -- Data for Name: indents; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.indents VALUES (199, 'IND-20260903-0001', '2026-09-03', 4, '2026-09-03', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-03 18:45:43.812395', 1, 27, 4580.00, 6, '2026-09-03 18:45:43.812395+05:30', '2026-09-03 18:46:03.341473+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (153, 'IND-20260829-0001', '2026-08-29', 8, '2026-08-25', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-29 18:30:10.144725', 85, 27, 9273.00, 6, '2026-08-29 18:30:10.144725+05:30', '2026-08-29 18:31:10.12585+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (202, 'IND-20260905-0001', '2026-09-05', 4, '2026-09-05', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-05 19:00:54.175918', 1, NULL, 25864.80, 6, '2026-09-05 19:00:54.175918+05:30', '2026-09-05 19:14:07.383456+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (149, 'IND-20260827-0012', '2026-08-27', 22, '2026-08-24', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, 'top cello tank', '2026-08-27 15:45:48.401879', 85, 27, 230430.49, 6, '2026-08-27 15:45:48.401879+05:30', '2026-08-27 15:46:08.51001+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (164, 'IND-20260831-0006', '2026-08-31', 4, '2026-08-29', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-31 11:40:46.910457', 85, 27, 21176.00, 6, '2026-08-31 11:40:46.910457+05:30', '2026-08-31 11:41:04.122293+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (33, 'IND-20260813-0017', '2026-08-13', 10, '2026-08-12', 'High', 'Closed', 10, 1, '2026-08-13 20:40:35.898', NULL, NULL, NULL, NULL, 'Issued to Pulp Mill Floor', '2026-08-13 20:40:35.886', NULL, NULL, 216000.00, 6, '2026-08-14 02:10:35.911+05:30', '2026-08-14 02:22:40.768+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -9333,16 +9524,18 @@ INSERT INTO public.indents VALUES (162, 'IND-20260831-0004', '2026-08-31', 4, '2
 INSERT INTO public.indents VALUES (141, 'IND-20260827-0004', '2026-08-27', 4, '2026-08-22', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-27 11:34:33.540413', 85, 27, 2320.00, 6, '2026-08-27 11:34:33.540413+05:30', '2026-08-27 11:34:56.785193+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (145, 'IND-20260827-0008', '2026-08-27', 8, '2026-08-24', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-27 13:06:12.872729', 85, 27, 1315.66, 6, '2026-08-27 13:06:12.872729+05:30', '2026-08-27 13:06:34.923209+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (163, 'IND-20260831-0005', '2026-08-31', 4, '2026-08-31', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-31 11:34:17.307727', 85, 27, 2779.52, 6, '2026-08-31 11:34:17.307727+05:30', '2026-08-31 11:34:40.996102+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (198, 'IND-20260902-0002', '2026-09-02', 4, '2026-09-02', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-02 19:41:23.34772', 85, 27, 2862.00, 6, '2026-09-02 19:41:23.34772+05:30', '2026-09-02 19:41:47.082804+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (168, 'IND-20260831-0010', '2026-08-31', 4, '2026-08-25', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-31 12:48:17.963055', 1, 27, 2125.00, 6, '2026-08-31 12:48:17.963055+05:30', '2026-08-31 12:49:22.769353+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (146, 'IND-20260827-0009', '2026-08-27', 8, '2026-08-24', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-08-27 13:16:45.685139', 85, 27, 24.00, 6, '2026-08-27 13:16:45.685139+05:30', '2026-08-27 13:17:07.953319+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (41, 'IND-20260819-TEST-FLOW', '2026-08-18', 4, NULL, 'Normal', 'Draft', 24, NULL, NULL, NULL, NULL, NULL, NULL, 'Automated Test Indent for Store Stock Replenishment', '2026-08-19 14:56:31.42', 85, NULL, 0.00, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.indents VALUES (190, 'IND-TEST-SEQ-A-1788347144335', '2026-09-02', 22, NULL, 'High', 'Submitted', 21, NULL, NULL, NULL, NULL, NULL, NULL, 'Test Sequence Violation - Direct Issue', '2026-09-02 16:35:44.337889', NULL, NULL, 500.00, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (187, 'IND-20260901-0001', '2026-09-01', 4, '2026-09-01', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-01 19:43:17.888846', 1, 27, 720.00, 6, '2026-09-01 19:43:17.888846+05:30', '2026-09-01 19:43:56.212962+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.indents VALUES (193, 'IND-TEST-SEQ-A-1788349408833', '2026-09-02', 22, NULL, 'High', 'Submitted', 21, NULL, NULL, NULL, NULL, NULL, NULL, 'Test Sequence Violation - Direct Issue', '2026-09-02 17:13:28.835621', NULL, NULL, 500.00, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.indents VALUES (194, 'IND-TEST-SEQ-B-1788349408842', '2026-09-02', 22, NULL, 'High', 'Approved', 21, NULL, NULL, NULL, NULL, NULL, NULL, 'Test Sequence Violation - Premature Sign', '2026-09-02 17:13:28.842877', NULL, NULL, 500.00, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (200, 'IND-20260904-0001', '2026-09-04', 4, '2026-09-04', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-04 18:32:39.570808', 106, NULL, 300.00, 6, '2026-09-04 18:32:39.570808+05:30', '2026-09-04 18:33:06.640557+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.indents VALUES (189, 'IND-20260901-0002', '2026-09-01', 4, '2026-09-01', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-01 10:04:05.634102', 85, 27, 27032.20, 6, '2026-09-01 10:04:05.634102+05:30', '2026-09-01 10:04:49.377762+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.indents VALUES (195, 'IND-TEST-SEQ-C-1788349408847', '2026-09-02', 22, NULL, 'High', 'Closed', 21, NULL, NULL, 21, '2026-09-02 17:13:28.854911', NULL, NULL, 'Overhaul Vacuum Pump bearings', '2026-09-02 17:13:28.848773', NULL, NULL, 1000.00, 21, '2026-09-02 17:13:28.860525+05:30', '2026-09-02 17:13:28.862821+05:30', false, NULL, NULL, NULL, 'Anil Deshmukh (Mech Senior Eng)', 'EMP-MECH-302', 'Bearings verified, fitment completed on PM1 Vacuum Pump', '2026-09-02 17:13:28.862821', 21, '2026-09-02', NULL, NULL, NULL, NULL);
-INSERT INTO public.indents VALUES (27, 'IND-20260813-0014', '2026-08-13', 10, '2026-08-12', 'High', 'Issued', 10, 1, '2026-08-13 20:24:00.13', NULL, NULL, NULL, NULL, 'Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]', '2026-08-13 20:24:00.115', NULL, NULL, 216000.00, 6, '2026-08-14 01:54:00.145+05:30', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (203, 'IND-20260905-0002', '2026-09-05', 4, '2026-09-05', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-05 19:12:38.336859', 1, NULL, 1395.00, 6, '2026-09-05 19:12:38.336859+05:30', '2026-09-05 19:13:55.766246+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (197, 'IND-20260902-0001', '2026-09-02', 4, '2026-09-02', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-02 19:31:58.982201', 85, 27, 693.32, 6, '2026-09-02 19:31:58.982201+05:30', '2026-09-02 19:32:22.381942+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (201, 'IND-20260904-0002', '2026-09-04', 4, '2026-09-04', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-04 18:56:47.737653', 85, NULL, 8883.60, 6, '2026-09-04 18:56:47.737653+05:30', '2026-09-04 18:57:11.089136+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (204, 'IND-20260905-0003', '2026-09-05', 4, '2026-09-05', 'Normal', 'Closed', 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-05 19:25:03.609258', 1, NULL, 1800.00, 6, '2026-09-05 19:25:03.609258+05:30', '2026-09-05 19:25:43.169746+05:30', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.indents VALUES (27, 'IND-20260813-0014', '2026-08-13', 10, '2026-08-12', 'High', 'Issued', 10, 1, '2026-08-13 20:24:00.13', NULL, NULL, NULL, NULL, 'Issued to Pulp Mill Floor [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h] [Auto-escalated: ack overdue >48h]', '2026-08-13 20:24:00.115', NULL, NULL, 216000.00, 6, '2026-08-14 01:54:00.145+05:30', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 --
@@ -9543,6 +9736,25 @@ INSERT INTO public.material_equipment VALUES (55, 4673, 105, 1, 638, NULL, '2026
 INSERT INTO public.material_equipment VALUES (56, 2299, 4, 1, 52, NULL, '2026-09-02 10:19:37.676666');
 INSERT INTO public.material_equipment VALUES (59, 2305, 6, 1, 94, NULL, '2026-09-02 10:22:34.129733');
 INSERT INTO public.material_equipment VALUES (60, 2305, 6, 10, 381, NULL, '2026-09-02 10:22:34.13251');
+INSERT INTO public.material_equipment VALUES (62, 4634, 85, NULL, 36, NULL, '2026-09-02 18:50:37.423065');
+INSERT INTO public.material_equipment VALUES (64, 4718, 85, NULL, 36, NULL, '2026-09-02 19:03:58.847751');
+INSERT INTO public.material_equipment VALUES (65, 4719, 6, NULL, 356, NULL, '2026-09-03 09:27:00.234852');
+INSERT INTO public.material_equipment VALUES (66, 4720, 6, NULL, 357, NULL, '2026-09-03 09:28:37.892088');
+INSERT INTO public.material_equipment VALUES (67, 4721, 6, NULL, 357, NULL, '2026-09-03 09:31:57.3003');
+INSERT INTO public.material_equipment VALUES (68, 4722, 6, NULL, 357, NULL, '2026-09-04 09:32:58.355905');
+INSERT INTO public.material_equipment VALUES (69, 4731, 19, 24, 36, NULL, '2026-09-04 15:30:59.931472');
+INSERT INTO public.material_equipment VALUES (71, 4732, 19, 24, 36, NULL, '2026-09-04 15:35:51.901937');
+INSERT INTO public.material_equipment VALUES (72, 4733, 19, NULL, 36, NULL, '2026-09-04 15:38:08.296564');
+INSERT INTO public.material_equipment VALUES (73, 4734, 19, 24, 36, NULL, '2026-09-04 15:39:53.122007');
+INSERT INTO public.material_equipment VALUES (74, 4735, 19, 24, 36, NULL, '2026-09-04 15:42:44.470041');
+INSERT INTO public.material_equipment VALUES (75, 4736, 19, 24, 36, NULL, '2026-09-04 15:44:55.649117');
+INSERT INTO public.material_equipment VALUES (76, 4737, 19, 24, 36, NULL, '2026-09-04 15:46:35.350933');
+INSERT INTO public.material_equipment VALUES (81, 4546, 140, NULL, 36, NULL, '2026-09-04 17:30:55.986053');
+INSERT INTO public.material_equipment VALUES (82, 4552, 140, NULL, 36, NULL, '2026-09-04 17:33:25.254443');
+INSERT INTO public.material_equipment VALUES (83, 4740, 140, NULL, 36, NULL, '2026-09-04 17:49:47.340381');
+INSERT INTO public.material_equipment VALUES (84, 4741, 140, NULL, 36, NULL, '2026-09-04 17:52:12.418947');
+INSERT INTO public.material_equipment VALUES (85, 4742, 140, NULL, 36, NULL, '2026-09-04 17:54:12.88975');
+INSERT INTO public.material_equipment VALUES (86, 4743, 140, NULL, 36, NULL, '2026-09-04 17:55:28.74535');
 
 
 --
@@ -9579,13 +9791,32 @@ INSERT INTO public.material_sections VALUES (54, 4661, 105, true, '2026-09-01 17
 INSERT INTO public.material_sections VALUES (56, 4673, 105, true, '2026-09-01 18:27:14.637462');
 INSERT INTO public.material_sections VALUES (57, 2299, 4, true, '2026-09-02 10:19:37.668943');
 INSERT INTO public.material_sections VALUES (59, 2305, 6, true, '2026-09-02 10:22:34.124277');
+INSERT INTO public.material_sections VALUES (61, 4634, 85, true, '2026-09-02 18:50:37.418236');
+INSERT INTO public.material_sections VALUES (63, 4718, 85, true, '2026-09-02 19:03:58.841732');
+INSERT INTO public.material_sections VALUES (64, 4719, 6, true, '2026-09-03 09:27:00.234852');
+INSERT INTO public.material_sections VALUES (65, 4720, 6, true, '2026-09-03 09:28:37.892088');
+INSERT INTO public.material_sections VALUES (66, 4721, 6, true, '2026-09-03 09:31:57.3003');
+INSERT INTO public.material_sections VALUES (67, 4722, 6, true, '2026-09-04 09:32:58.355905');
+INSERT INTO public.material_sections VALUES (68, 4731, 19, true, '2026-09-04 15:30:59.931472');
+INSERT INTO public.material_sections VALUES (70, 4732, 19, true, '2026-09-04 15:35:51.893291');
+INSERT INTO public.material_sections VALUES (71, 4733, 19, true, '2026-09-04 15:38:08.296564');
+INSERT INTO public.material_sections VALUES (72, 4734, 19, true, '2026-09-04 15:39:53.122007');
+INSERT INTO public.material_sections VALUES (73, 4735, 19, true, '2026-09-04 15:42:44.470041');
+INSERT INTO public.material_sections VALUES (74, 4736, 19, true, '2026-09-04 15:44:55.649117');
+INSERT INTO public.material_sections VALUES (75, 4737, 19, true, '2026-09-04 15:46:35.350933');
+INSERT INTO public.material_sections VALUES (80, 4546, 140, true, '2026-09-04 17:30:55.984663');
+INSERT INTO public.material_sections VALUES (81, 4552, 140, true, '2026-09-04 17:33:25.247661');
+INSERT INTO public.material_sections VALUES (82, 4740, 140, true, '2026-09-04 17:49:47.340381');
+INSERT INTO public.material_sections VALUES (83, 4741, 140, true, '2026-09-04 17:52:12.418947');
+INSERT INTO public.material_sections VALUES (84, 4742, 140, true, '2026-09-04 17:54:12.88975');
+INSERT INTO public.material_sections VALUES (85, 4743, 140, true, '2026-09-04 17:55:28.74535');
 
 
 --
 -- Data for Name: materials; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.materials VALUES (3111, 'CHSTP001', 'STARCH', 28, 'KG', '1108 1200', 0.000, 0.000, 0.000, 77.084, 35750.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3330, 'STA001', 'REGISTRES 100 PAGE', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3115, 'CHSRA005', 'RETENTION AID (2024)', 28, 'KG', '3906 9090', 0.000, 0.000, 0.000, 1673.700, 350.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3169, 'ECT0008', 'LC1E40M7 SCHNEIDER CONTACTOR', 56, 'NOS', NULL, 0.000, 0.000, 0.000, 683.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3170, 'ECT0009', 'LC1D12M7 SCHNEIDER CONTACTOR', 56, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9639,9 +9870,10 @@ INSERT INTO public.materials VALUES (3217, 'ERE0020', 'L & T (SWITCHGEAR) MN2 TH
 INSERT INTO public.materials VALUES (3218, 'ERE0021', 'SIEMENS REAL (20AMPS-25AMPS) THERMAL OVERLOAD RELAY', 57, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3219, 'ERE0022', 'SIEMENS REAL (2.8AMPS-4AMPS) THERMAL OVERLOAD RELAY', 57, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3114, 'CHENL004', 'ENZYME (L)', 28, 'KG', '3507 9062', 0.000, 0.000, 0.000, 15.953, 625.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3119, 'CHBSU012', 'BELT PRESS (SUCHEM - 638 )', 28, 'KG', '3906', 0.000, 0.000, 0.000, 163.000, 290.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2130, 'BE0003', '3309', 31, 'NOS', NULL, 1.000, 1.000, 0.000, 4.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4045, 'FLTDGD001', 'FLT GD 30UNO CEV-5 (KKK005009D3.0TCVT4500 SINGSOLSJV435)', 35, 'NOS', '8427-2000', 0.000, 0.000, 0.000, 1.000, 1665000.00, true, '2026-08-13 17:43:39.494756', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2130, 'BE0003', '3309', 31, 'NOS', NULL, 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3119, 'CHBSU012', 'BELT PRESS (SUCHEM - 638 )', 28, 'KG', '3906', 0.000, 0.000, 0.000, 13.000, 290.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2840, 'SSR0001', 'SUPERON S.S (3.15X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 5.000, 680.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2115, 'OS0066', '55-60-8 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3118, 'CHSKR006', 'KROFTA (303)', 28, 'KG', '3906 9090', 0.000, 0.000, 0.000, 1093.000, 255.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3121, 'CHSBC013', 'SE-BOND 102(CRACKING AGENT)', 28, 'KG', '3809 9200', 0.000, 0.000, 0.000, 0.000, 170.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9687,8 +9919,6 @@ INSERT INTO public.materials VALUES (3258, 'ELEG0012', 'L&T COMPRSER TERMINAL', 
 INSERT INTO public.materials VALUES (3260, 'ELEG0014', 'SWITCH GEAR MAKE CONTROLLER 3 PH ,380V,CAT: ST921660000', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3261, 'ELEG0015', 'SIREN 150-MFTER1, 90-120CB', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3262, 'ELEG0016', 'REPON/SIBASS FAN- 24 V', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3263, 'ELEG0017', '100 WATS FLOOD LIGHT', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3264, 'ELEG0018', 'LED TUBE LIGHTS', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 13.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3265, 'ELEG0019', 'LX1FJ220 COIL SCHNEIDER', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3266, 'ELEG0020', '12SDTO STATER DELTA TIMER 3S-120S', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3267, 'ELEG0021', '120DTY STATER DELTA TIMER 3S-30S', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9699,6 +9929,8 @@ INSERT INTO public.materials VALUES (3273, 'ELEG0027', 'LIMIT SWITCH (240V/30V) 
 INSERT INTO public.materials VALUES (3117, 'CHCOA004', 'COAGULANT (CL 200)', 28, 'KG', '3824', 0.000, 0.000, 0.000, 4088.000, 151.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3120, 'CHGYD008', 'GOLDEN YELLOW DYE', 28, 'KG', '4804 3900', 0.000, 0.000, 0.000, 1940.000, 180.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3112, 'CHPAS003', 'POLY ALUMINIUM CHLORIDE ( SOLID)', 28, 'KG', '2827 3200', 0.000, 0.000, 0.000, 13854.000, 31.50, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2854, 'GGW0002', '7" GRINDING WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 22.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3392, 'ELEG0084', 'TERMINAL PLATE TAMCO T1-9007 (5 HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-13 16:35:06.907613', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3326, 'ELEG0080', 'ALUMINIUM FLAT LUGS  300 SQMM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3312, 'ELEG0066', 'COPPER FLAT LUGS 70 SQMM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 28.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3313, 'ELEG0067', 'COPPER FLAT LUGS 95 SQMM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 33.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9724,8 +9956,6 @@ INSERT INTO public.materials VALUES (3295, 'ELEG0049', 'MOTOR FANS ND-200  CR (H
 INSERT INTO public.materials VALUES (3296, 'ELEG0050', 'MOTOR FANS   CR (HOLE48  X OD290) SCREW TYPE', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3297, 'ELEG0051', 'MOTOR FANS   CR (HOLE48  X OD290) PIN TYPE', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3298, 'ELEG0052', 'MOTOR FANS   CR (HOLE 93  X OD 400) KEY WAY TYPE', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3299, 'ELEG0053', 'TERMINAL BLOCK-PLATE Fr.ND200 CG (40HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3300, 'ELEG0054', 'TERMINAL BLOCK-PLATE Fr.ND160-180 CG (20-30HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3301, 'ELEG0055', 'TERMINAL BOX 112 /132 CG (40-20hp)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3302, 'ELEG0056', 'COLING FAN ND132 CG, (7.5HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3303, 'ELEG0057', 'COLING FAN ND160 CG, 4P (20HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9749,7 +9979,6 @@ INSERT INTO public.materials VALUES (3324, 'ELEG0078', 'ALUMINIUM FLAT LUGS  185
 INSERT INTO public.materials VALUES (3325, 'ELEG0079', 'ALUMINIUM FLAT LUGS  240 SQMM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 16.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3328, 'ELEG0082', 'TERMINAL PLATE ABB 200HP (T1-7040) TAMCO', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3329, 'ELEG0083', 'TERMINAL PLATE ABB 200HP (T1-7135) TAMCO', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3392, 'ELEG0084', 'TERMINAL PLATE TAMCO T1-9007 (5 HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-13 16:35:06.907613', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3393, 'ELEG0085', 'ELE HAND HALF (RUBBER) SET', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-13 16:35:06.912731', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3394, 'ELEG0086', '20 W LED BULB', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-13 16:35:06.915702', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3395, 'ELEG0087', '10 K POTENTIOAL METER', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-13 16:35:06.917694', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9854,6 +10083,8 @@ INSERT INTO public.materials VALUES (3133, 'CHCSF021', 'CAUSTIC SODA FLAKES', 28
 INSERT INTO public.materials VALUES (3134, 'CHDEL022', 'DESCALING [3250] (L)', 28, 'KG', '3824', 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2298, 'TW0001', 'TOP WIRE (20.250 X 3.65 M) SHALIMAR -48497, W&F -', 29, 'NOS', '5911-2000', 1.000, 1.000, 0.000, 1.000, 235171.00, true, '2026-07-15 18:39:14.282141', true, 90, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2300, 'PF0001', 'PRESS FELTS (14.1 X 3.5 M) 1650 GSM V3 (81.43 KGS) ,12579028', 29, 'NOS', '5911-9010', 1.000, 1.000, 0.000, 1.000, 243858.71, true, '2026-07-15 18:39:14.282141', true, 60, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2871, 'PCK0003', '100mm CYLINDER KITS', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4490, 'GER0048', 'COCONUT BROOMS', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 18.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4491, 'GER0049', 'PP WHITE STRAP 19 MM', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 21.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4493, 'GER0051', 'CONE TAAPER 20 MM BUSHES', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 50.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4494, 'GER0052', 'RUBBER 20MM BUSHES', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 50.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9863,7 +10094,6 @@ INSERT INTO public.materials VALUES (2869, 'PCK0001', '50mm CYLINDER KITS', 36, 
 INSERT INTO public.materials VALUES (3024, 'GER0003', 'ANABOND RTV SILICON RED 80GR', 35, 'NOS', '2710', 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3035, 'GER0014', '1/2" TEFLON TAPE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 33.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3488, 'GER0017', 'HOSE CLAMP 1/2" GI', 35, 'NOS', NULL, 2.000, 2.000, 0.000, 15.000, 0.00, true, '2026-08-13 17:13:50.539585', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4490, 'GER0048', 'COCNUT BROOMS', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 18.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2299, 'BW0001', 'BOTTOM WIRE (44.953 X 3.65)- (1.5 LAYER),W&F -60216', 29, 'NOS', '5911-2000', 1.000, 1.000, 0.000, 1.000, 507516.00, true, '2026-07-15 18:39:14.282141', false, 365, 'Wire Section › Bottom Wire Tension Roll-3', 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 4, 1, 52);
 INSERT INTO public.materials VALUES (3026, 'GER0005', 'GREAS GUN PESTOL TYPE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 1900.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4488, 'GER0046', 'BOTTEN BATTERS', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9910,9 +10140,9 @@ INSERT INTO public.materials VALUES (3513, 'GER0039', 'SELF ADHESIVE TAPE (36 X 
 INSERT INTO public.materials VALUES (3516, 'GER0042', 'WHITE STRAP BDL  12 MM', 35, 'NOS', NULL, 2.000, 2.000, 0.000, 20.000, 0.00, true, '2026-08-13 17:13:50.586515', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3517, 'GER0043', 'S.S CLOTH -10 PLAIN,1.320 X 1320 ( LENGTH *WIDTH) MESH', 35, 'NOS', NULL, 2.000, 2.000, 0.000, 1.000, 0.00, true, '2026-08-13 17:13:50.587636', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2870, 'PCK0002', '80mm CYLINDER KITS', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2871, 'PCK0003', '100mm CYLINDER KITS', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3113, 'CHSFS002', 'SURFACE SIZE (700C)', 28, 'KG', '4811', 0.000, 0.000, 0.000, 5673.000, 98.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3515, 'GER0041', 'PET STRAP BDL 12MM', 35, 'NOS', '3920-6220', 2.000, 2.000, 0.000, 27.000, 2150.00, true, '2026-08-13 17:13:50.585653', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2936, 'PBR001', 'PNEUMATIC BAREL 100 X 50 MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4524, 'BE0002-B', '3309B-TVH-C3', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-19 19:39:30.718663', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2903, 'PUM0006', '8X1/4" PU MAIL CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 210.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2902, 'PUE0005', '8X1/4" PU ELBOW CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 26.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9951,7 +10181,6 @@ INSERT INTO public.materials VALUES (2897, 'PUM0004', '6X3/8" PU MAIL CONNECTOR'
 INSERT INTO public.materials VALUES (2898, 'PUC0007', '6X6 PU COUPLER', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 39.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2899, 'PUT0003', '6X6X6 PU T CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 21.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2900, 'PUC0004', '6X8 PU COUPLER', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 50.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2901, 'PUM0008', '8X1/2" PU MAIL CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 29.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2904, 'PUE0004', '8X1/8" PU ELBOW CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 66.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2905, 'PUM0010', '8X1/8" PU MAIL CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 80.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2906, 'PUC0008', '8X10 PU COUPLER', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 46.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -9968,11 +10197,10 @@ INSERT INTO public.materials VALUES (2931, 'PRV0001', '1/2" ROTARY VALVE', 36, '
 INSERT INTO public.materials VALUES (2932, 'PCV0002', '1/4" COMPACT VALVE  (DS255ER61)-JANATICS', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2933, 'PSM001', 'PNEUMATIC PP & PET STRAPPING MACHINE MODEL: XQD-19', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2934, 'PSM002', 'PNEUMATIC PP & PET STRAPPING MACHINE MODEL: AQD-19', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2935, 'PSH001', 'PNEUMATIC SHAFT 100 X 50 MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2936, 'PBR001', 'PNEUMATIC BAREL 100 X 50 MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2901, 'PUM0008', '8X1/2" PU MAIL CONNECTOR', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 27.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2937, 'PCY001', 'PNEUMATIC CYLINDER 100 X 850 MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2302, 'DS0002', 'DRYER SCREEN (32 X 3.5 M) SHALIMAR-18163 ,18165', 29, 'NOS', '5911-2000', 1.000, 1.000, 0.000, 2.000, 175280.00, true, '2026-07-15 18:39:14.282141', true, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2164, 'BE0037', '6309-zz / L140', 39, 'NOS', '8482 10', 1.000, 1.000, 0.000, 6.000, 510.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, 'RM-YARD', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2168, 'BE0041', '6312-2z -L140', 39, 'NOS', NULL, 2.000, 2.000, 0.000, 8.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2152, 'BE0025', '6212-2z-L140', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 6.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2161, 'BE0034', '6306-2z /L207-C3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2155, 'BE0028', '6215-2rs/2z', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10002,7 +10230,6 @@ INSERT INTO public.materials VALUES (2159, 'BE0032', '6304-2Z /2RS1', 39, 'NOS',
 INSERT INTO public.materials VALUES (2160, 'BE0033', '6305-2Z', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2162, 'BE0035', '6307 -zz/ 2Z C3', 39, 'NOS', NULL, 2.000, 2.000, 0.000, 7.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2167, 'BE0040', '6312- H-SN-C3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2168, 'BE0041', '6312-2z -L140 /6310-2Z-C3', 39, 'NOS', NULL, 2.000, 2.000, 0.000, 8.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2170, 'BE0043', '6313-c3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2171, 'BE0044', '6314-H-SN /6314-C3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2172, 'BE0045', '6315-C3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10100,10 +10327,13 @@ INSERT INTO public.materials VALUES (2268, 'BE0141', 'NU319 E-XL -M1-QP -C3', 39
 INSERT INTO public.materials VALUES (2269, 'BE0142', 'NU320 E-XL-M1-QP-C3 -2 old side', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3282, 'ELEG0036', 'DISTRIBUSTION BOX', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2202, 'BE0075', '51109', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 4.000, 1050.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4722, 'MCH0004', 'GARE BOX MOUNTING PLATE', 31, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 66561.00, true, '2026-09-04 09:32:58.355905', false, 365, 'SECOUND PRESS ROLL', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 6, NULL, 357);
+INSERT INTO public.materials VALUES (4730, 'GER0097', 'TRACH LIGHT', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 1000.00, true, '2026-09-04 14:06:18.3801', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3380, 'BE0174', 'UJ CROSS (49 X 155) 4018', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-13 13:43:41.315018', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2292, 'BE0165', 'UCP 210', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2654, 'BE0171', '626 BEARING', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2061, 'OS0010', '25-62-7 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3111, 'CHSTP001', 'STARCH', 28, 'KG', '1108 1200', 0.000, 0.000, 0.000, 25079.084, 35.75, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2273, 'BE0146', 'SYJ 517', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 0.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2085, 'OS0035', '55-75-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 8.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2055, 'OS0002', '20-32-7 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
@@ -10111,6 +10341,7 @@ INSERT INTO public.materials VALUES (2056, 'OS0004', '20-52-7 OIL SEAL', 40, 'NO
 INSERT INTO public.materials VALUES (2057, 'OS0005', '25-40-8 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 4.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2058, 'OS0007', '25-42-10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2059, 'OS0008', '25-45-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 10.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3041, 'MSSC0004', 'S.S 2" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2062, 'OS0011', '28-38-7/2 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 4.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2063, 'OS0012', '30-47-7/10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2064, 'OS0013', '30-62-10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
@@ -10120,7 +10351,7 @@ INSERT INTO public.materials VALUES (2069, 'OS0018', '35-52-10 OIL SEAL', 40, 'N
 INSERT INTO public.materials VALUES (2070, 'OS0019', '35-55-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 10.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 3', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2071, 'OS0020', '40-55-8 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2073, 'OS0022', '42-55-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 8.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2075, 'OS0024', '45-60-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 6.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3067, 'MSSBE005', 'S.S 2" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 23.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2076, 'OS0025', '45-65-10/12 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 3', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2077, 'OS0026', '45-75-10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2078, 'OS0027', '48-62-10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 4.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 3', NULL, NULL, NULL);
@@ -10164,7 +10395,6 @@ INSERT INTO public.materials VALUES (2320, 'TCP0005', 'TYRE COUPLING PH-178', 41
 INSERT INTO public.materials VALUES (2090, 'OS0041', '65-85-10 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 6.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2068, 'OS0017', '35-47-7 OIL SEAL', 40, 'NOS', '4016 9330', 5.000, 5.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 3', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2088, 'OS0039', '65-75-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 10.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 5', NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2104, 'OS0055', '90-115-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 9.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 7', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2106, 'OS0057', '95-120-10 OIL SEAL', 40, 'NOS', '4016 9330', 3.000, 3.000, 0.000, 12.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 3', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2312, 'TP0003', 'TYRE PH-160', 41, 'NOS', '4012-9010', 1.000, 1.000, 0.000, 6.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2089, 'OS0040', '65-80-10 OIL SEAL', 40, 'NOS', '4016 9330', 3.000, 3.000, 0.000, 12.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 5', NULL, NULL, NULL);
@@ -10213,6 +10443,9 @@ INSERT INTO public.materials VALUES (2321, 'TCP0006', 'TYRE COUPLING PH-190', 41
 INSERT INTO public.materials VALUES (2322, 'TCP0007', 'TYRE COUPLING PH-250', 41, 'NOS', NULL, 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2323, 'CPB0001', 'FBC-6A4 (OD-254, 10 HPLES)', 41, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2304, 'PF0003', 'NEW PRESS FELTS TOP ( 15.1 X 3.5 M) 1450 , WT: 79.28 (12559803, 9026)', 29, 'NOS', '5911-9010', 1.000, 1.000, 0.000, 1.000, 230430.49, true, '2026-07-15 18:39:14.282141', true, 60, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4499, 'GCW0003', '7" CUTT OFF WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 11.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2664, 'MVB0008', 'GREEN & BLACK SPC-PT 4750', 43, 'NOS', '4010-3999', 0.000, 0.000, 0.000, 13.000, 4954.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3078, 'MMSF0003', 'M.S FLANGE 1 1/2 " or 1.5 "', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 23.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2337, 'MPS0011', 'TPR 80 /320', 42, 'NOS', NULL, 1.000, 1.000, 0.000, 0.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2328, 'MPS0002', 'MEGA A 40', 42, 'NOS', NULL, 1.000, 1.000, 0.000, 5.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2665, 'MVB0009', 'GREEN SPC 5300', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10220,7 +10453,6 @@ INSERT INTO public.materials VALUES (2662, 'MVB0006', 'V-BELTBLACK SPC 4300', 43
 INSERT INTO public.materials VALUES (2340, 'MPS0014', 'TURBO SLEEVE 400', 42, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2848, 'DB0002', 'DOCTOR BLADE 6.0X75X4000 MM PLASTIC GREEN', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2324, 'CPB0002', 'FBC-5L (6 HOLES)', 41, 'NOS', NULL, 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4499, 'GCW0003', '7" CUTT OFF WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 14.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2325, 'CPB0003', 'FGC2-0.5L GARE COUPALING PART(OD-185, 6 HOLES)', 41, 'NOS', NULL, 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2326, 'CPB0004', 'FGC1-0.5L GEAR COUPALING PART(OD-170, 6 HOLES)', 41, 'NOS', NULL, 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2327, 'MPS0001', 'SWP 80/260', 42, 'NOS', NULL, 1.000, 1.000, 0.000, 3.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10251,7 +10483,6 @@ INSERT INTO public.materials VALUES (2659, 'MVB0003', 'V-BELT BLACK SP 3300', 43
 INSERT INTO public.materials VALUES (2660, 'MVB0004', 'V- BELT GREEN SPC-PT 3750 /BLACK SPC 3750', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 12.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2661, 'MVB0005', 'V-BELTBLACK SPB 4250 /GREEN SPB-PT 4250', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 11.000, 2499.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2663, 'MVB0007', 'GREEN SPC -PT 4500', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2664, 'MVB0008', 'GREEN & BLACK SPC-PT 4750', 43, 'NOS', '4010-3999', 0.000, 0.000, 0.000, 17.000, 4954.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2666, 'MVB0010', 'GREEN SPC -PT 6000 /BLACK SPC-PT 6000', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2667, 'MVB0011', 'BLACK SPC 8500/ GREEN SPC -8500', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 11.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2668, 'MVB0012', 'BLACK XPA 1120', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10270,10 +10501,10 @@ INSERT INTO public.materials VALUES (2846, 'TWE0002', 'TUNGSTEN WELDING ELECTROD
 INSERT INTO public.materials VALUES (2847, 'DB0001', 'DOCTOR BLADE 1.2X75X3600 MM RSE -BRONZE', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2849, 'DB0003', 'DOCTOR BLADE 2X75X3350 MM PLASTIC', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2851, 'GGW0001', '4" GRINDING WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 54.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2854, 'GGW0002', '7" GRINDING WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 23.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3220, 'ERE0023', 'L & T (SWITCHGEAR) 353 THERMAL OVERLOAD RELAY (23AMPS-32AMPS)', 57, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3259, 'ELEG0013', 'PID CONTROLLER TN: 00442008 (JUMO MAKE)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3354, 'STA025', 'AA BATTERY', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2734, 'MV0030', 'S.S BALL VALVE 50MM', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4500, 'MV0045', 'SIGHT GLASS VALVE 1 1/2"', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 13.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2855, 'GEP0001', 'EMERY PAPER 36 GRIT -75 MM', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 50.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2853, 'GCW0002', '14 "CUTT OFF WHEEL', 45, 'NOS', NULL, 0.000, 0.000, 0.000, 16.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10309,7 +10540,6 @@ INSERT INTO public.materials VALUES (2729, 'MV0025', 'S.S BALL VALVE 15MM', 46, 
 INSERT INTO public.materials VALUES (2731, 'MV0027', 'S.S BALL VALVE 25MM / C.I BALL VALVE', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2732, 'MV0028', 'S.S BALL VALVE 32MM', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2733, 'MV0029', 'S.S BALL VALVE 40MM', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2734, 'MV0030', 'S.S BALL VALVE 50MM', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2735, 'MV0031', '2 1/2" PISTON VALVE', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2736, 'MV0032', 'S.S DISC CHECK VALVE 1 1/2"', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2737, 'MV0033', 'C.I WAFER CHECK VALVE -4"', 46, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10369,7 +10599,6 @@ INSERT INTO public.materials VALUES (2790, 'MGU0008', 'Messuring Guage 0 to 140 
 INSERT INTO public.materials VALUES (2791, 'MGU0009', 'Messuring Guage 0 to 10 kg /cm2 (25MMX1/4 BSP)', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2792, 'MGU0010', 'Messuring Guage 0 to 6 kg /cm2 FM (150MMX1/2" BSP', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2793, 'MGU0011', 'OXYGEN REGULATER DOUBLE GUAGE', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2794, 'MGU0012', 'Temperature Guage 0 to 200 C  (BAUMER MAKE)', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2795, 'MGU0013', 'Temperature Guage 0 to 300 C (P163.59-00160)-150MM-1/2" BSP', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2796, 'MGU0014', 'Vaccum Gauge 0 to 760 mm Hg 1/2" Bspt Dial 6"', 48, 'NOS', '9026-2000', 0.000, 0.000, 0.000, 1.000, 1700.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2797, 'MIMP001', 'CPC 100/320 WITH CHECKNUT', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10393,6 +10622,8 @@ INSERT INTO public.materials VALUES (2814, 'MIMP018', 'APPC 42 /150 WEAR PLATE -
 INSERT INTO public.materials VALUES (2815, 'MIMP019', 'CPC 125/320 IMPELLER', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2816, 'MIMP020', 'TURBO 400 IMPELLER', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2817, 'MIMP021', 'TURBO 400 SCREEN PLATE', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3040, 'MSSC0003', 'S.S 1.5" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 15.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3079, 'MMSF0004', 'M.S FLANGE 2"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3045, 'MSSC0008', 'S.S 5" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3044, 'MSSC0007', 'S.S 4 " COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 12.000, 150.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3083, 'MMSF0008', 'M.S FLANGE 5"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10420,8 +10651,6 @@ INSERT INTO public.materials VALUES (2838, 'MIMS016', 'PULP MILLL AFT PRESSURE S
 INSERT INTO public.materials VALUES (2839, 'MIMS017', 'VSL-08 PRESSURE SCREEN SHAFT', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3038, 'MSSC0001', 'S.S 1/2" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3039, 'MSSC0002', 'S.S 1" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 15.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3040, 'MSSC0003', 'S.S 1.5" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 17.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3041, 'MSSC0004', 'S.S 2" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3042, 'MSSC0005', 'S.S 2.5 " COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3043, 'MSSC0006', 'S.S 3 " COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3046, 'MSSC0009', 'S.S 6" COLLER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 23.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10443,7 +10672,6 @@ INSERT INTO public.materials VALUES (3063, 'MSSBE001', 'S.S BEND 1/2"', 50, 'NOS
 INSERT INTO public.materials VALUES (3064, 'MSSBE002', 'S.S 1" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3065, 'MSSBE003', 'S.S 1.25" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3066, 'MSSBE004', 'S.S 1 1/2 " BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 32.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3067, 'MSSBE005', 'S.S 2" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 25.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3068, 'MSSBE006', 'S.S 2.5" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 12.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3069, 'MSSBE007', 'S.S 3" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3070, 'MSSBE008', 'S.S 4" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10452,8 +10680,6 @@ INSERT INTO public.materials VALUES (3074, 'MSSBE012', 'S.S 10" BEND', 50, 'NOS'
 INSERT INTO public.materials VALUES (3075, 'MSSBE013', 'S.S 14" BEND', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3076, 'MMSF0001', 'M.S FLANGE 1/2"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3077, 'MMSF0002', 'M.S FLANGE 1 "', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3078, 'MMSF0003', 'M.S FLANGE 1 1/2 " or 1.5 "', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 27.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3079, 'MMSF0004', 'M.S FLANGE 2"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3080, 'MMSF0005', 'M.S FLANGE 2.5"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3081, 'MMSF0006', 'M.S FLANGE 3 "', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3084, 'MMSF0009', 'M.S FLANGE 6"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 20.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10520,8 +10746,8 @@ INSERT INTO public.materials VALUES (3368, 'COM0005', 'SOLENOID VALVE CPB-60', 5
 INSERT INTO public.materials VALUES (3369, 'COM0006', 'AIR FILTER CPB-7', 53, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-13 13:20:46.101235', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3370, 'COM0007', 'OIL SEPRATOR CPB-7', 53, 'NOS', NULL, 0.000, 0.000, 0.000, 41.000, 0.00, true, '2026-08-13 13:20:46.101235', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3396, 'EVFD001', 'VFD DRIVE /FREQUENCY CONVETER (6SL3210-1PE31-8UL0) ,POWER MODULE PM240-2, INPUT:-3AC 380 V-480V 47-63 HZ, 172 A, MOTOR: IEC 90 kW', 60, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-13 16:35:06.921703', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2958, 'GMSB0003', '1/2"X3" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 301.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4527, 'GMSB0016-B', '12mmX75mm MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 20.000, 0.00, true, '2026-08-19 19:39:30.718663', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2958, 'GMSB0003', '1/2"X3" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 305.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2967, 'GMSB0012', '5/8"X4" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 70.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2964, 'GMSB0009', '3/4"X5" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 199.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2981, 'GSSAB0006', '10mm X 2" SS ALLEN BOLT', 55, 'NOS', '7318', 0.000, 0.000, 0.000, 28.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10568,7 +10794,6 @@ INSERT INTO public.materials VALUES (3009, 'GSSBN0017', '1" X 4" SS BOLT & NUT',
 INSERT INTO public.materials VALUES (3010, 'GSSBN0018', '3/4" X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 25.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3011, 'GSSBN0019', '3/4" X 3" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 25.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3012, 'GSSBN0020', '3/8" X 2 1/2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 26.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3013, 'GSSBN0021', '3/8" X 1 1/4 SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 7.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3014, 'GSSBN0022', '5/16" X 1 1/4 SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 30.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3016, 'GSSSB001', '12mmX2 1/2" STUD BOLT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 17.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3388, 'GSSBN0024', '10 X 40 MM SS BOLT & LOCK NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 50.000, 0.00, true, '2026-08-13 13:43:41.315018', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10590,7 +10815,6 @@ INSERT INTO public.materials VALUES (4444, 'RM-DPX-06', 'Duplex Board Trimmings'
 INSERT INTO public.materials VALUES (4445, 'RM-BHKP-01', 'Imported BHKP (Bleached Hardwood Kraft Pulp)', 62, 'MT', NULL, 0.000, 5.000, 0.000, 26.000, 62000.00, true, '2026-08-14 01:11:28.016628', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'PULP-STORE-1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4446, 'RM-BSKP-02', 'Imported BSKP (Bleached Softwood Kraft Long Fiber)', 62, 'MT', NULL, 0.000, 5.000, 0.000, 19.500, 74000.00, true, '2026-08-14 01:11:28.016628', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'PULP-STORE-1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4447, 'RM-UKP-03', 'Unbleached Kraft Pulp (UKP)', 62, 'MT', NULL, 0.000, 4.000, 0.000, 14.000, 58000.00, true, '2026-08-14 01:11:28.016628', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'PULP-STORE-2', NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3330, 'STA001', 'REGISTRES 100 PAGE', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3331, 'STA002', 'REGISTRES 200 PAGE', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3020, 'GSSSB005', '1 1/4" X 400mm STUD BOLT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4522, 'LAB002', 'PH INDICATOR 125 ML SDFCL 31028 L03', 98, 'NOS', '3822', 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-19 19:34:07.249413', false, 365, 'Quality Control Laboratory', 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10643,9 +10867,10 @@ INSERT INTO public.materials VALUES (4448, 'MAT-PULP-505444', 'Bleached Hardwood
 INSERT INTO public.materials VALUES (2655, 'BE0172', '608 BEARING', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4454, 'MAT-PULP-639817', 'Bleached Hardwood Kraft Pulp Grade A-639817', 28, 'MT', NULL, 4.000, 2.000, 0.000, 9.000, 54000.00, false, '2026-08-14 01:53:59.918981', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'YARD-PULP-1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2912, 'PUTU001', 'Polyurethane Tubes 4 x 2.5 mm 100 mts', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2993, 'GSSBN0001', '8mm X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 23.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2054, 'OS0001', '10-22-7 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 15.000, 275.50, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, 6, 'Rack 2', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4455, 'MAT-PULP-635458', 'Bleached Hardwood Kraft Pulp Grade A-635458', 28, 'MT', NULL, 4.000, 2.000, 0.000, 5.000, 54000.00, false, '2026-08-14 02:10:35.705363', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'YARD-PULP-1', NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2844, 'MSR0003', 'MANDLAM M.S (4.00X450 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2843, 'MSR0002', 'MANGLAM M.S (3.15X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 10.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2918, 'PUTU007', 'Polyurethane Tubes 10 x 8 mm 100 mts', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 200.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2842, 'MSR0001', 'MANGLAM M.S (2.50X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 8.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2997, 'GSSBN0005', '14mm X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 20.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10655,7 +10880,8 @@ INSERT INTO public.materials VALUES (4452, 'MAT-PULP-613802', 'Bleached Hardwood
 INSERT INTO public.materials VALUES (4453, 'MAT-PULP-620717', 'Bleached Hardwood Kraft Pulp Grade A-620717', 28, 'MT', NULL, 4.000, 2.000, 0.000, 5.000, 54000.00, false, '2026-08-14 01:53:40.760237', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'YARD-PULP-1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2992, 'GSSCS0004', '8MM X 50MM SS CSK SCREW', 55, 'NOS', '7317-1400', 0.000, 0.000, 0.000, 18.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3000, 'GSSBN0008', '16mm  X 1 1/2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2999, 'GSSBN0007', '1/2" X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 42.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2844, 'MSR0003', 'MANGALAM M.S (4.00X450 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2999, 'GSSBN0007', '1/2" X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 37.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2144, 'BE0017', '6205-zz /2RS', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 9.000, 280.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 4, 1, 327);
 INSERT INTO public.materials VALUES (2680, 'MVB0024', 'BLACK B 68', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2841, 'SSR0002', 'SUPERON S.S (2.5X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10663,15 +10889,12 @@ INSERT INTO public.materials VALUES (2990, 'GSSCS0002', '5/16" X 1 1/4" SS CSK S
 INSERT INTO public.materials VALUES (2681, 'MVB0025', 'BLACK C 114/C2952', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2682, 'MVB0026', 'BLACK C 103', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2683, 'MVB0027', 'BLACK C 104', 43, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2840, 'SSR0001', 'SUPERON S.S (3.15X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 8.000, 680.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2843, 'MSR0002', 'MANGLAM M.S (3.15X350 MM) PKT', 44, 'PKT', NULL, 0.000, 0.000, 0.000, 12.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3059, 'MSSR0008', 'S.S 6 X 4 REDUCER', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3371, 'COM0008', 'OIL FILTER CPB-7', 53, 'NOS', NULL, 0.000, 0.000, 0.000, 41.000, 0.00, true, '2026-08-13 13:20:46.101235', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2987, 'GSSCAS0003', '12mm X 3/4" SS CSK ALLEN SCREW', 55, 'NOS', '7318', 0.000, 0.000, 0.000, 63.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2988, 'GSSCAS0004', '3/8" X 2 1/2" SS CSK ALLEN SCREW', 55, 'NOS', '7318', 0.000, 0.000, 0.000, 30.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2989, 'GSSCS0001', '5/16" X 2 1/2" SS CSK SCREW', 55, 'NOS', '7317-1400', 0.000, 0.000, 0.000, 51.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2991, 'GSSCS0003', '6MM X 25MM SS CSK SCREW', 55, 'NOS', '7317-1400', 0.000, 0.000, 0.000, 158.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2993, 'GSSBN0001', '8mm X 2" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 39.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2994, 'GSSBN0002', '1/4" X 3" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 64.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2995, 'GSSBN0003', '3/8" X 3" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 52.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2996, 'GSSBN0004', '10mm X 3" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 88.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10692,16 +10915,37 @@ INSERT INTO public.materials VALUES (2921, 'PUTU010', 'Polyurethane Tubes 14 x 
 INSERT INTO public.materials VALUES (2922, 'PUTU011', 'Polyurethane Tubes 16 x 12 mm 50 mts', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3343, 'STA014', 'BLACK MARKER', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4439, 'RM-OCC-01', 'OCC (Old Corrugated Containers - Grade 11)', 61, 'MT', NULL, 0.000, 25.000, 0.000, 135.500, 18500.00, true, '2026-08-14 01:11:28.016628', false, 365, 'OCC Grade 11 Furnish - Batch Dosing Point: Pulper 1', NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'RM-YARD-A', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3013, 'GSSBN0021', '3/8" X 1 1/4 SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 3.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3263, 'ELEG0017', '100 WATS FLOOD LIGHT', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2164, 'BE0037', '6309-zz / L140', 39, 'NOS', '8482 10', 1.000, 1.000, 0.000, 1.000, 510.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, 'RM-YARD', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2075, 'OS0024', '45-60-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 4.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4572, 'ELEG0124', 'ELECTRONIC DOSING PUMP (BIO SIDE CHEMICAL)', 59, 'NOS', '813', 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3264, 'ELEG0018', 'LED TUBE LIGHTS', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 12.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2656, 'BE0173', '627 BEARING', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2706, 'MV0002', '0.5" PISTON VALVES/ BELLOW SEAL GLOBE VALVE', 46, 'NOS', '4802', 0.000, 0.000, 0.000, 7.000, 100.00, true, '2026-08-09 11:48:09.915991', false, 365, 'e.g. Pulp Mill Section', NULL, 'e.g. OEM Direct Procurement', 'e.g. SKF India / Schaeffler', 'e.g. Cycle-1 Verified', 'e.g. Vibration spectral sweep validations', 0.00, NULL, 'Rack 2, Box 4', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2818, 'MIMP022', 'CPC 100/320 BEARING BED /HOUSING', 49, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:48:09.915991', true, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2303, 'URG001', '1 ST UNIRUN GROUP VOITH  41 X 3.5 (12595227)', 29, 'NOS', '5911-9010', 1.000, 1.000, 0.000, 1.000, 273543.22, true, '2026-07-15 18:39:14.282141', true, 365, 'Rewinder › Rewinder Drive roll-2', 'A', NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 2, Box 4', 14, 1, 210);
+INSERT INTO public.materials VALUES (4742, 'ELEG0130', 'TERMINAL BLOCK FR.ND 112 CG  (5HP)', 59, 'NOS', '8503', 0.000, 1.000, 2.000, 6.000, 286.00, true, '2026-09-04 17:54:12.88975', false, 365, '5 HP  MOTOR ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (4731, 'LAB009', 'BUFFER TABLET (PH )- 4', 64, 'NOS', '2917 3990', 0.000, 0.000, 0.000, 0.000, 775.00, true, '2026-09-04 15:30:59.931472', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
 INSERT INTO public.materials VALUES (2305, 'PF0004', 'NEW PRESS FELTS BOTTOM( 15.1 X 3.5 M) 1650 ,voith 12507946, (89.55) 12759027', 29, 'NOS', '5911-9010', 1.000, 1.000, 0.000, 2.000, 261152.62, true, '2026-07-15 18:39:14.282141', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 6, 10, 94);
+INSERT INTO public.materials VALUES (4737, 'LAB015', 'BUFFER SOLUTION  -PH 9 (500ML OR 1LTR)', 64, 'NOS', '9027 5090', 0.000, 0.000, 0.000, 0.000, 600.00, true, '2026-09-04 15:46:35.350933', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
+INSERT INTO public.materials VALUES (2794, 'MGU0012', 'Temperature Guage 0 to 200 C  (BAUMER MAKE)', 48, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2104, 'OS0055', '90-115-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 7.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 7', NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4726, 'GER0094', 'CIRCLIP', 35, 'NOS', '8441 9000', 0.000, 0.000, 0.000, 12.000, 5546.35, true, '2026-09-03 09:59:38.305945', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4743, 'ELEG0131', 'TERMINAL BLOCK FR.ND 132 CG  (7.5 HP)', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 6.000, 286.00, true, '2026-09-04 17:55:28.74535', false, 365, '7.5 HP MOTOR ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (4732, 'LAB010', 'BUFFER TABLET (PH )- 7', 64, 'NOS', '3822 9090', 0.000, 0.000, 0.000, 0.000, 775.00, true, '2026-09-04 15:33:02.757705', false, 365, 'Lab › Store Inventory Racking', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
 INSERT INTO public.materials VALUES (3440, 'EVFD045', 'SCHNEIDER EMS -SUPPLY (CORE I5 12TH GEN ,16 GB RAM,512 GB SSD ,22" SCREEN ,KBD & MOUSE WIN 110 PRO WITH 3 YEARS WARRANTY (5 - MURR RJ45 CABLE -5 MTRS ,6 -SCALNCE SWITCH 8 PORT ,MAKE: MURR) SCHNEIDER MONITORING SOFTWARE 25DL )', 60, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-13 16:35:07.025486', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2952, 'GBFP003', 'SS 304 Q BELLOW HOSE PIPE (FLEXIBLE PIPE) 50X400 mm', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3518, 'GER0044', 'S.S CLOTH -40 PLAIN,1.320 X 1320 ( LENGTH *WIDTH) MESH', 35, 'NOS', NULL, 2.000, 2.000, 0.000, 1.000, 0.00, true, '2026-08-13 17:13:50.58867', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2876, 'PCK0008', 'SPARE PENUMATICS AIR MAX SEAL KIT (200MM -214MM) SHAFT SIZE :38MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2927, 'PNCV001', '1/8-3/2" NC VALVE & SWITCH (JANATICS) MOUNTING VALVE (DS244P60-SH3A', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 14.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2910, 'PUC0001', '8X8 PU COUPLER', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 162.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4719, 'MCH0001', 'CI HOUSING', 31, 'NOS', '8441 9000', 0.000, 0.000, 0.000, 2.000, 33281.50, true, '2026-09-03 09:27:00.234852', false, 365, 'SECOUND PRESS ROLL', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 6, NULL, 356);
+INSERT INTO public.materials VALUES (4727, 'MCH0005', 'GARE BOX BEARING HOUSING WITH SHAFT', 31, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 55000.00, true, '2026-09-03 10:01:23.074017', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3300, 'ELEG0054', 'TERMINAL BLOCK-PLATE Fr.ND160-180 CG (20-30HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 16.000, 665.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3299, 'ELEG0053', 'TERMINAL BLOCK-PLATE Fr.ND200 CG (40HP)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 1009.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4741, 'ELEG0129', 'FAN COVER  FR.ND 160 CG', 59, 'NOS', '8503', 0.000, 1.000, 2.000, 6.000, 1276.00, true, '2026-09-04 17:52:12.418947', false, 365, '20 HP MOTOR ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (4733, 'LAB011', 'BUFFER TABLET (PH )- 9.20', 64, 'NOS', '3822 9090', 0.000, 0.000, 0.000, 0.000, 775.00, true, '2026-09-04 15:38:08.296564', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, NULL, 36);
 INSERT INTO public.materials VALUES (4597, 'MV0046', 'S.S BALL VALVE 4"', 46, 'NOS', '8481', 0.000, 4.000, 10.000, 4.000, 12825.00, true, '2026-08-27 19:45:57.789476', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4596, 'GERP001', '12MM MS PLATE (1 X 2 MTR)', 50, 'NOS', '7208', 0.000, 1.000, 0.000, 1.000, 13850.00, true, '2026-08-27 19:44:39.273725', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4598, 'ELEG0127', '250KW INPUT CHOKE (ARIHANT)', 59, 'NOS', '8504 5010', 0.000, 1.000, 1.000, 1.000, 40050.00, true, '2026-08-28 13:17:59.22092', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10709,7 +10953,6 @@ INSERT INTO public.materials VALUES (4599, 'GER0077', '76 MM CORE PLUGS', 35, 'N
 INSERT INTO public.materials VALUES (2968, 'GMSB0013', '5/8"X5" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 95.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3277, 'ELEG0031', 'TERMINAL PLATE CROMPTON (100 HP) (T17037)', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3082, 'MMSF0007', 'M.S FLANGE 4"', 50, 'NOS', NULL, 0.000, 0.000, 0.000, 12.000, 198.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2910, 'PUC0001', '8X8 PU COUPLER', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 163.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3007, 'GSSBN0015', '5/8" X 4" SS BOLT & NUT', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 17.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2169, 'BE0042', '6313-2Z -L140- C3', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 1.000, 0.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2956, 'GMSB0001', '1/2"X2" MS BOLT & NUT, WASHER', 55, 'NOS', '7318-1500', 0.000, 0.000, 0.000, 485.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10729,7 +10972,9 @@ INSERT INTO public.materials VALUES (4636, 'LAB008', 'MV ORM SOLUTION (500 Ml) A
 INSERT INTO public.materials VALUES (4617, 'GSSBN0027', '8 X 1 1/2" (40 MM) SS BOLT & LOCK NUT, WASHER', 55, 'NOS', '7318 1500', 0.000, 100.000, 200.000, 80.000, 8.50, true, '2026-08-29 11:12:38.299359', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2862, 'LHO0001', 'HYDRULIC OIL No: 68', 52, 'LTR', NULL, 0.000, 0.000, 0.000, 206.000, 155.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4614, 'GER0090', 'SELF DRILLING SCREW 2.5"', 35, 'NOS', '7210 7000', 0.000, 0.000, 0.000, 0.000, 3.81, true, '2026-08-28 19:28:46.283796', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4662, 'PULL0008', '315X5XBFENNER', 65, 'NOS', '84836010', 0.000, 0.000, 0.000, 0.000, 16530.00, false, '2026-09-01 16:56:44.042726', false, 365, 'FRACTINATOR -MOTOR END ', 'C', NULL, NULL, NULL, NULL, 0.00, 6, NULL, 105, NULL, 638);
 INSERT INTO public.materials VALUES (4633, 'MVB0028', 'V-BELT BLACK B 3140', 43, 'NOS', NULL, 0.000, 5.000, 10.000, 0.000, 0.00, true, '2026-08-31 15:52:14.737173', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4635, 'GSS002', 'SELF DRILLING SCREW 2"', 65, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 6.70, false, '2026-08-31 13:04:16.749248', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, 6, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4622, 'STA042', 'FLOOR MARKING TAPE (3" X 25 MTR)', 33, 'NOS', '3919 9090', 0.000, 0.000, 0.000, 10.000, 143.22, true, '2026-08-29 17:21:14.555156', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4629, 'PRS0001', 'PRESSUURE SCREEN ROTOR-VSL-08, DIA-788MM', 31, 'NOS', '9987 91', 0.000, 0.000, 0.000, 1.000, 32000.00, true, '2026-08-30 11:02:06.711893', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 4, 8, 643);
 INSERT INTO public.materials VALUES (4624, 'LAB005', 'BACTASLYED KET BS-102 (3 KIT)', 64, 'NOS', '9027 5090', 0.000, 0.000, 0.000, 3.000, 1660.00, true, '2026-08-29 17:26:23.578157', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10740,7 +10985,9 @@ INSERT INTO public.materials VALUES (4613, 'GER0089', 'PROFILE SHEET 27 FT', 35,
 INSERT INTO public.materials VALUES (4612, 'GER0088', 'PROFILE SHEET 25 FT', 35, 'NOS', '7210 7000', 0.000, 0.000, 0.000, 127.000, 3224.48, true, '2026-08-28 19:27:23.204796', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4611, 'GER0087', 'PROFILE SHEET 20 FT', 35, 'NOS', '7210 7000', 0.000, 0.000, 0.000, 127.000, 3224.48, true, '2026-08-28 19:26:24.977989', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4616, 'GER0092', '3" X 7" CLAMP PLATE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 95.000, 69.49, true, '2026-08-28 19:37:19.049079', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2859, 'LGO0001', 'SERVO GEAR OIL 320', 52, 'LTR', NULL, 0.000, 0.000, 0.000, 300.000, 222.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3029, 'GER0008', 'FEVIQUICK PKTS', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 76.000, 4.76, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2859, 'LGO0001', 'SERVO GEAR OIL 320', 52, 'LTR', NULL, 0.000, 0.000, 0.000, 290.000, 222.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4660, 'GER0093', 'BREAK LINER (16 X 125)', 48, 'MTR', '8708 3100', 0.000, 2.000, 1.000, 0.000, 3750.00, true, '2026-09-01 16:30:26.67319', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 14, 19, 204);
 INSERT INTO public.materials VALUES (4631, 'PRS0003', 'D PULPER SCREEN SS 304, DIA-149, THICK-16MM, HOLE SIZE 8/10MM PITCH 14MM', 31, 'NOS', '8439', 0.000, 0.000, 0.000, 1.000, 114000.00, true, '2026-08-30 11:08:51.19356', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 105, 6, 637);
 INSERT INTO public.materials VALUES (4623, 'STA044', 'SNKE CATCHER 5.2 FEET', 33, 'NOS', '8201 9000', 0.000, 0.000, 0.000, 1.000, 3150.00, true, '2026-08-29 17:22:18.220671', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4606, 'MGU0016', 'Pressue Guage 0 to 10 kg/cm2 (100mmX1/2" BSP)', 46, 'NOS', '9026 2000', 0.000, 1.000, 2.000, 0.000, 4850.00, true, '2026-08-28 15:48:59.962353', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10751,10 +10998,6 @@ INSERT INTO public.materials VALUES (4628, 'CNC0002', 'CONE FOR 1000 LPM (SS 304
 INSERT INTO public.materials VALUES (2949, 'GEGR007', 'GLAND ROPE 20MM (KGS)', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 12.500, 2100.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4618, 'GSSBN0028', '5/16 X 1 1/2" (40 MM) SS BOLT & LOCK NUT, WASHER', 55, 'NOS', '7318 1500', 0.000, 0.000, 0.000, 48.000, 8.20, true, '2026-08-29 11:13:26.435579', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4615, 'GER0091', 'SELF DRILLING SCREW 3"', 35, 'NOS', '7210 7000', 0.000, 0.000, 0.000, 0.000, 4.24, true, '2026-08-28 19:29:20.179304', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4634, 'GSS001', 'SELF DRILLING SCREW 1"', 55, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 4.30, true, '2026-08-31 13:03:39.990852', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4635, 'GSS002', 'SELF DRILLING SCREW 2"', 65, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 6.70, true, '2026-08-31 13:04:16.749248', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4660, 'GER0093', 'BREAK LINER (16 X 125)', 48, 'MTR', '8708 3100', 0.000, 2.000, 1.000, 2.000, 3750.00, true, '2026-09-01 16:30:26.67319', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 14, 19, 204);
-INSERT INTO public.materials VALUES (4662, 'PULL0008', '315X5XBFENNER', 65, 'NOS', '84836010', 0.000, 0.000, 0.000, 0.000, 16530.00, true, '2026-09-01 16:56:44.042726', false, 365, 'FRACTINATOR -MOTOR END ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 105, NULL, 638);
 INSERT INTO public.materials VALUES (4661, 'PULL0007', 'TLP 224X5XB  FENNER', 54, 'NOS', '84836010', 0.000, 1.000, 2.000, 0.000, 10155.00, true, '2026-09-01 16:51:53.863087', false, 365, 'COARSE SCREEN -MOTOR SIDE ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 105, NULL, 637);
 INSERT INTO public.materials VALUES (2084, 'OS0034', '55-72-10/8 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 16.000, 80.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 1', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2087, 'OS0037', '60-80-10 OIL SEAL', 40, 'NOS', '4016 9330', 2.000, 2.000, 0.000, 17.000, 85.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 5', NULL, NULL, NULL);
@@ -10765,7 +11008,13 @@ INSERT INTO public.materials VALUES (2108, 'OS0059', '110-130-12 OIL SEAL', 40, 
 INSERT INTO public.materials VALUES (2191, 'BE0064', '22220 E1-XL-K', 39, 'NOS', NULL, 1.000, 1.000, 0.000, 2.000, 7950.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2758, 'MCNW0002', 'CHECKNUT WASHER MB 12', 47, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 30.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2771, 'MCNW0015', 'CHECKNUT LOCK KM -12', 47, 'NOS', NULL, 0.000, 0.000, 0.000, 20.000, 90.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3029, 'GER0008', 'FEVIQUICK PKTS', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 78.000, 4.76, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4720, 'MCH0002', 'M.S COUPLING', 31, 'NOS', '8441 9000', 0.000, 0.000, 0.000, 4.000, 16640.25, true, '2026-09-03 09:28:37.892088', false, 365, 'SECOUND PRESS ROLL', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 6, NULL, 357);
+INSERT INTO public.materials VALUES (4728, 'GER0096', 'MS PIPE (APOLLO) 60X60X2.5MM (L-4.900 MTR)', 35, 'NOS', '7306 6100', 0.000, 0.000, 0.000, 350.000, 7899.00, true, '2026-09-03 10:03:58.805931', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4734, 'LAB012', 'GLYCERINE SOLUTION   (500ML OR 1LTR)', 64, 'NOS', '2905 4500', 0.000, 0.000, 0.000, 1.000, 400.00, true, '2026-09-04 15:39:53.122007', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
+INSERT INTO public.materials VALUES (4718, 'GSS003', 'SELF DRILLING SCREW 2"', 55, 'NOS', NULL, 0.000, 0.000, 0.000, 6000.000, 6.00, true, '2026-09-02 18:59:07.563956', false, 365, 'Store Section › Store Inventory Racking', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 85, NULL, 36);
+INSERT INTO public.materials VALUES (3339, 'STA010', 'BLUE PENS', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 138.000, 3.80, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2852, 'GCW0001', '4" CUTT OFF WHEEL', 45, 'NOS', '6804-2290', 0.000, 0.000, 0.000, 215.000, 12.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4736, 'LAB014', 'BUFFER SOLUTION  -PH 7 (500ML OR 1LTR)', 64, 'NOS', '9027 5090', 0.000, 0.000, 0.000, 0.000, 600.00, true, '2026-09-04 15:44:55.649117', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
 INSERT INTO public.materials VALUES (3461, 'GECR005', 'LIFT SLING WIRE ROPE 3 TON (10MM X 28MTR)', 35, 'NOS', NULL, 2.000, 2.000, 0.000, 28.000, 100.00, true, '2026-08-13 17:13:50.491878', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4467, 'ELEG0089', 'MEHANICAL SEAL 25MM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 360.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4468, 'ELEG0090', 'MEHANICAL SEAL 28MM', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 430.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10774,8 +11023,6 @@ INSERT INTO public.materials VALUES (2205, 'BE0078', '22319 -E', 39, 'NOS', '848
 INSERT INTO public.materials VALUES (2225, 'BE0098', '29418 -E1-XL-C3', 39, 'NOS', '848250', 1.000, 1.000, 0.000, 3.000, 36710.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4496, 'BE0179', '3306-BD-XL-TVH', 39, 'NOS', '848250', 0.000, 0.000, 0.000, 3.000, 3025.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4497, 'OS0079', '24-40-7 OIL SEAL', 40, 'NOS', '401693', 0.000, 0.000, 0.000, 7.000, 50.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, '1', NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3126, 'CHHYP015', 'SODIUM HYPO CHLORIDE [HYPO] (L)', 28, 'KG', '2828-9019', 0.000, 0.000, 0.000, 637.400, 18.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4495, 'GER0053', 'CLOTH WASTE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 15.000, 60.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3124, 'CHPDL009', 'PROSOLVE ADVANCE', 28, 'KG', '3824-9022', 0.000, 0.000, 0.000, 4048.700, 230.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3123, 'CHPSL011', 'PROSOLVE 126', 28, 'KG', '3824-9022', 0.000, 0.000, 0.000, 410.162, 230.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3122, 'CHPML010', 'PROMASK 192', 28, 'KG', '3824-9022', 0.000, 0.000, 0.000, 320.100, 320.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10786,16 +11033,12 @@ INSERT INTO public.materials VALUES (2679, 'MVB0023', 'BLACK C 107/C 2774', 43, 
 INSERT INTO public.materials VALUES (2163, 'BE0036', '6308-zz', 39, 'NOS', '8482', 1.000, 1.000, 0.000, 10.000, 1350.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4544, 'GER0066', 'NILKAMAL AP1210 HW PALLET', 63, 'NOS', '3923-1090', 0.000, 0.000, 0.000, 10.000, 3800.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4545, 'GER0067', 'NILKAMAL AP1210 MW PALLET', 63, 'NOS', '3923-1090', 0.000, 0.000, 0.000, 10.000, 3450.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4546, 'ELEG0110', 'COLLING FAN Fr.ND112 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 6.000, 135.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4547, 'ELEG0111', 'COLLING FAN Fr.ND122 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 6.000, 232.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4548, 'ELEG0112', 'COLLING FAN Fr.ND160 CG,4P', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 3.000, 287.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4549, 'ELEG0113', 'COLLING FAN Fr.ND200 CG,4P', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 4.000, 556.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4550, 'ELEG0114', 'FAN COVER Fr.ND 112 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 6.000, 549.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4551, 'ELEG0115', 'FAN COVER Fr.ND 132 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 4.000, 836.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4552, 'ELEG0116', 'FAN COVER Fr.ND 180 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 5.000, 1885.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4553, 'ELEG0117', 'FAN COVER Fr.ND 280 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 1.000, 6710.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4554, 'ELEG0118', 'EYE BOLT Fr.112', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 6.000, 50.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4555, 'ELEG0119', 'EYE BOLT Fr.132', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 6.000, 55.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4556, 'ELEG0120', 'EYE BOLT Fr.160', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 5.000, 60.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4557, 'ELEG0121', 'EYE BOLT Fr.180', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 3.000, 70.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4558, 'ELEG0122', 'EYE BOLT Fr.200', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 6.000, 120.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10803,8 +11046,6 @@ INSERT INTO public.materials VALUES (4559, 'ITM-1787719915087-182', 'P&F CJHARGE
 INSERT INTO public.materials VALUES (4560, 'PCR0001', 'PAPER CARRIER ROPE 10MM X 3/8"', 29, 'MTR', '5607-5090', 0.000, 0.000, 0.000, 600.000, 76.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (3116, 'CHDEL007', 'DEFOAMER (SE 100)', 28, 'KG', '3809-9200', 0.000, 0.000, 0.000, 2165.000, 204.50, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4561, 'GER0056', 'DRUM M.S TROLLY', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 1.000, 4450.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4562, 'GER0065', 'WHITE GOGGLES', 63, 'NOS', '6903-1000', 0.000, 0.000, 0.000, 18.000, 35.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (2852, 'GCW0001', '4" CUTT OFF WHEEL', 45, 'NOS', '6804-2290', 0.000, 0.000, 0.000, 296.000, 12.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4563, 'GER0057', 'SHANK END MILL DRILL 20MM', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 0.000, 1770.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4564, 'GER0058', 'SHANK END MILL DRILL 22MM', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 0.000, 2008.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4565, 'GER0059', 'SHANK END MILL DRILL 25MM', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 0.000, 2339.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10813,10 +11054,8 @@ INSERT INTO public.materials VALUES (4567, 'GER0061', '1 MTR OUT SIDE CALIPER', 
 INSERT INTO public.materials VALUES (2850, 'GBW0001', '4" BUFFIN WHEEL', 45, 'NOS', '6804', 0.000, 0.000, 0.000, 74.000, 30.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4568, 'GER0062', 'CARBIDE TIP 12 MM', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 1.000, 450.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4569, 'GER0063', 'CARBIDE TIP 20 MM', 63, 'NOS', '8207', 0.000, 0.000, 0.000, 0.000, 1250.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3033, 'GER0012', 'RUST RELEASE SPRAY (480ML)', 35, 'NOS', '3403-1900', 0.000, 0.000, 0.000, 7.000, 380.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4570, 'GER0055', 'LOCTITE-641 (50ML)', 63, 'NOS', '8483', 0.000, 0.000, 0.000, 4.000, 800.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4571, 'GER0064', 'SURFACE 12" MAGNATIC', 63, 'NOS', '9017', 0.000, 0.000, 0.000, 1.000, 368.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4572, 'ELEG0124', 'ELECTRONIC DOSING PUMP (BIO SIDE CHEMICAL)', 59, 'NOS', '813', 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4573, 'GER0068', 'WATER PROOF BANDAGE', 63, 'NOS', NULL, 0.000, 0.000, 0.000, 200.000, 1.80, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4574, 'GER0069', 'QUALFENGEL', 63, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 160.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4575, 'GER0070', 'BURNAL CREAM', 63, 'NOS', NULL, 0.000, 0.000, 0.000, 3.000, 75.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10827,7 +11066,6 @@ INSERT INTO public.materials VALUES (4579, 'GER0074', 'COTTON BUNDAL', 63, 'NOS'
 INSERT INTO public.materials VALUES (4580, 'GER0075', 'ROLL BANDAGE', 63, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 20.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4581, 'STA033', 'RUBBER BANDS 1.5 INCH (500 NOS)', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 400.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4582, 'STA034', 'PENCIL', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 10.000, 7.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3339, 'STA010', 'BLUE PENS', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 142.000, 3.80, true, '2026-08-09 11:53:06.935459', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4583, 'STA035', 'BLADE CUTTER', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 6.000, 40.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4584, 'STA036', 'BLADES', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 20.000, 5.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4585, 'STA037', 'CD PEN MARKER', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 9.000, 90.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
@@ -10835,14 +11073,28 @@ INSERT INTO public.materials VALUES (3346, 'STA017', 'BLACK PEN MARKER', 33, 'NO
 INSERT INTO public.materials VALUES (4487, 'GER0045', 'SCISSOR 212 MM SIZE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 60.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4586, 'STA038', 'ERIOSER', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 10.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4587, 'STA039', 'SHARPENER', 33, 'NOS', NULL, 0.000, 0.000, 0.000, 1.000, 10.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3126, 'CHHYP015', 'SODIUM HYPO CHLORIDE [HYPO] (L)', 28, 'KG', '2828-9019', 0.000, 0.000, 0.000, 1177.400, 18.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'A', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4562, 'GER0065', 'WHITE GOGGLES', 63, 'NOS', '6903-1000', 0.000, 0.000, 0.000, 17.000, 35.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4555, 'ELEG0119', 'EYE BOLT Fr.132', 59, 'NOS', '8503', 0.000, 0.000, 0.000, 3.000, 55.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (3033, 'GER0012', 'RUST RELEASE SPRAY (480ML)', 35, 'NOS', '3403-1900', 0.000, 0.000, 0.000, 6.000, 380.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4552, 'ELEG0116', 'FAN COVER Fr. ND 180 CG (25 To 30) Hp', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 5.000, 1885.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (4546, 'ELEG0110', 'COLLING FAN Fr.ND112 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 6.000, 135.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (4495, 'GER0053', 'CLOTH WASTE', 35, 'NOS', NULL, 0.000, 0.000, 0.000, 30.000, 60.00, true, '2026-08-19 19:34:07.249413', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4551, 'ELEG0115', 'FAN COVER Fr.ND 132 CG', 59, 'NOS', '8503-0029', 0.000, 0.000, 0.000, 3.000, 836.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (2060, 'OS0009', '25-52-7 OIL SEAL', 40, 'NOS', '4016 9330', 1.000, 1.000, 0.000, 1.000, 60.00, true, '2026-07-15 18:39:14.282141', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, 'Rack 7', NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4590, 'LAB004', 'REFRACTO MEATER0-90%', 64, 'NOS', '9027', 0.000, 0.000, 0.000, 0.000, 1311.86, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (3327, 'ELEG0081', 'INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 205.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4591, 'ELEG0123', '40 W LED BULB', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 0.000, 0.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4592, 'ELEG0125', '6 A 3 PIN PLUG TOP', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 0.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4593, 'ELEG0126', 'FAN COVER Fr.ND 225 CG 50HP', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 2.000, 0.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO public.materials VALUES (4594, 'PCR0002', 'PAPER CARRIER ROPE 12MM X 3/8"', 29, 'MTR', '5607-5090', 0.000, 0.000, 0.000, 400.000, 84.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.materials VALUES (4595, 'GST001', '16MM X 3" TRACTOR TYRE H/T NUT & BOLT', 35, 'NOS', '7318-1900', 0.000, 0.000, 0.000, 20.000, 90.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4634, 'GSS001', 'SELF DRILLING SCREW 1"', 55, 'NOS', NULL, 0.000, 0.000, 0.000, 7000.000, 5.00, true, '2026-08-31 13:03:39.990852', false, 365, 'SHED ROOFING', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 85, NULL, 36);
+INSERT INTO public.materials VALUES (4595, 'GST001', '16MM X 3" TRACTOR TYRE H/T NUT & BOLT', 35, 'NOS', '7318-1900', 0.000, 0.000, 0.000, 18.000, 90.00, true, '2026-08-26 10:21:54.915473', false, 365, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4721, 'MCH0003', 'GEAR BOX WITH MOTOR', 31, 'NOS', '8441 9000', 0.000, 0.000, 0.000, 8.000, 8320.13, true, '2026-09-03 09:31:57.3003', false, 365, 'SECOUND PRESS ROLL', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 6, NULL, 357);
+INSERT INTO public.materials VALUES (4729, 'BE0181', '6014 2RS', 39, 'NOS', NULL, 0.000, 0.000, 0.000, 4.000, 16641.20, true, '2026-09-03 10:11:04.480122', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4740, 'ELEG0128', 'COOLING FAN FR.ND 180 CG', 59, 'NOS', '8503', 0.000, 1.000, 2.000, 4.000, 288.00, true, '2026-09-04 17:49:47.340381', false, 365, '25 /30 HP MOTOR ', 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 140, NULL, 36);
+INSERT INTO public.materials VALUES (3327, 'ELEG0081', 'INSULATIN TAPE BLUE, GREEN, RED, YELLOW & BLACK', 59, 'NOS', NULL, 0.000, 0.000, 0.000, 195.000, 0.00, true, '2026-08-09 11:49:29.211122', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (2935, 'PSH001', 'PNEUMATIC SHAFT 100 X 50 MM', 36, 'NOS', NULL, 0.000, 0.000, 0.000, 5.000, 0.00, true, '2026-08-09 11:48:09.915991', false, 365, NULL, 'B', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO public.materials VALUES (4735, 'LAB013', 'BUFFER SOLUTION  -PH 4 (500ML OR 1LTR)', 64, 'NOS', '9027 5090', 0.000, 0.000, 0.000, 0.000, 600.00, true, '2026-09-04 15:42:44.470041', false, 365, NULL, 'C', NULL, NULL, NULL, NULL, 0.00, NULL, NULL, 19, 24, 36);
 
 
 --
@@ -11240,6 +11492,15 @@ INSERT INTO public.notifications VALUES (55, 2, 'warning', 'Pending Ack: IND-202
 INSERT INTO public.notifications VALUES (56, 1, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-02 13:37:11.84606+05:30');
 INSERT INTO public.notifications VALUES (57, 12, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-02 13:37:11.853383+05:30');
 INSERT INTO public.notifications VALUES (58, 2, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-02 13:37:11.854916+05:30');
+INSERT INTO public.notifications VALUES (59, 1, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-03 14:58:49.998435+05:30');
+INSERT INTO public.notifications VALUES (60, 12, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-03 14:58:50.002827+05:30');
+INSERT INTO public.notifications VALUES (61, 2, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-03 14:58:50.003677+05:30');
+INSERT INTO public.notifications VALUES (62, 1, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-04 16:02:01.818896+05:30');
+INSERT INTO public.notifications VALUES (63, 12, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-04 16:02:01.823019+05:30');
+INSERT INTO public.notifications VALUES (64, 2, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-04 16:02:01.823938+05:30');
+INSERT INTO public.notifications VALUES (65, 1, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-05 17:08:44.909207+05:30');
+INSERT INTO public.notifications VALUES (66, 12, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-05 17:08:44.911647+05:30');
+INSERT INTO public.notifications VALUES (67, 2, 'warning', 'Pending Ack: IND-20260813-0014', '1 item(s) from indent IND-20260813-0014 (Dispatch) await acknowledgment for >24h.', 'indents', 27, false, '2026-09-05 17:08:44.912307+05:30');
 
 
 --
@@ -11357,6 +11618,8 @@ INSERT INTO public.plant_sections VALUES (104, 'POPE', 'Pope Reel', '🎞️', '
 INSERT INTO public.plant_sections VALUES (105, 'PULP', 'Pulp Mill', '🪵', 'Pulp Mill from MK Paper Mill Machinery Registry', 50, true, '2026-08-24 10:55:04.026814', NULL);
 INSERT INTO public.plant_sections VALUES (15, 'STARCHKITCHEN', 'Starch Kitchen', '🧪', 'Wet-end starch preparation for retention/strength', 14, true, '2026-06-29 08:47:00.121', 1);
 INSERT INTO public.plant_sections VALUES (106, 'MECH', 'MECHANICAL', NULL, 'MECHANICAL Section', 0, true, '2026-08-31 16:25:40.366143', 2);
+INSERT INTO public.plant_sections VALUES (140, 'ELE DEPT', 'Electrical ', NULL, 'Electrical  Section', 0, true, '2026-09-04 17:25:10.498122', 3);
+INSERT INTO public.plant_sections VALUES (139, 'ELE', 'Electrical Section', NULL, 'Electrical Section Section', 0, false, '2026-09-04 17:24:36.839111', 3);
 
 
 --
@@ -11367,6 +11630,9 @@ INSERT INTO public.po_items VALUES (4, 4, 2299, 2.000, 0.000, 'NOS', 507516.00, 
 INSERT INTO public.po_items VALUES (5, 5, 3124, 2500.000, 2500.000, 'KGS', 230.00, 18.00, 678500.00, 0.00, 0.00, 0.00, 575000.00, 'inter', 0.00, 0.00, 18.00, 0.00, 0.00, 103500.00, NULL);
 INSERT INTO public.po_items VALUES (6, 5, 3123, 300.000, 300.000, 'KGS', 230.00, 18.00, 81420.00, 0.00, 0.00, 0.00, 69000.00, 'inter', 0.00, 0.00, 18.00, 0.00, 0.00, 12420.00, NULL);
 INSERT INTO public.po_items VALUES (7, 5, 3122, 250.000, 250.000, 'KGS', 320.00, 18.00, 94400.00, 0.00, 0.00, 0.00, 80000.00, 'inter', 0.00, 0.00, 18.00, 0.00, 0.00, 14400.00, NULL);
+INSERT INTO public.po_items VALUES (234, 93, 3300, 13.000, 13.000, 'NOS', 665.00, 18.00, 10319.10, 0.00, 0.00, 100.00, 8745.00, 'intra', 9.00, 9.00, 0.00, 787.05, 787.05, 0.00, NULL);
+INSERT INTO public.po_items VALUES (235, 93, 3299, 4.000, 4.000, 'NOS', 1009.00, 18.00, 4880.48, 0.00, 0.00, 100.00, 4136.00, 'intra', 9.00, 9.00, 0.00, 372.24, 372.24, 0.00, NULL);
+INSERT INTO public.po_items VALUES (236, 93, 4740, 4.000, 4.000, 'NOS', 288.00, 18.00, 1477.36, 0.00, 0.00, 100.00, 1252.00, 'intra', 9.00, 9.00, 0.00, 112.68, 112.68, 0.00, NULL);
 INSERT INTO public.po_items VALUES (8, 10, 2262, 2.000, 4.000, 'NOS', 6285.00, 18.00, 14832.60, 0.00, 0.00, 0.00, 12570.00, 'intra', 9.00, 9.00, 0.00, 1131.30, 1131.30, 0.00, NULL);
 INSERT INTO public.po_items VALUES (9, 10, 2205, 2.000, 4.000, 'NOS', 13195.00, 18.00, 31140.20, 0.00, 0.00, 0.00, 26390.00, 'intra', 9.00, 9.00, 0.00, 2375.10, 2375.10, 0.00, NULL);
 INSERT INTO public.po_items VALUES (10, 10, 2225, 2.000, 4.000, 'NOS', 36710.00, 18.00, 86635.60, 0.00, 0.00, 0.00, 73420.00, 'intra', 9.00, 9.00, 0.00, 6607.80, 6607.80, 0.00, NULL);
@@ -11387,6 +11653,7 @@ INSERT INTO public.po_items VALUES (24, 21, 2664, 12.000, 12.000, 'NOS', 4954.00
 INSERT INTO public.po_items VALUES (25, 21, 2661, 8.000, 8.000, 'NOS', 2499.00, 18.00, 12237.78, 50.00, 9996.00, 375.00, 10371.00, 'intra', 9.00, 9.00, 0.00, 933.39, 933.39, 0.00, NULL);
 INSERT INTO public.po_items VALUES (26, 22, 4598, 1.000, 1.000, 'NOS', 40050.00, 18.00, 47259.00, 0.00, 0.00, 0.00, 40050.00, 'intra', 9.00, 9.00, 0.00, 3604.50, 3604.50, 0.00, NULL);
 INSERT INTO public.po_items VALUES (27, 23, 4599, 5000.000, 5000.000, 'NOS', 2.60, 18.00, 15340.00, 0.00, 0.00, 0.00, 13000.00, 'intra', 9.00, 9.00, 0.00, 1170.00, 1170.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (237, 93, 4741, 6.000, 6.000, 'NOS', 1276.00, 18.00, 9152.08, 0.00, 0.00, 100.00, 7756.00, 'intra', 9.00, 9.00, 0.00, 698.04, 698.04, 0.00, NULL);
 INSERT INTO public.po_items VALUES (81, 43, 4613, 130.000, 130.000, 'NOS', 3224.48, 18.00, 494635.23, 0.00, 0.00, 0.00, 419182.40, 'intra', 9.00, 9.00, 0.00, 37726.42, 37726.42, 0.00, NULL);
 INSERT INTO public.po_items VALUES (82, 43, 4612, 127.000, 127.000, 'NOS', 3224.48, 18.00, 483220.57, 0.00, 0.00, 0.00, 409508.96, 'intra', 9.00, 9.00, 0.00, 36855.81, 36855.81, 0.00, NULL);
 INSERT INTO public.po_items VALUES (83, 43, 4611, 127.000, 127.000, 'NOS', 3224.48, 18.00, 483220.57, 0.00, 0.00, 0.00, 409508.96, 'intra', 9.00, 9.00, 0.00, 36855.81, 36855.81, 0.00, NULL);
@@ -11457,6 +11724,25 @@ INSERT INTO public.po_items VALUES (172, 44, 2770, 10.000, 10.000, 'NOS', 75.00,
 INSERT INTO public.po_items VALUES (173, 44, 2771, 10.000, 10.000, 'NOS', 90.00, 18.00, 1062.00, 0.00, 0.00, 0.00, 900.00, 'intra', 9.00, 9.00, 0.00, 81.00, 81.00, 0.00, NULL);
 INSERT INTO public.po_items VALUES (174, 44, 2757, 10.000, 10.000, 'NOS', 20.00, 18.00, 236.00, 0.00, 0.00, 0.00, 200.00, 'intra', 9.00, 9.00, 0.00, 18.00, 18.00, 0.00, NULL);
 INSERT INTO public.po_items VALUES (175, 44, 2758, 10.000, 10.000, 'NOS', 30.00, 18.00, 354.00, 0.00, 0.00, 0.00, 300.00, 'intra', 9.00, 9.00, 0.00, 27.00, 27.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (176, 87, 3126, 540.000, 540.000, 'KG', 18.00, 18.00, 11469.60, 0.00, 0.00, 0.00, 9720.00, 'intra', 9.00, 9.00, 0.00, 874.80, 874.80, 0.00, NULL);
+INSERT INTO public.po_items VALUES (177, 88, 3119, 150.000, 150.000, 'KG', 290.00, 18.00, 51330.00, 0.00, 0.00, 0.00, 43500.00, 'intra', 9.00, 9.00, 0.00, 3915.00, 3915.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (178, 89, 4719, 2.000, 2.000, 'NOS', 33281.50, 18.00, 78544.34, 0.00, 0.00, 0.00, 66563.00, 'intra', 9.00, 9.00, 0.00, 5990.67, 5990.67, 0.00, NULL);
+INSERT INTO public.po_items VALUES (179, 89, 4720, 4.000, 4.000, 'NOS', 16640.25, 18.00, 78541.98, 0.00, 0.00, 0.00, 66561.00, 'intra', 9.00, 9.00, 0.00, 5990.49, 5990.49, 0.00, NULL);
+INSERT INTO public.po_items VALUES (180, 89, 4721, 8.000, 8.000, 'NOS', 8320.13, 18.00, 78541.98, 0.00, 0.00, 0.00, 66561.00, 'intra', 9.00, 9.00, 0.00, 5990.49, 5990.49, 0.00, NULL);
+INSERT INTO public.po_items VALUES (181, 89, 4729, 4.000, 4.000, 'NOS', 16641.20, 18.00, 78546.46, 0.00, 0.00, 0.00, 66564.80, 'intra', 9.00, 9.00, 0.00, 5990.83, 5990.83, 0.00, NULL);
+INSERT INTO public.po_items VALUES (182, 89, 4726, 12.000, 12.000, 'NOS', 5546.35, 18.00, 78536.32, 0.00, 0.00, 0.00, 66556.20, 'intra', 9.00, 9.00, 0.00, 5990.06, 5990.06, 0.00, NULL);
+INSERT INTO public.po_items VALUES (183, 90, 4727, 1.000, 1.000, 'NOS', 55000.00, 18.00, 64900.00, 0.00, 0.00, 0.00, 55000.00, 'intra', 9.00, 9.00, 0.00, 4950.00, 4950.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (184, 91, 4728, 350.000, 350.000, 'NOS', 7899.00, 18.00, 3262287.00, 0.00, 0.00, 0.00, 2764650.00, 'intra', 9.00, 9.00, 0.00, 248818.50, 248818.50, 0.00, NULL);
+INSERT INTO public.po_items VALUES (238, 93, 4742, 6.000, 6.000, 'NOS', 286.00, 18.00, 2142.88, 0.00, 0.00, 100.00, 1816.00, 'intra', 9.00, 9.00, 0.00, 163.44, 163.44, 0.00, NULL);
+INSERT INTO public.po_items VALUES (239, 93, 4743, 6.000, 6.000, 'NOS', 286.00, 18.00, 2024.88, 0.00, 0.00, 0.00, 1716.00, 'intra', 9.00, 9.00, 0.00, 154.44, 154.44, 0.00, NULL);
+INSERT INTO public.po_items VALUES (240, 94, 3111, 25000.000, 25000.000, 'KG', 35.75, 5.00, 938437.50, 0.00, 0.00, 0.00, 893750.00, 'intra', 2.50, 2.50, 0.00, 22343.75, 22343.75, 0.00, NULL);
+INSERT INTO public.po_items VALUES (213, 92, 4731, 1.000, 1.000, 'NOS', 775.00, 18.00, 1032.50, 0.00, 0.00, 100.00, 875.00, 'intra', 9.00, 9.00, 0.00, 78.75, 78.75, 0.00, NULL);
+INSERT INTO public.po_items VALUES (214, 92, 4732, 1.000, 1.000, 'NOS', 775.00, 5.00, 813.75, 0.00, 0.00, 0.00, 775.00, 'intra', 2.50, 2.50, 0.00, 19.38, 19.38, 0.00, NULL);
+INSERT INTO public.po_items VALUES (215, 92, 4733, 1.000, 1.000, 'NOS', 775.00, 5.00, 813.75, 0.00, 0.00, 0.00, 775.00, 'intra', 2.50, 2.50, 0.00, 19.38, 19.38, 0.00, NULL);
+INSERT INTO public.po_items VALUES (216, 92, 4734, 1.000, 1.000, 'NOS', 400.00, 18.00, 590.00, 0.00, 0.00, 100.00, 500.00, 'intra', 9.00, 9.00, 0.00, 45.00, 45.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (217, 92, 4735, 1.000, 1.000, 'NOS', 600.00, 18.00, 826.00, 0.00, 0.00, 100.00, 700.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (218, 92, 4736, 1.000, 1.000, 'NOS', 600.00, 18.00, 826.00, 0.00, 0.00, 100.00, 700.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, NULL);
+INSERT INTO public.po_items VALUES (219, 92, 4737, 1.000, 1.000, 'NOS', 600.00, 18.00, 826.00, 0.00, 0.00, 100.00, 700.00, 'intra', 9.00, 9.00, 0.00, 63.00, 63.00, 0.00, NULL);
 
 
 --
@@ -11504,6 +11790,7 @@ INSERT INTO public.purchase_orders VALUES (28, 'PO-20260828-0009', '2026-08-28',
 INSERT INTO public.purchase_orders VALUES (43, 'PO-20260829-0002', '2026-08-29', 78, NULL, '2026-08-29', '30 days', 'Received', 1265776.60, 227839.79, 1493615.99, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 15:49:33.041988', 'intra', 0.00, 0.00, 113919.89, 113919.89, 0.00, -0.40);
 INSERT INTO public.purchase_orders VALUES (44, 'PO-20260829-0003', '2026-08-28', 62, NULL, '2026-08-28', '30 days', 'Approved', 159725.00, 28750.50, 188476.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 17:06:24.555037', 'intra', 0.00, 0.00, 14375.25, 14375.25, 0.00, 0.50);
 INSERT INTO public.purchase_orders VALUES (83, 'PO-20260901-0002', '2026-08-31', 46, NULL, '2026-08-31', 'Net 15', 'Received', 15966.75, 2874.02, 18840.77, 6, 6, 'PO raised against PR undefined (Dept)', '2026-09-01 17:43:31.791234', 'intra', 12008.25, 0.00, 1437.01, 1437.01, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (30, 'PO-20260829-0001', '2026-08-27', 33, NULL, '2026-08-27', NULL, 'Partial', 1720.00, 309.60, 2029.60, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 11:15:28.673433', 'intra', 0.00, 50.00, 154.80, 154.80, 0.00, 0.00);
 INSERT INTO public.purchase_orders VALUES (45, 'PO-20260829-0004', '2026-08-29', 23, NULL, '2026-08-29', NULL, 'Draft', 16686.80, 3003.62, 19690.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 17:57:06.401446', 'intra', 6937.20, 500.00, 1501.81, 1501.81, 0.00, -0.42);
 INSERT INTO public.purchase_orders VALUES (46, 'PO-20260829-0005', '2026-08-29', 23, NULL, '2026-08-29', NULL, 'Draft', 14202.00, 2556.36, 16758.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 18:02:20.378579', 'intra', 1578.00, 0.00, 1278.18, 1278.18, 0.00, -0.36);
 INSERT INTO public.purchase_orders VALUES (17, 'PO-TEST-985901', '2026-08-26', 2, NULL, NULL, NULL, 'Approved', 45000.00, NULL, 53100.00, NULL, 21, NULL, '2026-08-26 18:26:25.902805', 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
@@ -11516,7 +11803,14 @@ INSERT INTO public.purchase_orders VALUES (52, 'PO-20260830-0006', '2026-08-30',
 INSERT INTO public.purchase_orders VALUES (18, 'PO-20260827-0001', '2026-08-27', 30, NULL, '2026-09-01', 'Net 30 Days', 'Approved', 127650.00, 22977.00, 150627.00, NULL, 6, 'Direct PO generated from Indent IND-20260827-0011', '2026-08-27 18:39:55.274583', 'intra', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
 INSERT INTO public.purchase_orders VALUES (53, 'PO-20260831-0001', '2026-08-31', 79, NULL, '2026-08-31', '30 days', 'Draft', 6800.00, 1224.00, 8024.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-31 13:30:50.357069', 'inter', 0.00, 500.00, 612.00, 612.00, 0.00, 0.00);
 INSERT INTO public.purchase_orders VALUES (82, 'PO-20260901-0001', '2026-09-01', 60, NULL, '2026-09-01', NULL, 'Draft', 7500.00, 1350.00, 8850.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-01 16:41:04.941609', 'intra', 0.00, 0.00, 675.00, 675.00, 0.00, 0.00);
-INSERT INTO public.purchase_orders VALUES (30, 'PO-20260829-0001', '2026-08-27', 33, NULL, '2026-08-27', NULL, 'Received', 1720.00, 309.60, 2029.60, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-08-29 11:15:28.673433', 'intra', 0.00, 50.00, 154.80, 154.80, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (87, 'PO-20260902-0001', '2026-09-02', 34, NULL, '2026-09-02', NULL, 'Draft', 9720.00, 1749.60, 11470.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-02 19:11:25.156881', 'intra', 0.00, 0.00, 874.80, 874.80, 0.00, 0.40);
+INSERT INTO public.purchase_orders VALUES (91, 'PO-20260903-0003', '2026-09-03', 115, NULL, '2026-09-03', '30 days', 'Draft', 2764650.00, 497637.00, 3262287.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-03 13:20:46.623811', 'intra', 0.00, 0.00, 248818.50, 248818.50, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (88, 'PO-20260902-0002', '2026-09-02', 113, NULL, '2026-09-02', '30 days', 'Draft', 43500.00, 7830.00, 51330.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-02 19:20:41.8194', 'intra', 0.00, 0.00, 3915.00, 3915.00, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (89, 'PO-20260903-0001', '2026-09-03', 114, NULL, '2026-09-03', '30 days', 'Draft', 332806.00, 59905.08, 392711.02, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-03 13:07:59.89515', 'inter', 0.00, 0.00, 29952.54, 29952.54, 0.00, -0.06);
+INSERT INTO public.purchase_orders VALUES (90, 'PO-20260903-0002', '2026-09-03', 37, NULL, '2026-09-03', NULL, 'Draft', 55000.00, 9900.00, 64900.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-03 13:14:23.665058', 'inter', 0.00, 0.00, 4950.00, 4950.00, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (92, 'PO-20260904-0001', '2026-08-31', 79, NULL, '2026-08-31', '30 days', 'Draft', 5025.00, 703.00, 5728.14, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-04 16:23:37.364147', 'inter', 0.00, 500.00, 351.50, 351.50, 0.00, 0.14);
+INSERT INTO public.purchase_orders VALUES (93, 'PO-20260904-0002', '2026-09-04', 66, NULL, '2026-09-04', 'Net 30', 'Received', 25421.00, 4575.78, 29996.78, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-04 17:44:40.118572', 'intra', 0.00, 500.00, 2287.89, 2287.89, 0.00, 0.00);
+INSERT INTO public.purchase_orders VALUES (94, 'PO-20260904-0003', '2026-09-04', 35, NULL, '2026-09-04', 'Net 30', 'Draft', 893750.00, 44687.50, 938438.00, NULL, 6, 'PO raised against PR undefined (Dept)', '2026-09-04 18:16:05.93854', 'intra', 0.00, 0.00, 22343.75, 22343.75, 0.00, 0.50);
 
 
 --
@@ -20573,11 +20867,45 @@ INSERT INTO public.section_kpi_snapshots VALUES (14797, 3, '2026-09-02 16:00:00'
 INSERT INTO public.section_kpi_snapshots VALUES (14798, 100, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.930698');
 INSERT INTO public.section_kpi_snapshots VALUES (14799, 17, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.931654');
 INSERT INTO public.section_kpi_snapshots VALUES (14800, 18, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.932584');
+INSERT INTO public.section_kpi_snapshots VALUES (14914, 1, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.728686');
 INSERT INTO public.section_kpi_snapshots VALUES (14801, 86, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.933641');
 INSERT INTO public.section_kpi_snapshots VALUES (14802, 104, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.936256');
 INSERT INTO public.section_kpi_snapshots VALUES (14803, 105, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.9378');
 INSERT INTO public.section_kpi_snapshots VALUES (14804, 15, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.939012');
 INSERT INTO public.section_kpi_snapshots VALUES (14805, 106, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.940025');
+INSERT INTO public.section_kpi_snapshots VALUES (14887, 1, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.686262');
+INSERT INTO public.section_kpi_snapshots VALUES (14888, 20, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.702238');
+INSERT INTO public.section_kpi_snapshots VALUES (14889, 16, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.704179');
+INSERT INTO public.section_kpi_snapshots VALUES (14890, 21, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.706835');
+INSERT INTO public.section_kpi_snapshots VALUES (14891, 19, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.709013');
+INSERT INTO public.section_kpi_snapshots VALUES (14892, 85, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.710639');
+INSERT INTO public.section_kpi_snapshots VALUES (14893, 87, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.712066');
+INSERT INTO public.section_kpi_snapshots VALUES (14894, 4, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.713788');
+INSERT INTO public.section_kpi_snapshots VALUES (14895, 6, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.715503');
+INSERT INTO public.section_kpi_snapshots VALUES (14896, 7, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.716838');
+INSERT INTO public.section_kpi_snapshots VALUES (14897, 8, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.717991');
+INSERT INTO public.section_kpi_snapshots VALUES (14898, 9, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.719172');
+INSERT INTO public.section_kpi_snapshots VALUES (14899, 11, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.720508');
+INSERT INTO public.section_kpi_snapshots VALUES (14900, 12, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.723294');
+INSERT INTO public.section_kpi_snapshots VALUES (14901, 95, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.725883');
+INSERT INTO public.section_kpi_snapshots VALUES (14902, 14, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.727352');
+INSERT INTO public.section_kpi_snapshots VALUES (14903, 5, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.728963');
+INSERT INTO public.section_kpi_snapshots VALUES (14904, 10, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.730488');
+INSERT INTO public.section_kpi_snapshots VALUES (14905, 3, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.732576');
+INSERT INTO public.section_kpi_snapshots VALUES (14906, 100, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.734707');
+INSERT INTO public.section_kpi_snapshots VALUES (14907, 17, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.736213');
+INSERT INTO public.section_kpi_snapshots VALUES (14908, 18, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.737918');
+INSERT INTO public.section_kpi_snapshots VALUES (14915, 20, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.732646');
+INSERT INTO public.section_kpi_snapshots VALUES (14916, 16, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.733918');
+INSERT INTO public.section_kpi_snapshots VALUES (14917, 21, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.735199');
+INSERT INTO public.section_kpi_snapshots VALUES (14918, 19, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.736457');
+INSERT INTO public.section_kpi_snapshots VALUES (14919, 85, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.738356');
+INSERT INTO public.section_kpi_snapshots VALUES (14920, 87, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.739623');
+INSERT INTO public.section_kpi_snapshots VALUES (14921, 4, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.740768');
+INSERT INTO public.section_kpi_snapshots VALUES (14922, 6, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.741955');
+INSERT INTO public.section_kpi_snapshots VALUES (14923, 7, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.74304');
+INSERT INTO public.section_kpi_snapshots VALUES (14924, 8, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.744299');
+INSERT INTO public.section_kpi_snapshots VALUES (14925, 9, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.745333');
 INSERT INTO public.section_kpi_snapshots VALUES (14779, 1, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.903625');
 INSERT INTO public.section_kpi_snapshots VALUES (14780, 20, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.906652');
 INSERT INTO public.section_kpi_snapshots VALUES (14781, 16, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.90844');
@@ -20593,6 +20921,958 @@ INSERT INTO public.section_kpi_snapshots VALUES (14790, 9, '2026-09-02 16:00:00'
 INSERT INTO public.section_kpi_snapshots VALUES (14791, 11, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.922392');
 INSERT INTO public.section_kpi_snapshots VALUES (14792, 12, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.923535');
 INSERT INTO public.section_kpi_snapshots VALUES (14793, 95, '2026-09-02 16:00:00', '{"_alarms": {}}', '2026-09-02 16:10:08.924865');
+INSERT INTO public.section_kpi_snapshots VALUES (14909, 86, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.743603');
+INSERT INTO public.section_kpi_snapshots VALUES (14910, 104, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.74657');
+INSERT INTO public.section_kpi_snapshots VALUES (14911, 105, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.747985');
+INSERT INTO public.section_kpi_snapshots VALUES (14912, 15, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.749354');
+INSERT INTO public.section_kpi_snapshots VALUES (14913, 106, '2026-09-02 17:00:00', '{"_alarms": {}}', '2026-09-02 17:17:03.750808');
+INSERT INTO public.section_kpi_snapshots VALUES (14926, 11, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.746338');
+INSERT INTO public.section_kpi_snapshots VALUES (14927, 12, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.747401');
+INSERT INTO public.section_kpi_snapshots VALUES (14928, 95, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.748427');
+INSERT INTO public.section_kpi_snapshots VALUES (14929, 14, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.749416');
+INSERT INTO public.section_kpi_snapshots VALUES (14930, 5, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.751183');
+INSERT INTO public.section_kpi_snapshots VALUES (14931, 10, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.752195');
+INSERT INTO public.section_kpi_snapshots VALUES (14932, 3, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.753191');
+INSERT INTO public.section_kpi_snapshots VALUES (14933, 100, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.754183');
+INSERT INTO public.section_kpi_snapshots VALUES (14934, 17, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.755223');
+INSERT INTO public.section_kpi_snapshots VALUES (14935, 18, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.756213');
+INSERT INTO public.section_kpi_snapshots VALUES (14936, 86, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.757207');
+INSERT INTO public.section_kpi_snapshots VALUES (14937, 104, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.75819');
+INSERT INTO public.section_kpi_snapshots VALUES (14938, 105, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.759201');
+INSERT INTO public.section_kpi_snapshots VALUES (14939, 15, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.760189');
+INSERT INTO public.section_kpi_snapshots VALUES (14940, 106, '2026-09-02 18:00:00', '{"_alarms": {}}', '2026-09-02 18:16:58.761173');
+INSERT INTO public.section_kpi_snapshots VALUES (14941, 1, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.484666');
+INSERT INTO public.section_kpi_snapshots VALUES (14942, 20, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.488026');
+INSERT INTO public.section_kpi_snapshots VALUES (14943, 16, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.48958');
+INSERT INTO public.section_kpi_snapshots VALUES (14944, 21, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.491029');
+INSERT INTO public.section_kpi_snapshots VALUES (14945, 19, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.492309');
+INSERT INTO public.section_kpi_snapshots VALUES (14946, 85, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.493531');
+INSERT INTO public.section_kpi_snapshots VALUES (14947, 87, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.494795');
+INSERT INTO public.section_kpi_snapshots VALUES (14948, 4, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.495949');
+INSERT INTO public.section_kpi_snapshots VALUES (14949, 6, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.497082');
+INSERT INTO public.section_kpi_snapshots VALUES (14950, 7, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.498177');
+INSERT INTO public.section_kpi_snapshots VALUES (14951, 8, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.500036');
+INSERT INTO public.section_kpi_snapshots VALUES (14952, 9, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.501211');
+INSERT INTO public.section_kpi_snapshots VALUES (14953, 11, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.502323');
+INSERT INTO public.section_kpi_snapshots VALUES (14954, 12, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.503409');
+INSERT INTO public.section_kpi_snapshots VALUES (14955, 95, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.504542');
+INSERT INTO public.section_kpi_snapshots VALUES (14956, 14, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.505857');
+INSERT INTO public.section_kpi_snapshots VALUES (14957, 5, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.507387');
+INSERT INTO public.section_kpi_snapshots VALUES (14958, 10, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.508542');
+INSERT INTO public.section_kpi_snapshots VALUES (14959, 3, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.509585');
+INSERT INTO public.section_kpi_snapshots VALUES (14960, 100, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.510603');
+INSERT INTO public.section_kpi_snapshots VALUES (14961, 17, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.51161');
+INSERT INTO public.section_kpi_snapshots VALUES (14962, 18, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.512611');
+INSERT INTO public.section_kpi_snapshots VALUES (14963, 86, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.513607');
+INSERT INTO public.section_kpi_snapshots VALUES (14964, 104, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.514658');
+INSERT INTO public.section_kpi_snapshots VALUES (14965, 105, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.515674');
+INSERT INTO public.section_kpi_snapshots VALUES (14966, 15, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.516792');
+INSERT INTO public.section_kpi_snapshots VALUES (14967, 106, '2026-09-02 19:00:00', '{"_alarms": {}}', '2026-09-02 19:17:00.517956');
+INSERT INTO public.section_kpi_snapshots VALUES (14968, 1, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.921243');
+INSERT INTO public.section_kpi_snapshots VALUES (14969, 20, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.934444');
+INSERT INTO public.section_kpi_snapshots VALUES (14970, 16, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.936467');
+INSERT INTO public.section_kpi_snapshots VALUES (14971, 21, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.939389');
+INSERT INTO public.section_kpi_snapshots VALUES (14972, 19, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.941166');
+INSERT INTO public.section_kpi_snapshots VALUES (14973, 85, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.943763');
+INSERT INTO public.section_kpi_snapshots VALUES (14974, 87, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.945291');
+INSERT INTO public.section_kpi_snapshots VALUES (14975, 4, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.94663');
+INSERT INTO public.section_kpi_snapshots VALUES (14976, 6, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.947873');
+INSERT INTO public.section_kpi_snapshots VALUES (14977, 7, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.949063');
+INSERT INTO public.section_kpi_snapshots VALUES (14978, 8, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.950442');
+INSERT INTO public.section_kpi_snapshots VALUES (14979, 9, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.951735');
+INSERT INTO public.section_kpi_snapshots VALUES (14980, 11, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.953776');
+INSERT INTO public.section_kpi_snapshots VALUES (14981, 12, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.955515');
+INSERT INTO public.section_kpi_snapshots VALUES (14982, 95, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.95691');
+INSERT INTO public.section_kpi_snapshots VALUES (14983, 14, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.958233');
+INSERT INTO public.section_kpi_snapshots VALUES (14984, 5, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.959734');
+INSERT INTO public.section_kpi_snapshots VALUES (14985, 10, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.961165');
+INSERT INTO public.section_kpi_snapshots VALUES (14986, 3, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.962685');
+INSERT INTO public.section_kpi_snapshots VALUES (14987, 100, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.964045');
+INSERT INTO public.section_kpi_snapshots VALUES (14988, 17, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.965264');
+INSERT INTO public.section_kpi_snapshots VALUES (14989, 18, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.966615');
+INSERT INTO public.section_kpi_snapshots VALUES (14990, 86, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.967931');
+INSERT INTO public.section_kpi_snapshots VALUES (14991, 104, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.969652');
+INSERT INTO public.section_kpi_snapshots VALUES (14992, 105, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.971009');
+INSERT INTO public.section_kpi_snapshots VALUES (14993, 15, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.972301');
+INSERT INTO public.section_kpi_snapshots VALUES (14994, 106, '2026-09-03 08:00:00', '{"_alarms": {}}', '2026-09-03 08:58:53.973575');
+INSERT INTO public.section_kpi_snapshots VALUES (14995, 1, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.61531');
+INSERT INTO public.section_kpi_snapshots VALUES (14996, 20, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.621474');
+INSERT INTO public.section_kpi_snapshots VALUES (14997, 16, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.623197');
+INSERT INTO public.section_kpi_snapshots VALUES (14998, 21, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.62456');
+INSERT INTO public.section_kpi_snapshots VALUES (14999, 19, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.626336');
+INSERT INTO public.section_kpi_snapshots VALUES (15000, 85, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.628071');
+INSERT INTO public.section_kpi_snapshots VALUES (15001, 87, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.62934');
+INSERT INTO public.section_kpi_snapshots VALUES (15002, 4, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.630868');
+INSERT INTO public.section_kpi_snapshots VALUES (15003, 6, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.632065');
+INSERT INTO public.section_kpi_snapshots VALUES (15004, 7, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.633192');
+INSERT INTO public.section_kpi_snapshots VALUES (15005, 8, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.634351');
+INSERT INTO public.section_kpi_snapshots VALUES (15006, 9, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.635752');
+INSERT INTO public.section_kpi_snapshots VALUES (15007, 11, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.636886');
+INSERT INTO public.section_kpi_snapshots VALUES (15008, 12, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.638039');
+INSERT INTO public.section_kpi_snapshots VALUES (15009, 95, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.640044');
+INSERT INTO public.section_kpi_snapshots VALUES (15010, 14, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.641259');
+INSERT INTO public.section_kpi_snapshots VALUES (15011, 5, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.642541');
+INSERT INTO public.section_kpi_snapshots VALUES (15012, 10, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.643993');
+INSERT INTO public.section_kpi_snapshots VALUES (15013, 3, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.645104');
+INSERT INTO public.section_kpi_snapshots VALUES (15014, 100, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.646116');
+INSERT INTO public.section_kpi_snapshots VALUES (15015, 17, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.647127');
+INSERT INTO public.section_kpi_snapshots VALUES (15016, 18, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.648442');
+INSERT INTO public.section_kpi_snapshots VALUES (15017, 86, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.64946');
+INSERT INTO public.section_kpi_snapshots VALUES (15018, 104, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.650477');
+INSERT INTO public.section_kpi_snapshots VALUES (15019, 105, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.651587');
+INSERT INTO public.section_kpi_snapshots VALUES (15020, 15, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.652614');
+INSERT INTO public.section_kpi_snapshots VALUES (15021, 106, '2026-09-03 09:00:00', '{"_alarms": {}}', '2026-09-03 09:58:49.653688');
+INSERT INTO public.section_kpi_snapshots VALUES (15023, 20, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.008033');
+INSERT INTO public.section_kpi_snapshots VALUES (15024, 16, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.00926');
+INSERT INTO public.section_kpi_snapshots VALUES (15025, 21, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.010397');
+INSERT INTO public.section_kpi_snapshots VALUES (15049, 1, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.863024');
+INSERT INTO public.section_kpi_snapshots VALUES (15050, 20, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.874109');
+INSERT INTO public.section_kpi_snapshots VALUES (15051, 16, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.876162');
+INSERT INTO public.section_kpi_snapshots VALUES (15052, 21, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.878021');
+INSERT INTO public.section_kpi_snapshots VALUES (15053, 19, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.879819');
+INSERT INTO public.section_kpi_snapshots VALUES (15054, 85, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.88141');
+INSERT INTO public.section_kpi_snapshots VALUES (15055, 87, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.882976');
+INSERT INTO public.section_kpi_snapshots VALUES (15056, 4, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.884481');
+INSERT INTO public.section_kpi_snapshots VALUES (15057, 6, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.885905');
+INSERT INTO public.section_kpi_snapshots VALUES (15058, 7, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.887203');
+INSERT INTO public.section_kpi_snapshots VALUES (15059, 8, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.888451');
+INSERT INTO public.section_kpi_snapshots VALUES (15060, 9, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.889723');
+INSERT INTO public.section_kpi_snapshots VALUES (15061, 11, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.890843');
+INSERT INTO public.section_kpi_snapshots VALUES (15062, 12, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.891911');
+INSERT INTO public.section_kpi_snapshots VALUES (15063, 95, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.892898');
+INSERT INTO public.section_kpi_snapshots VALUES (15064, 14, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.893852');
+INSERT INTO public.section_kpi_snapshots VALUES (15065, 5, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.894808');
+INSERT INTO public.section_kpi_snapshots VALUES (15066, 10, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.895734');
+INSERT INTO public.section_kpi_snapshots VALUES (15067, 3, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.89666');
+INSERT INTO public.section_kpi_snapshots VALUES (15068, 100, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.897583');
+INSERT INTO public.section_kpi_snapshots VALUES (15069, 17, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.898487');
+INSERT INTO public.section_kpi_snapshots VALUES (15070, 18, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.899424');
+INSERT INTO public.section_kpi_snapshots VALUES (15071, 86, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.90045');
+INSERT INTO public.section_kpi_snapshots VALUES (15072, 104, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.901525');
+INSERT INTO public.section_kpi_snapshots VALUES (15073, 105, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.902531');
+INSERT INTO public.section_kpi_snapshots VALUES (15074, 15, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.903491');
+INSERT INTO public.section_kpi_snapshots VALUES (15075, 106, '2026-09-03 11:00:00', '{"_alarms": {}}', '2026-09-03 11:58:49.904412');
+INSERT INTO public.section_kpi_snapshots VALUES (15103, 1, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.981368');
+INSERT INTO public.section_kpi_snapshots VALUES (15104, 20, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.984448');
+INSERT INTO public.section_kpi_snapshots VALUES (15105, 16, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.98568');
+INSERT INTO public.section_kpi_snapshots VALUES (15106, 21, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.986861');
+INSERT INTO public.section_kpi_snapshots VALUES (15107, 19, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.98805');
+INSERT INTO public.section_kpi_snapshots VALUES (15108, 85, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.989222');
+INSERT INTO public.section_kpi_snapshots VALUES (15109, 87, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.990354');
+INSERT INTO public.section_kpi_snapshots VALUES (15110, 4, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.991417');
+INSERT INTO public.section_kpi_snapshots VALUES (15111, 6, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.992484');
+INSERT INTO public.section_kpi_snapshots VALUES (15112, 7, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.993528');
+INSERT INTO public.section_kpi_snapshots VALUES (15113, 8, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.994496');
+INSERT INTO public.section_kpi_snapshots VALUES (15114, 9, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.995494');
+INSERT INTO public.section_kpi_snapshots VALUES (15115, 11, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.996416');
+INSERT INTO public.section_kpi_snapshots VALUES (15116, 12, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.997338');
+INSERT INTO public.section_kpi_snapshots VALUES (15117, 95, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.998249');
+INSERT INTO public.section_kpi_snapshots VALUES (15118, 14, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:49.999152');
+INSERT INTO public.section_kpi_snapshots VALUES (15119, 5, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.000073');
+INSERT INTO public.section_kpi_snapshots VALUES (15120, 10, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.000984');
+INSERT INTO public.section_kpi_snapshots VALUES (15121, 3, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.001892');
+INSERT INTO public.section_kpi_snapshots VALUES (15122, 100, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.002805');
+INSERT INTO public.section_kpi_snapshots VALUES (15027, 85, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.012654');
+INSERT INTO public.section_kpi_snapshots VALUES (15028, 87, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.014951');
+INSERT INTO public.section_kpi_snapshots VALUES (15029, 4, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.015918');
+INSERT INTO public.section_kpi_snapshots VALUES (15030, 6, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.016912');
+INSERT INTO public.section_kpi_snapshots VALUES (15031, 7, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.017985');
+INSERT INTO public.section_kpi_snapshots VALUES (15033, 9, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.019978');
+INSERT INTO public.section_kpi_snapshots VALUES (15034, 11, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.021628');
+INSERT INTO public.section_kpi_snapshots VALUES (15035, 12, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.023011');
+INSERT INTO public.section_kpi_snapshots VALUES (15036, 95, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.024015');
+INSERT INTO public.section_kpi_snapshots VALUES (15037, 14, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.025045');
+INSERT INTO public.section_kpi_snapshots VALUES (15038, 5, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.026007');
+INSERT INTO public.section_kpi_snapshots VALUES (15039, 10, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.026965');
+INSERT INTO public.section_kpi_snapshots VALUES (15040, 3, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.028055');
+INSERT INTO public.section_kpi_snapshots VALUES (15041, 100, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.029121');
+INSERT INTO public.section_kpi_snapshots VALUES (15042, 17, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.030162');
+INSERT INTO public.section_kpi_snapshots VALUES (15043, 18, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.03119');
+INSERT INTO public.section_kpi_snapshots VALUES (15044, 86, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.032215');
+INSERT INTO public.section_kpi_snapshots VALUES (15045, 104, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.03563');
+INSERT INTO public.section_kpi_snapshots VALUES (15046, 105, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.038332');
+INSERT INTO public.section_kpi_snapshots VALUES (15047, 15, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.040439');
+INSERT INTO public.section_kpi_snapshots VALUES (15048, 106, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.042489');
+INSERT INTO public.section_kpi_snapshots VALUES (15076, 1, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.0151');
+INSERT INTO public.section_kpi_snapshots VALUES (15077, 20, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.018664');
+INSERT INTO public.section_kpi_snapshots VALUES (15078, 16, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.019881');
+INSERT INTO public.section_kpi_snapshots VALUES (15079, 21, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.021128');
+INSERT INTO public.section_kpi_snapshots VALUES (15081, 85, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.023736');
+INSERT INTO public.section_kpi_snapshots VALUES (15082, 87, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.025026');
+INSERT INTO public.section_kpi_snapshots VALUES (15083, 4, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.026211');
+INSERT INTO public.section_kpi_snapshots VALUES (15084, 6, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.027333');
+INSERT INTO public.section_kpi_snapshots VALUES (15085, 7, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.0285');
+INSERT INTO public.section_kpi_snapshots VALUES (15086, 8, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.029671');
+INSERT INTO public.section_kpi_snapshots VALUES (15087, 9, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.031201');
+INSERT INTO public.section_kpi_snapshots VALUES (15088, 11, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.032832');
+INSERT INTO public.section_kpi_snapshots VALUES (15089, 12, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.034073');
+INSERT INTO public.section_kpi_snapshots VALUES (15090, 95, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.035247');
+INSERT INTO public.section_kpi_snapshots VALUES (15091, 14, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.03629');
+INSERT INTO public.section_kpi_snapshots VALUES (15092, 5, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.037267');
+INSERT INTO public.section_kpi_snapshots VALUES (15093, 10, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.038228');
+INSERT INTO public.section_kpi_snapshots VALUES (15094, 3, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.039205');
+INSERT INTO public.section_kpi_snapshots VALUES (15095, 100, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.040191');
+INSERT INTO public.section_kpi_snapshots VALUES (15096, 17, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.041378');
+INSERT INTO public.section_kpi_snapshots VALUES (15097, 18, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.042611');
+INSERT INTO public.section_kpi_snapshots VALUES (15098, 86, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.043722');
+INSERT INTO public.section_kpi_snapshots VALUES (15099, 104, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.044823');
+INSERT INTO public.section_kpi_snapshots VALUES (15100, 105, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.04584');
+INSERT INTO public.section_kpi_snapshots VALUES (15102, 106, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.049093');
+INSERT INTO public.section_kpi_snapshots VALUES (15123, 17, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.003762');
+INSERT INTO public.section_kpi_snapshots VALUES (15124, 18, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.004994');
+INSERT INTO public.section_kpi_snapshots VALUES (15125, 86, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.005857');
+INSERT INTO public.section_kpi_snapshots VALUES (15126, 104, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.006747');
+INSERT INTO public.section_kpi_snapshots VALUES (15127, 105, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.007659');
+INSERT INTO public.section_kpi_snapshots VALUES (15128, 15, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.008558');
+INSERT INTO public.section_kpi_snapshots VALUES (15129, 106, '2026-09-03 13:00:00', '{"_alarms": {}}', '2026-09-03 13:58:50.009458');
+INSERT INTO public.section_kpi_snapshots VALUES (15130, 1, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.050964');
+INSERT INTO public.section_kpi_snapshots VALUES (15131, 20, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.054941');
+INSERT INTO public.section_kpi_snapshots VALUES (15132, 16, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.056269');
+INSERT INTO public.section_kpi_snapshots VALUES (15133, 21, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.057788');
+INSERT INTO public.section_kpi_snapshots VALUES (15134, 19, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.059081');
+INSERT INTO public.section_kpi_snapshots VALUES (15135, 85, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.06063');
+INSERT INTO public.section_kpi_snapshots VALUES (15136, 87, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.06167');
+INSERT INTO public.section_kpi_snapshots VALUES (15137, 4, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.062728');
+INSERT INTO public.section_kpi_snapshots VALUES (15138, 6, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.063684');
+INSERT INTO public.section_kpi_snapshots VALUES (15139, 7, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.064718');
+INSERT INTO public.section_kpi_snapshots VALUES (15140, 8, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.065703');
+INSERT INTO public.section_kpi_snapshots VALUES (15141, 9, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.066701');
+INSERT INTO public.section_kpi_snapshots VALUES (15142, 11, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.06774');
+INSERT INTO public.section_kpi_snapshots VALUES (15143, 12, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.068707');
+INSERT INTO public.section_kpi_snapshots VALUES (15144, 95, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.06965');
+INSERT INTO public.section_kpi_snapshots VALUES (15145, 14, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.071137');
+INSERT INTO public.section_kpi_snapshots VALUES (15146, 5, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.072189');
+INSERT INTO public.section_kpi_snapshots VALUES (15147, 10, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.073614');
+INSERT INTO public.section_kpi_snapshots VALUES (15148, 3, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.074917');
+INSERT INTO public.section_kpi_snapshots VALUES (15149, 100, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.07607');
+INSERT INTO public.section_kpi_snapshots VALUES (15150, 17, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.07714');
+INSERT INTO public.section_kpi_snapshots VALUES (15151, 18, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.078222');
+INSERT INTO public.section_kpi_snapshots VALUES (15152, 86, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.079289');
+INSERT INTO public.section_kpi_snapshots VALUES (15153, 104, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.080361');
+INSERT INTO public.section_kpi_snapshots VALUES (15154, 105, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.081439');
+INSERT INTO public.section_kpi_snapshots VALUES (15155, 15, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.08255');
+INSERT INTO public.section_kpi_snapshots VALUES (15156, 106, '2026-09-03 14:00:00', '{"_alarms": {}}', '2026-09-03 14:58:50.083661');
+INSERT INTO public.section_kpi_snapshots VALUES (15157, 1, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.923927');
+INSERT INTO public.section_kpi_snapshots VALUES (15158, 20, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.936633');
+INSERT INTO public.section_kpi_snapshots VALUES (15159, 16, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.938555');
+INSERT INTO public.section_kpi_snapshots VALUES (15160, 21, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.940342');
+INSERT INTO public.section_kpi_snapshots VALUES (15161, 19, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.942087');
+INSERT INTO public.section_kpi_snapshots VALUES (15162, 85, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.943669');
+INSERT INTO public.section_kpi_snapshots VALUES (15163, 87, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.945252');
+INSERT INTO public.section_kpi_snapshots VALUES (15164, 4, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.946907');
+INSERT INTO public.section_kpi_snapshots VALUES (15165, 6, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.948117');
+INSERT INTO public.section_kpi_snapshots VALUES (15166, 7, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.949353');
+INSERT INTO public.section_kpi_snapshots VALUES (15167, 8, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.950545');
+INSERT INTO public.section_kpi_snapshots VALUES (15168, 9, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.951803');
+INSERT INTO public.section_kpi_snapshots VALUES (15169, 11, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.952903');
+INSERT INTO public.section_kpi_snapshots VALUES (15170, 12, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.954044');
+INSERT INTO public.section_kpi_snapshots VALUES (15171, 95, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.955107');
+INSERT INTO public.section_kpi_snapshots VALUES (15172, 14, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.956181');
+INSERT INTO public.section_kpi_snapshots VALUES (15173, 5, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.95719');
+INSERT INTO public.section_kpi_snapshots VALUES (15174, 10, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.958229');
+INSERT INTO public.section_kpi_snapshots VALUES (15175, 3, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.959243');
+INSERT INTO public.section_kpi_snapshots VALUES (15176, 100, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.960227');
+INSERT INTO public.section_kpi_snapshots VALUES (15177, 17, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.961395');
+INSERT INTO public.section_kpi_snapshots VALUES (15178, 18, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.962508');
+INSERT INTO public.section_kpi_snapshots VALUES (15179, 86, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.963635');
+INSERT INTO public.section_kpi_snapshots VALUES (15180, 104, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.964711');
+INSERT INTO public.section_kpi_snapshots VALUES (15181, 105, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.965792');
+INSERT INTO public.section_kpi_snapshots VALUES (15182, 15, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.96687');
+INSERT INTO public.section_kpi_snapshots VALUES (15183, 106, '2026-09-03 15:00:00', '{"_alarms": {}}', '2026-09-03 15:58:49.967952');
+INSERT INTO public.section_kpi_snapshots VALUES (15184, 1, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.034672');
+INSERT INTO public.section_kpi_snapshots VALUES (15185, 20, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.03684');
+INSERT INTO public.section_kpi_snapshots VALUES (15186, 16, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.037757');
+INSERT INTO public.section_kpi_snapshots VALUES (15187, 21, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.03866');
+INSERT INTO public.section_kpi_snapshots VALUES (15188, 19, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.039535');
+INSERT INTO public.section_kpi_snapshots VALUES (15189, 85, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.040377');
+INSERT INTO public.section_kpi_snapshots VALUES (15190, 87, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.041224');
+INSERT INTO public.section_kpi_snapshots VALUES (15191, 4, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.042048');
+INSERT INTO public.section_kpi_snapshots VALUES (15192, 6, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.042955');
+INSERT INTO public.section_kpi_snapshots VALUES (15193, 7, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.043852');
+INSERT INTO public.section_kpi_snapshots VALUES (15194, 8, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.044734');
+INSERT INTO public.section_kpi_snapshots VALUES (15195, 9, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.045794');
+INSERT INTO public.section_kpi_snapshots VALUES (15196, 11, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.046654');
+INSERT INTO public.section_kpi_snapshots VALUES (15197, 12, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.047496');
+INSERT INTO public.section_kpi_snapshots VALUES (15198, 95, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.04832');
+INSERT INTO public.section_kpi_snapshots VALUES (15199, 14, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.049117');
+INSERT INTO public.section_kpi_snapshots VALUES (15200, 5, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.050026');
+INSERT INTO public.section_kpi_snapshots VALUES (15201, 10, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.050967');
+INSERT INTO public.section_kpi_snapshots VALUES (15202, 3, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.051892');
+INSERT INTO public.section_kpi_snapshots VALUES (15203, 100, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.052937');
+INSERT INTO public.section_kpi_snapshots VALUES (15204, 17, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.054022');
+INSERT INTO public.section_kpi_snapshots VALUES (15205, 18, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.055045');
+INSERT INTO public.section_kpi_snapshots VALUES (15206, 86, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.056105');
+INSERT INTO public.section_kpi_snapshots VALUES (15207, 104, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.057066');
+INSERT INTO public.section_kpi_snapshots VALUES (15208, 105, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.057935');
+INSERT INTO public.section_kpi_snapshots VALUES (15209, 15, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.058771');
+INSERT INTO public.section_kpi_snapshots VALUES (15210, 106, '2026-09-03 16:00:00', '{"_alarms": {}}', '2026-09-03 16:58:50.059581');
+INSERT INTO public.section_kpi_snapshots VALUES (15211, 1, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.120457');
+INSERT INTO public.section_kpi_snapshots VALUES (15212, 20, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.123523');
+INSERT INTO public.section_kpi_snapshots VALUES (15213, 16, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.124851');
+INSERT INTO public.section_kpi_snapshots VALUES (15214, 21, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.126011');
+INSERT INTO public.section_kpi_snapshots VALUES (15215, 19, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.127188');
+INSERT INTO public.section_kpi_snapshots VALUES (15216, 85, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.128494');
+INSERT INTO public.section_kpi_snapshots VALUES (15217, 87, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.129671');
+INSERT INTO public.section_kpi_snapshots VALUES (15218, 4, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.131088');
+INSERT INTO public.section_kpi_snapshots VALUES (15219, 6, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.132501');
+INSERT INTO public.section_kpi_snapshots VALUES (15220, 7, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.133749');
+INSERT INTO public.section_kpi_snapshots VALUES (15221, 8, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.135149');
+INSERT INTO public.section_kpi_snapshots VALUES (15222, 9, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.136289');
+INSERT INTO public.section_kpi_snapshots VALUES (15223, 11, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.137356');
+INSERT INTO public.section_kpi_snapshots VALUES (15224, 12, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.138436');
+INSERT INTO public.section_kpi_snapshots VALUES (15225, 95, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.139517');
+INSERT INTO public.section_kpi_snapshots VALUES (15226, 14, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.140567');
+INSERT INTO public.section_kpi_snapshots VALUES (15227, 5, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.141602');
+INSERT INTO public.section_kpi_snapshots VALUES (15228, 10, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.142653');
+INSERT INTO public.section_kpi_snapshots VALUES (15229, 3, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.143619');
+INSERT INTO public.section_kpi_snapshots VALUES (15230, 100, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.144713');
+INSERT INTO public.section_kpi_snapshots VALUES (15231, 17, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.14575');
+INSERT INTO public.section_kpi_snapshots VALUES (15232, 18, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.146831');
+INSERT INTO public.section_kpi_snapshots VALUES (15233, 86, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.147951');
+INSERT INTO public.section_kpi_snapshots VALUES (15234, 104, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.149104');
+INSERT INTO public.section_kpi_snapshots VALUES (15235, 105, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.150142');
+INSERT INTO public.section_kpi_snapshots VALUES (15236, 15, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.151235');
+INSERT INTO public.section_kpi_snapshots VALUES (15237, 106, '2026-09-03 17:00:00', '{"_alarms": {}}', '2026-09-03 17:58:50.152328');
+INSERT INTO public.section_kpi_snapshots VALUES (15238, 1, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.854992');
+INSERT INTO public.section_kpi_snapshots VALUES (15239, 20, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.860129');
+INSERT INTO public.section_kpi_snapshots VALUES (15240, 16, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.862379');
+INSERT INTO public.section_kpi_snapshots VALUES (15241, 21, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.864338');
+INSERT INTO public.section_kpi_snapshots VALUES (15242, 19, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.866161');
+INSERT INTO public.section_kpi_snapshots VALUES (15243, 85, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.867849');
+INSERT INTO public.section_kpi_snapshots VALUES (15244, 87, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.869501');
+INSERT INTO public.section_kpi_snapshots VALUES (15245, 4, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.871207');
+INSERT INTO public.section_kpi_snapshots VALUES (15246, 6, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.872862');
+INSERT INTO public.section_kpi_snapshots VALUES (15247, 7, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.874446');
+INSERT INTO public.section_kpi_snapshots VALUES (15248, 8, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.876034');
+INSERT INTO public.section_kpi_snapshots VALUES (15249, 9, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.877651');
+INSERT INTO public.section_kpi_snapshots VALUES (15250, 11, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.879364');
+INSERT INTO public.section_kpi_snapshots VALUES (15251, 12, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.881182');
+INSERT INTO public.section_kpi_snapshots VALUES (15252, 95, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.882803');
+INSERT INTO public.section_kpi_snapshots VALUES (15253, 14, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.884538');
+INSERT INTO public.section_kpi_snapshots VALUES (15254, 5, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.886277');
+INSERT INTO public.section_kpi_snapshots VALUES (15255, 10, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.88792');
+INSERT INTO public.section_kpi_snapshots VALUES (15256, 3, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.889691');
+INSERT INTO public.section_kpi_snapshots VALUES (15257, 100, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.891451');
+INSERT INTO public.section_kpi_snapshots VALUES (15258, 17, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.893046');
+INSERT INTO public.section_kpi_snapshots VALUES (15259, 18, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.894755');
+INSERT INTO public.section_kpi_snapshots VALUES (15260, 86, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.896331');
+INSERT INTO public.section_kpi_snapshots VALUES (15261, 104, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.897984');
+INSERT INTO public.section_kpi_snapshots VALUES (15262, 105, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.899592');
+INSERT INTO public.section_kpi_snapshots VALUES (15263, 15, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.901124');
+INSERT INTO public.section_kpi_snapshots VALUES (15264, 106, '2026-09-03 18:00:00', '{"_alarms": {}}', '2026-09-03 18:00:42.902745');
+INSERT INTO public.section_kpi_snapshots VALUES (15265, 1, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.21038');
+INSERT INTO public.section_kpi_snapshots VALUES (15266, 20, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.238967');
+INSERT INTO public.section_kpi_snapshots VALUES (15267, 16, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.24238');
+INSERT INTO public.section_kpi_snapshots VALUES (15268, 21, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.244411');
+INSERT INTO public.section_kpi_snapshots VALUES (15269, 19, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.246217');
+INSERT INTO public.section_kpi_snapshots VALUES (15270, 85, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.247834');
+INSERT INTO public.section_kpi_snapshots VALUES (15271, 87, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.249579');
+INSERT INTO public.section_kpi_snapshots VALUES (15272, 4, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.251428');
+INSERT INTO public.section_kpi_snapshots VALUES (15273, 6, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.253214');
+INSERT INTO public.section_kpi_snapshots VALUES (15274, 7, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.255394');
+INSERT INTO public.section_kpi_snapshots VALUES (15275, 8, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.257515');
+INSERT INTO public.section_kpi_snapshots VALUES (15276, 9, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.259421');
+INSERT INTO public.section_kpi_snapshots VALUES (15277, 11, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.260937');
+INSERT INTO public.section_kpi_snapshots VALUES (15278, 12, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.262312');
+INSERT INTO public.section_kpi_snapshots VALUES (15279, 95, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.263617');
+INSERT INTO public.section_kpi_snapshots VALUES (15280, 14, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.265246');
+INSERT INTO public.section_kpi_snapshots VALUES (15281, 5, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.266592');
+INSERT INTO public.section_kpi_snapshots VALUES (15282, 10, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.26787');
+INSERT INTO public.section_kpi_snapshots VALUES (15283, 3, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.269069');
+INSERT INTO public.section_kpi_snapshots VALUES (15284, 100, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.270428');
+INSERT INTO public.section_kpi_snapshots VALUES (15285, 17, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.271843');
+INSERT INTO public.section_kpi_snapshots VALUES (15286, 18, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.273062');
+INSERT INTO public.section_kpi_snapshots VALUES (15287, 86, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.274606');
+INSERT INTO public.section_kpi_snapshots VALUES (15288, 104, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.276454');
+INSERT INTO public.section_kpi_snapshots VALUES (15289, 105, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.277883');
+INSERT INTO public.section_kpi_snapshots VALUES (15290, 15, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.279231');
+INSERT INTO public.section_kpi_snapshots VALUES (15291, 106, '2026-09-04 09:00:00', '{"_alarms": {}}', '2026-09-04 09:15:03.280537');
+INSERT INTO public.section_kpi_snapshots VALUES (15022, 1, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.003201');
+INSERT INTO public.section_kpi_snapshots VALUES (15026, 19, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.011468');
+INSERT INTO public.section_kpi_snapshots VALUES (15032, 8, '2026-09-03 10:00:00', '{"_alarms": {}}', '2026-09-03 10:58:50.01899');
+INSERT INTO public.section_kpi_snapshots VALUES (15319, 1, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.092451');
+INSERT INTO public.section_kpi_snapshots VALUES (15320, 20, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.095726');
+INSERT INTO public.section_kpi_snapshots VALUES (15321, 16, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.09692');
+INSERT INTO public.section_kpi_snapshots VALUES (15322, 21, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.09808');
+INSERT INTO public.section_kpi_snapshots VALUES (15323, 19, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.099302');
+INSERT INTO public.section_kpi_snapshots VALUES (15324, 85, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.101398');
+INSERT INTO public.section_kpi_snapshots VALUES (15325, 87, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.102994');
+INSERT INTO public.section_kpi_snapshots VALUES (15326, 4, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.10427');
+INSERT INTO public.section_kpi_snapshots VALUES (15327, 6, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.105586');
+INSERT INTO public.section_kpi_snapshots VALUES (15328, 7, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.107097');
+INSERT INTO public.section_kpi_snapshots VALUES (15329, 8, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.108287');
+INSERT INTO public.section_kpi_snapshots VALUES (15330, 9, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.109378');
+INSERT INTO public.section_kpi_snapshots VALUES (15331, 11, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.110544');
+INSERT INTO public.section_kpi_snapshots VALUES (15332, 12, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.111769');
+INSERT INTO public.section_kpi_snapshots VALUES (15333, 95, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.11303');
+INSERT INTO public.section_kpi_snapshots VALUES (15334, 14, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.114261');
+INSERT INTO public.section_kpi_snapshots VALUES (15335, 5, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.115458');
+INSERT INTO public.section_kpi_snapshots VALUES (15336, 10, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.117607');
+INSERT INTO public.section_kpi_snapshots VALUES (15337, 3, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.119417');
+INSERT INTO public.section_kpi_snapshots VALUES (15338, 100, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.120652');
+INSERT INTO public.section_kpi_snapshots VALUES (15339, 17, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.122032');
+INSERT INTO public.section_kpi_snapshots VALUES (15340, 18, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.123384');
+INSERT INTO public.section_kpi_snapshots VALUES (15341, 86, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.124676');
+INSERT INTO public.section_kpi_snapshots VALUES (15342, 104, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.126549');
+INSERT INTO public.section_kpi_snapshots VALUES (15343, 105, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.127725');
+INSERT INTO public.section_kpi_snapshots VALUES (15344, 15, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.128891');
+INSERT INTO public.section_kpi_snapshots VALUES (15345, 106, '2026-09-04 11:00:00', '{"_alarms": {}}', '2026-09-04 11:14:57.130396');
+INSERT INTO public.section_kpi_snapshots VALUES (15346, 1, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.089257');
+INSERT INTO public.section_kpi_snapshots VALUES (15347, 20, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.092791');
+INSERT INTO public.section_kpi_snapshots VALUES (15348, 16, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.094173');
+INSERT INTO public.section_kpi_snapshots VALUES (15349, 21, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.095458');
+INSERT INTO public.section_kpi_snapshots VALUES (15350, 19, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.09679');
+INSERT INTO public.section_kpi_snapshots VALUES (15351, 85, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.098063');
+INSERT INTO public.section_kpi_snapshots VALUES (15352, 87, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.099345');
+INSERT INTO public.section_kpi_snapshots VALUES (15353, 4, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.101028');
+INSERT INTO public.section_kpi_snapshots VALUES (15354, 6, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.102604');
+INSERT INTO public.section_kpi_snapshots VALUES (15355, 7, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.103961');
+INSERT INTO public.section_kpi_snapshots VALUES (15356, 8, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.105367');
+INSERT INTO public.section_kpi_snapshots VALUES (15357, 9, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.106622');
+INSERT INTO public.section_kpi_snapshots VALUES (15358, 11, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.107885');
+INSERT INTO public.section_kpi_snapshots VALUES (15359, 12, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.109142');
+INSERT INTO public.section_kpi_snapshots VALUES (15360, 95, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.110387');
+INSERT INTO public.section_kpi_snapshots VALUES (15361, 14, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.111688');
+INSERT INTO public.section_kpi_snapshots VALUES (15362, 5, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.112969');
+INSERT INTO public.section_kpi_snapshots VALUES (15363, 10, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.114203');
+INSERT INTO public.section_kpi_snapshots VALUES (15364, 3, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.115527');
+INSERT INTO public.section_kpi_snapshots VALUES (15365, 100, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.116751');
+INSERT INTO public.section_kpi_snapshots VALUES (15366, 17, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.118511');
+INSERT INTO public.section_kpi_snapshots VALUES (15367, 18, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.120049');
+INSERT INTO public.section_kpi_snapshots VALUES (15368, 86, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.121331');
+INSERT INTO public.section_kpi_snapshots VALUES (15369, 104, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.122525');
+INSERT INTO public.section_kpi_snapshots VALUES (15370, 105, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.123655');
+INSERT INTO public.section_kpi_snapshots VALUES (15371, 15, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.124833');
+INSERT INTO public.section_kpi_snapshots VALUES (15372, 106, '2026-09-04 12:00:00', '{"_alarms": {}}', '2026-09-04 12:14:57.126035');
+INSERT INTO public.section_kpi_snapshots VALUES (15080, 19, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.022387');
+INSERT INTO public.section_kpi_snapshots VALUES (15101, 15, '2026-09-03 12:00:00', '{"_alarms": {}}', '2026-09-03 12:58:50.046834');
+INSERT INTO public.section_kpi_snapshots VALUES (15400, 1, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.709241');
+INSERT INTO public.section_kpi_snapshots VALUES (15401, 20, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.712708');
+INSERT INTO public.section_kpi_snapshots VALUES (15402, 16, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.714039');
+INSERT INTO public.section_kpi_snapshots VALUES (15403, 21, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.715279');
+INSERT INTO public.section_kpi_snapshots VALUES (15404, 19, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.716561');
+INSERT INTO public.section_kpi_snapshots VALUES (15405, 85, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.717797');
+INSERT INTO public.section_kpi_snapshots VALUES (15406, 87, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.71903');
+INSERT INTO public.section_kpi_snapshots VALUES (15407, 4, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.720219');
+INSERT INTO public.section_kpi_snapshots VALUES (15408, 6, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.721381');
+INSERT INTO public.section_kpi_snapshots VALUES (15409, 7, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.722497');
+INSERT INTO public.section_kpi_snapshots VALUES (15410, 8, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.723676');
+INSERT INTO public.section_kpi_snapshots VALUES (15411, 9, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.724752');
+INSERT INTO public.section_kpi_snapshots VALUES (15412, 11, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.725966');
+INSERT INTO public.section_kpi_snapshots VALUES (15413, 12, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.727103');
+INSERT INTO public.section_kpi_snapshots VALUES (15414, 95, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.728253');
+INSERT INTO public.section_kpi_snapshots VALUES (15415, 14, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.729329');
+INSERT INTO public.section_kpi_snapshots VALUES (15416, 5, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.730416');
+INSERT INTO public.section_kpi_snapshots VALUES (15417, 10, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.732037');
+INSERT INTO public.section_kpi_snapshots VALUES (15418, 3, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.733238');
+INSERT INTO public.section_kpi_snapshots VALUES (15419, 100, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.734333');
+INSERT INTO public.section_kpi_snapshots VALUES (15420, 17, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.735426');
+INSERT INTO public.section_kpi_snapshots VALUES (15421, 18, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.736515');
+INSERT INTO public.section_kpi_snapshots VALUES (15422, 86, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.737584');
+INSERT INTO public.section_kpi_snapshots VALUES (15423, 104, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.738656');
+INSERT INTO public.section_kpi_snapshots VALUES (15424, 105, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.740488');
+INSERT INTO public.section_kpi_snapshots VALUES (15425, 15, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.74161');
+INSERT INTO public.section_kpi_snapshots VALUES (15426, 106, '2026-09-04 13:00:00', '{"_alarms": {}}', '2026-09-04 13:59:30.742733');
+INSERT INTO public.section_kpi_snapshots VALUES (15427, 1, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.671581');
+INSERT INTO public.section_kpi_snapshots VALUES (15428, 20, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.676677');
+INSERT INTO public.section_kpi_snapshots VALUES (15429, 16, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.678381');
+INSERT INTO public.section_kpi_snapshots VALUES (15430, 21, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.679896');
+INSERT INTO public.section_kpi_snapshots VALUES (15431, 19, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.681168');
+INSERT INTO public.section_kpi_snapshots VALUES (15432, 85, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.682297');
+INSERT INTO public.section_kpi_snapshots VALUES (15433, 87, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.683406');
+INSERT INTO public.section_kpi_snapshots VALUES (15434, 4, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.684557');
+INSERT INTO public.section_kpi_snapshots VALUES (15435, 6, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.685662');
+INSERT INTO public.section_kpi_snapshots VALUES (15436, 7, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.686734');
+INSERT INTO public.section_kpi_snapshots VALUES (15437, 8, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.687852');
+INSERT INTO public.section_kpi_snapshots VALUES (15438, 9, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.689014');
+INSERT INTO public.section_kpi_snapshots VALUES (15439, 11, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.690263');
+INSERT INTO public.section_kpi_snapshots VALUES (15440, 12, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.691642');
+INSERT INTO public.section_kpi_snapshots VALUES (15441, 95, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.692802');
+INSERT INTO public.section_kpi_snapshots VALUES (15442, 14, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.694181');
+INSERT INTO public.section_kpi_snapshots VALUES (15443, 5, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.695274');
+INSERT INTO public.section_kpi_snapshots VALUES (15444, 10, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.696373');
+INSERT INTO public.section_kpi_snapshots VALUES (15445, 3, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.697465');
+INSERT INTO public.section_kpi_snapshots VALUES (15446, 100, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.6985');
+INSERT INTO public.section_kpi_snapshots VALUES (15447, 17, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.699553');
+INSERT INTO public.section_kpi_snapshots VALUES (15448, 18, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.700529');
+INSERT INTO public.section_kpi_snapshots VALUES (15449, 86, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.701559');
+INSERT INTO public.section_kpi_snapshots VALUES (15450, 104, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.702636');
+INSERT INTO public.section_kpi_snapshots VALUES (15451, 105, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.703899');
+INSERT INTO public.section_kpi_snapshots VALUES (15452, 15, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.705121');
+INSERT INTO public.section_kpi_snapshots VALUES (15453, 106, '2026-09-04 14:00:00', '{"_alarms": {}}', '2026-09-04 14:02:06.708373');
+INSERT INTO public.section_kpi_snapshots VALUES (15454, 1, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.752014');
+INSERT INTO public.section_kpi_snapshots VALUES (15455, 20, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.755717');
+INSERT INTO public.section_kpi_snapshots VALUES (15456, 16, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.757199');
+INSERT INTO public.section_kpi_snapshots VALUES (15457, 21, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.758538');
+INSERT INTO public.section_kpi_snapshots VALUES (15458, 19, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.75989');
+INSERT INTO public.section_kpi_snapshots VALUES (15459, 85, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.761132');
+INSERT INTO public.section_kpi_snapshots VALUES (15460, 87, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.762308');
+INSERT INTO public.section_kpi_snapshots VALUES (15461, 4, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.763457');
+INSERT INTO public.section_kpi_snapshots VALUES (15462, 6, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.764566');
+INSERT INTO public.section_kpi_snapshots VALUES (15463, 7, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.765598');
+INSERT INTO public.section_kpi_snapshots VALUES (15464, 8, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.767456');
+INSERT INTO public.section_kpi_snapshots VALUES (15465, 9, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.768498');
+INSERT INTO public.section_kpi_snapshots VALUES (15466, 11, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.769519');
+INSERT INTO public.section_kpi_snapshots VALUES (15467, 12, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.770535');
+INSERT INTO public.section_kpi_snapshots VALUES (15468, 95, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.771542');
+INSERT INTO public.section_kpi_snapshots VALUES (15469, 14, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.77256');
+INSERT INTO public.section_kpi_snapshots VALUES (15470, 5, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.773766');
+INSERT INTO public.section_kpi_snapshots VALUES (15471, 10, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.774878');
+INSERT INTO public.section_kpi_snapshots VALUES (15472, 3, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.775992');
+INSERT INTO public.section_kpi_snapshots VALUES (15473, 100, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.777032');
+INSERT INTO public.section_kpi_snapshots VALUES (15474, 17, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.778121');
+INSERT INTO public.section_kpi_snapshots VALUES (15475, 18, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.779168');
+INSERT INTO public.section_kpi_snapshots VALUES (15476, 86, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.780161');
+INSERT INTO public.section_kpi_snapshots VALUES (15477, 104, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.78117');
+INSERT INTO public.section_kpi_snapshots VALUES (15478, 105, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.782181');
+INSERT INTO public.section_kpi_snapshots VALUES (15479, 15, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.783423');
+INSERT INTO public.section_kpi_snapshots VALUES (15480, 106, '2026-09-04 15:00:00', '{"_alarms": {}}', '2026-09-04 15:02:01.784435');
+INSERT INTO public.section_kpi_snapshots VALUES (15481, 1, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.75553');
+INSERT INTO public.section_kpi_snapshots VALUES (15482, 20, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.759575');
+INSERT INTO public.section_kpi_snapshots VALUES (15483, 16, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.760887');
+INSERT INTO public.section_kpi_snapshots VALUES (15484, 21, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.762076');
+INSERT INTO public.section_kpi_snapshots VALUES (15485, 19, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.763244');
+INSERT INTO public.section_kpi_snapshots VALUES (15486, 85, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.764367');
+INSERT INTO public.section_kpi_snapshots VALUES (15487, 87, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.765468');
+INSERT INTO public.section_kpi_snapshots VALUES (15488, 4, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.766515');
+INSERT INTO public.section_kpi_snapshots VALUES (15489, 6, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.767561');
+INSERT INTO public.section_kpi_snapshots VALUES (15490, 7, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.768603');
+INSERT INTO public.section_kpi_snapshots VALUES (15491, 8, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.769752');
+INSERT INTO public.section_kpi_snapshots VALUES (15492, 9, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.770795');
+INSERT INTO public.section_kpi_snapshots VALUES (15493, 11, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.771996');
+INSERT INTO public.section_kpi_snapshots VALUES (15494, 12, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.773868');
+INSERT INTO public.section_kpi_snapshots VALUES (15495, 95, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.775777');
+INSERT INTO public.section_kpi_snapshots VALUES (15496, 14, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.777015');
+INSERT INTO public.section_kpi_snapshots VALUES (15497, 5, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.778387');
+INSERT INTO public.section_kpi_snapshots VALUES (15498, 10, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.779441');
+INSERT INTO public.section_kpi_snapshots VALUES (15499, 3, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.780685');
+INSERT INTO public.section_kpi_snapshots VALUES (15500, 100, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.781879');
+INSERT INTO public.section_kpi_snapshots VALUES (15501, 17, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.783064');
+INSERT INTO public.section_kpi_snapshots VALUES (15502, 18, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.784231');
+INSERT INTO public.section_kpi_snapshots VALUES (15503, 86, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.785403');
+INSERT INTO public.section_kpi_snapshots VALUES (15504, 104, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.78663');
+INSERT INTO public.section_kpi_snapshots VALUES (15505, 105, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.787848');
+INSERT INTO public.section_kpi_snapshots VALUES (15506, 15, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.789255');
+INSERT INTO public.section_kpi_snapshots VALUES (15507, 106, '2026-09-04 16:00:00', '{"_alarms": {}}', '2026-09-04 16:02:01.790816');
+INSERT INTO public.section_kpi_snapshots VALUES (15508, 1, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.675903');
+INSERT INTO public.section_kpi_snapshots VALUES (15509, 20, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.67901');
+INSERT INTO public.section_kpi_snapshots VALUES (15510, 16, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.680367');
+INSERT INTO public.section_kpi_snapshots VALUES (15511, 21, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.681576');
+INSERT INTO public.section_kpi_snapshots VALUES (15512, 19, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.682782');
+INSERT INTO public.section_kpi_snapshots VALUES (15513, 85, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.68397');
+INSERT INTO public.section_kpi_snapshots VALUES (15514, 87, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.68516');
+INSERT INTO public.section_kpi_snapshots VALUES (15515, 4, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.686259');
+INSERT INTO public.section_kpi_snapshots VALUES (15516, 6, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.687379');
+INSERT INTO public.section_kpi_snapshots VALUES (15517, 7, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.68847');
+INSERT INTO public.section_kpi_snapshots VALUES (15518, 8, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.689655');
+INSERT INTO public.section_kpi_snapshots VALUES (15519, 9, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.690738');
+INSERT INTO public.section_kpi_snapshots VALUES (15520, 11, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.691823');
+INSERT INTO public.section_kpi_snapshots VALUES (15521, 12, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.692907');
+INSERT INTO public.section_kpi_snapshots VALUES (15522, 95, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.693976');
+INSERT INTO public.section_kpi_snapshots VALUES (15523, 14, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.695071');
+INSERT INTO public.section_kpi_snapshots VALUES (15524, 5, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.696161');
+INSERT INTO public.section_kpi_snapshots VALUES (15525, 10, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.697224');
+INSERT INTO public.section_kpi_snapshots VALUES (15526, 3, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.698337');
+INSERT INTO public.section_kpi_snapshots VALUES (15527, 100, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.699324');
+INSERT INTO public.section_kpi_snapshots VALUES (15528, 17, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.700539');
+INSERT INTO public.section_kpi_snapshots VALUES (15529, 18, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.701546');
+INSERT INTO public.section_kpi_snapshots VALUES (15530, 86, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.702536');
+INSERT INTO public.section_kpi_snapshots VALUES (15531, 104, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.703511');
+INSERT INTO public.section_kpi_snapshots VALUES (15532, 105, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.704501');
+INSERT INTO public.section_kpi_snapshots VALUES (15533, 15, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.705482');
+INSERT INTO public.section_kpi_snapshots VALUES (15534, 106, '2026-09-04 17:00:00', '{"_alarms": {}}', '2026-09-04 17:02:01.70646');
+INSERT INTO public.section_kpi_snapshots VALUES (15535, 1, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.940673');
+INSERT INTO public.section_kpi_snapshots VALUES (15536, 20, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.944101');
+INSERT INTO public.section_kpi_snapshots VALUES (15537, 16, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.945312');
+INSERT INTO public.section_kpi_snapshots VALUES (15538, 21, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.946558');
+INSERT INTO public.section_kpi_snapshots VALUES (15539, 19, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.947731');
+INSERT INTO public.section_kpi_snapshots VALUES (15540, 85, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.948938');
+INSERT INTO public.section_kpi_snapshots VALUES (15541, 87, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.950117');
+INSERT INTO public.section_kpi_snapshots VALUES (15542, 4, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.95127');
+INSERT INTO public.section_kpi_snapshots VALUES (15543, 6, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.9524');
+INSERT INTO public.section_kpi_snapshots VALUES (15544, 7, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.953477');
+INSERT INTO public.section_kpi_snapshots VALUES (15545, 8, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.954602');
+INSERT INTO public.section_kpi_snapshots VALUES (15546, 9, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.955858');
+INSERT INTO public.section_kpi_snapshots VALUES (15547, 11, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.957085');
+INSERT INTO public.section_kpi_snapshots VALUES (15548, 12, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.958911');
+INSERT INTO public.section_kpi_snapshots VALUES (15549, 95, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.960203');
+INSERT INTO public.section_kpi_snapshots VALUES (15550, 14, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.961291');
+INSERT INTO public.section_kpi_snapshots VALUES (15551, 5, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.962278');
+INSERT INTO public.section_kpi_snapshots VALUES (15552, 10, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.963295');
+INSERT INTO public.section_kpi_snapshots VALUES (15553, 3, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.964285');
+INSERT INTO public.section_kpi_snapshots VALUES (15554, 100, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.965253');
+INSERT INTO public.section_kpi_snapshots VALUES (15555, 17, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.966212');
+INSERT INTO public.section_kpi_snapshots VALUES (15556, 18, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.967167');
+INSERT INTO public.section_kpi_snapshots VALUES (15557, 86, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.968149');
+INSERT INTO public.section_kpi_snapshots VALUES (15558, 104, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.969105');
+INSERT INTO public.section_kpi_snapshots VALUES (15559, 105, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.970086');
+INSERT INTO public.section_kpi_snapshots VALUES (15560, 15, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.97109');
+INSERT INTO public.section_kpi_snapshots VALUES (15561, 106, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.972886');
+INSERT INTO public.section_kpi_snapshots VALUES (15562, 140, '2026-09-04 18:00:00', '{"_alarms": {}}', '2026-09-04 18:02:01.974514');
+INSERT INTO public.section_kpi_snapshots VALUES (15563, 1, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.604467');
+INSERT INTO public.section_kpi_snapshots VALUES (15564, 20, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.607467');
+INSERT INTO public.section_kpi_snapshots VALUES (15565, 16, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.608845');
+INSERT INTO public.section_kpi_snapshots VALUES (15566, 21, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.61019');
+INSERT INTO public.section_kpi_snapshots VALUES (15567, 19, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.611486');
+INSERT INTO public.section_kpi_snapshots VALUES (15568, 85, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.612786');
+INSERT INTO public.section_kpi_snapshots VALUES (15569, 87, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.614082');
+INSERT INTO public.section_kpi_snapshots VALUES (15570, 4, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.615335');
+INSERT INTO public.section_kpi_snapshots VALUES (15571, 6, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.616637');
+INSERT INTO public.section_kpi_snapshots VALUES (15572, 7, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.617832');
+INSERT INTO public.section_kpi_snapshots VALUES (15573, 8, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.619054');
+INSERT INTO public.section_kpi_snapshots VALUES (15574, 9, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.620247');
+INSERT INTO public.section_kpi_snapshots VALUES (15575, 11, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.621428');
+INSERT INTO public.section_kpi_snapshots VALUES (15576, 12, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.622585');
+INSERT INTO public.section_kpi_snapshots VALUES (15577, 95, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.623725');
+INSERT INTO public.section_kpi_snapshots VALUES (15578, 14, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.625284');
+INSERT INTO public.section_kpi_snapshots VALUES (15579, 5, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.62665');
+INSERT INTO public.section_kpi_snapshots VALUES (15580, 10, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.627735');
+INSERT INTO public.section_kpi_snapshots VALUES (15581, 3, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.628806');
+INSERT INTO public.section_kpi_snapshots VALUES (15582, 100, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.629898');
+INSERT INTO public.section_kpi_snapshots VALUES (15583, 17, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.630957');
+INSERT INTO public.section_kpi_snapshots VALUES (15584, 18, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.632076');
+INSERT INTO public.section_kpi_snapshots VALUES (15585, 86, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.633149');
+INSERT INTO public.section_kpi_snapshots VALUES (15586, 104, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.63424');
+INSERT INTO public.section_kpi_snapshots VALUES (15587, 105, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.635251');
+INSERT INTO public.section_kpi_snapshots VALUES (15588, 15, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.636261');
+INSERT INTO public.section_kpi_snapshots VALUES (15589, 106, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.637331');
+INSERT INTO public.section_kpi_snapshots VALUES (15590, 140, '2026-09-04 19:00:00', '{"_alarms": {}}', '2026-09-04 19:02:04.638329');
+INSERT INTO public.section_kpi_snapshots VALUES (15591, 1, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.242632');
+INSERT INTO public.section_kpi_snapshots VALUES (15592, 20, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.271279');
+INSERT INTO public.section_kpi_snapshots VALUES (15593, 16, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.273182');
+INSERT INTO public.section_kpi_snapshots VALUES (15594, 21, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.274999');
+INSERT INTO public.section_kpi_snapshots VALUES (15595, 19, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.276709');
+INSERT INTO public.section_kpi_snapshots VALUES (15596, 85, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.278351');
+INSERT INTO public.section_kpi_snapshots VALUES (15597, 87, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.280181');
+INSERT INTO public.section_kpi_snapshots VALUES (15598, 4, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.282316');
+INSERT INTO public.section_kpi_snapshots VALUES (15599, 6, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.284077');
+INSERT INTO public.section_kpi_snapshots VALUES (15600, 7, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.285703');
+INSERT INTO public.section_kpi_snapshots VALUES (15601, 8, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.287386');
+INSERT INTO public.section_kpi_snapshots VALUES (15602, 9, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.289317');
+INSERT INTO public.section_kpi_snapshots VALUES (15603, 11, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.290636');
+INSERT INTO public.section_kpi_snapshots VALUES (15604, 12, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.29212');
+INSERT INTO public.section_kpi_snapshots VALUES (15605, 95, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.293894');
+INSERT INTO public.section_kpi_snapshots VALUES (15606, 14, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.296219');
+INSERT INTO public.section_kpi_snapshots VALUES (15607, 5, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.297898');
+INSERT INTO public.section_kpi_snapshots VALUES (15608, 10, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.363879');
+INSERT INTO public.section_kpi_snapshots VALUES (15609, 3, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.369438');
+INSERT INTO public.section_kpi_snapshots VALUES (15610, 100, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.37479');
+INSERT INTO public.section_kpi_snapshots VALUES (15611, 17, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.379349');
+INSERT INTO public.section_kpi_snapshots VALUES (15612, 18, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.383338');
+INSERT INTO public.section_kpi_snapshots VALUES (15613, 86, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.386418');
+INSERT INTO public.section_kpi_snapshots VALUES (15614, 104, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.390024');
+INSERT INTO public.section_kpi_snapshots VALUES (15615, 105, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.392796');
+INSERT INTO public.section_kpi_snapshots VALUES (15616, 15, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.395245');
+INSERT INTO public.section_kpi_snapshots VALUES (15617, 106, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.397501');
+INSERT INTO public.section_kpi_snapshots VALUES (15618, 140, '2026-09-05 09:00:00', '{"_alarms": {}}', '2026-09-05 09:08:50.398987');
+INSERT INTO public.section_kpi_snapshots VALUES (15619, 1, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.105314');
+INSERT INTO public.section_kpi_snapshots VALUES (15620, 20, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.108723');
+INSERT INTO public.section_kpi_snapshots VALUES (15621, 16, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.109911');
+INSERT INTO public.section_kpi_snapshots VALUES (15622, 21, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.11105');
+INSERT INTO public.section_kpi_snapshots VALUES (15623, 19, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.11215');
+INSERT INTO public.section_kpi_snapshots VALUES (15624, 85, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.113247');
+INSERT INTO public.section_kpi_snapshots VALUES (15625, 87, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.114334');
+INSERT INTO public.section_kpi_snapshots VALUES (15626, 4, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.115712');
+INSERT INTO public.section_kpi_snapshots VALUES (15627, 6, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.116835');
+INSERT INTO public.section_kpi_snapshots VALUES (15628, 7, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.117891');
+INSERT INTO public.section_kpi_snapshots VALUES (15629, 8, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.118956');
+INSERT INTO public.section_kpi_snapshots VALUES (15630, 9, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.120161');
+INSERT INTO public.section_kpi_snapshots VALUES (15631, 11, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.121208');
+INSERT INTO public.section_kpi_snapshots VALUES (15632, 12, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.12224');
+INSERT INTO public.section_kpi_snapshots VALUES (15633, 95, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.123306');
+INSERT INTO public.section_kpi_snapshots VALUES (15634, 14, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.124853');
+INSERT INTO public.section_kpi_snapshots VALUES (15635, 5, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.125935');
+INSERT INTO public.section_kpi_snapshots VALUES (15636, 10, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.12708');
+INSERT INTO public.section_kpi_snapshots VALUES (15637, 3, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.128125');
+INSERT INTO public.section_kpi_snapshots VALUES (15638, 100, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.129189');
+INSERT INTO public.section_kpi_snapshots VALUES (15639, 17, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.130223');
+INSERT INTO public.section_kpi_snapshots VALUES (15640, 18, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.131292');
+INSERT INTO public.section_kpi_snapshots VALUES (15641, 86, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.132322');
+INSERT INTO public.section_kpi_snapshots VALUES (15642, 104, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.134013');
+INSERT INTO public.section_kpi_snapshots VALUES (15643, 105, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.135088');
+INSERT INTO public.section_kpi_snapshots VALUES (15644, 15, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.136132');
+INSERT INTO public.section_kpi_snapshots VALUES (15645, 106, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.137161');
+INSERT INTO public.section_kpi_snapshots VALUES (15646, 140, '2026-09-05 10:00:00', '{"_alarms": {}}', '2026-09-05 10:08:45.138183');
+INSERT INTO public.section_kpi_snapshots VALUES (15647, 1, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.893392');
+INSERT INTO public.section_kpi_snapshots VALUES (15648, 20, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.896411');
+INSERT INTO public.section_kpi_snapshots VALUES (15649, 16, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.897631');
+INSERT INTO public.section_kpi_snapshots VALUES (15650, 21, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.898769');
+INSERT INTO public.section_kpi_snapshots VALUES (15651, 19, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.899863');
+INSERT INTO public.section_kpi_snapshots VALUES (15652, 85, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.900925');
+INSERT INTO public.section_kpi_snapshots VALUES (15653, 87, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.901993');
+INSERT INTO public.section_kpi_snapshots VALUES (15654, 4, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.902985');
+INSERT INTO public.section_kpi_snapshots VALUES (15655, 6, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.904071');
+INSERT INTO public.section_kpi_snapshots VALUES (15656, 7, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.905271');
+INSERT INTO public.section_kpi_snapshots VALUES (15657, 8, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.906383');
+INSERT INTO public.section_kpi_snapshots VALUES (15658, 9, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.908346');
+INSERT INTO public.section_kpi_snapshots VALUES (15659, 11, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.909375');
+INSERT INTO public.section_kpi_snapshots VALUES (15660, 12, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.910383');
+INSERT INTO public.section_kpi_snapshots VALUES (15661, 95, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.911513');
+INSERT INTO public.section_kpi_snapshots VALUES (15662, 14, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.912569');
+INSERT INTO public.section_kpi_snapshots VALUES (15663, 5, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.913719');
+INSERT INTO public.section_kpi_snapshots VALUES (15664, 10, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.914865');
+INSERT INTO public.section_kpi_snapshots VALUES (15665, 3, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.915917');
+INSERT INTO public.section_kpi_snapshots VALUES (15666, 100, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.916927');
+INSERT INTO public.section_kpi_snapshots VALUES (15667, 17, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.917867');
+INSERT INTO public.section_kpi_snapshots VALUES (15668, 18, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.918837');
+INSERT INTO public.section_kpi_snapshots VALUES (15669, 86, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.919804');
+INSERT INTO public.section_kpi_snapshots VALUES (15670, 104, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.92075');
+INSERT INTO public.section_kpi_snapshots VALUES (15671, 105, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.921691');
+INSERT INTO public.section_kpi_snapshots VALUES (15672, 15, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.92283');
+INSERT INTO public.section_kpi_snapshots VALUES (15673, 106, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.923808');
+INSERT INTO public.section_kpi_snapshots VALUES (15674, 140, '2026-09-05 11:00:00', '{"_alarms": {}}', '2026-09-05 11:08:44.924734');
+INSERT INTO public.section_kpi_snapshots VALUES (15675, 1, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.853639');
+INSERT INTO public.section_kpi_snapshots VALUES (15676, 20, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.856934');
+INSERT INTO public.section_kpi_snapshots VALUES (15677, 16, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.858294');
+INSERT INTO public.section_kpi_snapshots VALUES (15678, 21, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.859582');
+INSERT INTO public.section_kpi_snapshots VALUES (15679, 19, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.860794');
+INSERT INTO public.section_kpi_snapshots VALUES (15680, 85, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.861908');
+INSERT INTO public.section_kpi_snapshots VALUES (15681, 87, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.863144');
+INSERT INTO public.section_kpi_snapshots VALUES (15682, 4, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.864261');
+INSERT INTO public.section_kpi_snapshots VALUES (15683, 6, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.865456');
+INSERT INTO public.section_kpi_snapshots VALUES (15684, 7, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.866551');
+INSERT INTO public.section_kpi_snapshots VALUES (15685, 8, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.867639');
+INSERT INTO public.section_kpi_snapshots VALUES (15686, 9, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.868735');
+INSERT INTO public.section_kpi_snapshots VALUES (15687, 11, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.869818');
+INSERT INTO public.section_kpi_snapshots VALUES (15688, 12, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.87097');
+INSERT INTO public.section_kpi_snapshots VALUES (15689, 95, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.872163');
+INSERT INTO public.section_kpi_snapshots VALUES (15690, 14, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.873213');
+INSERT INTO public.section_kpi_snapshots VALUES (15691, 5, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.874273');
+INSERT INTO public.section_kpi_snapshots VALUES (15692, 10, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.875303');
+INSERT INTO public.section_kpi_snapshots VALUES (15693, 3, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.876339');
+INSERT INTO public.section_kpi_snapshots VALUES (15694, 100, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.87812');
+INSERT INTO public.section_kpi_snapshots VALUES (15695, 17, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.879249');
+INSERT INTO public.section_kpi_snapshots VALUES (15696, 18, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.880424');
+INSERT INTO public.section_kpi_snapshots VALUES (15697, 86, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.881526');
+INSERT INTO public.section_kpi_snapshots VALUES (15698, 104, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.882611');
+INSERT INTO public.section_kpi_snapshots VALUES (15699, 105, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.883737');
+INSERT INTO public.section_kpi_snapshots VALUES (15700, 15, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.884823');
+INSERT INTO public.section_kpi_snapshots VALUES (15701, 106, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.885941');
+INSERT INTO public.section_kpi_snapshots VALUES (15702, 140, '2026-09-05 12:00:00', '{"_alarms": {}}', '2026-09-05 12:08:44.887001');
+INSERT INTO public.section_kpi_snapshots VALUES (15703, 1, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.917355');
+INSERT INTO public.section_kpi_snapshots VALUES (15704, 20, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.919909');
+INSERT INTO public.section_kpi_snapshots VALUES (15705, 16, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.920925');
+INSERT INTO public.section_kpi_snapshots VALUES (15706, 21, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.921826');
+INSERT INTO public.section_kpi_snapshots VALUES (15707, 19, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.922737');
+INSERT INTO public.section_kpi_snapshots VALUES (15708, 85, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.923619');
+INSERT INTO public.section_kpi_snapshots VALUES (15709, 87, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.924644');
+INSERT INTO public.section_kpi_snapshots VALUES (15710, 4, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.925551');
+INSERT INTO public.section_kpi_snapshots VALUES (15711, 6, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.926506');
+INSERT INTO public.section_kpi_snapshots VALUES (15712, 7, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.927415');
+INSERT INTO public.section_kpi_snapshots VALUES (15713, 8, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.92835');
+INSERT INTO public.section_kpi_snapshots VALUES (15714, 9, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.929205');
+INSERT INTO public.section_kpi_snapshots VALUES (15715, 11, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.930148');
+INSERT INTO public.section_kpi_snapshots VALUES (15716, 12, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.931194');
+INSERT INTO public.section_kpi_snapshots VALUES (15717, 95, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.932102');
+INSERT INTO public.section_kpi_snapshots VALUES (15718, 14, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.933072');
+INSERT INTO public.section_kpi_snapshots VALUES (15719, 5, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.934017');
+INSERT INTO public.section_kpi_snapshots VALUES (15720, 10, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.93489');
+INSERT INTO public.section_kpi_snapshots VALUES (15721, 3, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.935756');
+INSERT INTO public.section_kpi_snapshots VALUES (15722, 100, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.936594');
+INSERT INTO public.section_kpi_snapshots VALUES (15723, 17, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.937425');
+INSERT INTO public.section_kpi_snapshots VALUES (15724, 18, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.938294');
+INSERT INTO public.section_kpi_snapshots VALUES (15725, 86, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.939114');
+INSERT INTO public.section_kpi_snapshots VALUES (15726, 104, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.93994');
+INSERT INTO public.section_kpi_snapshots VALUES (15727, 105, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.940815');
+INSERT INTO public.section_kpi_snapshots VALUES (15728, 15, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.941666');
+INSERT INTO public.section_kpi_snapshots VALUES (15729, 106, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.9425');
+INSERT INTO public.section_kpi_snapshots VALUES (15730, 140, '2026-09-05 13:00:00', '{"_alarms": {}}', '2026-09-05 13:08:44.943355');
+INSERT INTO public.section_kpi_snapshots VALUES (15731, 1, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.862024');
+INSERT INTO public.section_kpi_snapshots VALUES (15732, 20, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.865189');
+INSERT INTO public.section_kpi_snapshots VALUES (15733, 16, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.866487');
+INSERT INTO public.section_kpi_snapshots VALUES (15734, 21, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.867689');
+INSERT INTO public.section_kpi_snapshots VALUES (15735, 19, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.868845');
+INSERT INTO public.section_kpi_snapshots VALUES (15736, 85, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.869995');
+INSERT INTO public.section_kpi_snapshots VALUES (15737, 87, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.871128');
+INSERT INTO public.section_kpi_snapshots VALUES (15738, 4, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.87215');
+INSERT INTO public.section_kpi_snapshots VALUES (15739, 6, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.873234');
+INSERT INTO public.section_kpi_snapshots VALUES (15740, 7, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.87427');
+INSERT INTO public.section_kpi_snapshots VALUES (15741, 8, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.875249');
+INSERT INTO public.section_kpi_snapshots VALUES (15742, 9, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.876266');
+INSERT INTO public.section_kpi_snapshots VALUES (15743, 11, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.877449');
+INSERT INTO public.section_kpi_snapshots VALUES (15744, 12, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.87844');
+INSERT INTO public.section_kpi_snapshots VALUES (15745, 95, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.879415');
+INSERT INTO public.section_kpi_snapshots VALUES (15746, 14, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.880403');
+INSERT INTO public.section_kpi_snapshots VALUES (15747, 5, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.881442');
+INSERT INTO public.section_kpi_snapshots VALUES (15748, 10, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.882422');
+INSERT INTO public.section_kpi_snapshots VALUES (15749, 3, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.883409');
+INSERT INTO public.section_kpi_snapshots VALUES (15750, 100, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.884389');
+INSERT INTO public.section_kpi_snapshots VALUES (15751, 17, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.885352');
+INSERT INTO public.section_kpi_snapshots VALUES (15752, 18, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.886382');
+INSERT INTO public.section_kpi_snapshots VALUES (15753, 86, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.887383');
+INSERT INTO public.section_kpi_snapshots VALUES (15754, 104, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.888365');
+INSERT INTO public.section_kpi_snapshots VALUES (15755, 105, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.889738');
+INSERT INTO public.section_kpi_snapshots VALUES (15756, 15, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.890756');
+INSERT INTO public.section_kpi_snapshots VALUES (15757, 106, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.891726');
+INSERT INTO public.section_kpi_snapshots VALUES (15758, 140, '2026-09-05 14:00:00', '{"_alarms": {}}', '2026-09-05 14:08:44.892697');
+INSERT INTO public.section_kpi_snapshots VALUES (15759, 1, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.917768');
+INSERT INTO public.section_kpi_snapshots VALUES (15760, 20, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.921626');
+INSERT INTO public.section_kpi_snapshots VALUES (15761, 16, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.922898');
+INSERT INTO public.section_kpi_snapshots VALUES (15762, 21, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.924089');
+INSERT INTO public.section_kpi_snapshots VALUES (15763, 19, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.925276');
+INSERT INTO public.section_kpi_snapshots VALUES (15764, 85, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.926395');
+INSERT INTO public.section_kpi_snapshots VALUES (15765, 87, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.927488');
+INSERT INTO public.section_kpi_snapshots VALUES (15766, 4, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.929236');
+INSERT INTO public.section_kpi_snapshots VALUES (15767, 6, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.930857');
+INSERT INTO public.section_kpi_snapshots VALUES (15768, 7, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.932204');
+INSERT INTO public.section_kpi_snapshots VALUES (15769, 8, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.9334');
+INSERT INTO public.section_kpi_snapshots VALUES (15770, 9, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.934823');
+INSERT INTO public.section_kpi_snapshots VALUES (15771, 11, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.936288');
+INSERT INTO public.section_kpi_snapshots VALUES (15772, 12, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.937343');
+INSERT INTO public.section_kpi_snapshots VALUES (15773, 95, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.938352');
+INSERT INTO public.section_kpi_snapshots VALUES (15774, 14, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.940172');
+INSERT INTO public.section_kpi_snapshots VALUES (15775, 5, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.941194');
+INSERT INTO public.section_kpi_snapshots VALUES (15776, 10, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.942195');
+INSERT INTO public.section_kpi_snapshots VALUES (15777, 3, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.943186');
+INSERT INTO public.section_kpi_snapshots VALUES (15778, 100, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.944182');
+INSERT INTO public.section_kpi_snapshots VALUES (15779, 17, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.945123');
+INSERT INTO public.section_kpi_snapshots VALUES (15780, 18, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.946334');
+INSERT INTO public.section_kpi_snapshots VALUES (15781, 86, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.947471');
+INSERT INTO public.section_kpi_snapshots VALUES (15782, 104, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.949482');
+INSERT INTO public.section_kpi_snapshots VALUES (15783, 105, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.950928');
+INSERT INTO public.section_kpi_snapshots VALUES (15784, 15, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.952034');
+INSERT INTO public.section_kpi_snapshots VALUES (15785, 106, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.953181');
+INSERT INTO public.section_kpi_snapshots VALUES (15786, 140, '2026-09-05 15:00:00', '{"_alarms": {}}', '2026-09-05 15:08:44.954357');
+INSERT INTO public.section_kpi_snapshots VALUES (15787, 1, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.885823');
+INSERT INTO public.section_kpi_snapshots VALUES (15788, 20, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.892659');
+INSERT INTO public.section_kpi_snapshots VALUES (15789, 16, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.894546');
+INSERT INTO public.section_kpi_snapshots VALUES (15790, 21, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.89667');
+INSERT INTO public.section_kpi_snapshots VALUES (15791, 19, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.898306');
+INSERT INTO public.section_kpi_snapshots VALUES (15792, 85, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.899583');
+INSERT INTO public.section_kpi_snapshots VALUES (15793, 87, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.900725');
+INSERT INTO public.section_kpi_snapshots VALUES (15794, 4, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.902213');
+INSERT INTO public.section_kpi_snapshots VALUES (15795, 6, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.904179');
+INSERT INTO public.section_kpi_snapshots VALUES (15796, 7, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.905234');
+INSERT INTO public.section_kpi_snapshots VALUES (15797, 8, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.906245');
+INSERT INTO public.section_kpi_snapshots VALUES (15798, 9, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.90721');
+INSERT INTO public.section_kpi_snapshots VALUES (15799, 11, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.908217');
+INSERT INTO public.section_kpi_snapshots VALUES (15800, 12, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.909166');
+INSERT INTO public.section_kpi_snapshots VALUES (15801, 95, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.910168');
+INSERT INTO public.section_kpi_snapshots VALUES (15802, 14, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.91167');
+INSERT INTO public.section_kpi_snapshots VALUES (15803, 5, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.913315');
+INSERT INTO public.section_kpi_snapshots VALUES (15804, 10, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.914791');
+INSERT INTO public.section_kpi_snapshots VALUES (15805, 3, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.915939');
+INSERT INTO public.section_kpi_snapshots VALUES (15806, 100, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.916966');
+INSERT INTO public.section_kpi_snapshots VALUES (15807, 17, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.917934');
+INSERT INTO public.section_kpi_snapshots VALUES (15808, 18, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.919349');
+INSERT INTO public.section_kpi_snapshots VALUES (15809, 86, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.920368');
+INSERT INTO public.section_kpi_snapshots VALUES (15810, 104, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.921903');
+INSERT INTO public.section_kpi_snapshots VALUES (15811, 105, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.923367');
+INSERT INTO public.section_kpi_snapshots VALUES (15812, 15, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.924357');
+INSERT INTO public.section_kpi_snapshots VALUES (15813, 106, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.925392');
+INSERT INTO public.section_kpi_snapshots VALUES (15814, 140, '2026-09-05 16:00:00', '{"_alarms": {}}', '2026-09-05 16:08:44.92638');
+INSERT INTO public.section_kpi_snapshots VALUES (15815, 1, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.940773');
+INSERT INTO public.section_kpi_snapshots VALUES (15816, 20, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.943543');
+INSERT INTO public.section_kpi_snapshots VALUES (15817, 16, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.944727');
+INSERT INTO public.section_kpi_snapshots VALUES (15818, 21, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.945831');
+INSERT INTO public.section_kpi_snapshots VALUES (15819, 19, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.947082');
+INSERT INTO public.section_kpi_snapshots VALUES (15820, 85, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.949071');
+INSERT INTO public.section_kpi_snapshots VALUES (15821, 87, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.950164');
+INSERT INTO public.section_kpi_snapshots VALUES (15822, 4, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.952003');
+INSERT INTO public.section_kpi_snapshots VALUES (15823, 6, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.955062');
+INSERT INTO public.section_kpi_snapshots VALUES (15824, 7, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.957142');
+INSERT INTO public.section_kpi_snapshots VALUES (15825, 8, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.960759');
+INSERT INTO public.section_kpi_snapshots VALUES (15826, 9, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.962177');
+INSERT INTO public.section_kpi_snapshots VALUES (15827, 11, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.971145');
+INSERT INTO public.section_kpi_snapshots VALUES (15828, 12, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.972688');
+INSERT INTO public.section_kpi_snapshots VALUES (15829, 95, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.974005');
+INSERT INTO public.section_kpi_snapshots VALUES (15830, 14, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.975506');
+INSERT INTO public.section_kpi_snapshots VALUES (15831, 5, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.977481');
+INSERT INTO public.section_kpi_snapshots VALUES (15832, 10, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.97876');
+INSERT INTO public.section_kpi_snapshots VALUES (15833, 3, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.980054');
+INSERT INTO public.section_kpi_snapshots VALUES (15834, 100, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.984584');
+INSERT INTO public.section_kpi_snapshots VALUES (15835, 17, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.985856');
+INSERT INTO public.section_kpi_snapshots VALUES (15836, 18, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.987362');
+INSERT INTO public.section_kpi_snapshots VALUES (15837, 86, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.988657');
+INSERT INTO public.section_kpi_snapshots VALUES (15838, 104, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.989702');
+INSERT INTO public.section_kpi_snapshots VALUES (15839, 105, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.990811');
+INSERT INTO public.section_kpi_snapshots VALUES (15840, 15, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.992474');
+INSERT INTO public.section_kpi_snapshots VALUES (15841, 106, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.993706');
+INSERT INTO public.section_kpi_snapshots VALUES (15842, 140, '2026-09-05 17:00:00', '{"_alarms": {}}', '2026-09-05 17:08:44.994825');
+INSERT INTO public.section_kpi_snapshots VALUES (15843, 1, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.915043');
+INSERT INTO public.section_kpi_snapshots VALUES (15844, 20, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.921228');
+INSERT INTO public.section_kpi_snapshots VALUES (15845, 16, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.922568');
+INSERT INTO public.section_kpi_snapshots VALUES (15846, 21, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.923852');
+INSERT INTO public.section_kpi_snapshots VALUES (15847, 19, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.925025');
+INSERT INTO public.section_kpi_snapshots VALUES (15848, 85, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.92618');
+INSERT INTO public.section_kpi_snapshots VALUES (15849, 87, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.927299');
+INSERT INTO public.section_kpi_snapshots VALUES (15850, 4, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.928685');
+INSERT INTO public.section_kpi_snapshots VALUES (15851, 6, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.929769');
+INSERT INTO public.section_kpi_snapshots VALUES (15852, 7, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.931571');
+INSERT INTO public.section_kpi_snapshots VALUES (15853, 8, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.932715');
+INSERT INTO public.section_kpi_snapshots VALUES (15854, 9, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.933856');
+INSERT INTO public.section_kpi_snapshots VALUES (15855, 11, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.934914');
+INSERT INTO public.section_kpi_snapshots VALUES (15856, 12, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.935955');
+INSERT INTO public.section_kpi_snapshots VALUES (15857, 95, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.936994');
+INSERT INTO public.section_kpi_snapshots VALUES (15858, 14, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.938516');
+INSERT INTO public.section_kpi_snapshots VALUES (15859, 5, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.93961');
+INSERT INTO public.section_kpi_snapshots VALUES (15860, 10, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.940647');
+INSERT INTO public.section_kpi_snapshots VALUES (15861, 3, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.941663');
+INSERT INTO public.section_kpi_snapshots VALUES (15862, 100, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.942696');
+INSERT INTO public.section_kpi_snapshots VALUES (15863, 17, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.943892');
+INSERT INTO public.section_kpi_snapshots VALUES (15864, 18, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.944985');
+INSERT INTO public.section_kpi_snapshots VALUES (15865, 86, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.946013');
+INSERT INTO public.section_kpi_snapshots VALUES (15866, 104, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.947407');
+INSERT INTO public.section_kpi_snapshots VALUES (15867, 105, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.94847');
+INSERT INTO public.section_kpi_snapshots VALUES (15868, 15, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.949494');
+INSERT INTO public.section_kpi_snapshots VALUES (15869, 106, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.950559');
+INSERT INTO public.section_kpi_snapshots VALUES (15870, 140, '2026-09-05 18:00:00', '{"_alarms": {}}', '2026-09-05 18:08:44.9517');
+INSERT INTO public.section_kpi_snapshots VALUES (15871, 1, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.114823');
+INSERT INTO public.section_kpi_snapshots VALUES (15872, 20, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.11847');
+INSERT INTO public.section_kpi_snapshots VALUES (15873, 16, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.119525');
+INSERT INTO public.section_kpi_snapshots VALUES (15874, 21, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.120692');
+INSERT INTO public.section_kpi_snapshots VALUES (15875, 19, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.122476');
+INSERT INTO public.section_kpi_snapshots VALUES (15876, 85, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.123618');
+INSERT INTO public.section_kpi_snapshots VALUES (15877, 87, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.124993');
+INSERT INTO public.section_kpi_snapshots VALUES (15878, 4, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.12701');
+INSERT INTO public.section_kpi_snapshots VALUES (15879, 6, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.128058');
+INSERT INTO public.section_kpi_snapshots VALUES (15880, 7, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.128922');
+INSERT INTO public.section_kpi_snapshots VALUES (15881, 8, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.129815');
+INSERT INTO public.section_kpi_snapshots VALUES (15882, 9, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.130684');
+INSERT INTO public.section_kpi_snapshots VALUES (15883, 11, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.131562');
+INSERT INTO public.section_kpi_snapshots VALUES (15884, 12, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.132425');
+INSERT INTO public.section_kpi_snapshots VALUES (15885, 95, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.133278');
+INSERT INTO public.section_kpi_snapshots VALUES (15886, 14, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.134459');
+INSERT INTO public.section_kpi_snapshots VALUES (15887, 5, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.135434');
+INSERT INTO public.section_kpi_snapshots VALUES (15888, 10, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.136315');
+INSERT INTO public.section_kpi_snapshots VALUES (15889, 3, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.137339');
+INSERT INTO public.section_kpi_snapshots VALUES (15890, 100, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.13921');
+INSERT INTO public.section_kpi_snapshots VALUES (15891, 17, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.140286');
+INSERT INTO public.section_kpi_snapshots VALUES (15892, 18, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.141489');
+INSERT INTO public.section_kpi_snapshots VALUES (15893, 86, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.143043');
+INSERT INTO public.section_kpi_snapshots VALUES (15894, 104, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.144699');
+INSERT INTO public.section_kpi_snapshots VALUES (15895, 105, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.145708');
+INSERT INTO public.section_kpi_snapshots VALUES (15896, 15, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.146621');
+INSERT INTO public.section_kpi_snapshots VALUES (15897, 106, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.147604');
+INSERT INTO public.section_kpi_snapshots VALUES (15898, 140, '2026-09-05 19:00:00', '{"_alarms": {}}', '2026-09-05 19:08:45.148556');
+INSERT INTO public.section_kpi_snapshots VALUES (15899, 1, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.679956');
+INSERT INTO public.section_kpi_snapshots VALUES (15900, 20, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.689809');
+INSERT INTO public.section_kpi_snapshots VALUES (15901, 16, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.692233');
+INSERT INTO public.section_kpi_snapshots VALUES (15902, 21, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.693872');
+INSERT INTO public.section_kpi_snapshots VALUES (15903, 19, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.695294');
+INSERT INTO public.section_kpi_snapshots VALUES (15904, 85, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.696639');
+INSERT INTO public.section_kpi_snapshots VALUES (15905, 87, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.697874');
+INSERT INTO public.section_kpi_snapshots VALUES (15906, 4, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.702412');
+INSERT INTO public.section_kpi_snapshots VALUES (15907, 6, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.706063');
+INSERT INTO public.section_kpi_snapshots VALUES (15908, 7, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.708011');
+INSERT INTO public.section_kpi_snapshots VALUES (15909, 8, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.709188');
+INSERT INTO public.section_kpi_snapshots VALUES (15910, 9, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.711525');
+INSERT INTO public.section_kpi_snapshots VALUES (15911, 11, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.713292');
+INSERT INTO public.section_kpi_snapshots VALUES (15912, 12, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.714729');
+INSERT INTO public.section_kpi_snapshots VALUES (15913, 95, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.71676');
+INSERT INTO public.section_kpi_snapshots VALUES (15914, 14, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.719131');
+INSERT INTO public.section_kpi_snapshots VALUES (15915, 5, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.720932');
+INSERT INTO public.section_kpi_snapshots VALUES (15916, 10, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.723247');
+INSERT INTO public.section_kpi_snapshots VALUES (15917, 3, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.724632');
+INSERT INTO public.section_kpi_snapshots VALUES (15918, 100, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.727268');
+INSERT INTO public.section_kpi_snapshots VALUES (15919, 17, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.728476');
+INSERT INTO public.section_kpi_snapshots VALUES (15920, 18, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.731015');
+INSERT INTO public.section_kpi_snapshots VALUES (15921, 86, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.732458');
+INSERT INTO public.section_kpi_snapshots VALUES (15922, 104, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.734415');
+INSERT INTO public.section_kpi_snapshots VALUES (15923, 105, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.73609');
+INSERT INTO public.section_kpi_snapshots VALUES (15924, 15, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.738827');
+INSERT INTO public.section_kpi_snapshots VALUES (15925, 106, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.740709');
+INSERT INTO public.section_kpi_snapshots VALUES (15926, 140, '2026-09-06 10:00:00', '{"_alarms": {}}', '2026-09-06 10:21:00.742189');
 
 
 --
@@ -20643,6 +21923,8 @@ INSERT INTO public.sections VALUES (27, 'Cranes', 'CRANES', 8, true, '2026-06-29
 INSERT INTO public.sections VALUES (28, 'Compressors & Air Dryer', 'COMPRESSORS', 9, true, '2026-06-29 13:37:22.464509');
 INSERT INTO public.sections VALUES (29, 'Store Section', 'STORE', 4, true, '2026-06-29 13:37:22.464509');
 INSERT INTO public.sections VALUES (30, 'MECHANICAL', 'MECH', 2, true, '2026-08-31 16:25:40.352936');
+INSERT INTO public.sections VALUES (63, 'Electrical Section', 'ELE', 3, true, '2026-09-04 17:24:36.825557');
+INSERT INTO public.sections VALUES (64, 'Electrical ', 'ELE DEPT', 3, true, '2026-09-04 17:25:10.49132');
 
 
 --
@@ -20690,6 +21972,7 @@ INSERT INTO public.shifts VALUES (3, '2026-07-11', 'Day', '2026-07-11 14:36:00',
 
 INSERT INTO public.stock_ledger VALUES (2686, 3343, '2026-08-13', 'issue', NULL, 'indent', 0.000, 1.000, -1.000, 0.00, 0.00, NULL, NULL, 'Indent IND-20260813-0002', 6, '2026-08-13 22:15:07.470584', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3571, 2164, '2026-09-02', 'transfer', 7, 'store_transfer', 0.000, 6.000, 0.000, 510.00, 3060.00, NULL, NULL, 'STO Dispatch: #STO-20260902-0001', 6, '2026-09-02 16:22:40.691061', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3609, 4728, '2026-09-03', 'grn', 168, 'GRN', 350.000, 0.000, 350.000, 7899.00, 2764650.00, NULL, NULL, '[GRN GRN-20260903-0003] | Ref: PO-20260903-0003 | Party: SHIVSHAKTI STEEL TUBES | QC: Accepted | Auto-populated from PO PO-20260903-0003', 6, '2026-09-03 13:21:27.507589', NULL, false, 115);
 INSERT INTO public.stock_ledger VALUES (905, 2708, '2026-08-13', 'grn', NULL, 'PO', 3.000, 0.000, 3.000, 25.00, 75.00, NULL, NULL, '[Vendor GRN] | Ref: FULLLOOP-TEST-003 | Party: Test Vendor Co | QC: Accepted', 6, '2026-08-13 20:53:48.022567', NULL, false, 1);
 INSERT INTO public.stock_ledger VALUES (2190, 3116, '2026-08-19', 'opening', NULL, 'OPENING', 165.000, 0.000, 165.000, 215.00, 35475.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2990, 2068, '2026-08-19', 'grn', NULL, 'TEST-GRN-AUTO', 20.000, 0.000, 45.000, 100.00, 2000.00, NULL, NULL, 'Test Inward Entry by Ramesh Kumar (Store Assistant)', 24, '2026-08-19 20:25:25.556169', NULL, false, NULL);
@@ -20710,6 +21993,7 @@ INSERT INTO public.stock_ledger VALUES (2992, 2068, '2026-08-19', 'grn', NULL, '
 INSERT INTO public.stock_ledger VALUES (2035, 3130, '2026-08-19', 'opening', NULL, 'OPENING', 265.000, 0.000, 265.000, 92.00, 24380.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2836, 2912, '2026-08-19', 'opening', NULL, NULL, 0.000, 0.000, 0.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3572, 2164, '2026-09-02', 'transfer', 7, 'store_transfer', 6.000, 0.000, 6.000, 510.00, 3060.00, NULL, NULL, 'STO Received: #STO-20260902-0001', 6, '2026-09-02 16:23:20.96579', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3610, 4495, '2026-09-04', 'cash_purchase', 9, 'cash_purchase', 20.000, 0.000, 35.000, 60.00, 1200.00, NULL, NULL, 'Cash Purchase CP-20260904-0001 from ZAVERI BROTHERS', 6, '2026-09-04 13:52:14.532604', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (880, 3392, '2026-08-08', 'grn', NULL, 'IGRN', 4.000, 0.000, 8.000, 0.00, 0.00, NULL, NULL, '[Vendor GRN 20260/-14] | Party: DATTU ELECTRICALS | Inv: 4855 | Transport: VRL | LR: 1091407145', NULL, '2026-08-13 17:47:46.789268', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2060, 3131, '2026-08-19', 'opening', NULL, 'OPENING', 204.000, 0.000, 204.000, 85.00, 17340.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (1945, 2130, '2026-08-01', 'opening', NULL, 'OPENING', 5.000, 0.000, 5.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
@@ -20733,6 +22017,7 @@ INSERT INTO public.stock_ledger VALUES (1952, 3133, '2026-08-19', 'opening', NUL
 INSERT INTO public.stock_ledger VALUES (2593, 3330, '2026-08-01', 'opening', NULL, 'OPENING', 6.000, 0.000, 6.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2717, 3059, '2026-08-15', 'issue', NULL, 'indent', 0.000, 1.000, -1.000, 0.00, 0.00, NULL, NULL, 'Indent IND-20260815-0001', 6, '2026-08-15 15:10:37.056553', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3573, 3111, '2026-09-02', 'adjustment_plus', NULL, 'indent_reversal', 2.000, 0.000, 79.084, 35750.00, 71500.00, NULL, NULL, 'Stock restored on Force Delete of Indent IND-TEST-SEQ-C-1788347144349', 6, '2026-09-02 16:56:04.193672', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3611, 4730, '2026-09-04', 'cash_purchase', 10, 'cash_purchase', 1.000, 0.000, 1.000, 1000.00, 1000.00, NULL, NULL, 'Cash Purchase CP-20260904-0002 from CASH PURCHASE', 6, '2026-09-04 14:07:22.265274', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2721, 3367, '2026-08-16', 'issue', 1, 'ISSUE', 0.000, 40.000, 680.000, 45.00, 1800.00, NULL, NULL, 'Issued to PM2 Bleaching Tower', 21, '2026-08-16 18:41:44.050088', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2723, 3368, '2026-08-16', 'issue', 1, 'ISSUE', 0.000, 40.000, 680.000, 45.00, 1800.00, NULL, NULL, 'Issued to PM2 Bleaching Tower', 21, '2026-08-16 18:48:22.204862', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2725, 3369, '2026-08-16', 'issue', 1, 'ISSUE', 0.000, 40.000, 680.000, 45.00, 1800.00, NULL, NULL, 'Issued to PM2 Bleaching Tower', 21, '2026-08-16 19:10:38.459815', NULL, false, NULL);
@@ -21080,7 +22365,6 @@ INSERT INTO public.stock_ledger VALUES (2825, 3518, '2026-08-19', 'opening', NUL
 INSERT INTO public.stock_ledger VALUES (2826, 4487, '2026-08-19', 'opening', NULL, NULL, 0.000, 0.000, 0.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2827, 4488, '2026-08-19', 'opening', NULL, NULL, 0.000, 0.000, 0.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2828, 4489, '2026-08-19', 'opening', NULL, NULL, 7.000, 0.000, 7.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
-INSERT INTO public.stock_ledger VALUES (2829, 4490, '2026-08-19', 'opening', NULL, NULL, 22.000, 0.000, 22.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2830, 4491, '2026-08-19', 'opening', NULL, NULL, 21.000, 0.000, 21.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2831, 4492, '2026-08-19', 'opening', NULL, NULL, 5.000, 0.000, 5.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2832, 4493, '2026-08-19', 'opening', NULL, NULL, 50.000, 0.000, 50.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
@@ -21488,7 +22772,6 @@ INSERT INTO public.stock_ledger VALUES (2578, 2840, '2026-08-19', 'opening', NUL
 INSERT INTO public.stock_ledger VALUES (2241, 2841, '2026-08-19', 'opening', NULL, 'OPENING', 7.000, 0.000, 7.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2525, 2842, '2026-08-19', 'opening', NULL, 'OPENING', 8.000, 0.000, 8.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2117, 2843, '2026-08-19', 'opening', NULL, 'OPENING', 15.000, 0.000, 15.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
-INSERT INTO public.stock_ledger VALUES (2542, 2844, '2026-08-19', 'opening', NULL, 'OPENING', 3.000, 0.000, 3.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2326, 2845, '2026-08-19', 'opening', NULL, 'OPENING', 20.000, 0.000, 20.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2231, 2846, '2026-08-19', 'opening', NULL, 'OPENING', 10.000, 0.000, 10.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2569, 2847, '2026-08-19', 'opening', NULL, 'OPENING', 6.000, 0.000, 6.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
@@ -21828,6 +23111,10 @@ INSERT INTO public.stock_ledger VALUES (2981, 4529, '2026-08-19', 'opening', NUL
 INSERT INTO public.stock_ledger VALUES (2973, 4521, '2026-08-19', 'opening', NULL, NULL, 2.000, 0.000, 2.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2974, 4522, '2026-08-19', 'opening', NULL, NULL, 2.000, 0.000, 2.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2975, 4523, '2026-08-19', 'opening', NULL, NULL, 0.000, 0.000, 0.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3574, 4634, '2026-09-02', 'cash_purchase', 8, 'cash_purchase', 7000.000, 0.000, 7000.000, 5.00, 35000.00, NULL, NULL, 'Cash Purchase CP-20260902-0002 from MK INDUSTRIES', 6, '2026-09-02 19:09:48.839902', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3575, 4718, '2026-09-02', 'cash_purchase', 8, 'cash_purchase', 7200.000, 0.000, 7200.000, 6.00, 43200.00, NULL, NULL, 'Cash Purchase CP-20260902-0002 from MK INDUSTRIES', 6, '2026-09-02 19:09:48.839902', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3612, 4731, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 775.00, 775.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3613, 4732, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 775.00, 775.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
 INSERT INTO public.stock_ledger VALUES (1872, 3061, '2026-08-19', 'opening', NULL, 'OPENING', 4.000, 0.000, 4.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2627, 3062, '2026-08-19', 'opening', NULL, 'OPENING', 3.000, 0.000, 3.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2936, 4509, '2026-08-19', 'opening', NULL, NULL, 1.000, 0.000, 1.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
@@ -21847,6 +23134,38 @@ INSERT INTO public.stock_ledger VALUES (3045, 3166, '2026-08-23', 'adjustment_pl
 INSERT INTO public.stock_ledger VALUES (3046, 3114, '2026-08-23', 'adjustment_plus', NULL, 'indent_reversal', 2.000, 0.000, 13.953, 625.00, 1250.00, NULL, NULL, 'Stock restored on Force Delete of Indent IND-TEST-SEQ-C-1787465494753', 6, '2026-08-23 16:14:03.203679', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3047, 3167, '2026-08-23', 'adjustment_plus', NULL, 'indent_reversal', 2.000, 0.000, 4.000, 0.00, 0.00, NULL, NULL, 'Stock restored on Force Delete of Indent IND-TEST-1787474059947', 6, '2026-08-23 16:14:08.616805', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3048, 3168, '2026-08-23', 'adjustment_plus', NULL, 'indent_reversal', 2.000, 0.000, 2.000, 0.00, 0.00, NULL, NULL, 'Stock restored on Force Delete of Indent IND-TEST-SEQ-C-1787474060495', 6, '2026-08-23 16:14:27.144869', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3614, 4733, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 775.00, 775.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3615, 4734, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 400.00, 400.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3616, 4735, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 600.00, 600.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3617, 4736, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 600.00, 600.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3618, 4737, '2026-09-04', 'grn', 169, 'GRN', 1.000, 0.000, 1.000, 600.00, 600.00, NULL, NULL, '[GRN GRN-20260904-0001] | Ref: PO-20260904-0001 | Party: ARHAM SCIENTIFIC CO | QC: Accepted | Auto-populated from PO PO-20260904-0001', 6, '2026-09-04 16:39:28.993169', NULL, false, 79);
+INSERT INTO public.stock_ledger VALUES (3576, 3126, '2026-09-02', 'grn', 164, 'GRN', 540.000, 0.000, 1177.400, 18.00, 9720.00, NULL, NULL, '[GRN GRN-20260902-0001] | Ref: PO-20260902-0001 | Party: M.P. CHEMICALS | QC: Accepted | Auto-populated from PO PO-20260902-0001', 6, '2026-09-02 19:12:32.239734', NULL, false, 34);
+INSERT INTO public.stock_ledger VALUES (3619, 3300, '2026-09-04', 'grn', 170, 'GRN', 13.000, 0.000, 16.000, 665.00, 8645.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3620, 3299, '2026-09-04', 'grn', 170, 'GRN', 4.000, 0.000, 6.000, 1009.00, 4036.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3621, 4740, '2026-09-04', 'grn', 170, 'GRN', 4.000, 0.000, 4.000, 288.00, 1152.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3622, 4741, '2026-09-04', 'grn', 170, 'GRN', 6.000, 0.000, 6.000, 1276.00, 7656.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3623, 4742, '2026-09-04', 'grn', 170, 'GRN', 6.000, 0.000, 6.000, 286.00, 1716.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3624, 4743, '2026-09-04', 'grn', 170, 'GRN', 6.000, 0.000, 6.000, 286.00, 1716.00, NULL, NULL, '[GRN GRN-20260904-0002] | Ref: PO-20260904-0002 | Party: NAGENDHRA ELECTRICAL WORKS | QC: Accepted | Auto-populated from PO PO-20260904-0002', 6, '2026-09-04 18:11:44.635188', NULL, false, 66);
+INSERT INTO public.stock_ledger VALUES (3577, 3119, '2026-09-02', 'grn', 165, 'GRN', 150.000, 0.000, 163.000, 290.00, 43500.00, NULL, NULL, '[GRN GRN-20260902-0002] | Ref: PO-20260902-0002 | Party: SUZALKEM TECHNOLOGIES PVT LTD | QC: Accepted | Auto-populated from PO PO-20260902-0002', 6, '2026-09-02 19:21:40.184407', NULL, false, 113);
+INSERT INTO public.stock_ledger VALUES (3625, 3111, '2026-09-04', 'grn', 171, 'GRN', 25000.000, 0.000, 25079.084, 35.75, 893750.00, NULL, NULL, '[GRN GRN-20260904-0003] | Ref: PO-20260904-0003 | Party: SUKHJIT STARCH MILL | QC: Accepted | Auto-populated from PO PO-20260904-0003', 6, '2026-09-04 18:17:08.228055', NULL, false, 35);
+INSERT INTO public.stock_ledger VALUES (3578, 3339, '2026-09-02', 'issue', 197, 'indent', 0.000, 1.000, 141.000, 3.80, 3.80, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3579, 3330, '2026-09-02', 'issue', 197, 'indent', 0.000, 1.000, 4.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3580, 3029, '2026-09-02', 'issue', 197, 'indent', 0.000, 2.000, 76.000, 4.76, 9.52, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3581, 2840, '2026-09-02', 'issue', 197, 'indent', 0.000, 1.000, 7.000, 680.00, 680.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3582, 4499, '2026-09-02', 'issue', 197, 'indent', 0.000, 3.000, 11.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3583, 2854, '2026-09-02', 'issue', 197, 'indent', 0.000, 1.000, 22.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0001', 6, '2026-09-02 19:31:58.982201', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3626, 2843, '2026-09-04', 'issue', 200, 'indent', 0.000, 2.000, 10.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0001', 6, '2026-09-04 18:32:39.570808', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3627, 4495, '2026-09-04', 'issue', 200, 'indent', 0.000, 5.000, 30.000, 60.00, 300.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0001', 6, '2026-09-04 18:32:39.570808', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3584, 3111, '2026-09-02', 'adjustment_plus', NULL, 'indent_reversal', 2.000, 0.000, 79.084, 35750.00, 71500.00, NULL, NULL, 'Stock restored on Force Delete of Indent IND-TEST-SEQ-C-1788349408847', 6, '2026-09-02 19:33:07.276917', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3628, 2958, '2026-09-04', 'issue', 201, 'indent', 0.000, 4.000, 301.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3629, 4660, '2026-09-04', 'issue', 201, 'indent', 0.000, 2.000, 0.000, 3750.00, 7500.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3630, 3392, '2026-09-04', 'issue', 201, 'indent', 0.000, 3.000, 1.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3631, 4555, '2026-09-04', 'issue', 201, 'indent', 0.000, 3.000, 3.000, 55.00, 165.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3632, 3327, '2026-09-04', 'issue', 201, 'indent', 0.000, 10.000, 195.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3633, 4551, '2026-09-04', 'issue', 201, 'indent', 0.000, 1.000, 3.000, 836.00, 836.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3634, 2852, '2026-09-04', 'issue', 201, 'indent', 0.000, 25.000, 250.000, 15.00, 375.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3635, 2999, '2026-09-04', 'issue', 201, 'indent', 0.000, 4.000, 38.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3636, 3339, '2026-09-04', 'issue', 201, 'indent', 0.000, 2.000, 139.000, 3.80, 7.60, NULL, NULL, 'Immediate Issuance from Indent IND-20260904-0002', 6, '2026-09-04 18:56:47.737653', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3149, 3033, '2026-08-26', 'issue', 63, 'indent', 0.000, 1.000, 8.000, 380.00, 380.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260826-0001', 6, '2026-08-26 11:39:52.188697', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3150, 3312, '2026-08-26', 'issue', 63, 'indent', 0.000, 9.000, 34.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260826-0001', 6, '2026-08-26 11:39:52.188697', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3151, 3311, '2026-08-26', 'issue', 63, 'indent', 0.000, 6.000, 19.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260826-0001', 6, '2026-08-26 11:39:52.188697', NULL, false, NULL);
@@ -21960,21 +23279,46 @@ INSERT INTO public.stock_ledger VALUES (3260, 4603, '2026-08-28', 'grn', 82, 'GR
 INSERT INTO public.stock_ledger VALUES (3261, 4604, '2026-08-28', 'grn', 82, 'GRN', 1.000, 0.000, 1.000, 600.00, 600.00, NULL, NULL, '[GRN GRN-20260828-0005] | Ref: PO-20260828-0005 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0005---I.NO.679/26-27, DATE 25/08/2026', 6, '2026-08-28 16:01:56.320795', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3262, 3506, '2026-08-28', 'grn', 82, 'GRN', 24.000, 0.000, 32.000, 15.00, 360.00, NULL, NULL, '[GRN GRN-20260828-0005] | Ref: PO-20260828-0005 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0005---I.NO.679/26-27, DATE 25/08/2026', 6, '2026-08-28 16:01:56.320795', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3263, 4605, '2026-08-28', 'grn', 82, 'GRN', 2.000, 0.000, 2.000, 1995.00, 3990.00, NULL, NULL, '[GRN GRN-20260828-0005] | Ref: PO-20260828-0005 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0005---I.NO.679/26-27, DATE 25/08/2026', 6, '2026-08-28 16:01:56.320795', NULL, false, 60);
+INSERT INTO public.stock_ledger VALUES (3585, 2852, '2026-09-02', 'issue', 198, 'indent', 0.000, 11.000, 285.000, 12.00, 132.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3264, 4606, '2026-08-28', 'grn', 82, 'GRN', 1.000, 0.000, 1.000, 4850.00, 4850.00, NULL, NULL, '[GRN GRN-20260828-0005] | Ref: PO-20260828-0005 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0005---I.NO.679/26-27, DATE 25/08/2026', 6, '2026-08-28 16:01:56.320795', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3265, 4607, '2026-08-28', 'grn', 83, 'GRN', 27.000, 0.000, 27.000, 61.11, 1649.97, NULL, NULL, '[GRN GRN-20260828-0006] | Ref: PO-20260828-0006 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0006, I.NO.702/26-27, DATE:26/08/2026', 6, '2026-08-28 17:35:12.430617', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3266, 4608, '2026-08-28', 'grn', 83, 'GRN', 1.000, 0.000, 1.000, 750.00, 750.00, NULL, NULL, '[GRN GRN-20260828-0006] | Ref: PO-20260828-0006 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0006, I.NO.702/26-27, DATE:26/08/2026', 6, '2026-08-28 17:35:12.430617', NULL, false, 60);
+INSERT INTO public.stock_ledger VALUES (3586, 3013, '2026-09-02', 'issue', 198, 'indent', 0.000, 4.000, 3.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3587, 3263, '2026-09-02', 'issue', 198, 'indent', 0.000, 1.000, 2.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3269, 4609, '2026-08-28', 'cash_purchase', 4, 'cash_purchase', 50.000, 0.000, 50.000, 28.40, 1420.00, NULL, NULL, 'Cash Purchase CP-20260828-0001 from SARASWATHI TRADERS', 6, '2026-08-28 18:29:21.480075', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3270, 4610, '2026-08-28', 'cash_purchase', 5, 'cash_purchase', 1.000, 0.000, 1.000, 140.00, 140.00, NULL, NULL, 'Cash Purchase CP-20260828-0002 from LOCAL PURCHAE', 6, '2026-08-28 18:34:52.106223', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3271, 2947, '2026-08-28', 'grn', 84, 'GRN', 7.500, 0.000, 7.500, 300.00, 2250.00, NULL, NULL, '[GRN GRN-20260828-0007] | Ref: PO-20260828-0007 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0007 INO.711/26-27, DATE:27/08/2026', 6, '2026-08-28 18:41:19.684231', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3272, 2949, '2026-08-28', 'grn', 84, 'GRN', 5.000, 0.000, 12.500, 2100.00, 10500.00, NULL, NULL, '[GRN GRN-20260828-0007] | Ref: PO-20260828-0007 | Party: CENTURY TRADING CO | QC: Accepted | Auto-populated from PO PO-20260828-0007 INO.711/26-27, DATE:27/08/2026', 6, '2026-08-28 18:41:19.684231', NULL, false, 60);
 INSERT INTO public.stock_ledger VALUES (3273, 2705, '2026-08-28', 'grn', 85, 'GRN', 2.000, 0.000, 2.000, 3985.00, 7970.00, NULL, NULL, '[GRN GRN-20260828-0008] | Ref: PO-20260828-0008 | Party: ASIAN PIPE & FITTINGS INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260828-0008 I.NO.1449/2026-27, DATE:27/08/2026', 6, '2026-08-28 18:43:47.037284', NULL, false, 75);
+INSERT INTO public.stock_ledger VALUES (3588, 2130, '2026-09-02', 'issue', 198, 'indent', 0.000, 1.000, 4.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3589, 2164, '2026-09-02', 'issue', 198, 'indent', 0.000, 1.000, 1.000, 510.00, 510.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3590, 2075, '2026-09-02', 'issue', 198, 'indent', 0.000, 2.000, 4.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3591, 2859, '2026-09-02', 'issue', 198, 'indent', 0.000, 10.000, 290.000, 222.00, 2220.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3592, 4572, '2026-09-02', 'issue', 198, 'indent', 0.000, 1.000, 1.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3593, 3264, '2026-09-02', 'issue', 198, 'indent', 0.000, 1.000, 12.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260902-0002', 6, '2026-09-02 19:41:23.34772', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3637, 4731, '2026-09-05', 'issue', 202, 'indent', 0.000, 1.000, 0.000, 775.00, 775.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3638, 4732, '2026-09-05', 'issue', 202, 'indent', 0.000, 1.000, 0.000, 775.00, 775.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3639, 4733, '2026-09-05', 'issue', 202, 'indent', 0.000, 1.000, 0.000, 775.00, 775.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3283, 2862, '2026-08-28', 'grn', 28, 'PO', 210.000, 0.000, 210.000, 155.00, 32550.00, NULL, NULL, 'Inward GRN GRN-20260828-0009 against PO PO-20260828-0009', 6, '2026-08-28 18:53:25.980375', NULL, false, 58);
 INSERT INTO public.stock_ledger VALUES (3284, 2859, '2026-08-28', 'grn', 28, 'PO', 210.000, 0.000, 300.000, 222.00, 46620.00, NULL, NULL, 'Inward GRN GRN-20260828-0009 against PO PO-20260828-0009', 6, '2026-08-28 18:53:25.980375', NULL, false, 58);
 INSERT INTO public.stock_ledger VALUES (3285, 2860, '2026-08-28', 'grn', 28, 'PO', 182.000, 0.000, 272.000, 300.00, 54600.00, NULL, NULL, 'Inward GRN GRN-20260828-0009 against PO PO-20260828-0009', 6, '2026-08-28 18:53:25.980375', NULL, false, 58);
+INSERT INTO public.stock_ledger VALUES (3640, 2664, '2026-09-05', 'issue', 202, 'indent', 0.000, 4.000, 13.000, 4954.00, 19816.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3641, 2852, '2026-09-05', 'issue', 202, 'indent', 0.000, 10.000, 240.000, 12.00, 120.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3642, 4718, '2026-09-05', 'issue', 202, 'indent', 0.000, 600.000, 6000.000, 6.00, 3600.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3643, 3339, '2026-09-05', 'issue', 202, 'indent', 0.000, 1.000, 138.000, 3.80, 3.80, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0001', 6, '2026-09-05 19:00:54.175918', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (903, 2706, '2026-08-12', 'grn', NULL, 'PO', 5.000, 0.000, 17.001, 100.00, 500.00, NULL, 'Rack 2, Box 4', '[Vendor GRN] | Ref: TEST-VENDORID-001 | Party: Test Vendor Co | QC: Accepted', 6, '2026-08-13 15:21:06.752', NULL, false, 1);
 INSERT INTO public.stock_ledger VALUES (2993, 2068, '2026-08-18', 'grn', NULL, 'TEST-GRN-AUTO', 20.000, 0.000, 45.000, 100.00, 2000.00, NULL, NULL, 'Test Inward Entry by Ramesh Kumar (Store Assistant)', 24, '2026-08-19 14:57:03.328', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3286, 4617, '2026-08-29', 'grn', 89, 'GRN', 100.000, 0.000, 100.000, 8.50, 850.00, NULL, NULL, '[GRN GRN-20260829-0001] | Ref: PO-20260829-0001 | Party: IMPERIAL ENGINEERING | QC: Accepted | Auto-populated from PO PO-20260829-0001', 6, '2026-08-29 11:27:54.88934', NULL, false, 33);
 INSERT INTO public.stock_ledger VALUES (3287, 4618, '2026-08-29', 'grn', 89, 'GRN', 100.000, 0.000, 100.000, 8.20, 820.00, NULL, NULL, '[GRN GRN-20260829-0001] | Ref: PO-20260829-0001 | Party: IMPERIAL ENGINEERING | QC: Accepted | Auto-populated from PO PO-20260829-0001', 6, '2026-08-29 11:27:54.88934', NULL, false, 33);
+INSERT INTO public.stock_ledger VALUES (2542, 2844, '2026-09-03', 'opening', NULL, 'OPENING', 3.000, 0.000, 3.000, 0.00, 0.00, NULL, NULL, 'Initial Opening Balance (Verified)', NULL, '2026-08-13 22:00:47.279345', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3644, 2840, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 5.000, 680.00, 680.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3645, 3040, '2026-09-05', 'issue', 203, 'indent', 0.000, 2.000, 15.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3646, 2999, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 37.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3647, 4562, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 17.000, 35.00, 35.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3648, 3033, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 6.000, 380.00, 380.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3649, 2852, '2026-09-05', 'issue', 203, 'indent', 0.000, 25.000, 215.000, 12.00, 300.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3650, 2935, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 5.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3651, 2871, '2026-09-05', 'issue', 203, 'indent', 0.000, 1.000, 6.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0002', 6, '2026-09-05 19:12:38.336859', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3000, 4455, '2026-08-18', 'grn', 32, 'GRN', 10.000, 0.000, 22.500, 54000.00, 540000.00, NULL, 'YARD-PULP-1', '[GRN GRN-20260819-0004] | Ref: PO-20260813-0008 | Party: Test Precision Vendor 635458 | QC: Accepted | Auto-populated from PO PO-20260813-0008', 6, '2026-08-19 17:50:12.934', NULL, false, 17);
 INSERT INTO public.stock_ledger VALUES (2697, 4439, '2026-08-13', 'grn', NULL, 'PO', 10.000, 0.000, 155.500, 18500.00, 185000.00, NULL, 'RM-YARD-A', '[Vendor GRN] | Ref: PO-2026-0099 | QC: Accepted | Test Inward Delivery | Party: ITC Paperboard', 1, '2026-08-13 19:46:38.37', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (2712, 4454, '2026-08-13', 'return', NULL, 'DEPT_RETURN', 1.500, 0.000, 12.500, 54000.00, 81000.00, NULL, 'YARD-PULP-1', '[Dept Return - Dispatch] | Ref: RET-639817 | QC: Accepted | Surplus pulp from Batch #401 returned clean & dry', 6, '2026-08-13 20:24:00.17', NULL, false, NULL);
@@ -22160,9 +23504,33 @@ INSERT INTO public.stock_ledger VALUES (3482, 4661, '2026-09-01', 'issue', 189, 
 INSERT INTO public.stock_ledger VALUES (3483, 4673, '2026-09-01', 'issue', 189, 'indent', 0.000, 1.000, 0.000, 16530.00, 16530.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260901-0002', 6, '2026-09-01 10:04:05.634102', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3484, 4609, '2026-09-01', 'issue', 189, 'indent', 0.000, 8.000, 28.000, 28.40, 227.20, NULL, NULL, 'Immediate Issuance from Indent IND-20260901-0002', 6, '2026-09-01 10:04:05.634102', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3485, 4623, '2026-09-02', 'cash_purchase', 7, 'cash_purchase', 1.000, 0.000, 1.000, 3150.00, 3150.00, NULL, NULL, 'Cash Purchase CP-20260902-0001 from SHARPEX ENGEINEERING WORKES (AMAZON)', 6, '2026-09-02 11:09:18.307314', NULL, false, NULL);
-INSERT INTO public.stock_ledger VALUES (3487, 2164, '2026-09-02', 'grn', 134, 'GRN', 4.000, 0.000, 6.000, 510.00, 2040.00, NULL, 'RM-YARD', '[GRN GRN-20260902-0002] | QC: Accepted', 23, '2026-09-02 15:22:55.262299', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (2829, 4490, '2026-09-03', 'opening', NULL, NULL, 18.000, 0.000, 18.000, 0.00, 0.00, NULL, NULL, 'Master Opening Balance (Excel 8192026)', 1, '2026-08-19 19:34:07.249413', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3652, 2936, '2026-09-05', 'issue', 204, 'indent', 0.000, 2.000, 1.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3653, 2901, '2026-09-05', 'issue', 204, 'indent', 0.000, 2.000, 27.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3654, 2734, '2026-09-05', 'issue', 204, 'indent', 0.000, 1.000, 0.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3655, 3079, '2026-09-05', 'issue', 204, 'indent', 0.000, 2.000, 7.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3656, 3041, '2026-09-05', 'issue', 204, 'indent', 0.000, 4.000, 3.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3657, 3067, '2026-09-05', 'issue', 204, 'indent', 0.000, 2.000, 23.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3658, 4735, '2026-09-05', 'issue', 204, 'indent', 0.000, 1.000, 0.000, 600.00, 600.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3659, 4736, '2026-09-05', 'issue', 204, 'indent', 0.000, 1.000, 0.000, 600.00, 600.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3660, 4737, '2026-09-05', 'issue', 204, 'indent', 0.000, 1.000, 0.000, 600.00, 600.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3661, 3078, '2026-09-05', 'issue', 204, 'indent', 0.000, 4.000, 23.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260905-0003', 6, '2026-09-05 19:25:03.609258', NULL, false, NULL);
 INSERT INTO public.stock_ledger VALUES (3488, 3461, '2026-08-12', 'grn', 135, 'GRN', 28.000, 0.000, 28.000, 100.00, 2800.00, NULL, NULL, '[GRN 202608-24] | Party: ENAR MILL STORES | Inv: 256', 1, '2026-09-02 16:05:18.127671', NULL, false, 22);
 INSERT INTO public.stock_ledger VALUES (3489, 4467, '2026-08-12', 'grn', 135, 'GRN', 2.000, 0.000, 4.000, 360.00, 720.00, NULL, NULL, '[GRN 202608-24] | Party: ENAR MILL STORES | Inv: 256', 1, '2026-09-02 16:05:18.127671', NULL, false, 22);
+INSERT INTO public.stock_ledger VALUES (3594, 2910, '2026-09-03', 'issue', 199, 'indent', 0.000, 1.000, 162.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3595, 2993, '2026-09-03', 'issue', 199, 'indent', 0.000, 16.000, 23.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3596, 4718, '2026-09-03', 'issue', 199, 'indent', 0.000, 600.000, 6600.000, 6.00, 3600.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3597, 4595, '2026-09-03', 'issue', 199, 'indent', 0.000, 2.000, 18.000, 90.00, 180.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3598, 2840, '2026-09-03', 'issue', 199, 'indent', 0.000, 1.000, 6.000, 680.00, 680.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3599, 2844, '2026-09-03', 'issue', 199, 'indent', 0.000, 1.000, 2.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3600, 2794, '2026-09-03', 'issue', 199, 'indent', 0.000, 1.000, 0.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3601, 2104, '2026-09-03', 'issue', 199, 'indent', 0.000, 2.000, 7.000, 0.00, 0.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3602, 2852, '2026-09-03', 'issue', 199, 'indent', 0.000, 10.000, 275.000, 12.00, 120.00, NULL, NULL, 'Immediate Issuance from Indent IND-20260903-0001', 6, '2026-09-03 18:45:43.812395', NULL, false, NULL);
+INSERT INTO public.stock_ledger VALUES (3603, 4719, '2026-09-03', 'grn', 166, 'GRN', 2.000, 0.000, 2.000, 33281.50, 66563.00, NULL, NULL, '[GRN GRN-20260903-0001] | Ref: PO-20260903-0001 | Party: MICRO FAB INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260903-0001', 6, '2026-09-03 13:09:07.351781', NULL, false, 114);
+INSERT INTO public.stock_ledger VALUES (3604, 4720, '2026-09-03', 'grn', 166, 'GRN', 4.000, 0.000, 4.000, 16640.25, 66561.00, NULL, NULL, '[GRN GRN-20260903-0001] | Ref: PO-20260903-0001 | Party: MICRO FAB INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260903-0001', 6, '2026-09-03 13:09:07.351781', NULL, false, 114);
+INSERT INTO public.stock_ledger VALUES (3605, 4721, '2026-09-03', 'grn', 166, 'GRN', 8.000, 0.000, 8.000, 8320.13, 66561.04, NULL, NULL, '[GRN GRN-20260903-0001] | Ref: PO-20260903-0001 | Party: MICRO FAB INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260903-0001', 6, '2026-09-03 13:09:07.351781', NULL, false, 114);
+INSERT INTO public.stock_ledger VALUES (3606, 4729, '2026-09-03', 'grn', 166, 'GRN', 4.000, 0.000, 4.000, 16641.20, 66564.80, NULL, NULL, '[GRN GRN-20260903-0001] | Ref: PO-20260903-0001 | Party: MICRO FAB INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260903-0001', 6, '2026-09-03 13:09:07.351781', NULL, false, 114);
+INSERT INTO public.stock_ledger VALUES (3607, 4726, '2026-09-03', 'grn', 166, 'GRN', 12.000, 0.000, 12.000, 5546.35, 66556.20, NULL, NULL, '[GRN GRN-20260903-0001] | Ref: PO-20260903-0001 | Party: MICRO FAB INDUSTRIES | QC: Accepted | Auto-populated from PO PO-20260903-0001', 6, '2026-09-03 13:09:07.351781', NULL, false, 114);
 INSERT INTO public.stock_ledger VALUES (3490, 4468, '2026-08-16', 'grn', 136, 'GRN', 1.000, 0.000, 0.000, 430.00, 430.00, NULL, NULL, '[GRN 202608-25] | Party: Internal / Direct Purchase', 1, '2026-09-02 16:05:18.127671', NULL, false, 61);
 INSERT INTO public.stock_ledger VALUES (3491, 2262, '2026-08-16', 'grn', 137, 'GRN', 2.000, 0.000, 3.000, 6285.00, 14832.60, NULL, NULL, '[GRN 202608-26] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31151', 1, '2026-09-02 16:05:18.127671', NULL, false, 112);
 INSERT INTO public.stock_ledger VALUES (3492, 2205, '2026-08-16', 'grn', 137, 'GRN', 2.000, 0.000, 3.000, 13195.00, 31140.20, NULL, NULL, '[GRN 202608-26] | Party: SUNRISE BEARING CORPORATION | Inv: SIV-31151', 1, '2026-09-02 16:05:18.127671', NULL, false, 112);
@@ -22243,6 +23611,7 @@ INSERT INTO public.stock_ledger VALUES (3567, 4592, '2026-08-24', 'grn', 158, 'G
 INSERT INTO public.stock_ledger VALUES (3568, 4593, '2026-08-24', 'grn', 158, 'GRN', 2.000, 0.000, 2.000, 0.00, 0.00, NULL, NULL, '[GRN 202608-42] | Party: DATTU ELECTRICALS | Inv: D.C. NO.5298 | Transport: BY HAND', 1, '2026-09-02 16:05:18.127671', NULL, false, 29);
 INSERT INTO public.stock_ledger VALUES (3569, 4594, '2026-08-24', 'grn', 159, 'GRN', 400.000, 0.000, 400.000, 84.00, 35280.00, NULL, NULL, '[GRN 202608-43] | Party: ANNPURANA GLOBALS | Inv: AG/26-27/112', 1, '2026-09-02 16:05:18.127671', NULL, false, 68);
 INSERT INTO public.stock_ledger VALUES (3570, 4595, '2026-08-24', 'grn', 160, 'GRN', 20.000, 0.000, 20.000, 90.00, 1800.00, NULL, NULL, '[GRN 202608-C01-2] | Party: LOCAL PURCHASE', 1, '2026-09-02 16:05:18.127671', NULL, false, 74);
+INSERT INTO public.stock_ledger VALUES (3608, 4727, '2026-09-03', 'grn', 167, 'GRN', 1.000, 0.000, 1.000, 55000.00, 55000.00, NULL, NULL, '[GRN GRN-20260903-0002] | Ref: PO-20260903-0002 | Party: Unified Paper Machine Pvt Ltd | QC: Accepted | Auto-populated from PO PO-20260903-0002', 6, '2026-09-03 13:15:05.676318', NULL, false, 37);
 
 
 --
@@ -22302,10 +23671,22 @@ INSERT INTO public.store_indent_log VALUES (102, 187, 'Immediate Store Issuance'
 INSERT INTO public.store_indent_log VALUES (103, 187, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-01 19:43:56.213913', NULL);
 INSERT INTO public.store_indent_log VALUES (105, 189, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-01 10:04:05.634102', NULL);
 INSERT INTO public.store_indent_log VALUES (106, 189, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-01 10:04:49.381311', NULL);
-INSERT INTO public.store_indent_log VALUES (111, 195, 'Dept Request Raised', 'Draft', 'Submitted', 21, 'Head - Packing', 'Indentor', NULL, 'Requisition submitted by Mech Dept', '2026-09-02 17:13:28.85191', NULL);
-INSERT INTO public.store_indent_log VALUES (112, 195, 'Approval SM', 'Submitted', 'Approved', 21, 'Head - Packing', 'Store Manager', NULL, 'SM verified category stock and approved emergency breakdown request', '2026-09-02 17:13:28.857301', NULL);
-INSERT INTO public.store_indent_log VALUES (113, 195, 'Store Keeper Issue', 'Approved', 'Issued', 21, 'Head - Packing', 'Store Keeper', NULL, 'Physical stock issued and deducted from bin Rack M-01', '2026-09-02 17:13:28.861354', 2.00);
-INSERT INTO public.store_indent_log VALUES (114, 195, 'Receiver Sign & Handover', 'Issued', 'Closed', 21, 'Anil Deshmukh (Mech Senior Eng)', 'Department Receiver', NULL, 'Bearings verified, fitment completed on PM1 Vacuum Pump', '2026-09-02 17:13:28.864422', NULL);
+INSERT INTO public.store_indent_log VALUES (116, 197, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-02 19:31:58.982201', NULL);
+INSERT INTO public.store_indent_log VALUES (117, 197, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-02 19:32:22.383213', NULL);
+INSERT INTO public.store_indent_log VALUES (118, 198, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-02 19:41:23.34772', NULL);
+INSERT INTO public.store_indent_log VALUES (119, 198, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-02 19:41:47.083899', NULL);
+INSERT INTO public.store_indent_log VALUES (120, 199, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-03 18:45:43.812395', NULL);
+INSERT INTO public.store_indent_log VALUES (121, 199, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-03 18:46:03.342681', NULL);
+INSERT INTO public.store_indent_log VALUES (122, 200, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-04 18:32:39.570808', NULL);
+INSERT INTO public.store_indent_log VALUES (123, 200, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-04 18:33:06.641518', NULL);
+INSERT INTO public.store_indent_log VALUES (124, 201, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-04 18:56:47.737653', NULL);
+INSERT INTO public.store_indent_log VALUES (125, 201, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-04 18:57:11.090116', NULL);
+INSERT INTO public.store_indent_log VALUES (126, 202, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-05 19:00:54.175918', NULL);
+INSERT INTO public.store_indent_log VALUES (127, 203, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-05 19:12:38.336859', NULL);
+INSERT INTO public.store_indent_log VALUES (128, 203, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-05 19:13:55.770934', NULL);
+INSERT INTO public.store_indent_log VALUES (129, 202, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-05 19:14:07.385351', NULL);
+INSERT INTO public.store_indent_log VALUES (130, 204, 'Immediate Store Issuance', 'Draft', 'Issued', 6, 'Head - Store Management', 'Manager', NULL, 'Immediate store issuance executed on creation', '2026-09-05 19:25:03.609258', NULL);
+INSERT INTO public.store_indent_log VALUES (131, 204, 'Closed', 'Closed', 'Closed', 6, 'Head - Store Management', 'Manager', NULL, NULL, '2026-09-05 19:25:43.174323', NULL);
 
 
 --
@@ -22431,8 +23812,8 @@ INSERT INTO public.users VALUES (10, 'DH-MAINT', 'Head - Maintenance', 'head.mai
 INSERT INTO public.users VALUES (24, 'STORE-ASST-01', 'Ramesh Kumar (Store Assistant)', 'store.assistant@mkpapermill.com', '9000000021', '$2a$10$VmNpcJHLana.dFy3QVTqLuxywSoFQ2YGXFlmX9VVjx987aYXVdcl.', 1, 4, 'General', true, '2026-08-23 10:30:04.51485', '2026-08-19 20:04:30.664422', '2026-08-19 20:04:54.537418', false, 29);
 INSERT INTO public.users VALUES (2, 'PH-001', 'Plant Head', 'planthead@mkpapermill.com', '9000000099', '$2a$10$Mki/Rc2R/Hv5UqJR9lknWOsRNNGm6.2U.j7FIEYo3Mpfxi6TEaZci', 4, 16, NULL, true, '2026-08-25 09:31:44.514508', '2026-06-29 09:48:42.952885', '2026-07-10 19:40:06.471594', false, NULL);
 INSERT INTO public.users VALUES (23, 'STORE-DESK', 'Store Issue Desk', 'store@mkpapermill.com', '9000000004', '$2a$10$AH7XN2rc2.PZlteRF2gQP.0FtS1Yfq6ED/dPzvUaUZ3hMoiLp1ASG', 2, 4, NULL, true, '2026-09-02 14:51:02.408111', '2026-06-29 09:48:42.952885', '2026-06-29 09:48:42.952885', false, NULL);
-INSERT INTO public.users VALUES (6, 'DH-STORE', 'Head - Store Management', 'head.store@mkpapermill.com', '9000000004', '$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa', 3, 4, NULL, true, '2026-09-02 16:37:59.563689', '2026-06-29 09:48:42.952885', '2026-06-29 09:48:42.952885', false, NULL);
-INSERT INTO public.users VALUES (1, 'EMP001', 'Admin', 'admin@mkpapermill.com', '9999999999', '$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq', 5, 16, NULL, true, '2026-09-02 10:56:50.283822', '2026-06-26 18:13:01.372505', '2026-06-26 18:13:01.372505', false, NULL);
+INSERT INTO public.users VALUES (1, 'EMP001', 'Admin', 'admin@mkpapermill.com', '9999999999', '$2a$10$N3cL4pFzuolxbW1Lu.NWI.r78kMPsrE7WYbKGB3W7pKQeWHl6xFWq', 5, 16, NULL, true, '2026-09-04 19:48:04.62803', '2026-06-26 18:13:01.372505', '2026-06-26 18:13:01.372505', false, NULL);
+INSERT INTO public.users VALUES (6, 'DH-STORE', 'Head - Store Management', 'head.store@mkpapermill.com', '9000000004', '$2a$10$9FTv/2pV9HFVAstxtm56Oex6inkpaScB6bHhmgZhrkfN/Z.nTowZa', 3, 4, NULL, true, '2026-09-06 10:21:16.685612', '2026-06-29 09:48:42.952885', '2026-06-29 09:48:42.952885', false, NULL);
 
 
 --
@@ -22480,6 +23861,9 @@ INSERT INTO public.vendor_bills VALUES (28, 'BILL-202608C04', 73, NULL, NULL, 'I
 INSERT INTO public.vendor_bills VALUES (29, 'BILL-20260841', 61, NULL, NULL, 'INV-202608-41', '2026-08-24', '2026-08-24', 1311.86, 0.00, 0.00, 236.13, 236.13, 0.00, 1548.00, 0.00, 1548.00, 'Unpaid', 'Automated AP Bill for GRN 202608-41 from Internal / Direct Purchase', 1, '2026-08-26 10:21:54.915473', '2026-08-26 10:21:54.915473', NULL, NULL);
 INSERT INTO public.vendor_bills VALUES (30, 'BILL-20260843', 68, NULL, NULL, 'AG/26-27/112', '2026-08-17', '2026-08-17', 33600.00, 0.00, 0.00, 1680.00, 1680.00, 0.00, 35280.00, 0.00, 35280.00, 'Unpaid', 'Automated AP Bill for GRN 202608-43 from ANNPURANA GLOBALS', 1, '2026-08-26 10:21:54.915473', '2026-08-26 10:21:54.915473', NULL, NULL);
 INSERT INTO public.vendor_bills VALUES (31, 'BILL-202608C012', 74, NULL, NULL, 'INV-202608-C01-2', '2026-08-24', '2026-08-24', 1800.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1800.00, 0.00, 1800.00, 'Unpaid', 'Automated AP Bill for GRN 202608-C01-2 from LOCAL PURCHASE', 1, '2026-08-26 10:21:54.915473', '2026-08-26 10:21:54.915473', NULL, NULL);
+INSERT INTO public.vendor_bills VALUES (61, 'BILL-20260902-0002', NULL, NULL, NULL, '14549', '2026-09-02', '2026-09-02', 78200.00, 0.00, 0.00, 0.00, 0.00, 0.00, 78200.00, 78200.00, 0.00, 'Paid', 'Cash Purchase CP-20260902-0002 (Cash) - MK INDUSTRIES', 6, '2026-09-02 19:09:48.839902', '2026-09-02 19:09:48.839902', NULL, NULL);
+INSERT INTO public.vendor_bills VALUES (62, 'BILL-20260904-0001', NULL, NULL, NULL, 'ZAVERI BROTHERS', '2026-09-04', '2026-09-04', 1200.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1200.00, 1200.00, 0.00, 'Paid', 'Cash Purchase CP-20260904-0001 (Cash) - ZAVERI BROTHERS', 6, '2026-09-04 13:52:14.532604', '2026-09-04 13:52:14.532604', NULL, NULL);
+INSERT INTO public.vendor_bills VALUES (63, 'BILL-20260904-0002', NULL, NULL, NULL, 'NILL', '2026-09-04', '2026-09-04', 1000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1000.00, 1000.00, 0.00, 'Paid', 'Cash Purchase CP-20260904-0002 (Cash) - CASH PURCHASE', 6, '2026-09-04 14:07:22.265274', '2026-09-04 14:07:22.265274', NULL, NULL);
 
 
 --
@@ -22565,6 +23949,9 @@ INSERT INTO public.vendors VALUES (77, 'VND-0069', 'SRI UDAYA BHASKARA PLASTICS'
 INSERT INTO public.vendors VALUES (78, 'VND-0070', 'M K INDUSTRIES', '36CAGPM9460G1ZE', 'CAGPM9460G', 'BESIDE HP PETROL PUMP SARANGAPUR, NIZAMABAD', 'NIZAMABAD', 'TELANAGAN', '503 186', '', '9848490684', 'mkindustries2022@gmail.com', '30 days', 30, 3.0, true, '2026-08-28 19:06:47.013158', NULL, 'Union Bank of India', '226611010000028', 'UBIN0822663', 'BODHAN ROAD', 'M K INDUSTRIES', 'Current');
 INSERT INTO public.vendors VALUES (79, 'VND-0071', 'ARHAM SCIENTIFIC CO', '27AAGFA2551A1Z2', 'AAGFA2551A', '102, Blue Roase Ind, Premises, Western Express, Hyghtway, Dattapada, Borivali (e), Mumbai', 'Mumbai', 'Maharashtra', '400 066', '', '', 'arthamscientificgmail.com', '30 days', 30, 3.0, true, '2026-08-31 13:25:52.671193', NULL, 'ICICI Bank', '333705002511', 'ICIC0003337', 'Borivali', 'ARHAM SCIENTIFIC CO', 'Current');
 INSERT INTO public.vendors VALUES (112, 'VEN-SUNRIS', 'SUNRISE BEARING CORPORATION', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 30, 0.0, true, '2026-09-02 16:05:17.456512', NULL, NULL, NULL, NULL, NULL, NULL, 'Current');
+INSERT INTO public.vendors VALUES (113, 'VND-0073', 'SUZALKEM TECHNOLOGIES PVT LTD', '36AARCS1260Q1ZN', 'AARCS1260Q', '401, RAJESWARE AAPARTMENTS, NAGARJUNA NAGAR, AMEERPET, HYDERBAD', 'HYDERBAD', 'TELANGANA', '500 073', '', '', '', '30 days', 30, 3.0, true, '2026-09-02 19:15:54.711733', NULL, 'ICICI Bank', '0070505014941', 'ICIC0002363', 'AMEERPET', 'SUZALKEM TECHNOLOGIES PVT LTD', 'Current');
+INSERT INTO public.vendors VALUES (114, 'VND-0074', 'MICRO FAB INDUSTRIES', '24ABXPR3776L1ZN', 'ABXPR3776L', 'PLOT NO.5006, 4TH PHASE, GIDC VAPI', 'VAPI', 'GUJARAT', '503 195', '', '', '', '30 days', 30, 3.0, true, '2026-09-03 18:54:53.435969', NULL, NULL, NULL, NULL, NULL, 'MICRO FAB INDUSTRIES', 'Current');
+INSERT INTO public.vendors VALUES (115, 'VND-0075', 'SHIVSHAKTI STEEL TUBES', '36AAOFS6315A1ZB', 'AAOFS6315A', 'REG OFF :5-2-199 TO 200/4, DISTILLERY ROAD, RANIGUNJ, SECUNDRABAD', 'SECUNDRABAD', 'TELANGANA', '500 055', '', '', '', '30 days', 30, 3.0, true, '2026-09-03 13:19:51.367587', NULL, 'HDFC Bank', '00422790001334', 'HDFC0000042', 'SECUNDRABAD PARADISE CIRCLE', 'SHIVSHAKTI STEEL TUBES', 'Current');
 
 
 --
@@ -22638,7 +24025,7 @@ SELECT pg_catalog.setval('public.attendance_regularization_id_seq', 1, false);
 -- Name: audit_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.audit_log_id_seq', 480, true);
+SELECT pg_catalog.setval('public.audit_log_id_seq', 551, true);
 
 
 --
@@ -22652,14 +24039,14 @@ SELECT pg_catalog.setval('public.boiler_performance_logs_id_seq', 3, true);
 -- Name: cash_purchase_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cash_purchase_items_id_seq', 7, true);
+SELECT pg_catalog.setval('public.cash_purchase_items_id_seq', 11, true);
 
 
 --
 -- Name: cash_purchases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cash_purchases_id_seq', 7, true);
+SELECT pg_catalog.setval('public.cash_purchases_id_seq', 10, true);
 
 
 --
@@ -22862,14 +24249,14 @@ SELECT pg_catalog.setval('public.grades_id_seq', 5, true);
 -- Name: grn_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.grn_id_seq', 163, true);
+SELECT pg_catalog.setval('public.grn_id_seq', 171, true);
 
 
 --
 -- Name: grn_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.grn_items_id_seq', 325, true);
+SELECT pg_catalog.setval('public.grn_items_id_seq', 348, true);
 
 
 --
@@ -22897,7 +24284,7 @@ SELECT pg_catalog.setval('public.inbound_dc_items_id_seq', 5, true);
 -- Name: indent_audit_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indent_audit_log_id_seq', 91, true);
+SELECT pg_catalog.setval('public.indent_audit_log_id_seq', 107, true);
 
 
 --
@@ -22911,14 +24298,14 @@ SELECT pg_catalog.setval('public.indent_comments_id_seq', 1, false);
 -- Name: indent_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indent_items_id_seq', 353, true);
+SELECT pg_catalog.setval('public.indent_items_id_seq', 419, true);
 
 
 --
 -- Name: indents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.indents_id_seq', 195, true);
+SELECT pg_catalog.setval('public.indents_id_seq', 204, true);
 
 
 --
@@ -23002,7 +24389,7 @@ SELECT pg_catalog.setval('public.material_categories_id_seq', 98, true);
 -- Name: material_equipment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.material_equipment_id_seq', 60, true);
+SELECT pg_catalog.setval('public.material_equipment_id_seq', 86, true);
 
 
 --
@@ -23016,14 +24403,14 @@ SELECT pg_catalog.setval('public.material_rejections_id_seq', 21, true);
 -- Name: material_sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.material_sections_id_seq', 59, true);
+SELECT pg_catalog.setval('public.material_sections_id_seq', 85, true);
 
 
 --
 -- Name: materials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.materials_id_seq', 4673, true);
+SELECT pg_catalog.setval('public.materials_id_seq', 4743, true);
 
 
 --
@@ -23037,7 +24424,7 @@ SELECT pg_catalog.setval('public.motor_electrical_specs_id_seq', 332, true);
 -- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notifications_id_seq', 58, true);
+SELECT pg_catalog.setval('public.notifications_id_seq', 67, true);
 
 
 --
@@ -23093,14 +24480,14 @@ SELECT pg_catalog.setval('public.payrolls_id_seq', 1, false);
 -- Name: plant_sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.plant_sections_id_seq', 138, true);
+SELECT pg_catalog.setval('public.plant_sections_id_seq', 140, true);
 
 
 --
 -- Name: po_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.po_items_id_seq', 175, true);
+SELECT pg_catalog.setval('public.po_items_id_seq', 240, true);
 
 
 --
@@ -23135,7 +24522,7 @@ SELECT pg_catalog.setval('public.production_summary_id_seq', 1, false);
 -- Name: purchase_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.purchase_orders_id_seq', 86, true);
+SELECT pg_catalog.setval('public.purchase_orders_id_seq', 94, true);
 
 
 --
@@ -23212,7 +24599,7 @@ SELECT pg_catalog.setval('public.section_equipment_id_seq', 675, true);
 -- Name: section_kpi_snapshots_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 14886, true);
+SELECT pg_catalog.setval('public.section_kpi_snapshots_id_seq', 15926, true);
 
 
 --
@@ -23233,7 +24620,7 @@ SELECT pg_catalog.setval('public.section_sops_id_seq', 1, false);
 -- Name: sections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.sections_id_seq', 62, true);
+SELECT pg_catalog.setval('public.sections_id_seq', 64, true);
 
 
 --
@@ -23275,14 +24662,14 @@ SELECT pg_catalog.setval('public.slitting_waste_log_id_seq', 1, false);
 -- Name: stock_ledger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.stock_ledger_id_seq', 3573, true);
+SELECT pg_catalog.setval('public.stock_ledger_id_seq', 3661, true);
 
 
 --
 -- Name: store_indent_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.store_indent_log_id_seq', 114, true);
+SELECT pg_catalog.setval('public.store_indent_log_id_seq', 131, true);
 
 
 --
@@ -23366,7 +24753,7 @@ SELECT pg_catalog.setval('public.utility_readings_id_seq', 3, true);
 -- Name: vendor_bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendor_bills_id_seq', 60, true);
+SELECT pg_catalog.setval('public.vendor_bills_id_seq', 63, true);
 
 
 --
@@ -23380,7 +24767,7 @@ SELECT pg_catalog.setval('public.vendor_payments_id_seq', 1, true);
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendors_id_seq', 112, true);
+SELECT pg_catalog.setval('public.vendors_id_seq', 115, true);
 
 
 --
@@ -27673,5 +29060,5 @@ ALTER TABLE ONLY public.vendors
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 9DZpofYaup9lPD8gB8an4l5b8OKc5J11kZbb8i0mTjlTFfdHdworoXkxtyCzo0N
+\unrestrict 5UdgHgQIKReRHXcDtR7RPh4UmIMaQYFcK985VZQmMXfoBQr9NvUFYrOMLAHgM9y
 

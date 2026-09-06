@@ -598,5 +598,165 @@
     "user_id": 6,
     "remarks": "Issued to Pulp Mill Floor",
     "created_at": "2026-08-13T20:24:00.145Z"
+  },
+  {
+    "id": 92,
+    "indent_id": 197,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-02T14:01:58.982Z"
+  },
+  {
+    "id": 93,
+    "indent_id": 197,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-02T14:02:22.383Z"
+  },
+  {
+    "id": 94,
+    "indent_id": 198,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-02T14:11:23.347Z"
+  },
+  {
+    "id": 95,
+    "indent_id": 198,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-02T14:11:47.084Z"
+  },
+  {
+    "id": 96,
+    "indent_id": 199,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-03T13:15:43.812Z"
+  },
+  {
+    "id": 97,
+    "indent_id": 199,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-03T13:16:03.343Z"
+  },
+  {
+    "id": 98,
+    "indent_id": 200,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-04T13:02:39.570Z"
+  },
+  {
+    "id": 99,
+    "indent_id": 200,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-04T13:03:06.642Z"
+  },
+  {
+    "id": 100,
+    "indent_id": 201,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-04T13:26:47.737Z"
+  },
+  {
+    "id": 101,
+    "indent_id": 201,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-04T13:27:11.090Z"
+  },
+  {
+    "id": 102,
+    "indent_id": 202,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-05T13:30:54.175Z"
+  },
+  {
+    "id": 103,
+    "indent_id": 203,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-05T13:42:38.336Z"
+  },
+  {
+    "id": 104,
+    "indent_id": 203,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-05T13:43:55.772Z"
+  },
+  {
+    "id": 105,
+    "indent_id": 202,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-05T13:44:07.386Z"
+  },
+  {
+    "id": 106,
+    "indent_id": 204,
+    "action": "issue",
+    "old_status": "Submitted",
+    "new_status": "Issued",
+    "user_id": 6,
+    "remarks": "Immediate store issuance executed on indent creation",
+    "created_at": "2026-09-05T13:55:03.609Z"
+  },
+  {
+    "id": 107,
+    "indent_id": 204,
+    "action": "close",
+    "old_status": "Closed",
+    "new_status": "Closed",
+    "user_id": 6,
+    "remarks": null,
+    "created_at": "2026-09-05T13:55:43.175Z"
   }
 ]

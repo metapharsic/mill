@@ -178,5 +178,176 @@
     "section_equipment_id": 381,
     "remarks": null,
     "created_at": "2026-09-02T04:52:34.132Z"
+  },
+  {
+    "id": 62,
+    "material_id": 4634,
+    "section_id": 85,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-02T13:20:37.423Z"
+  },
+  {
+    "id": 64,
+    "material_id": 4718,
+    "section_id": 85,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-02T13:33:58.847Z"
+  },
+  {
+    "id": 65,
+    "material_id": 4719,
+    "section_id": 6,
+    "machine_id": null,
+    "section_equipment_id": 356,
+    "remarks": null,
+    "created_at": "2026-09-03T03:57:00.234Z"
+  },
+  {
+    "id": 66,
+    "material_id": 4720,
+    "section_id": 6,
+    "machine_id": null,
+    "section_equipment_id": 357,
+    "remarks": null,
+    "created_at": "2026-09-03T03:58:37.892Z"
+  },
+  {
+    "id": 67,
+    "material_id": 4721,
+    "section_id": 6,
+    "machine_id": null,
+    "section_equipment_id": 357,
+    "remarks": null,
+    "created_at": "2026-09-03T04:01:57.300Z"
+  },
+  {
+    "id": 68,
+    "material_id": 4722,
+    "section_id": 6,
+    "machine_id": null,
+    "section_equipment_id": 357,
+    "remarks": null,
+    "created_at": "2026-09-04T04:02:58.355Z"
+  },
+  {
+    "id": 69,
+    "material_id": 4731,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:00:59.931Z"
+  },
+  {
+    "id": 71,
+    "material_id": 4732,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:05:51.901Z"
+  },
+  {
+    "id": 72,
+    "material_id": 4733,
+    "section_id": 19,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:08:08.296Z"
+  },
+  {
+    "id": 73,
+    "material_id": 4734,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:09:53.122Z"
+  },
+  {
+    "id": 74,
+    "material_id": 4735,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:12:44.470Z"
+  },
+  {
+    "id": 75,
+    "material_id": 4736,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:14:55.649Z"
+  },
+  {
+    "id": 76,
+    "material_id": 4737,
+    "section_id": 19,
+    "machine_id": 24,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T10:16:35.350Z"
+  },
+  {
+    "id": 81,
+    "material_id": 4546,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:00:55.986Z"
+  },
+  {
+    "id": 82,
+    "material_id": 4552,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:03:25.254Z"
+  },
+  {
+    "id": 83,
+    "material_id": 4740,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:19:47.340Z"
+  },
+  {
+    "id": 84,
+    "material_id": 4741,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:22:12.418Z"
+  },
+  {
+    "id": 85,
+    "material_id": 4742,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:24:12.889Z"
+  },
+  {
+    "id": 86,
+    "material_id": 4743,
+    "section_id": 140,
+    "machine_id": null,
+    "section_equipment_id": 36,
+    "remarks": null,
+    "created_at": "2026-09-04T12:25:28.745Z"
   }
 ]
