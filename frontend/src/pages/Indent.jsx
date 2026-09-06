@@ -5,6 +5,7 @@ import SearchableSelect from '../components/SearchableSelect'
 import { LOGO_DATA_URI } from '../utils/logo'
 import { ExternalLink } from 'lucide-react'
 import A3InvoicePrintModal from '../components/A3InvoicePrintModal'
+import CashPurchasePrintModal from '../components/CashPurchasePrintModal'
 import SequenceEnforcementModal from '../components/SequenceEnforcementModal'
 import { useMinimizedModals } from '../contexts/MinimizedModalsContext'
 
@@ -230,6 +231,7 @@ export default function Indent() {
 
   // Sequence Violation Modal State
   const [sequenceViolation, setSequenceViolation] = useState(null)
+  const [cashPrintDoc, setCashPrintDoc] = useState(null)
 
   const openA3IndentPrint = async (indOrId) => {
     let fullDoc = typeof indOrId === 'object' ? indOrId : null
@@ -844,6 +846,7 @@ export default function Indent() {
     setConverting(false)
     if (res.success) {
       flash(true, res.message || 'Cash Purchase Voucher generated & stock updated successfully!')
+      if (res.data) setCashPrintDoc(res.data)
       setCashModal(null)
       if (detail?.id === cashModal.id) openDetail(cashModal.id)
       load()
@@ -3896,6 +3899,13 @@ export default function Indent() {
           title={a3PrintDoc.title || 'STORE INDENT / ISSUE VOUCHER'}
         />
       )}
+
+      {/* ── CASH PURCHASE VOUCHER PRINT MODAL ── */}
+      <CashPurchasePrintModal
+        isOpen={!!cashPrintDoc}
+        data={cashPrintDoc}
+        onClose={() => setCashPrintDoc(null)}
+      />
 
       {/* ── SEQUENCE ENFORCEMENT POPUP (Strict 4-Step Maker-Checker Sequence) ── */}
       {sequenceViolation && (

@@ -3251,6 +3251,15 @@ router.get('/reports/item-wise', requireAuth, ar(async (req, res) => {
   res.json({ success: true, data: { items: items.rows, topDepartments } });
 }));
 
+// GET /api/store/reports/item-wise/export — Export formatted Excel workbook of Item Consumption
+router.get('/reports/item-wise/export', requireAuth, ar(async (req, res) => {
+  const { generateItemConsumptionExcel } = require('../services/inventoryExcelExporter');
+  const { buffer, filename } = await generateItemConsumptionExcel(req.query);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(buffer);
+}));
+
 // GET /api/store/reports/category-wise — category/subcategory hierarchy drill-down
 router.get('/reports/category-wise', requireAuth, ar(async (req, res) => {
   const { from, to } = req.query;

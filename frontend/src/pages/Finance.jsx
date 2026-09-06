@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import AgentStatusBanner from '../components/AgentStatusBanner'
+import CashPurchasePrintModal from '../components/CashPurchasePrintModal'
 
 const API = async (p, o = {}) => {
   try {
@@ -51,6 +52,7 @@ export default function Finance() {
   const [vendorPayments, setVendorPayments] = useState([])
   const [billFilterStatus, setBillFilterStatus] = useState('')
   const [billSearch, setBillSearch] = useState('')
+  const [cashPrintDoc, setCashPrintDoc] = useState(null)
 
   // Payment Disbursal Modal State
   const [disburseModal, setDisburseModal] = useState(null)
@@ -868,6 +870,13 @@ export default function Finance() {
           </div>
         </div>
       )}
+
+      {/* ── CASH PURCHASE VOUCHER PRINT MODAL ── */}
+      <CashPurchasePrintModal
+        isOpen={!!cashPrintDoc}
+        data={cashPrintDoc}
+        onClose={() => setCashPrintDoc(null)}
+      />
     </div>
   )
 }

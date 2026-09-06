@@ -2490,9 +2490,36 @@ export default function Store({ onNavigate }) {
                         >
                           ✍️ Sign
                         </button>
+                        {outw.transaction_type === 'job_work' && (
+                          <button
+                            style={{ ...S.btnSm, background: '#7c3aed', color: '#fff', fontWeight: 800, padding: '3px 6px', fontSize: 10, display: 'flex', alignItems: 'center', gap: 2 }}
+                            onClick={() => setA3PrintDoc({
+                              ...outw,
+                              dc_number: outw.dc_number || outw.reference_id || `DC-JW-${outw.id}`,
+                              vendorName: outw.vendorName || outw.vendor_name || 'Job Work Vendor / Lathe Repair Workshop',
+                              isReturnable: true,
+                              items: [{
+                                materialName: outw.materialName,
+                                materialCode: outw.materialCode,
+                                uom: outw.uom,
+                                in_qty: outw.out_qty,
+                                unit_price: outw.unit_price,
+                                hsnCode: outw.hsnCode || '8439',
+                                gst_pct: 18,
+                                batch_number: outw.batch_number || 'JW-BATCH',
+                                mrp: outw.unit_price,
+                                remarks: outw.remarks || 'Sent for plant repair / lathe turning / rewinding'
+                              }],
+                              title: 'OUTWARD DELIVERY CHALLAN (RETURNABLE - JOB WORK)'
+                            })}
+                            title="Print Official Job Work Delivery Challan (DC)"
+                          >
+                            🖨️ Job Work DC
+                          </button>
+                        )}
                         <button
                           style={{ ...S.btnSm, background: '#0f766e', color: '#fff', fontWeight: 800, padding: '3px 6px', fontSize: 10 }}
-                          onClick={() => openA3Invoice({
+                          onClick={() => setA3PrintDoc({
                             ...outw,
                             items: [{
                               materialName: outw.materialName,

@@ -8,6 +8,7 @@ import TableScrollWrapper from '../components/TableScrollWrapper'
 import SearchableSelect from '../components/SearchableSelect'
 import MultiSearchableSelect from '../components/MultiSearchableSelect'
 import SectionMachineAllocator from '../components/SectionMachineAllocator'
+import ProductDetailModal from '../components/ProductDetailModal'
 import { UOM_CATEGORIES, ALL_UOM_CODES, PRIMARY_UOMS } from '../constants/uom'
 
 const API = (path, opts) => fetch(path, {
@@ -104,6 +105,7 @@ export default function Materials() {
   const [catModal, setCatModal] = useState(false)
   const [exportModal, setExportModal] = useState(false)
   const [edit, setEdit] = useState(null)
+  const [selectedProductModalId, setSelectedProductModalId] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [catForm, setCatForm] = useState({ name: '', code: '', type: 'Raw Material', parent_id: '' })
   const [saving, setSaving] = useState(false)
@@ -1545,6 +1547,7 @@ export default function Materials() {
                         {/* Actions */}
                         <td style={S.td}>
                           <div style={S.actions}>
+                            <button style={S.btnIcon} title="View 360-Degree History & Download Excel" onClick={() => setSelectedProductModalId(m.id)}>📜</button>
                             <button style={S.btnIcon} title="Edit Master Record" onClick={() => openEdit(m)}>✏️</button>
                             <button style={S.btnIcon} title={m.is_active ? 'Deactivate Material' : 'Activate Material'} onClick={() => toggleActive(m)}>
                               {m.is_active ? '⏸' : '▶'}
@@ -2383,6 +2386,14 @@ export default function Materials() {
         initialCategoryId={filterCat}
         categories={categories}
         sections={sections}
+      />
+
+      {/* ── UNIFIED 360-DEGREE PRODUCT LEDGER & EXCEL EXPORT MODAL ── */}
+      <ProductDetailModal
+        materialId={selectedProductModalId}
+        isOpen={!!selectedProductModalId}
+        onClose={() => setSelectedProductModalId(null)}
+        onUpdated={fetchMaterials}
       />
     </div>
   )

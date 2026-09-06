@@ -5,6 +5,7 @@ import AgentStatusBanner from '../components/AgentStatusBanner'
 import TableScrollWrapper from '../components/TableScrollWrapper'
 import ScrollableTabs from '../components/ScrollableTabs'
 import SearchableSelect from '../components/SearchableSelect'
+import CashPurchasePrintModal from '../components/CashPurchasePrintModal'
 import { useMinimizedModals } from '../contexts/MinimizedModalsContext'
 import { LOGO_DATA_URI, LOGO_SRC } from '../utils/logo'
 const API = (p, o) => fetch(p.startsWith('/api') ? p : `/api${p}`, { headers: { Authorization: `Bearer ${localStorage.getItem('mk_token')}`, 'Content-Type': 'application/json', ...(o?.headers || {}) }, ...o }).then(r => r.json())
@@ -187,6 +188,7 @@ export default function Purchase() {
   const [billSaving,setBillSaving]=useState(false),[billErr,setBillErr]=useState(''),[billSuccess,setBillSuccess]=useState('')
   // Print
   const [printContent,setPrintContent]=useState(null)
+  const [cashPrintDoc, setCashPrintDoc]=useState(null)
   const LIMIT=20
 
   // Multi-tab Management: 'orders' | 'grn' | 'bills' | 'pipeline'
@@ -1322,142 +1324,7 @@ export default function Purchase() {
       const r = await API(`/api/purchase/cash-purchases/${cpRow.id}`)
       if (r.success) cp = r.data
     }
-    const isInter = cp.vendor_gstin && !cp.vendor_gstin.startsWith('29')
-    const sub = Number(cp.taxable_amount || cp.taxableAmount || 0)
-    const cgst = Number(cp.cgst_amount || 0)
-    const sgst = Number(cp.sgst_amount || 0)
-    const igst = Number(cp.igst_amount || 0)
-    const grand = Number(cp.total_amount || cp.totalAmount || 0)
-
-    const content = (
-      <div id="print-document" style={{ fontFamily: 'Inter, system-ui, sans-serif', color: '#0f172a', lineHeight: 1.4, padding: '16px' }}>
-        {/* Letterhead */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f766e', paddingBottom: 12, marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src={LOGO_DATA_URI} alt="Logo" style={{ height: 44, width: 'auto', maxWidth: 150, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', padding: '2px 6px' }} />
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#0f766e', letterSpacing: 0.5 }}>SRI M.K. PAPER MILLS PRIVATE LIMITED</div>
-              <div style={{ fontSize: 11, color: '#334155', fontWeight: 600 }}>CASH PURCHASE &amp; SPOT PROCUREMENT VOUCHER</div>
-              <div style={{ fontSize: 10, color: '#64748b' }}>Plant: Survey No. 42/1, Mill Road, Industrial Area, Karnataka | GSTIN: 29AABCS1429B1Z8</div>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: '#0f766e' }}>{cp.voucher_number || cp.voucherNumber}</div>
-            <div style={{ fontSize: 11, color: '#64748b' }}>Date: <strong>{cp.date ? new Date(cp.date).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</strong></div>
-            <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700 }}>PAID ({cp.payment_mode || cp.paymentMode || 'Cash'})</div>
-          </div>
-        </div>
-
-        {/* Vendor & Details */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
-          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 12px', background: '#f8fafc' }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>SUPPLIER / SHOP DETAILS</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{cp.vendor_name || cp.vendorName}</div>
-            <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>GSTIN: <strong>{cp.vendor_gstin || cp.vendorGstin || 'Unregistered / Cash Vendor'}</strong></div>
-            <div style={{ fontSize: 11, color: '#334155' }}>Cash Memo / Invoice: <strong>{cp.invoice_number || cp.invoiceNumber || '—'}</strong></div>
-          </div>
-          <div style={{ border: '1px solid #cbd5e1', borderRadius: 6, padding: '10px 12px', background: '#f8fafc' }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: '#0f766e', textTransform: 'uppercase', marginBottom: 4 }}>PROCUREMENT &amp; PAYMENT INFO</div>
-            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>PR / Indent Ref: <strong>{cp.indentNumber || cp.indent_number || 'Direct Spot Purchase'}</strong></div>
-            <div style={{ fontSize: 11, color: '#334155', marginBottom: 2 }}>Payment Mode: <strong>{cp.payment_mode || cp.paymentMode || 'Cash'}</strong> {cp.payment_ref ? `(Ref: ${cp.payment_ref})` : ''}</div>
-            <div style={{ fontSize: 11, color: '#334155' }}>Inventory Status: <strong style={{ color: '#16a34a' }}>✓ Stock Added to Central Store</strong></div>
-          </div>
-        </div>
-
-        {/* Items Table */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16, fontSize: 11 }}>
-          <thead>
-            <tr style={{ background: '#f1f5f9', borderTop: '1px solid #0f766e', borderBottom: '2px solid #0f766e', textAlign: 'left', color: '#0f766e', fontWeight: 800 }}>
-              <th style={{ padding: '8px 6px', width: 30, textAlign: 'center' }}>#</th>
-              <th style={{ padding: '8px 6px' }}>Item Description &amp; Part Code</th>
-              <th style={{ padding: '8px 6px', textAlign: 'center', width: 70 }}>HSN</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 60 }}>Qty</th>
-              <th style={{ padding: '8px 6px', width: 45 }}>UOM</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 80 }}>Unit Rate</th>
-              <th style={{ padding: '8px 6px', textAlign: 'center', width: 50 }}>GST%</th>
-              <th style={{ padding: '8px 6px', textAlign: 'right', width: 95 }}>Total (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(cp.items || []).map((it, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{i + 1}</td>
-                <td style={{ padding: '8px 6px' }}>
-                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{it.materialName || it.description}</div>
-                  <div style={{ fontSize: 10, color: '#64748b' }}>Code: <code>{it.materialCode || it.material_id}</code></div>
-                </td>
-                <td style={{ padding: '8px 6px', textAlign: 'center', color: '#64748b' }}>{it.hsnCode || '8439'}</td>
-                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>{parseFloat(it.qty || 0).toFixed(2)}</td>
-                <td style={{ padding: '8px 6px', color: '#475569' }}>{it.uom || it.matUom || 'NOS'}</td>
-                <td style={{ padding: '8px 6px', textAlign: 'right' }}>₹{parseFloat(it.unit_price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{it.gst_pct != null && it.gst_pct !== '' ? it.gst_pct : 18}%</td>
-                <td style={{ padding: '8px 6px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(it.line_total || it.lineTotal || (parseFloat(it.qty || 0) * parseFloat(it.unit_price || 0) * (1 + ((it.gst_pct != null && it.gst_pct !== '' ? parseFloat(it.gst_pct) : 18) / 100)))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Valuation and Signatures */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginBottom: 20 }}>
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 14px', background: '#f8fafc' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#0f766e', marginBottom: 4 }}>Amount in Words:</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', fontStyle: 'italic' }}>
-              {numberToWords(grand)}
-            </div>
-            {cp.remarks && <div style={{ fontSize: 11, color: '#475569', marginTop: 8 }}><strong>Remarks:</strong> {cp.remarks}</div>}
-          </div>
-          <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
-            <tbody>
-              <tr>
-                <td style={{ padding: '4px 6px', color: '#64748b' }}>Taxable Amount:</td>
-                <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600 }}>₹{sub.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-              </tr>
-              {isInter ? (
-                <tr>
-                  <td style={{ padding: '4px 6px', color: '#d97706' }}>IGST Amount:</td>
-                  <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#d97706' }}>₹{igst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                </tr>
-              ) : (
-                <>
-                  <tr>
-                    <td style={{ padding: '4px 6px', color: '#059669' }}>CGST Amount:</td>
-                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '4px 6px', color: '#059669' }}>SGST Amount:</td>
-                    <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 600, color: '#059669' }}>₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  </tr>
-                </>
-              )}
-              <tr style={{ borderTop: '1px solid #cbd5e1', background: '#f0fdf4' }}>
-                <td style={{ padding: '6px 6px', fontWeight: 800, fontSize: 13, color: '#0f766e' }}>Total Paid:</td>
-                <td style={{ padding: '6px 6px', textAlign: 'right', fontWeight: 900, fontSize: 14, color: '#0f766e' }}>₹{grand.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* 3 Signatures */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, textAlign: 'center', fontSize: 11, color: '#334155', marginTop: 32 }}>
-          <div>
-            <div style={{ height: 36 }}></div>
-            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Purchaser / Indentor</div>
-            <div style={{ fontSize: 10, color: '#64748b' }}>{cp.createdByName || 'Purchaser'}</div>
-          </div>
-          <div>
-            <div style={{ height: 36 }}></div>
-            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Store Keeper (Stock Verified)</div>
-            <div style={{ fontSize: 10, color: '#64748b' }}>Central Stores</div>
-          </div>
-          <div>
-            <div style={{ height: 36 }}></div>
-            <div style={{ borderTop: '1px solid #94a3b8', paddingTop: 4, fontWeight: 700 }}>Finance / Accounts Incharge</div>
-            <div style={{ fontSize: 10, color: '#64748b' }}>Accounts Department</div>
-          </div>
-        </div>
-      </div>
-    )
-    setPrintContent(content)
+    setCashPrintDoc(cp)
   }
 
   // Print Commercial Vendor Bill & Tax Invoice Entry
@@ -4453,6 +4320,12 @@ export default function Purchase() {
           </div>
         )
       })()}
+
+      <CashPurchasePrintModal
+        isOpen={!!cashPrintDoc}
+        data={cashPrintDoc}
+        onClose={() => setCashPrintDoc(null)}
+      />
     </div>
   )
 }

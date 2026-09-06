@@ -76,6 +76,30 @@ export default function StoreDeptReports({ onNavigate }) {
     }
   }, [tab, fromDate, toDate, selectedItemId, expandedVendor, selectedSecFilter, addToast])
 
+  const handleExportItemWiseExcel = async () => {
+    try {
+      const p = new URLSearchParams()
+      if (fromDate) p.set('from', fromDate)
+      if (toDate) p.set('to', toDate)
+      
+      const res = await fetch(`${API}/store/reports/item-wise/export?${p.toString()}`, {
+        headers: h()
+      })
+      if (!res.ok) throw new Error('Failed to generate Excel report')
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `MK_Mill_Item_Wise_Consumption_${fromDate || 'All'}_to_${toDate || 'Current'}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      addToast('Error exporting Excel: ' + err.message, 'error')
+    }
+  }
+
   useEffect(() => {
     if (tab !== 'dept') loadGranular()
   }, [tab, loadGranular])
@@ -325,8 +349,16 @@ export default function StoreDeptReports({ onNavigate }) {
       {tab === 'item' && (
         <div style={S.tableWrap}>
           <div style={{ padding: '14px 18px', borderBottom: '1px solid #e7e6df', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <b>Item-Wise Consumption Report</b>
-            {isOrgWide && <span style={S.muted}>Click a row to see its top-issuing departments</span>}
+            <div>
+              <b style={{ fontSize: 15, color: '#111827' }}>📦 Item-Wise Consumption Report</b>
+              {isOrgWide && <span style={{ ...S.muted, marginLeft: 12 }}>Click any item to view department breakdown</span>}
+            </div>
+            <button
+              onClick={handleExportItemWiseExcel}
+              style={{ background: '#15803d', color: '#fff', border: 'none', padding: '7px 16px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+            >
+              📥 Download Formatted Excel Report
+            </button>
           </div>
           <table style={S.table}>
             <thead>

@@ -746,7 +746,318 @@ async function generateInventoryExcel(options = {}) {
   };
 }
 
+async function generateSingleItemHistoryExcel(materialId) {
+  const { rows: [mat] } = await pool.query(`
+    SELECT m.*, mc.name AS category_name, mc.code AS category_code
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE m.id = $1
+  `, [materialId]);
+
+  if (!mat) throw new Error('Material not found');
+
+  const { rows: history } = await pool.query(`
+    SELECT 
+      sl.id,
+      sl.date,
+      sl.transaction_type,
+      sl.reference_type,
+      sl.reference_id,
+      sl.in_qty,
+      sl.out_qty,
+      sl.balance,
+      sl.unit_price,
+      sl.value,
+      sl.batch_number,
+      sl.remarks,
+      sl.created_at,
+      u.name AS created_by_name,
+      v.name AS vendor_name,
+      g.grn_number,
+      ind.indent_number,
+      dept.name AS department_name
+    FROM stock_ledger sl
+    LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
+    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END)
+    LEFT JOIN indents ind ON ((sl.reference_type ILIKE 'indent%' OR sl.reference_type ILIKE 'issue%') AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
+    LEFT JOIN departments dept ON (ind.department_id = dept.id OR u.department_id = dept.id)
+    WHERE sl.material_id = $1
+    ORDER BY sl.date DESC, sl.id DESC
+  `, [materialId]);
+
+  const { rows: deptBreakdown } = await pool.query(`
+    SELECT 
+      COALESCE(d.name, 'General Mill Operations') AS department_name,
+      COUNT(sl.id) AS issue_count,
+      SUM(sl.out_qty) AS total_issued_qty,
+      SUM(sl.value) AS total_issued_value
+    FROM stock_ledger sl
+    LEFT JOIN indents ind ON ((sl.reference_type ILIKE 'indent%' OR sl.reference_type ILIKE 'issue%') AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
+    LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN departments d ON (ind.department_id = d.id OR u.department_id = d.id)
+    WHERE sl.material_id = $1 AND sl.out_qty > 0
+    GROUP BY d.name
+    ORDER BY total_issued_qty DESC
+  `, [materialId]);
+
+  const { rows: sectionAllocations } = await pool.query(`
+    SELECT 
+      ps.name AS section_name,
+      ps.section_code,
+      se.equipment_name,
+      se.tag_name
+    FROM material_sections ms
+    JOIN plant_sections ps ON ms.section_id = ps.id
+    LEFT JOIN material_equipment me ON me.material_id = ms.material_id
+    LEFT JOIN section_equipment se ON me.section_equipment_id = se.id
+    WHERE ms.material_id = $1
+  `, [materialId]);
+
+  const wb = XLSX.utils.book_new();
+
+  // SHEET 1: PRODUCT SPECIFICATIONS
+  const specData = [
+    ['SRI M.K. PAPER MILLS PRIVATE LIMITED'],
+    ['MATERIAL MASTER SPECIFICATIONS & INVENTORY AUDIT REPORT'],
+    [`Generated On: ${new Date().toLocaleString('en-IN')}`],
+    [''],
+    ['ATTRIBUTES', 'VALUE'],
+    ['Material Code / SKU', mat.code],
+    ['Material Description', mat.name],
+    ['Category', mat.category_name || 'Store Item'],
+    ['Unit of Measure (UOM)', mat.uom],
+    ['Current Stock Balance', `${parseFloat(mat.current_stock || 0).toLocaleString('en-IN')} ${mat.uom}`],
+    ['Unit Price (₹)', parseFloat(mat.unit_price || 0)],
+    ['Total Valuation (₹)', parseFloat(mat.current_stock || 0) * parseFloat(mat.unit_price || 0)],
+    ['Reorder Level', mat.reorder_level || 0],
+    ['Min Stock Level', mat.min_stock || 0],
+    ['Max Stock Level', mat.max_stock || 0],
+    ['Bin Location', mat.bin_location || 'Unassigned'],
+    ['HSN Code', mat.hsn_code || '-'],
+    ['Criticality Class', mat.criticality_class || 'C'],
+    ['Procurement Strategy', mat.procurement_strategy || '-'],
+    ['OEM / Vendor Supplier', mat.oem_supplier || '-'],
+    [''],
+    ['ASSIGNED PLANT SECTIONS & EQUIPMENT CONTEXT'],
+    ['Section Code', 'Section Name', 'Machine Name', 'Equipment Tag']
+  ];
+
+  if (sectionAllocations.length === 0) {
+    specData.push(['-', 'General Store / Unassigned', '-', '-']);
+  } else {
+    sectionAllocations.forEach(sec => {
+      specData.push([sec.section_code || 'SEC', sec.section_name, sec.machine_name || '-', `${sec.equipment_name || ''} (${sec.tag_name || ''})`]);
+    });
+  }
+
+  const wsSpec = XLSX.utils.aoa_to_sheet(specData);
+  wsSpec['!cols'] = autoFitColumns(specData);
+  XLSX.utils.book_append_sheet(wb, wsSpec, 'Product Summary');
+
+  // SHEET 2: COMPLETE TRANSACTION LEDGER
+  const ledgerData = [
+    ['SRI M.K. PAPER MILLS PRIVATE LIMITED'],
+    [`COMPLETE TRANSACTION LEDGER — ${mat.code} (${mat.name})`],
+    [`Total Records: ${history.length}`],
+    [''],
+    ['S.No', 'Date & Time', 'Txn Type', 'In Qty', 'Out Qty', 'Balance Stock', 'Rate (₹)', 'Transaction Value (₹)', 'Department / Indent', 'Vendor Name / GRN #', 'Batch Number', 'Logged By', 'Remarks']
+  ];
+
+  let totIn = 0;
+  let totOut = 0;
+  let totVal = 0;
+
+  history.forEach((h, idx) => {
+    const inQty = parseFloat(h.in_qty || 0);
+    const outQty = parseFloat(h.out_qty || 0);
+    const val = parseFloat(h.value || 0);
+    totIn += inQty;
+    totOut += outQty;
+    totVal += val;
+
+    ledgerData.push([
+      idx + 1,
+      h.date ? String(h.date).slice(0, 10) : (h.created_at ? new Date(h.created_at).toLocaleDateString() : '-'),
+      (h.transaction_type || 'TXN').toUpperCase(),
+      inQty > 0 ? inQty : 0,
+      outQty > 0 ? outQty : 0,
+      parseFloat(h.balance || 0),
+      parseFloat(h.unit_price || 0),
+      val,
+      h.department_name || (h.indent_number ? `Indent: ${h.indent_number}` : '-'),
+      h.vendor_name || (h.grn_number ? `GRN: ${h.grn_number}` : '-'),
+      h.batch_number || '-',
+      h.created_by_name || 'System',
+      h.remarks || '-'
+    ]);
+  });
+
+  ledgerData.push(['']);
+  ledgerData.push(['TOTALS', '', '', totIn, totOut, '', '', totVal, '', '', '', '', '']);
+
+  const wsLedger = XLSX.utils.aoa_to_sheet(ledgerData);
+  wsLedger['!cols'] = autoFitColumns(ledgerData);
+  XLSX.utils.book_append_sheet(wb, wsLedger, 'Transaction Ledger');
+
+  // SHEET 3: DEPARTMENT CONSUMPTION USAGE
+  const deptData = [
+    ['SRI M.K. PAPER MILLS PRIVATE LIMITED'],
+    [`DEPARTMENT USAGE & CONSUMPTION BREAKDOWN — ${mat.code}`],
+    [''],
+    ['S.No', 'Department Name', 'Total Issues Count', 'Total Issued Quantity', 'UOM', 'Total Issued Value (₹)']
+  ];
+
+  deptBreakdown.forEach((d, idx) => {
+    deptData.push([
+      idx + 1,
+      d.department_name,
+      parseInt(d.issue_count || 0),
+      parseFloat(d.total_issued_qty || 0),
+      mat.uom,
+      parseFloat(d.total_issued_value || 0)
+    ]);
+  });
+
+  const wsDept = XLSX.utils.aoa_to_sheet(deptData);
+  wsDept['!cols'] = autoFitColumns(deptData);
+  XLSX.utils.book_append_sheet(wb, wsDept, 'Department Usage');
+
+  const fileBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+  const sanitizedCode = (mat.code || 'ITEM').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `MK_Mill_Item_History_${sanitizedCode}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+  return { buffer: fileBuffer, filename };
+}
+
+async function generateItemConsumptionExcel(options = {}) {
+  const { from, to, departmentId, categoryId, materialId } = options;
+  
+  const params = [];
+  const dateFilter = [];
+  if (from) { params.push(from); dateFilter.push(`sl.date >= $${params.length}`); }
+  if (to)   { params.push(to);   dateFilter.push(`sl.date <= $${params.length}`); }
+  const dateClause = dateFilter.length ? 'AND ' + dateFilter.join(' AND ') : '';
+
+  const matFilter = [];
+  if (materialId) { params.push(materialId); matFilter.push(`m.id = $${params.length}`); }
+  if (categoryId) { params.push(categoryId); matFilter.push(`m.category_id = $${params.length}`); }
+  const matClause = matFilter.length ? 'AND ' + matFilter.join(' AND ') : '';
+
+  const itemsRes = await pool.query(`
+    SELECT
+      m.id, m.code, m.name, m.uom, m.current_stock, m.min_stock, m.reorder_level, m.unit_price,
+      m.bin_location, mc.name AS "categoryName",
+      COUNT(sl.id) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')) AS "issueCount",
+      COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "totalIssuedQty",
+      COALESCE(SUM(sl.value) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) AS "totalIssuedValue",
+      COALESCE(SUM(sl.in_qty) FILTER (WHERE sl.transaction_type IN ('grn','return','in')), 0) AS "totalReceivedQty",
+      CASE WHEN m.current_stock > 0
+        THEN ROUND(COALESCE(SUM(sl.out_qty) FILTER (WHERE sl.transaction_type IN ('issue','out','return_to_vendor','transfer')), 0) / m.current_stock, 2)
+        ELSE 0 END AS "turnoverRate"
+    FROM materials m
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN stock_ledger sl ON sl.material_id = m.id ${dateClause}
+    WHERE m.is_active = true ${matClause}
+    GROUP BY m.id, m.code, m.name, m.uom, m.current_stock, m.min_stock, m.reorder_level, m.unit_price, m.bin_location, mc.name
+    ORDER BY "totalIssuedValue" DESC, "totalIssuedQty" DESC
+    LIMIT 1000
+  `, params);
+
+  // Department wise breakdown
+  const deptParams = [];
+  const deptFilter = [];
+  if (from) { deptParams.push(from); deptFilter.push(`si.issue_date >= $${deptParams.length}`); }
+  if (to)   { deptParams.push(to);   deptFilter.push(`si.issue_date <= $${deptParams.length}`); }
+  if (departmentId) { deptParams.push(departmentId); deptFilter.push(`si.department_id = $${deptParams.length}`); }
+  if (materialId) { deptParams.push(materialId); deptFilter.push(`si.material_id = $${deptParams.length}`); }
+  const deptClause = deptFilter.length ? 'WHERE ' + deptFilter.join(' AND ') : '';
+
+  const deptRes = await pool.query(`
+    SELECT d.name AS "deptName", m.code AS "materialCode", m.name AS "materialName", m.uom,
+           COUNT(si.id)::int AS "issueCount",
+           COALESCE(SUM(si.quantity), 0) AS "totalQty",
+           COALESCE(SUM(si.estimated_value), 0) AS "totalValue"
+    FROM store_issues si
+    LEFT JOIN departments d ON si.department_id = d.id
+    LEFT JOIN materials m ON si.material_id = m.id
+    ${deptClause}
+    GROUP BY d.name, m.code, m.name, m.uom
+    ORDER BY "totalValue" DESC
+    LIMIT 1000
+  `, deptParams);
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1
+  const s1Data = [
+    ['SRI M.K. PAPER MILLS PRIVATE LIMITED'],
+    [`ITEM-WISE CONSUMPTION REPORT (${from || 'Beginning'} TO ${to || 'Present'})`],
+    [''],
+    ['S.No', 'Material Code', 'Material Name', 'Category', 'Bin', 'Current Stock', 'UOM', 'Unit Price (₹)', 'Issued Qty', 'Issued Value (₹)', 'Received Qty', 'Turnover Rate']
+  ];
+
+  let totIssuedVal = 0;
+  itemsRes.rows.forEach((it, idx) => {
+    const val = parseFloat(it.totalIssuedValue || 0);
+    totIssuedVal += val;
+    s1Data.push([
+      idx + 1,
+      it.code,
+      it.name,
+      it.categoryName || 'General',
+      it.bin_location || '—',
+      parseFloat(it.current_stock || 0),
+      it.uom || 'NOS',
+      parseFloat(it.unit_price || 0),
+      parseFloat(it.totalIssuedQty || 0),
+      val,
+      parseFloat(it.totalReceivedQty || 0),
+      parseFloat(it.turnoverRate || 0)
+    ]);
+  });
+  s1Data.push(['']);
+  s1Data.push(['TOTAL CONSUMPTION VALUE', '', '', '', '', '', '', '', '', totIssuedVal, '', '']);
+
+  const ws1 = XLSX.utils.aoa_to_sheet(s1Data);
+  ws1['!cols'] = autoFitColumns(s1Data);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Item Consumption Summary');
+
+  // Sheet 2
+  const s2Data = [
+    ['SRI M.K. PAPER MILLS PRIVATE LIMITED'],
+    ['DEPARTMENT-WISE ITEM CONSUMPTION BREAKDOWN'],
+    [''],
+    ['S.No', 'Department Name', 'Material Code', 'Material Name', 'Issue Transactions', 'Issued Qty', 'UOM', 'Total Issued Value (₹)']
+  ];
+
+  deptRes.rows.forEach((d, idx) => {
+    s2Data.push([
+      idx + 1,
+      d.deptName || 'Unassigned',
+      d.materialCode,
+      d.materialName,
+      d.issueCount,
+      parseFloat(d.totalQty || 0),
+      d.uom || 'NOS',
+      parseFloat(d.totalValue || 0)
+    ]);
+  });
+
+  const ws2 = XLSX.utils.aoa_to_sheet(s2Data);
+  ws2['!cols'] = autoFitColumns(s2Data);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Department Breakdown');
+
+  const fileBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+  const filename = `MK_Mill_Item_Consumption_Report_${from || 'All'}_to_${to || 'Current'}.xlsx`;
+
+  return { buffer: fileBuffer, filename };
+}
+
 module.exports = {
   generateInventoryExcel,
+  generateSingleItemHistoryExcel,
+  generateItemConsumptionExcel,
   getStoreTypeFilter
 };
+

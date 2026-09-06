@@ -87,10 +87,71 @@ export default function ProductDetailModal({
   })
   const [issueLoading, setIssueLoading] = useState(false)
 
+  // 360-Degree Complete History & Usage Engine State
+  const [completeHistory, setCompleteHistory] = useState([])
+  const [completeHistoryPagination, setCompleteHistoryPagination] = useState({ total: 0, page: 1, totalPages: 1, totalInQty: 0, totalOutQty: 0, totalValue: 0 })
+  const [whereUsedData, setWhereUsedData] = useState({ department_breakdown: [], plant_sections: [], lifespan_history: [] })
+  const [historyPage, setHistoryPage] = useState(1)
+  const [historySearch, setHistorySearch] = useState('')
+  const [historyTxnType, setHistoryTxnType] = useState('')
+  const [historyLoading, setHistoryLoading] = useState(false)
+
   const showToast = (text, type = 'success') => {
     setToastMsg({ text, type })
     setTimeout(() => setToastMsg({ text: '', type: '' }), 4000)
   }
+
+  const loadCompleteHistory = useCallback(async () => {
+    if (!materialId || materialId === 'new' || !isOpen) return
+    setHistoryLoading(true)
+    try {
+      const p = new URLSearchParams({ page: historyPage, limit: 30 })
+      if (historySearch) p.set('search', historySearch)
+      if (historyTxnType) p.set('transaction_type', historyTxnType)
+      const res = await fetch(`${API}/master/materials/${materialId}/complete-history?${p}`, { headers: h() }).then(r => r.json())
+      if (res.success && res.data) {
+        setCompleteHistory(res.data.history || [])
+        setCompleteHistoryPagination(res.data.pagination || { total: 0, page: 1, totalPages: 1, totalInQty: 0, totalOutQty: 0, totalValue: 0 })
+        setWhereUsedData(res.data.where_used || { department_breakdown: [], plant_sections: [], lifespan_history: [] })
+      }
+    } catch (err) {
+      console.error('Error loading complete history:', err)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [materialId, isOpen, historyPage, historySearch, historyTxnType])
+
+  useEffect(() => {
+    if (activeTab === 'ledger') {
+      loadCompleteHistory()
+    }
+  }, [activeTab, loadCompleteHistory])
+
+  const handleDownloadHistoryExcel = async () => {
+    if (!materialId || materialId === 'new') return
+    try {
+      showToast('Generating formatted Excel history workbook...', 'info')
+      const token = localStorage.getItem('mk_token')
+      const res = await fetch(`${API}/master/materials/${materialId}/export-history-excel`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Export failed')
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `MK_Mill_Item_History_${data?.code || 'ITEM'}_${new Date().toISOString().slice(0, 10)}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+      showToast('Formatted Excel workbook downloaded successfully!', 'success')
+    } catch (err) {
+      console.error(err)
+      showToast('Error downloading formatted Excel history', 'error')
+    }
+  }
+
 
   const loadMaterialDetail = useCallback(async () => {
     if (!materialId || !isOpen) return
@@ -404,9 +465,21 @@ export default function ProductDetailModal({
               </div>
             </div>
           </div>
-          <button style={S.closeBtn} onClick={onClose} title="Close product form">
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            {materialId && materialId !== 'new' && (
+              <button
+                type="button"
+                onClick={handleDownloadHistoryExcel}
+                style={{ background: '#f0fdfa', color: '#0f766e', border: '1px solid #0f766e', borderRadius: 6, padding: '6px 12px', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                title="Download formatted multi-sheet Excel history workbook for this item"
+              >
+                📊 Download Formatted Excel
+              </button>
+            )}
+            <button style={S.closeBtn} onClick={onClose} title="Close product form">
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* ── Toast notification inside modal ── */}
@@ -486,7 +559,7 @@ export default function ProductDetailModal({
         <div style={S.navTabs}>
           {[
             { id: 'specs', label: '📋 Product Specifications & Master Data' },
-            { id: 'ledger', label: `📜 Transaction Ledger & History (${data?.recent_transactions?.length || 0})` },
+            { id: 'ledger', label: `📜 Transaction Ledger & History (${completeHistoryPagination.total || data?.recent_transactions?.length || 0})` },
             { id: 'quick_ops', label: '⚡ Fast Inward / Issue Desks' }
           ].map(t => (
             <button
@@ -686,64 +759,182 @@ export default function ProductDetailModal({
           </form>
         )}
 
-        {/* ── TAB 2: LIVE TRANSACTION LEDGER & HISTORY ── */}
+        {/* ── TAB 2: LIVE 360-DEGREE TRANSACTION LEDGER & USAGE HISTORY ── */}
         {activeTab === 'ledger' && (
-          <div style={{ overflowY: 'auto', maxHeight: 420 }}>
-            <table style={S.tbl}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Date</th>
-                  <th style={S.th}>Transaction Type</th>
-                  <th style={S.th}>In Qty</th>
-                  <th style={S.th}>Out Qty</th>
-                  <th style={S.th}>Balance Stock</th>
-                  <th style={S.th}>Rate (₹)</th>
-                  <th style={S.th}>Total Value (₹)</th>
-                  <th style={S.th}>Reference / Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(!data?.recent_transactions || data.recent_transactions.length === 0) ? (
-                  <tr>
-                    <td colSpan={8} style={S.tdEmpty}>No transaction ledger history recorded for this material.</td>
-                  </tr>
-                ) : (
-                  data.recent_transactions.map(txn => {
-                    const isIn = parseFloat(txn.in_qty || 0) > 0
-                    return (
-                      <tr key={txn.id}>
-                        <td style={{ ...S.td, whiteSpace: 'nowrap', color: '#64748b' }}>
-                          {txn.date ? new Date(txn.date).toLocaleDateString() : '—'}
-                        </td>
-                        <td style={S.td}>
-                          <span style={{
-                            ...S.txnBadge,
-                            background: isIn ? '#dcfce7' : '#fee2e2',
-                            color: isIn ? '#15803d' : '#dc2626'
-                          }}>
-                            {txn.transaction_type?.toUpperCase()}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* WHERE & HOW USED BREAKDOWN PANEL */}
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 14 }}>
+              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 13, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <MapPin size={16} color="#0f766e" />
+                <span>📍 Plant Section & Department Usage Breakdown (Where & How Item is Used)</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                {/* Department Consumption Summary */}
+                <div style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 6, padding: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
+                    🏢 Consumption by Department
+                  </div>
+                  {(!whereUsedData?.department_breakdown || whereUsedData.department_breakdown.length === 0) ? (
+                    <div style={{ fontSize: 11.5, color: '#94a3b8' }}>No department issues recorded yet.</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 110, overflowY: 'auto' }}>
+                      {whereUsedData.department_breakdown.map((dept, idx) => (
+                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, padding: '2px 0', borderBottom: '1px dashed #f1f5f9' }}>
+                          <span style={{ fontWeight: 600, color: '#1e293b' }}>{dept.department_name}</span>
+                          <span style={{ color: '#0f766e', fontWeight: 700 }}>
+                            {fmtN(dept.total_issued_qty, 2)} {data?.uom} ({fmtCur(dept.total_issued_value)})
                           </span>
-                        </td>
-                        <td style={{ ...S.td, fontWeight: 700, color: '#16a34a' }}>
-                          {isIn ? `+${fmtN(txn.in_qty, 2)}` : '—'}
-                        </td>
-                        <td style={{ ...S.td, fontWeight: 700, color: '#dc2626' }}>
-                          {parseFloat(txn.out_qty || 0) > 0 ? `-${fmtN(txn.out_qty, 2)}` : '—'}
-                        </td>
-                        <td style={{ ...S.td, fontWeight: 700, color: '#0f172a' }}>
-                          {fmtN(txn.balance, 2)} {data?.uom}
-                        </td>
-                        <td style={S.td}>{fmtCur(txn.unit_price)}</td>
-                        <td style={{ ...S.td, fontWeight: 600 }}>{fmtCur(txn.value)}</td>
-                        <td style={{ ...S.td, fontSize: 11.5, color: '#475569' }}>
-                          {txn.remarks || txn.reference_type || '—'}
-                        </td>
-                      </tr>
-                    )
-                  })
-                )}
-              </tbody>
-            </table>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Plant Section & Machine Equipment Allocations */}
+                <div style={{ background: '#fff', border: '1px solid #cbd5e1', borderRadius: 6, padding: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
+                    ⚙️ Assigned Plant Sections & Equipment Context
+                  </div>
+                  {(!whereUsedData?.plant_sections || whereUsedData.plant_sections.length === 0) ? (
+                    <div style={{ fontSize: 11.5, color: '#94a3b8' }}>Item not assigned to a specific machine equipment tag.</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 110, overflowY: 'auto' }}>
+                      {whereUsedData.plant_sections.map((sec, idx) => (
+                        <div key={idx} style={{ fontSize: 11.5, color: '#1e293b' }}>
+                          <span style={{ fontWeight: 700, color: '#0369a1' }}>[{sec.section_code || 'SEC'}] {sec.section_name}</span>
+                          {sec.machine_name && <span> · Machine: <b>{sec.machine_name}</b></span>}
+                          {sec.equipment_name && <span style={{ color: '#0f766e' }}> · Eq: {sec.equipment_name} ({sec.tag_name || ''})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* FILTER & PAGINATION BAR */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, background: '#fff', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 6 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1, minWidth: 280 }}>
+                <input
+                  style={{ ...S.input, padding: '5px 10px', fontSize: 12 }}
+                  placeholder="🔍 Search batch #, GRN #, vendor, user..."
+                  value={historySearch}
+                  onChange={e => { setHistorySearch(e.target.value); setHistoryPage(1) }}
+                />
+                <select
+                  style={{ ...S.select, padding: '5px 10px', fontSize: 12, width: 160 }}
+                  value={historyTxnType}
+                  onChange={e => { setHistoryTxnType(e.target.value); setHistoryPage(1) }}
+                >
+                  <option value="">All Transactions</option>
+                  <option value="grn">GRN Receipts (Inward)</option>
+                  <option value="issue">Store Issues (Outward)</option>
+                  <option value="adjustment">Stock Adjustments</option>
+                  <option value="opening">Opening Balance</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={handleDownloadHistoryExcel}
+                  style={{ ...S.btnPage, background: '#0f766e', color: '#fff', padding: '5px 12px', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                  title="Export formatted multi-sheet Excel history"
+                >
+                  📊 Download Excel
+                </button>
+              </div>
+
+              {/* Pagination Controls */}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                  disabled={historyPage === 1 || historyLoading}
+                  style={{ ...S.btnPage, padding: '4px 10px', opacity: historyPage === 1 ? 0.5 : 1 }}
+                >
+                  Prev
+                </button>
+                <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
+                  Page {historyPage} of {completeHistoryPagination.totalPages || 1} ({completeHistoryPagination.total || 0} total records)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setHistoryPage(p => p + 1)}
+                  disabled={historyPage >= (completeHistoryPagination.totalPages || 1) || historyLoading}
+                  style={{ ...S.btnPage, padding: '4px 10px', opacity: historyPage >= (completeHistoryPagination.totalPages || 1) ? 0.5 : 1 }}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
+            {/* FULL TRANSACTION HISTORY TABLE */}
+            <div style={{ overflowY: 'auto', maxHeight: 380 }}>
+              <table style={S.tbl}>
+                <thead>
+                  <tr>
+                    <th style={S.th}>Date & Time</th>
+                    <th style={S.th}>Txn Type</th>
+                    <th style={S.th}>In Qty</th>
+                    <th style={S.th}>Out Qty</th>
+                    <th style={S.th}>Balance Stock</th>
+                    <th style={S.th}>Rate (₹)</th>
+                    <th style={S.th}>Total Value (₹)</th>
+                    <th style={S.th}>Department / Ref / User</th>
+                    <th style={S.th}>Batch / Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyLoading ? (
+                    <tr><td colSpan={9} style={S.tdEmpty}>Loading complete 360-degree item history...</td></tr>
+                  ) : completeHistory.length === 0 ? (
+                    <tr><td colSpan={9} style={S.tdEmpty}>No matching transaction history records found.</td></tr>
+                  ) : (
+                    completeHistory.map(txn => {
+                      const isIn = parseFloat(txn.in_qty || 0) > 0
+                      const isOut = parseFloat(txn.out_qty || 0) > 0
+                      return (
+                        <tr key={txn.id}>
+                          <td style={{ ...S.td, whiteSpace: 'nowrap', color: '#64748b', fontSize: 11.5 }}>
+                            {txn.date ? String(txn.date).slice(0, 10) : (txn.created_at ? new Date(txn.created_at).toLocaleDateString() : '—')}
+                          </td>
+                          <td style={S.td}>
+                            <span style={{
+                              ...S.txnBadge,
+                              background: isIn ? '#dcfce7' : isOut ? '#fee2e2' : '#f3f4f6',
+                              color: isIn ? '#15803d' : isOut ? '#dc2626' : '#4b5563'
+                            }}>
+                              {txn.transaction_type?.toUpperCase() || (isIn ? 'GRN' : isOut ? 'ISSUE' : 'TXN')}
+                            </span>
+                          </td>
+                          <td style={{ ...S.td, fontWeight: 700, color: '#16a34a' }}>
+                            {isIn ? `+${fmtN(txn.in_qty, 2)}` : '—'}
+                          </td>
+                          <td style={{ ...S.td, fontWeight: 700, color: '#dc2626' }}>
+                            {isOut ? `-${fmtN(txn.out_qty, 2)}` : '—'}
+                          </td>
+                          <td style={{ ...S.td, fontWeight: 700, color: '#0f172a' }}>
+                            {txn.balance !== undefined ? fmtN(txn.balance, 2) : '—'} {data?.uom}
+                          </td>
+                          <td style={S.td}>{fmtCur(txn.unit_price)}</td>
+                          <td style={{ ...S.td, fontWeight: 600 }}>{fmtCur(txn.value)}</td>
+                          <td style={{ ...S.td, fontSize: 11.5, color: '#334155' }}>
+                            {txn.department_name ? <span style={{ fontWeight: 700, color: '#0369a1' }}>🏢 {txn.department_name}</span> : null}
+                            {txn.vendor_name ? <span style={{ color: '#0f766e', fontWeight: 600 }}> 🚚 {txn.vendor_name}</span> : null}
+                            {txn.grn_number ? <span style={{ color: '#b45309' }}> (GRN: {txn.grn_number})</span> : null}
+                            {txn.indent_number ? <span style={{ color: '#6b21a8' }}> (Indent: {txn.indent_number})</span> : null}
+                            {txn.created_by_name ? <div style={{ fontSize: 10.5, color: '#94a3b8' }}>By: {txn.created_by_name}</div> : null}
+                          </td>
+                          <td style={{ ...S.td, fontSize: 11.5, color: '#475569' }}>
+                            {txn.batch_number ? <span style={{ fontWeight: 600, color: '#0f766e' }}>Batch: {txn.batch_number} </span> : null}
+                            <span>{txn.remarks || txn.reference_type || '—'}</span>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

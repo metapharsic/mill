@@ -655,6 +655,171 @@ router.get('/materials/:id', auth, ar(async (req, res) => {
   });
 }));
 
+// GET /api/master/materials/:id/complete-history — 360-Degree Multi-Agent Item History & Usage Engine
+router.get('/materials/:id/complete-history', auth, ar(async (req, res) => {
+  const { id } = req.params;
+  const page = parseInt(req.query.page || 1);
+  const limit = parseInt(req.query.limit || 50);
+  const offset = (page - 1) * limit;
+  const search = req.query.search ? `%${req.query.search}%` : null;
+  const transactionType = req.query.transaction_type || null;
+
+  // 1. Fetch Material Info
+  const matRes = await pool.query('SELECT * FROM materials WHERE id = $1', [id]);
+  if (!matRes.rows[0]) {
+    return res.status(404).json({ success: false, message: 'Material not found' });
+  }
+  const mat = matRes.rows[0];
+
+  // 2. Build Stock Ledger Query
+  const whereClauses = ['sl.material_id = $1'];
+  const queryParams = [id];
+
+  if (transactionType) {
+    queryParams.push(transactionType.toLowerCase());
+    whereClauses.push(`LOWER(sl.transaction_type) = $${queryParams.length}`);
+  }
+
+  if (search) {
+    queryParams.push(search);
+    whereClauses.push(`(
+      sl.remarks ILIKE $${queryParams.length} OR 
+      sl.batch_number ILIKE $${queryParams.length} OR 
+      sl.reference_type ILIKE $${queryParams.length} OR 
+      v.name ILIKE $${queryParams.length} OR
+      u.name ILIKE $${queryParams.length}
+    )`);
+  }
+
+  const whereStr = whereClauses.join(' AND ');
+
+  // Fetch paginated history
+  const historyRes = await pool.query(`
+    SELECT 
+      sl.id,
+      sl.date,
+      sl.transaction_type,
+      sl.reference_type,
+      sl.reference_id,
+      sl.in_qty,
+      sl.out_qty,
+      sl.balance,
+      sl.unit_price,
+      sl.value,
+      sl.batch_number,
+      sl.remarks,
+      sl.created_at,
+      sl.vendor_id,
+      u.name AS created_by_name,
+      v.name AS vendor_name,
+      g.grn_number,
+      g.vehicle_number,
+      g.challan_number,
+      g.invoice_number,
+      ind.indent_number,
+      dept.name AS department_name
+    FROM stock_ledger sl
+    LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
+    LEFT JOIN grn g ON (sl.reference_type = 'GRN' AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = g.id ELSE FALSE END)
+    LEFT JOIN indents ind ON ((sl.reference_type ILIKE 'indent%' OR sl.reference_type ILIKE 'issue%') AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
+    LEFT JOIN departments dept ON (ind.department_id = dept.id OR u.department_id = dept.id)
+    WHERE ${whereStr}
+    ORDER BY sl.date DESC, sl.id DESC
+    LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}
+  `, [...queryParams, limit, offset]);
+
+  // Fetch total count and aggregations
+  const countRes = await pool.query(`
+    SELECT 
+      COUNT(*) AS total_records,
+      COALESCE(SUM(sl.in_qty), 0) AS total_in_qty,
+      COALESCE(SUM(sl.out_qty), 0) AS total_out_qty,
+      COALESCE(SUM(sl.value), 0) AS total_value
+    FROM stock_ledger sl
+    LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN vendors v ON sl.vendor_id = v.id
+    WHERE ${whereStr}
+  `, queryParams);
+
+  // 3. "Where & How Used" Department Consumption Breakdown
+  const deptBreakdown = await pool.query(`
+    SELECT 
+      COALESCE(d.name, 'General Mill Operations') AS department_name,
+      COUNT(sl.id) AS issue_count,
+      SUM(sl.out_qty) AS total_issued_qty,
+      SUM(sl.value) AS total_issued_value
+    FROM stock_ledger sl
+    LEFT JOIN indents ind ON ((sl.reference_type ILIKE 'indent%' OR sl.reference_type ILIKE 'issue%') AND CASE WHEN sl.reference_id::text ~ '^[0-9]+$' THEN sl.reference_id::int = ind.id ELSE FALSE END)
+    LEFT JOIN users u ON sl.created_by = u.id
+    LEFT JOIN departments d ON (ind.department_id = d.id OR u.department_id = d.id)
+    WHERE sl.material_id = $1 AND sl.out_qty > 0
+    GROUP BY d.name
+    ORDER BY total_issued_qty DESC
+  `, [id]);
+
+  // 4. Plant Section & Machine Allocations ("Where Assigned/Fitted")
+  const sectionAllocations = await pool.query(`
+    SELECT 
+      ms.section_id,
+      ps.name AS section_name,
+      ps.section_code,
+      se.equipment_name,
+      se.tag_name
+    FROM material_sections ms
+    JOIN plant_sections ps ON ms.section_id = ps.id
+    LEFT JOIN material_equipment me ON me.material_id = ms.material_id
+    LEFT JOIN section_equipment se ON me.section_equipment_id = se.id
+    WHERE ms.material_id = $1
+  `, [id]);
+
+  // 5. Machine Position Lifespan History (Fitted Equipment Lifespan)
+  const lifespanHistory = await pool.query(`
+    SELECT 
+      plh.*,
+      mp.position_name,
+      ps.name AS section_name
+    FROM position_lifespan_history plh
+    JOIN machine_positions mp ON plh.position_id = mp.id
+    JOIN plant_sections ps ON mp.section_id = ps.id
+    WHERE plh.material_id = $1
+    ORDER BY plh.installation_date DESC
+  `, [id]).catch(() => ({ rows: [] }));
+
+  res.json({
+    success: true,
+    data: {
+      material: mat,
+      pagination: {
+        total: parseInt(countRes.rows[0]?.total_records || 0),
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(parseInt(countRes.rows[0]?.total_records || 0) / limit)),
+        totalInQty: parseFloat(countRes.rows[0]?.total_in_qty || 0),
+        totalOutQty: parseFloat(countRes.rows[0]?.total_out_qty || 0),
+        totalValue: parseFloat(countRes.rows[0]?.total_value || 0)
+      },
+      history: historyRes.rows || [],
+      where_used: {
+        department_breakdown: deptBreakdown.rows || [],
+        plant_sections: sectionAllocations.rows || [],
+        lifespan_history: lifespanHistory.rows || []
+      }
+    }
+  });
+}));
+
+// GET /api/master/materials/:id/export-history-excel — Formatted Single-Item Excel Export Engine
+router.get('/materials/:id/export-history-excel', auth, ar(async (req, res) => {
+  const { id } = req.params;
+  const { generateSingleItemHistoryExcel } = require('../services/inventoryExcelExporter');
+  const { buffer, filename } = await generateSingleItemHistoryExcel(id);
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(buffer);
+}));
+
 router.put('/materials/:id', auth, requireLevel(1), ar(async (req, res) => {
   const { code, name, category_id, uom, hsn_code, reorder_level, min_stock, max_stock,
           reorder_buffer, unit_price, is_active, bin_location,
