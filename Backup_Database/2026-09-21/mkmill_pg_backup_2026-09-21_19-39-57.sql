@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict cLQhqSWkglhmtPvaLmPcFTVvllPbBdXgzx0xrCQx8SIcX91rzUVr5ldcWyl8f02
+\restrict svACNGXJffvLKclcobGuY7t984MHzHUkt9OceAHmVhPx3wWLf2pam5ZE2aBancw
 
 -- Dumped from database version 18.4
 -- Dumped by pg_dump version 18.4
@@ -8363,6 +8363,7 @@ INSERT INTO public.audit_log VALUES (1084, 6, 'PUT /materials/4773', 'master', 4
 INSERT INTO public.audit_log VALUES (1085, 6, 'DELETE /materials/4445', 'master', 4445, NULL, '{}', '::1', '2026-09-21 18:35:02.329287');
 INSERT INTO public.audit_log VALUES (1086, 6, 'DELETE /materials/4446', 'master', 4446, NULL, '{}', '::1', '2026-09-21 18:35:08.372783');
 INSERT INTO public.audit_log VALUES (1087, 6, 'DELETE /materials/4447', 'master', 4447, NULL, '{}', '::1', '2026-09-21 18:35:14.910352');
+INSERT INTO public.audit_log VALUES (1088, NULL, 'MULTI_AGENT_DAILY_BACKUP_SUCCESS', 'SYSTEM_BACKUP', 0, NULL, '{"date": "2026-09-21", "files": ["mkmill_pg_backup_2026-09-21_19-20-44.sql", "MK_Mill_Inventory_Master_Report_2026-09-21.xlsx", "MK_Mill_Procurement_P2P_Report_2026-09-21.xlsx", "MK_Mill_Store_Movements_Report_2026-09-21.xlsx", "MK_Mill_Finance_Vendors_Report_2026-09-21.xlsx", "MK_Mill_Plant_Operations_Report_2026-09-21.xlsx"], "sizeMB": "8.68"}', '127.0.0.1', '2026-09-21 19:20:46.565128');
 
 
 --
@@ -30160,7 +30161,7 @@ SELECT pg_catalog.setval('public.attendance_regularization_id_seq', 1, false);
 -- Name: audit_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.audit_log_id_seq', 1087, true);
+SELECT pg_catalog.setval('public.audit_log_id_seq', 1088, true);
 
 
 --
@@ -35195,5 +35196,5 @@ ALTER TABLE ONLY public.vendors
 -- PostgreSQL database dump complete
 --
 
-\unrestrict cLQhqSWkglhmtPvaLmPcFTVvllPbBdXgzx0xrCQx8SIcX91rzUVr5ldcWyl8f02
+\unrestrict svACNGXJffvLKclcobGuY7t984MHzHUkt9OceAHmVhPx3wWLf2pam5ZE2aBancw
 
