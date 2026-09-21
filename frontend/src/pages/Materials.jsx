@@ -222,6 +222,8 @@ export default function Materials() {
     setLoading(false)
   }, [page, filterActive, filterCat, filterSection, filterMachine, filterCrit, search, colSearch, sortBy, sortOrder])
 
+  const fetchMaterials = load
+
   const handleSort = (key, order) => {
     setSortBy(key)
     setSortOrder(order)
@@ -2393,7 +2395,7 @@ export default function Materials() {
         materialId={selectedProductModalId}
         isOpen={!!selectedProductModalId}
         onClose={() => setSelectedProductModalId(null)}
-        onUpdated={fetchMaterials}
+        onUpdated={load}
       />
     </div>
   )
