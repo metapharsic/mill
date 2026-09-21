@@ -252,6 +252,10 @@ app.use((err, req, res, next) => {
   res.status(status).json({ success: false, message: msg });
 });
 
+// Daily 9:00 PM Multi-Agent Database & Excel Application Backup Daemon
+const { startBackupScheduler } = require('./services/backupSchedulerDaemon');
+startBackupScheduler();
+
 app.listen(PORT, () => {
   console.log(`MK Paper Mill ERP server running on port ${PORT}`);
 });

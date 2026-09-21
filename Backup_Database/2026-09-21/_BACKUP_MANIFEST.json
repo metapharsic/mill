@@ -1,0 +1,92 @@
+{
+  "title": "SRI M.K. PAPER MILLS PVT. LTD. — Automated Daily Backup Manifest",
+  "backup_date": "2026-09-21",
+  "backup_time": "19:20:44",
+  "executed_at": "2026-09-21T13:50:46.509Z",
+  "destination_root": "C:\\Users\\MKKANTA\\MK_Mill\\Backup_Database",
+  "dated_folder": "C:\\Users\\MKKANTA\\MK_Mill\\Backup_Database\\2026-09-21",
+  "latest_folder": "C:\\Users\\MKKANTA\\MK_Mill\\Backup_Database\\Latest_Backup",
+  "system_agents_count": 6,
+  "artifacts": [
+    {
+      "agent": "🐘 Agent 1: PgDatabaseBackupAgent",
+      "file_name": "mkmill_pg_backup_2026-09-21_19-20-44.sql",
+      "file_size_bytes": 4514634,
+      "file_size_mb": "4.31",
+      "sha256_checksum": "ab7119aea53309f0e82e3874c589a87f8a4cea49ccfabac815fb23dc1fa49d37",
+      "sheets_count": null,
+      "meta": {
+        "skus": null,
+        "valuation": null,
+        "table_count": 118
+      }
+    },
+    {
+      "agent": "📦 Agent 2: InventoryReportAgent",
+      "file_name": "MK_Mill_Inventory_Master_Report_2026-09-21.xlsx",
+      "file_size_bytes": 1912291,
+      "file_size_mb": "1.82",
+      "sha256_checksum": "56e97f479f88a6b9950c63b16a3967434dc0b33e4f9e2cb3b820556296f1c721",
+      "sheets_count": 10,
+      "meta": {
+        "skus": 1354,
+        "valuation": 15236196.31,
+        "table_count": null
+      }
+    },
+    {
+      "agent": "📋 Agent 3: ProcurementReportAgent",
+      "file_name": "MK_Mill_Procurement_P2P_Report_2026-09-21.xlsx",
+      "file_size_bytes": 638070,
+      "file_size_mb": "0.61",
+      "sha256_checksum": "5326d8a18ad17d84354d2bc05e77cde0a3f6b1fcb672c52df6456b5fec30265f",
+      "sheets_count": 6,
+      "meta": {
+        "skus": null,
+        "valuation": null,
+        "table_count": null
+      }
+    },
+    {
+      "agent": "🔄 Agent 4: StoreMovementReportAgent",
+      "file_name": "MK_Mill_Store_Movements_Report_2026-09-21.xlsx",
+      "file_size_bytes": 1574352,
+      "file_size_mb": "1.50",
+      "sha256_checksum": "4bac23bf01efe9886b09154131beed6f1bc6e999ee40f5cd15020d63d35a330c",
+      "sheets_count": 3,
+      "meta": {
+        "skus": null,
+        "valuation": null,
+        "table_count": null
+      }
+    },
+    {
+      "agent": "💳 Agent 5: FinanceVendorReportAgent",
+      "file_name": "MK_Mill_Finance_Vendors_Report_2026-09-21.xlsx",
+      "file_size_bytes": 107453,
+      "file_size_mb": "0.10",
+      "sha256_checksum": "0ab720384ffef19ba8d3c3b4d689affe664737063e4ff600e55cd3ca8d3b58f7",
+      "sheets_count": 4,
+      "meta": {
+        "skus": null,
+        "valuation": null,
+        "table_count": null
+      }
+    },
+    {
+      "agent": "🏭 Agent 6: PlantQualityReportAgent",
+      "file_name": "MK_Mill_Plant_Operations_Report_2026-09-21.xlsx",
+      "file_size_bytes": 359485,
+      "file_size_mb": "0.34",
+      "sha256_checksum": "4bd70be6683be5685c142c10044cfbd087e9b8ae75f9a88a7b74c1968abb51ec",
+      "sheets_count": 5,
+      "meta": {
+        "skus": null,
+        "valuation": null,
+        "table_count": null
+      }
+    }
+  ],
+  "total_backup_size_bytes": 9106285,
+  "total_backup_size_mb": "8.68"
+}

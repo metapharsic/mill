@@ -35,7 +35,11 @@ All data and logic are bundled in the workspace:
 
 | Folder / File Path | Description | Contents / Purpose |
 | :--- | :--- | :--- |
-| `database_backup/mk_paper_mill_full_dump.sql` | **Full PostgreSQL SQL Dump** | Schema, tables, sequences, foreign keys, triggers, and 1,126+ material rows. |
+| `Backup_Database/` | **Daily Multi-Agent Backups & Excel Reports** | Automated daily 9:00 PM PostgreSQL database dumps (`.sql`) and 5 comprehensive domain Excel workbooks (`.xlsx`) with cryptographic SHA-256 manifests. |
+| `Backup_Database/Latest_Backup/` | **Fast-Access Latest Backup Mirror** | Always points to the most recent SQL database dump (`mkmill_pg_backup_latest.sql`) and latest Excel reports. |
+| `setup_backup_scheduler.bat` | **1-Click 9:00 PM Scheduler Setup** | Automatically registers/configures the daily 9:00 PM Windows Scheduled Task (`MK_Paper_Mill_Daily_Backup`). |
+| `run_backup_now.bat` | **1-Click Immediate Backup Runner** | Runs the full 7-agent backup and reporting engine on demand with real-time colored progress. |
+| `database_backup/mk_paper_mill_full_dump.sql` | **Full PostgreSQL SQL Dump** | Schema, tables, sequences, foreign keys, triggers, and live material rows. |
 | `database_backup/json_tables/` | **Portable JSON Table Exports** | 101 JSON files representing every relational table for universal DB portability. |
 | `frontend/` | **Client Application** | React 18, Vite, Lucide Icons, dynamic modals, responsive print templates. |
 | `backend/` | **API Server & Business Logic** | Express server, REST endpoints, database pool, Kafka integration, and tests. |
@@ -148,3 +152,25 @@ node scripts/test_store_dashboard_analytics.js
 | **Finance Officer** | `finance` | `admin123` | Level 3 (Accounts / AP) |
 | **Mechanical Engineer** | `mech` | `admin123` | Level 2 (Department Staff) |
 | **Electrical Engineer** | `elect` | `admin123` | Level 2 (Department Staff) |
+
+---
+
+## 7. Multi-Agent Daily 9:00 PM Automated Backup & Excel Reporting System
+
+The ERP includes an autonomous 7-agent backup system that triggers every day at **9:00 PM (21:00:00 IST)** and saves complete archives to:
+`C:\Users\MKKANTA\MK_Mill\Backup_Database\`
+
+### System Agents Architecture:
+1. **`PgDatabaseBackupAgent`**: Generates full self-contained PostgreSQL SQL dump (`mkmill_pg_backup_*.sql`) with schema, tables, sequences, constraints, triggers, and live data.
+2. **`InventoryReportAgent`**: Generates `MK_Mill_Inventory_Master_Report_*.xlsx` (Executive KPI Dashboard, 1,354+ Master Catalog items, Reorder Shortfall Alerts, Class A High-Value Items, Category breakdown sheets).
+3. **`ProcurementReportAgent`**: Generates `MK_Mill_Procurement_P2P_Report_*.xlsx` (P2P KPI Dashboard, PR Indents, POs with item pricing, GRNs with physical inspection status, Cash Purchases, Gate Passes).
+4. **`StoreMovementReportAgent`**: Generates `MK_Mill_Store_Movements_Report_*.xlsx` (Movement Dashboard, 2,377+ Double-Entry Stock Ledger records, Department-wise consumption matrix, Transfers & Returns).
+5. **`FinanceVendorReportAgent`**: Generates `MK_Mill_Finance_Vendors_Report_*.xlsx` (AP KPI Dashboard, Master Vendor Directory, AP Bills & Invoices, Payment Disbursements).
+6. **`PlantQualityReportAgent`**: Generates `MK_Mill_Plant_Operations_Report_*.xlsx` (Plant Dashboard, Equipment Master, Electrical Motors & Bearing specs, Daily Production DPRs, Lab QC Tests).
+7. **`IntegrityVerificationAgent`**: Generates cryptographic SHA-256 manifest (`_BACKUP_MANIFEST.json`), human-readable summary (`DAILY_BACKUP_SUMMARY.md`), records audit event in PostgreSQL (`audit_log`), updates `Latest_Backup/` mirror, and enforces 30-day rolling retention.
+
+### Automation & Execution:
+- **Windows Task Scheduler (Daily 9:00 PM)**: Configured via `setup_backup_scheduler.bat` (or `scripts/setup_daily_backup_task.ps1`).
+- **In-App Server Daemon**: Automatically calculates delay to next 21:00:00 upon server startup and triggers daily backup.
+- **1-Click Manual Execution**: Double-click `run_backup_now.bat` (or run `node scripts/run_multi_agent_backup.js`) to trigger backup immediately.
+
