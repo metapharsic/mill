@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { LOGO_DATA_URI } from '../utils/logo'
+import JobWorkChallanModal from './JobWorkChallanModal'
 
 // Indian Number to Currency Words generator
 function amountInWords(num) {
@@ -111,6 +112,20 @@ export default function A3InvoicePrintModal({ docData, onClose, title = 'STORE I
   }, [])
 
   if (!docData) return null
+
+  // Dedicated Check: If Job Work Delivery Challan, render screenshot-exact modal
+  const isJobWorkChallan = Boolean(
+    docData.isJobWork ||
+    docData.transaction_type === 'job_work' ||
+    docData.outward_type === 'job_work' ||
+    title?.toUpperCase().includes('JOB WORK') ||
+    title?.toUpperCase().includes('DELIVER CHALLAN') ||
+    title?.toUpperCase().includes('DELIVERY CHALLAN')
+  )
+
+  if (isJobWorkChallan) {
+    return <JobWorkChallanModal docData={docData} onClose={onClose} />
+  }
 
   // Company Details from DB system_settings
   const company = {

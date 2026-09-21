@@ -1733,6 +1733,36 @@ export default function Store({ onNavigate }) {
             📊 Excel Master Export
           </button>
           <button
+            style={{ ...S.btn, background: '#7c3aed', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+            onClick={() => setA3PrintDoc({
+              dc_number: `DC-JW-${Date.now().toString().slice(-6)}`,
+              dc_date: new Date().toISOString().split('T')[0],
+              vendorName: 'M/s. Industrial Engineering Works & Lathe Workshop',
+              party_address: 'Plot No. 44, GIDC Industrial Estate, Vapi, Gujarat - 396195',
+              party_gstin: '24AAACI1234F1Z8',
+              party_state: 'Gujarat (24)',
+              nature_of_processing: 'Roll Grinding, Dynamic Balancing & Surface Hardening',
+              transport_mode: 'Tempo / Mahindra Bolero Pickup',
+              vehicle_number: 'GJ-15-AT-4491',
+              isReturnable: true,
+              items: [
+                {
+                  materialName: 'Calendar Roll (Press Section)',
+                  materialCode: 'ENG-MCH-ROL-04',
+                  hsnCode: '84399900',
+                  uom: 'NOS',
+                  in_qty: 1,
+                  unit_price: 185000,
+                  remarks: 'Sent for precision grinding and rubber lining'
+                }
+              ],
+              title: 'OUTWARD DELIVERY CHALLAN (RETURNABLE - JOB WORK)'
+            })}
+            title="Preview & Print Official Job Work Delivery Challan (Returnable)"
+          >
+            📄 Job Work DC
+          </button>
+          <button
             style={{ ...S.btn, background: '#0f172a', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
             onClick={() => onNavigate ? onNavigate('store-dashboard') : (window.location.href = '/store-dashboard')}
             title="Open Exclusive Store Management Realtime Dashboard"

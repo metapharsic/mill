@@ -45,7 +45,10 @@ router.get('/rawmaterials', requireAuth, ar(async (req, res) => {
            mc.name AS category_name,
            mc.type AS category_type,
            (m.current_stock <= m.min_stock) AS "lowStock",
-           (m.current_stock <= m.min_stock) AS lowstock
+           (m.current_stock <= m.min_stock) AS lowstock,
+           COALESCE((SELECT SUM(sl.in_qty)  FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.date = CURRENT_DATE AND sl.transaction_type != 'opening'), 0) AS today_received,
+           COALESCE((SELECT SUM(sl.out_qty) FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.date = CURRENT_DATE AND sl.transaction_type != 'opening'), 0) AS today_issued,
+           COALESCE((SELECT sl.in_qty FROM stock_ledger sl WHERE sl.material_id = m.id AND sl.transaction_type = 'opening' LIMIT 1), 0) AS initial_opening
     FROM materials m
     LEFT JOIN material_categories mc ON m.category_id = mc.id
     WHERE ${where.join(' AND ')}
@@ -54,18 +57,39 @@ router.get('/rawmaterials', requireAuth, ar(async (req, res) => {
 
   const { rows } = await pool.query(query, vals);
 
-  // Compute live summary
-  const totalItems = rows.length;
-  const totalQty = rows.reduce((s, r) => s + parseFloat(r.current_stock || 0), 0);
-  const totalValuation = rows.reduce((s, r) => s + parseFloat(r.valuation || 0), 0);
-  const lowStockCount = rows.filter(r => r.lowStock).length;
+  // Compute live summary & calculate opening stock rollover for each row
+  const processedRows = rows.map(r => {
+    const curStock = parseFloat(r.current_stock || 0);
+    const todayRec = parseFloat(r.today_received || 0);
+    const todayIss = parseFloat(r.today_issued || 0);
+    // Rollover: today's opening = current_stock - today_received + today_issued
+    const openingStock = parseFloat((curStock - todayRec + todayIss).toFixed(3));
+    return {
+      ...r,
+      today_received: todayRec,
+      today_issued: todayIss,
+      opening_stock: openingStock,
+      opening: openingStock
+    };
+  });
+
+  const totalItems = processedRows.length;
+  const totalQty = processedRows.reduce((s, r) => s + parseFloat(r.current_stock || 0), 0);
+  const totalOpening = processedRows.reduce((s, r) => s + parseFloat(r.opening_stock || 0), 0);
+  const totalTodayRec = processedRows.reduce((s, r) => s + parseFloat(r.today_received || 0), 0);
+  const totalTodayIss = processedRows.reduce((s, r) => s + parseFloat(r.today_issued || 0), 0);
+  const totalValuation = processedRows.reduce((s, r) => s + parseFloat(r.valuation || 0), 0);
+  const lowStockCount = processedRows.filter(r => r.lowStock).length;
 
   res.json({
     success: true,
-    data: rows,
+    data: processedRows,
     summary: {
       totalItems,
       totalQty,
+      totalOpening,
+      totalTodayRec,
+      totalTodayIss,
       totalValuation,
       lowStockCount
     }

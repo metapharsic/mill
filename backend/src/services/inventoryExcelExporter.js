@@ -51,10 +51,38 @@ function autoFitColumns(aoa) {
     row.forEach((val, colIdx) => {
       const str = val == null ? '' : String(val);
       const len = str.length;
-      colWidths[colIdx] = Math.max(colWidths[colIdx] || 10, Math.min(len + 3, 50));
+      colWidths[colIdx] = Math.max(colWidths[colIdx] || 12, Math.min(len + 4, 55));
     });
   }
   return colWidths.map(w => ({ wch: w }));
+}
+
+function applySheetFormatting(ws, aoa, headerRowIndex = 0) {
+  if (!ws || !aoa || !aoa.length) return;
+  const headers = (aoa[headerRowIndex] || []).map(h => String(h || '').toLowerCase());
+  
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    if (R <= headerRowIndex) continue;
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+      const cell = ws[cellRef];
+      if (!cell || cell.t !== 'n') continue;
+
+      const headerText = headers[C] || '';
+      if (headerText.includes('price') || headerText.includes('val') || headerText.includes('cost') || headerText.includes('investment') || headerText.includes('rate') || headerText.includes('amount') || headerText.includes('₹')) {
+        cell.z = '₹#,##0.00';
+      } else if (headerText.includes('share') || headerText.includes('%')) {
+        cell.z = '0.00%';
+      } else if (headerText.includes('stock') || headerText.includes('qty') || headerText.includes('unit') || headerText.includes('inward') || headerText.includes('outward') || headerText.includes('shortfall') || headerText.includes('balance') || headerText.includes('received') || headerText.includes('issued')) {
+        cell.z = '#,##0.000';
+      } else if (headerText.includes('sr') || headerText.includes('rank') || headerText.includes('sku') || headerText.includes('item') || headerText.includes('po') || headerText.includes('day')) {
+        cell.z = '#,##0';
+      } else {
+        cell.z = '#,##0.00';
+      }
+    }
+  }
 }
 
 async function generateInventoryExcel(options = {}) {
@@ -362,6 +390,8 @@ async function generateInventoryExcel(options = {}) {
 
     const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
     wsSummary['!cols'] = autoFitColumns(summaryData);
+    applySheetFormatting(wsSummary, summaryData, 10);
+    applySheetFormatting(wsSummary, summaryData, 20);
     const summarySheetName = sanitizeSheetName('📊 Executive Summary', existingSheetNames);
     XLSX.utils.book_append_sheet(wb, wsSummary, summarySheetName);
   }
@@ -464,6 +494,7 @@ async function generateInventoryExcel(options = {}) {
 
   const wsMaster = XLSX.utils.aoa_to_sheet(masterData);
   wsMaster['!cols'] = autoFitColumns(masterData);
+  applySheetFormatting(wsMaster, masterData, 3);
   const masterSheetName = sanitizeSheetName('📦 Complete Inventory', existingSheetNames);
   XLSX.utils.book_append_sheet(wb, wsMaster, masterSheetName);
 
@@ -507,6 +538,7 @@ async function generateInventoryExcel(options = {}) {
 
       const wsCat = XLSX.utils.aoa_to_sheet(catSheetData);
       wsCat['!cols'] = autoFitColumns(catSheetData);
+      applySheetFormatting(wsCat, catSheetData, 3);
       const sheetName = sanitizeSheetName(grp.name, existingSheetNames);
       XLSX.utils.book_append_sheet(wb, wsCat, sheetName);
     });
@@ -604,6 +636,7 @@ async function generateInventoryExcel(options = {}) {
 
     const wsAlert = XLSX.utils.aoa_to_sheet(alertData);
     wsAlert['!cols'] = autoFitColumns(alertData);
+    applySheetFormatting(wsAlert, alertData, 3);
     const alertSheetName = sanitizeSheetName('⚠️ Reorder & Low Stock', existingSheetNames);
     XLSX.utils.book_append_sheet(wb, wsAlert, alertSheetName);
   }
@@ -666,6 +699,7 @@ async function generateInventoryExcel(options = {}) {
 
     const wsHighVal = XLSX.utils.aoa_to_sheet(highValData);
     wsHighVal['!cols'] = autoFitColumns(highValData);
+    applySheetFormatting(wsHighVal, highValData, 3);
     const highValSheetName = sanitizeSheetName('💰 Class A High Value', existingSheetNames);
     XLSX.utils.book_append_sheet(wb, wsHighVal, highValSheetName);
   }
@@ -722,6 +756,7 @@ async function generateInventoryExcel(options = {}) {
 
     const wsSlow = XLSX.utils.aoa_to_sheet(slowMovingData);
     wsSlow['!cols'] = autoFitColumns(slowMovingData);
+    applySheetFormatting(wsSlow, slowMovingData, 3);
     const slowSheetName = sanitizeSheetName('⏳ Slow & Dead Stock', existingSheetNames);
     XLSX.utils.book_append_sheet(wb, wsSlow, slowSheetName);
   }

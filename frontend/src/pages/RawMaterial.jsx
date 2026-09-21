@@ -5,7 +5,7 @@ import ProductDetailModal from '../components/ProductDetailModal'
 import {
   Package, FlaskConical, AlertTriangle, ArrowDownRight, ArrowUpRight,
   Plus, RefreshCw, Search, CheckCircle2, Filter, Layers, Clock,
-  ShieldCheck, Printer, Check, Copy, ExternalLink, FileText
+  ShieldCheck, Printer, Check, Copy, ExternalLink, FileText, Boxes
 } from 'lucide-react'
 
 const API = '/api'
@@ -315,6 +315,15 @@ export default function RawMaterial({ onNavigate }) {
       <div style={S.kpiGrid}>
         <div style={S.kpiCard}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={S.kpiTitle}>Opening Stock (Yesterday)</div>
+            <div style={{ ...S.iconBox, background: '#e0f2fe', color: '#0284c7' }}><Boxes size={18} /></div>
+          </div>
+          <div style={{ ...S.kpiVal, color: '#0369a1' }}>{fmtN(summary.totalOpening ?? materials.reduce((acc, r) => acc + (parseFloat(r.opening_stock || r.opening || 0)), 0), 1)} Kgs / MT</div>
+          <div style={S.kpiSub}>Yesterday closing stock rollover balance</div>
+        </div>
+
+        <div style={S.kpiCard}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={S.kpiTitle}>Total Stock Valuation</div>
             <div style={{ ...S.iconBox, background: '#ecfdf5', color: '#16a34a' }}><ShieldCheck size={18} /></div>
           </div>
@@ -424,8 +433,11 @@ export default function RawMaterial({ onNavigate }) {
                 <th style={S.th}>Material & Grade</th>
                 <th style={S.th}>Category</th>
                 <th style={S.th}>UOM</th>
-                <th style={S.th}>Current Stock</th>
-                <th style={S.th}>Min Reorder Stock</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Opening Stock (Yesterday)</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Received (+)</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Issued (-)</th>
+                <th style={{ ...S.th, textAlign: 'right' }}>Current Balance</th>
+                <th style={S.th}>Min Reorder</th>
                 <th style={S.th}>Unit Rate</th>
                 <th style={S.th}>Total Valuation (₹)</th>
                 <th style={S.th}>Stock Status</th>
@@ -435,7 +447,7 @@ export default function RawMaterial({ onNavigate }) {
             <tbody>
               {materials.length === 0 && (
                 <tr>
-                  <td colSpan={10} style={S.tdEmpty}>
+                  <td colSpan={13} style={S.tdEmpty}>
                     {loading ? 'Compiling live raw material inventory...' : 'No raw materials match the selected filters.'}
                   </td>
                 </tr>
@@ -443,6 +455,9 @@ export default function RawMaterial({ onNavigate }) {
               {materials.map(m => {
                 const isLow = m.lowStock || m.lowstock
                 const stockVal = parseFloat(m.current_stock || 0) * parseFloat(m.unit_price || 0)
+                const opStock = m.opening_stock ?? m.opening ?? (parseFloat(m.current_stock || 0) - parseFloat(m.today_received || 0) + parseFloat(m.today_issued || 0))
+                const recToday = parseFloat(m.today_received || 0)
+                const issToday = parseFloat(m.today_issued || 0)
                 return (
                   <tr key={m.id} style={{ background: isLow ? '#fef2f2' : 'white' }}>
                     <td style={{ ...S.td, fontFamily: 'monospace', fontWeight: 700 }}>
@@ -470,7 +485,16 @@ export default function RawMaterial({ onNavigate }) {
                       </span>
                     </td>
                     <td style={S.td}>{m.unit || m.uom || 'Kgs'}</td>
-                    <td style={{ ...S.td, fontWeight: 800, color: isLow ? '#dc2626' : '#15803d', fontSize: 14 }}>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 700, color: '#0369a1' }}>
+                      {fmtN(opStock, 2)}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 600, color: '#16a34a' }}>
+                      {recToday > 0 ? `+${fmtN(recToday, 2)}` : '—'}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 600, color: '#dc2626' }}>
+                      {issToday > 0 ? `-${fmtN(issToday, 2)}` : '—'}
+                    </td>
+                    <td style={{ ...S.td, textAlign: 'right', fontWeight: 800, color: isLow ? '#dc2626' : '#15803d', fontSize: 14 }}>
                       {fmtN(m.current_stock, 2)}
                     </td>
                     <td style={{ ...S.td, color: '#64748b' }}>
