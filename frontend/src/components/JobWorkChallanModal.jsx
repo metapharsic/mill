@@ -65,6 +65,9 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
   const [useExactSample, setUseExactSample] = useState(
     !docData.items || docData.items.length === 0 || docData.useScreenshotData
   )
+  const [fillBankDetails, setFillBankDetails] = useState(false)
+  const [showReceiverSign, setShowReceiverSign] = useState(false)
+  const [showGstClause, setShowGstClause] = useState(false)
 
   const printRef = useRef(null)
 
@@ -178,10 +181,10 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
     ),
     note: docData.note || docData.remarks || screenshotData.note,
     inWords: docData.total_amount ? numberToWords(parseFloat(docData.total_amount)) : screenshotData.inWords,
-    bankName: docData.bankName || '',
-    bankAccount: docData.bankAccount || '',
-    bankIfsc: docData.bankIfsc || '',
-    bankBranch: docData.bankBranch || '',
+    bankName: fillBankDetails ? (docData.bankName || 'HDFC Bank Ltd.') : (docData.bankName || ''),
+    bankAccount: fillBankDetails ? (docData.bankAccount || docData.bankAccountNumber || '50200067891234') : (docData.bankAccount || ''),
+    bankIfsc: fillBankDetails ? (docData.bankIfsc || 'HDFC0001234') : (docData.bankIfsc || ''),
+    bankBranch: fillBankDetails ? (docData.bankBranch || 'Main Branch, Nizamabad') : (docData.bankBranch || ''),
     sgst: docData.sgst || '-',
     cgst: docData.cgst || '-',
     igst: docData.igst || '-'
@@ -206,7 +209,7 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <button
             style={{ ...S.btnToggle, background: useExactSample ? '#0f766e' : '#f1f5f9', color: useExactSample ? '#fff' : '#334155' }}
             onClick={() => setUseExactSample(true)}
@@ -221,6 +224,20 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
           >
             ⚡ Live Issue Data
           </button>
+          <button
+            style={{ ...S.btnToggle, background: fillBankDetails ? '#0284c7' : '#f1f5f9', color: fillBankDetails ? '#fff' : '#334155' }}
+            onClick={() => setFillBankDetails(!fillBankDetails)}
+            title="Toggle between blank lines (per screenshot) and pre-filled mill bank account"
+          >
+            🏦 {fillBankDetails ? 'Bank: Filled' : 'Bank: Blank (Screenshot)'}
+          </button>
+          <button
+            style={{ ...S.btnToggle, background: showReceiverSign ? '#7c3aed' : '#f1f5f9', color: showReceiverSign ? '#fff' : '#334155' }}
+            onClick={() => setShowReceiverSign(!showReceiverSign)}
+            title="Toggle extra Receiver signature column"
+          >
+            ✍️ {showReceiverSign ? 'Receiver Sign: On' : '+ Receiver Sign'}
+          </button>
           <button style={S.btnPrint} onClick={handlePrint}>
             <Printer size={16} /> Print / Save PDF
           </button>
@@ -234,7 +251,8 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
       <div style={S.docScrollWrapper}>
         <div id="job-work-dc-modal" ref={printRef} style={S.pageContainer}>
           
-          {/* Top Header Block */}
+          {/* Main Enclosed Frame (Border terminates under Bank / Totals block, matching screenshot) */}
+          <div style={S.framedBox}>
           <div style={S.headerWrapper}>
             {/* Logo Left */}
             <div style={S.logoBox}>
@@ -442,11 +460,16 @@ export default function JobWorkChallanModal({ docData = {}, onClose }) {
               </div>
             </div>
           </div>
+          {/* ── End of Framed Box (matches screenshot where border ends at Total Amount) ── */}
+          </div>
 
-          {/* ── Signatures Row ── */}
+          {/* ── Signatures Row (Outside the Framed Box on Page Footer) ── */}
           <div style={S.signaturesRow}>
             <div style={S.sigCol}>Store Dept</div>
             <div style={S.sigCol}>Head Of Dept</div>
+            {showReceiverSign && (
+              <div style={S.sigCol}>Receiver's Signature &amp; Stamp</div>
+            )}
             <div style={S.sigCol}>M.D Approval</div>
           </div>
 
@@ -538,12 +561,17 @@ const S = {
   },
   pageContainer: {
     background: '#ffffff',
-    border: '2px solid #000000',
     color: '#000000',
     fontFamily: '"Calibri", "Segoe UI", Arial, sans-serif',
     padding: '10px 14px',
     boxSizing: 'border-box',
     width: '100%'
+  },
+  framedBox: {
+    border: '2px solid #000000',
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: 0
   },
   headerWrapper: {
     display: 'flex',
@@ -688,9 +716,11 @@ const S = {
     border: '2px solid #000000',
     borderTop: 'none',
     padding: '4px 8px',
+    minHeight: 46,
     fontSize: 13,
     fontWeight: 700,
-    color: '#000000'
+    color: '#000000',
+    boxSizing: 'border-box'
   },
   inWordBox: {
     border: '2px solid #000000',
@@ -735,45 +765,56 @@ const S = {
     display: 'flex',
     justifyContent: 'space-between',
     borderBottom: '1px solid #000000',
-    padding: '2px 8px'
+    padding: 0
   },
   taxLabel: {
     textAlign: 'right',
-    width: '50%',
+    width: '45%',
     fontWeight: 600,
-    paddingRight: 10
+    padding: '2px 8px',
+    borderRight: '1px solid #000000',
+    boxSizing: 'border-box'
   },
   taxLabelBlue: {
     textAlign: 'right',
-    width: '50%',
+    width: '45%',
     fontWeight: 700,
     color: '#0056b3',
     textDecoration: 'underline',
-    paddingRight: 10
+    padding: '2px 8px',
+    borderRight: '1px solid #000000',
+    boxSizing: 'border-box'
   },
   taxVal: {
     textAlign: 'right',
-    width: '50%',
-    fontWeight: 700
+    width: '55%',
+    fontWeight: 700,
+    padding: '2px 8px',
+    boxSizing: 'border-box'
   },
   taxRowTotal: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '4px 8px'
+    borderTop: '2px solid #000000',
+    padding: 0
   },
   taxLabelTotal: {
     textAlign: 'right',
-    width: '50%',
+    width: '45%',
     fontWeight: 700,
-    paddingRight: 10
+    padding: '4px 8px',
+    borderRight: '1px solid #000000',
+    boxSizing: 'border-box'
   },
   taxValTotal: {
     textAlign: 'right',
-    width: '50%',
+    width: '55%',
     fontSize: 22,
     fontWeight: 900,
-    letterSpacing: -0.5
+    letterSpacing: -0.5,
+    padding: '4px 8px',
+    boxSizing: 'border-box'
   },
   signaturesRow: {
     display: 'flex',
